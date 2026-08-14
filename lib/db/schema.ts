@@ -120,6 +120,24 @@ export const invites = pgTable("invites", {
     .defaultNow(),
 });
 
+/** Client-owned assets stored in the 3PL warehouse */
+export const clientInventoryItems = pgTable("client_inventory_items", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  clientCompanyId: uuid("client_company_id")
+    .notNull()
+    .references(() => clientCompanies.id, { onDelete: "cascade" }),
+  sku: text("sku").notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  totalQuantity: integer("total_quantity").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 /** Org-owned inventory (dollies, gear) — not fleet, not tools */
 export const inventoryItems = pgTable("inventory_items", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -141,6 +159,7 @@ export type OrgMembership = typeof orgMemberships.$inferSelect;
 export type ClientCompany = typeof clientCompanies.$inferSelect;
 export type Invite = typeof invites.$inferSelect;
 export type InventoryItem = typeof inventoryItems.$inferSelect;
+export type ClientInventoryItem = typeof clientInventoryItems.$inferSelect;
 
 export const STAFF_TAGS = [
   "driver",
