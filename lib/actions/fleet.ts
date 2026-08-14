@@ -1,9 +1,11 @@
 "use server";
 
+import { randomUUID } from "crypto";
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { activityLogInsert } from "@/lib/activity/log";
 import { canManageFleet } from "@/lib/auth/permissions";
-import { db, withOrgQuery } from "@/lib/db";
+import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import { fleetVehicles, type FleetVehicle } from "@/lib/db/schema";
 import { requireSession } from "@/lib/org/context";
 
@@ -24,15 +26,25 @@ export async function createFleetVehicle(formData: FormData) {
 
   if (!name) throw new Error("Name is required");
 
-  await withOrgQuery(session.user.orgId, (database) =>
+  const id = randomUUID();
+  await withOrgQueries(session.user.orgId, (database) => [
     database.insert(fleetVehicles).values({
+      id,
       orgId: session.user.orgId,
       name,
       plate,
       description,
       isActive,
-    })
-  );
+    }),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      action: `Created fleet vehicle "${name}"`,
+      entityType: "fleet_vehicle",
+      entityId: id,
+      metadata: { name, plate, isActive },
+    }),
+  ]);
 
   revalidatePath("/dashboard/fleet");
 }
@@ -50,7 +62,7 @@ export async function updateFleetVehicle(formData: FormData) {
 
   if (!name) throw new Error("Name is required");
 
-  await withOrgQuery(session.user.orgId, (database) =>
+  await withOrgQueries(session.user.orgId, (database) => [
     database
       .update(fleetVehicles)
       .set({ name, plate, description, isActive })
@@ -59,8 +71,16 @@ export async function updateFleetVehicle(formData: FormData) {
           eq(fleetVehicles.id, id),
           eq(fleetVehicles.orgId, session.user.orgId)
         )
-      )
-  );
+      ),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      action: `Updated fleet vehicle "${name}"`,
+      entityType: "fleet_vehicle",
+      entityId: id,
+      metadata: { name, plate, isActive },
+    }),
+  ]);
 
   revalidatePath("/dashboard/fleet");
 }
@@ -71,7 +91,7 @@ export async function deleteFleetVehicle(formData: FormData) {
   const id = formData.get("id") as string;
   if (!id) throw new Error("Missing vehicle id");
 
-  await withOrgQuery(session.user.orgId, (database) =>
+  await withOrgQueries(session.user.orgId, (database) => [
     database
       .delete(fleetVehicles)
       .where(
@@ -79,8 +99,15 @@ export async function deleteFleetVehicle(formData: FormData) {
           eq(fleetVehicles.id, id),
           eq(fleetVehicles.orgId, session.user.orgId)
         )
-      )
-  );
+      ),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      action: "Deleted fleet vehicle",
+      entityType: "fleet_vehicle",
+      entityId: id,
+    }),
+  ]);
 
   revalidatePath("/dashboard/fleet");
 }

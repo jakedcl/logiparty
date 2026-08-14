@@ -33,9 +33,9 @@
 - [x] M2-3 Fleet vehicles CRUD
 - [x] M2-4 Tools CRUD
 - [x] M2-5 RLS on catalog tables
-- [ ] M2-6 Activity log on catalog mutations
+- [x] M2-6 Activity log on catalog mutations
 
-**M2 milestone complete:** [ ]
+**M2 milestone complete:** [x]
 
 ---
 
