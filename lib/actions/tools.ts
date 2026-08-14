@@ -3,8 +3,8 @@
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { canManageTools } from "@/lib/auth/permissions";
-import { db } from "@/lib/db";
-import { tools } from "@/lib/db/schema";
+import { db, withOrgQuery } from "@/lib/db";
+import { tools, type Tool } from "@/lib/db/schema";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
 async function requireToolsAccess() {
@@ -32,12 +32,14 @@ export async function createTool(formData: FormData) {
 
   if (!name) throw new Error("Name is required");
 
-  await db!.insert(tools).values({
-    orgId: session.user.orgId,
-    sku,
-    name,
-    totalQuantity,
-  });
+  await withOrgQuery(session.user.orgId, (database) =>
+    database.insert(tools).values({
+      orgId: session.user.orgId,
+      sku,
+      name,
+      totalQuantity,
+    })
+  );
 
   revalidatePath("/dashboard/tools");
 }
@@ -54,10 +56,12 @@ export async function updateTool(formData: FormData) {
 
   if (!name) throw new Error("Name is required");
 
-  await db!
-    .update(tools)
-    .set({ name, sku, totalQuantity })
-    .where(and(eq(tools.id, id), eq(tools.orgId, session.user.orgId)));
+  await withOrgQuery(session.user.orgId, (database) =>
+    database
+      .update(tools)
+      .set({ name, sku, totalQuantity })
+      .where(and(eq(tools.id, id), eq(tools.orgId, session.user.orgId)))
+  );
 
   revalidatePath("/dashboard/tools");
 }
@@ -68,19 +72,23 @@ export async function deleteTool(formData: FormData) {
   const id = formData.get("id") as string;
   if (!id) throw new Error("Missing tool id");
 
-  await db!
-    .delete(tools)
-    .where(and(eq(tools.id, id), eq(tools.orgId, session.user.orgId)));
+  await withOrgQuery(session.user.orgId, (database) =>
+    database
+      .delete(tools)
+      .where(and(eq(tools.id, id), eq(tools.orgId, session.user.orgId)))
+  );
 
   revalidatePath("/dashboard/tools");
 }
 
-export async function listTools(orgId: string) {
+export async function listTools(orgId: string): Promise<Tool[]> {
   const session = await requireToolsAccess();
   if (session.user.orgId !== orgId) throw new Error("Forbidden");
-  return db!
-    .select()
-    .from(tools)
-    .where(eq(tools.orgId, orgId))
-    .orderBy(asc(tools.name));
+  return withOrgQuery<Tool[]>(orgId, (database) =>
+    database
+      .select()
+      .from(tools)
+      .where(eq(tools.orgId, orgId))
+      .orderBy(asc(tools.name))
+  );
 }

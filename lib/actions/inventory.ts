@@ -3,8 +3,8 @@
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { canManageOrgInventory } from "@/lib/auth/permissions";
-import { db } from "@/lib/db";
-import { inventoryItems } from "@/lib/db/schema";
+import { db, withOrgQuery } from "@/lib/db";
+import { inventoryItems, type InventoryItem } from "@/lib/db/schema";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
 async function requireInventoryAccess() {
@@ -36,13 +36,15 @@ export async function createOrgInventoryItem(formData: FormData) {
   if (!sku) throw new Error("SKU is required");
   if (!name) throw new Error("Name is required");
 
-  await db!.insert(inventoryItems).values({
-    orgId: session.user.orgId,
-    sku,
-    name,
-    description,
-    totalQuantity,
-  });
+  await withOrgQuery(session.user.orgId, (database) =>
+    database.insert(inventoryItems).values({
+      orgId: session.user.orgId,
+      sku,
+      name,
+      description,
+      totalQuantity,
+    })
+  );
 
   revalidatePath("/dashboard/inventory");
 }
@@ -61,15 +63,17 @@ export async function updateOrgInventoryItem(formData: FormData) {
   if (!sku) throw new Error("SKU is required");
   if (!name) throw new Error("Name is required");
 
-  await db!
-    .update(inventoryItems)
-    .set({ sku, name, description, totalQuantity })
-    .where(
-      and(
-        eq(inventoryItems.id, id),
-        eq(inventoryItems.orgId, session.user.orgId)
+  await withOrgQuery(session.user.orgId, (database) =>
+    database
+      .update(inventoryItems)
+      .set({ sku, name, description, totalQuantity })
+      .where(
+        and(
+          eq(inventoryItems.id, id),
+          eq(inventoryItems.orgId, session.user.orgId)
+        )
       )
-    );
+  );
 
   revalidatePath("/dashboard/inventory");
 }
@@ -80,23 +84,29 @@ export async function deleteOrgInventoryItem(formData: FormData) {
   const id = formData.get("id") as string;
   if (!id) throw new Error("Missing item id");
 
-  await db!
-    .delete(inventoryItems)
-    .where(
-      and(
-        eq(inventoryItems.id, id),
-        eq(inventoryItems.orgId, session.user.orgId)
+  await withOrgQuery(session.user.orgId, (database) =>
+    database
+      .delete(inventoryItems)
+      .where(
+        and(
+          eq(inventoryItems.id, id),
+          eq(inventoryItems.orgId, session.user.orgId)
+        )
       )
-    );
+  );
 
   revalidatePath("/dashboard/inventory");
 }
 
-export async function listOrgInventoryItems(orgId: string) {
+export async function listOrgInventoryItems(
+  orgId: string
+): Promise<InventoryItem[]> {
   if (!db) return [];
-  return db
-    .select()
-    .from(inventoryItems)
-    .where(eq(inventoryItems.orgId, orgId))
-    .orderBy(asc(inventoryItems.name));
+  return withOrgQuery<InventoryItem[]>(orgId, (database) =>
+    database
+      .select()
+      .from(inventoryItems)
+      .where(eq(inventoryItems.orgId, orgId))
+      .orderBy(asc(inventoryItems.name))
+  );
 }

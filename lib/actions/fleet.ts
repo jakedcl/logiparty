@@ -3,8 +3,8 @@
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { canManageFleet } from "@/lib/auth/permissions";
-import { db } from "@/lib/db";
-import { fleetVehicles } from "@/lib/db/schema";
+import { db, withOrgQuery } from "@/lib/db";
+import { fleetVehicles, type FleetVehicle } from "@/lib/db/schema";
 import { requireSession } from "@/lib/org/context";
 
 async function requireFleetAccess() {
@@ -24,13 +24,15 @@ export async function createFleetVehicle(formData: FormData) {
 
   if (!name) throw new Error("Name is required");
 
-  await db!.insert(fleetVehicles).values({
-    orgId: session.user.orgId,
-    name,
-    plate,
-    description,
-    isActive,
-  });
+  await withOrgQuery(session.user.orgId, (database) =>
+    database.insert(fleetVehicles).values({
+      orgId: session.user.orgId,
+      name,
+      plate,
+      description,
+      isActive,
+    })
+  );
 
   revalidatePath("/dashboard/fleet");
 }
@@ -48,15 +50,17 @@ export async function updateFleetVehicle(formData: FormData) {
 
   if (!name) throw new Error("Name is required");
 
-  await db!
-    .update(fleetVehicles)
-    .set({ name, plate, description, isActive })
-    .where(
-      and(
-        eq(fleetVehicles.id, id),
-        eq(fleetVehicles.orgId, session.user.orgId)
+  await withOrgQuery(session.user.orgId, (database) =>
+    database
+      .update(fleetVehicles)
+      .set({ name, plate, description, isActive })
+      .where(
+        and(
+          eq(fleetVehicles.id, id),
+          eq(fleetVehicles.orgId, session.user.orgId)
+        )
       )
-    );
+  );
 
   revalidatePath("/dashboard/fleet");
 }
@@ -67,24 +71,28 @@ export async function deleteFleetVehicle(formData: FormData) {
   const id = formData.get("id") as string;
   if (!id) throw new Error("Missing vehicle id");
 
-  await db!
-    .delete(fleetVehicles)
-    .where(
-      and(
-        eq(fleetVehicles.id, id),
-        eq(fleetVehicles.orgId, session.user.orgId)
+  await withOrgQuery(session.user.orgId, (database) =>
+    database
+      .delete(fleetVehicles)
+      .where(
+        and(
+          eq(fleetVehicles.id, id),
+          eq(fleetVehicles.orgId, session.user.orgId)
+        )
       )
-    );
+  );
 
   revalidatePath("/dashboard/fleet");
 }
 
-export async function listFleetVehicles(orgId: string) {
+export async function listFleetVehicles(orgId: string): Promise<FleetVehicle[]> {
   const session = await requireFleetAccess();
   if (session.user.orgId !== orgId) throw new Error("Forbidden");
-  return db!
-    .select()
-    .from(fleetVehicles)
-    .where(eq(fleetVehicles.orgId, orgId))
-    .orderBy(asc(fleetVehicles.name));
+  return withOrgQuery<FleetVehicle[]>(orgId, (database) =>
+    database
+      .select()
+      .from(fleetVehicles)
+      .where(eq(fleetVehicles.orgId, orgId))
+      .orderBy(asc(fleetVehicles.name))
+  );
 }
