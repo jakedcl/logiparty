@@ -7,6 +7,12 @@ import {
   listJobClientCompanies,
   updateJob,
 } from "@/lib/actions/jobs";
+import {
+  addJobLocation,
+  deleteJobLocation,
+  listJobLocations,
+  updateJobLocation,
+} from "@/lib/actions/job-locations";
 import { JOB_STATUSES } from "@/lib/db/schema";
 import { requireSession } from "@/lib/org/context";
 
@@ -25,11 +31,13 @@ export default async function JobDetailPage({
   if (!canManageJobs(session.user)) redirect("/dashboard");
 
   const { id } = await params;
-  const [job, companies] = await Promise.all([
-    getJob(session.user.orgId, id),
-    listJobClientCompanies(session.user.orgId),
-  ]);
+  const job = await getJob(session.user.orgId, id);
   if (!job) notFound();
+
+  const [companies, locations] = await Promise.all([
+    listJobClientCompanies(session.user.orgId),
+    listJobLocations(session.user.orgId, id),
+  ]);
 
   return (
     <div className="space-y-8 max-w-2xl">
@@ -171,6 +179,80 @@ export default async function JobDetailPage({
             Save
           </button>
         </form>
+      </section>
+
+      <section className="border rounded-lg p-4 bg-white space-y-4">
+        <div>
+          <h2 className="font-medium">Locations ({locations.length}/5)</h2>
+          <p className="text-xs text-neutral-500 mt-1">
+            Up to 5 labels + addresses (e.g. Warehouse, Venue).
+          </p>
+        </div>
+
+        {locations.map((loc) => (
+          <div key={loc.id} className="border rounded p-3 space-y-2">
+            <form action={updateJobLocation} className="space-y-2">
+              <input type="hidden" name="id" value={loc.id} />
+              <input type="hidden" name="jobId" value={job.id} />
+              <input
+                name="label"
+                required
+                defaultValue={loc.label}
+                placeholder="Label"
+                className="w-full border rounded px-3 py-2 text-sm"
+              />
+              <input
+                name="address"
+                required
+                defaultValue={loc.address}
+                placeholder="Address"
+                className="w-full border rounded px-3 py-2 text-sm"
+              />
+              <button
+                type="submit"
+                className="rounded px-3 py-1.5 text-sm border border-neutral-300"
+              >
+                Save
+              </button>
+            </form>
+            <form action={deleteJobLocation}>
+              <input type="hidden" name="id" value={loc.id} />
+              <input type="hidden" name="jobId" value={job.id} />
+              <button
+                type="submit"
+                className="text-sm text-red-600 hover:text-red-800"
+              >
+                Remove
+              </button>
+            </form>
+          </div>
+        ))}
+
+        {locations.length < 5 ? (
+          <form action={addJobLocation} className="space-y-2 border-t pt-3">
+            <input type="hidden" name="jobId" value={job.id} />
+            <input
+              name="label"
+              required
+              placeholder="Label (e.g. Warehouse)"
+              className="w-full border rounded px-3 py-2 text-sm"
+            />
+            <input
+              name="address"
+              required
+              placeholder="Address"
+              className="w-full border rounded px-3 py-2 text-sm"
+            />
+            <button
+              type="submit"
+              className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
+            >
+              Add location
+            </button>
+          </form>
+        ) : (
+          <p className="text-sm text-neutral-500">Maximum of 5 locations.</p>
+        )}
       </section>
 
       <form action={deleteJob}>

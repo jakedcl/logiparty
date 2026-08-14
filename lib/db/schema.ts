@@ -242,6 +242,23 @@ export const jobs = pgTable("jobs", {
     .defaultNow(),
 });
 
+export const jobLocations = pgTable(
+  "job_locations",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jobId: uuid("job_id")
+      .notNull()
+      .references(() => jobs.id, { onDelete: "cascade" }),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    label: text("label").notNull(),
+    address: text("address").notNull(),
+    sortOrder: integer("sort_order").notNull().default(0),
+  },
+  (t) => [unique().on(t.jobId, t.sortOrder)]
+);
+
 export type Organization = typeof organizations.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type OrgMembership = typeof orgMemberships.$inferSelect;
@@ -253,6 +270,7 @@ export type FleetVehicle = typeof fleetVehicles.$inferSelect;
 export type Tool = typeof tools.$inferSelect;
 export type ActivityLog = typeof activityLogs.$inferSelect;
 export type Job = typeof jobs.$inferSelect;
+export type JobLocation = typeof jobLocations.$inferSelect;
 export type JobStatus = (typeof jobStatusEnum.enumValues)[number];
 
 export const JOB_STATUSES = jobStatusEnum.enumValues;
