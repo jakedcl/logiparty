@@ -70,3 +70,11 @@ export function canManageTools(
 ): boolean {
   return canManageOrgInventory(m, staffTags);
 }
+
+/** Managers or warehouse staff — update quantity_loaded on job lines */
+export function canUpdateQuantityLoaded(
+  m: SessionMembership,
+  staffTags: readonly string[] = []
+): boolean {
+  return canManageOrgInventory(m, staffTags);
+}

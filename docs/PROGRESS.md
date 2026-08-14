@@ -45,7 +45,8 @@
 - [x] M3-2 `job_locations` max 5
 - [x] M3-3 Job detail panels
 - [x] M3-4 Assign inventory
-- [ ] M3-5 through M3-12
+- [x] M3-5 `quantity_loaded` + lock rules
+- [ ] M3-6 through M3-12
 
 **M3 milestone complete:** [ ]
 
