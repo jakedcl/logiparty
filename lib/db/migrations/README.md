@@ -15,6 +15,7 @@ npm run db:migrate:sql
 | `0004_public_invite_read.sql` | invite token read |
 | `0005_m2_org_inventory.sql` | org inventory catalog |
 | `0006_m2_client_inventory.sql` | client inventory catalog |
+| `0007_m2_fleet.sql` | fleet vehicles catalog |
 
 Then seed (optional):
 
