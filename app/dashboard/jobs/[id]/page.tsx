@@ -13,6 +13,7 @@ import {
   listAssignableOrgInventory,
   listJobInventoryLines,
   updateJobInventoryLine,
+  updateQuantityLoaded,
 } from "@/lib/actions/job-inventory";
 import {
   deleteJob,
@@ -336,30 +337,57 @@ export default async function JobDetailPage({
                     ({line.itemType})
                   </span>
                 </p>
-                <p className="text-xs text-neutral-500">
-                  Loaded {line.quantityLoaded} / assigned {line.quantityAssigned}
-                </p>
-                <form action={updateJobInventoryLine} className="flex gap-2 items-end">
-                  <input type="hidden" name="id" value={line.id} />
-                  <input type="hidden" name="jobId" value={job.id} />
-                  <label className="text-sm text-neutral-600">
-                    Assigned qty
-                    <input
-                      name="quantityAssigned"
-                      type="number"
-                      min={1}
-                      required
-                      defaultValue={line.quantityAssigned}
-                      className="mt-1 w-28 border rounded px-3 py-2 text-sm"
-                    />
-                  </label>
-                  <button
-                    type="submit"
-                    className="rounded px-3 py-2 text-sm border border-neutral-300 h-[42px]"
+                <div className="flex flex-wrap gap-3">
+                  <form
+                    action={updateJobInventoryLine}
+                    className="flex gap-2 items-end"
                   >
-                    Save
-                  </button>
-                </form>
+                    <input type="hidden" name="id" value={line.id} />
+                    <input type="hidden" name="jobId" value={job.id} />
+                    <label className="text-sm text-neutral-600">
+                      Assigned qty
+                      <input
+                        name="quantityAssigned"
+                        type="number"
+                        min={1}
+                        required
+                        defaultValue={line.quantityAssigned}
+                        className="mt-1 w-28 border rounded px-3 py-2 text-sm"
+                      />
+                    </label>
+                    <button
+                      type="submit"
+                      className="rounded px-3 py-2 text-sm border border-neutral-300 h-[42px]"
+                    >
+                      Save
+                    </button>
+                  </form>
+                  <form
+                    action={updateQuantityLoaded}
+                    className="flex gap-2 items-end"
+                  >
+                    <input type="hidden" name="id" value={line.id} />
+                    <input type="hidden" name="jobId" value={job.id} />
+                    <label className="text-sm text-neutral-600">
+                      Loaded qty
+                      <input
+                        name="quantityLoaded"
+                        type="number"
+                        min={0}
+                        max={line.quantityAssigned}
+                        required
+                        defaultValue={line.quantityLoaded}
+                        className="mt-1 w-28 border rounded px-3 py-2 text-sm"
+                      />
+                    </label>
+                    <button
+                      type="submit"
+                      className="rounded px-3 py-2 text-sm border border-neutral-300 h-[42px]"
+                    >
+                      Save
+                    </button>
+                  </form>
+                </div>
                 <form action={deleteJobInventoryLine}>
                   <input type="hidden" name="id" value={line.id} />
                   <input type="hidden" name="jobId" value={job.id} />
