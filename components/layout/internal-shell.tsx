@@ -3,6 +3,7 @@ import { signOut } from "@/lib/auth";
 import type { Session } from "next-auth";
 import {
   canManageClientInventory,
+  canManageFleet,
   canManageOrgInventory,
   canManageOrgSettings,
   canInviteUsers,
@@ -28,6 +29,7 @@ export function InternalShell({
   const showTeam = canInviteUsers(session.user);
   const showInventory = canManageOrgInventory(session.user, staffTags);
   const showClientInventory = canManageClientInventory(session.user, staffTags);
+  const showFleet = canManageFleet(session.user);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -63,6 +65,11 @@ export function InternalShell({
                 className="hover:text-neutral-900"
               >
                 Client inventory
+              </Link>
+            )}
+            {showFleet && (
+              <Link href="/dashboard/fleet" className="hover:text-neutral-900">
+                Fleet
               </Link>
             )}
             {showTeam && (
