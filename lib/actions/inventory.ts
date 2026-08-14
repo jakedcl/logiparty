@@ -1,9 +1,11 @@
 "use server";
 
+import { randomUUID } from "crypto";
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { activityLogInsert } from "@/lib/activity/log";
 import { canManageOrgInventory } from "@/lib/auth/permissions";
-import { db, withOrgQuery } from "@/lib/db";
+import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import { inventoryItems, type InventoryItem } from "@/lib/db/schema";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
@@ -36,15 +38,25 @@ export async function createOrgInventoryItem(formData: FormData) {
   if (!sku) throw new Error("SKU is required");
   if (!name) throw new Error("Name is required");
 
-  await withOrgQuery(session.user.orgId, (database) =>
+  const id = randomUUID();
+  await withOrgQueries(session.user.orgId, (database) => [
     database.insert(inventoryItems).values({
+      id,
       orgId: session.user.orgId,
       sku,
       name,
       description,
       totalQuantity,
-    })
-  );
+    }),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      action: `Created org inventory "${name}"`,
+      entityType: "inventory_item",
+      entityId: id,
+      metadata: { sku, name, totalQuantity },
+    }),
+  ]);
 
   revalidatePath("/dashboard/inventory");
 }
@@ -63,7 +75,7 @@ export async function updateOrgInventoryItem(formData: FormData) {
   if (!sku) throw new Error("SKU is required");
   if (!name) throw new Error("Name is required");
 
-  await withOrgQuery(session.user.orgId, (database) =>
+  await withOrgQueries(session.user.orgId, (database) => [
     database
       .update(inventoryItems)
       .set({ sku, name, description, totalQuantity })
@@ -72,8 +84,16 @@ export async function updateOrgInventoryItem(formData: FormData) {
           eq(inventoryItems.id, id),
           eq(inventoryItems.orgId, session.user.orgId)
         )
-      )
-  );
+      ),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      action: `Updated org inventory "${name}"`,
+      entityType: "inventory_item",
+      entityId: id,
+      metadata: { sku, name, totalQuantity },
+    }),
+  ]);
 
   revalidatePath("/dashboard/inventory");
 }
@@ -84,7 +104,7 @@ export async function deleteOrgInventoryItem(formData: FormData) {
   const id = formData.get("id") as string;
   if (!id) throw new Error("Missing item id");
 
-  await withOrgQuery(session.user.orgId, (database) =>
+  await withOrgQueries(session.user.orgId, (database) => [
     database
       .delete(inventoryItems)
       .where(
@@ -92,8 +112,15 @@ export async function deleteOrgInventoryItem(formData: FormData) {
           eq(inventoryItems.id, id),
           eq(inventoryItems.orgId, session.user.orgId)
         )
-      )
-  );
+      ),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      action: "Deleted org inventory item",
+      entityType: "inventory_item",
+      entityId: id,
+    }),
+  ]);
 
   revalidatePath("/dashboard/inventory");
 }

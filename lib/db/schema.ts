@@ -1,6 +1,7 @@
 import {
   boolean,
   integer,
+  jsonb,
   pgTable,
   text,
   timestamp,
@@ -181,6 +182,25 @@ export const tools = pgTable("tools", {
     .defaultNow(),
 });
 
+export const activityLogs = pgTable("activity_logs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  jobId: uuid("job_id"),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  action: text("action").notNull(),
+  entityType: text("entity_type").notNull(),
+  entityId: uuid("entity_id"),
+  metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+  isClientVisible: boolean("is_client_visible").notNull().default(false),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export type Organization = typeof organizations.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type OrgMembership = typeof orgMemberships.$inferSelect;
@@ -190,6 +210,7 @@ export type InventoryItem = typeof inventoryItems.$inferSelect;
 export type ClientInventoryItem = typeof clientInventoryItems.$inferSelect;
 export type FleetVehicle = typeof fleetVehicles.$inferSelect;
 export type Tool = typeof tools.$inferSelect;
+export type ActivityLog = typeof activityLogs.$inferSelect;
 
 export const STAFF_TAGS = [
   "driver",

@@ -38,6 +38,23 @@ export async function withOrgQuery<T>(
   return result as T;
 }
 
+/** Multiple queries in one org-scoped RLS transaction (e.g. mutate + activity log). */
+export async function withOrgQueries(
+  orgId: string,
+  build: (database: Db) => [BatchItem<"pg">, ...BatchItem<"pg">[]]
+): Promise<unknown[]> {
+  if (!db) {
+    throw new Error("DATABASE_URL is not configured");
+  }
+  const queries = build(db);
+  const results = await db.batch([
+    db.execute(sql`SET LOCAL ROLE logiparty_app`),
+    db.execute(sql`SELECT set_config('app.current_org_id', ${orgId}, true)`),
+    ...queries,
+  ]);
+  return results.slice(2);
+}
+
 /** @deprecated Prefer withOrgQuery — bare set_config does not span neon-http calls */
 export async function withOrgContext<T>(
   orgId: string,
