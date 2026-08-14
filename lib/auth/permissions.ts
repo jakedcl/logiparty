@@ -62,3 +62,11 @@ export function canManageClientInventory(
 export function canManageFleet(m: SessionMembership): boolean {
   return m.isOrgAdmin || m.isManager;
 }
+
+/** Same people as org inventory: managers + warehouse staff */
+export function canManageTools(
+  m: SessionMembership,
+  staffTags: readonly string[] = []
+): boolean {
+  return canManageOrgInventory(m, staffTags);
+}

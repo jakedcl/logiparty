@@ -6,6 +6,7 @@ import {
   canManageFleet,
   canManageOrgInventory,
   canManageOrgSettings,
+  canManageTools,
   canInviteUsers,
 } from "@/lib/auth/permissions";
 
@@ -30,6 +31,7 @@ export function InternalShell({
   const showInventory = canManageOrgInventory(session.user, staffTags);
   const showClientInventory = canManageClientInventory(session.user, staffTags);
   const showFleet = canManageFleet(session.user);
+  const showTools = canManageTools(session.user, staffTags);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -70,6 +72,11 @@ export function InternalShell({
             {showFleet && (
               <Link href="/dashboard/fleet" className="hover:text-neutral-900">
                 Fleet
+              </Link>
+            )}
+            {showTools && (
+              <Link href="/dashboard/tools" className="hover:text-neutral-900">
+                Tools
               </Link>
             )}
             {showTeam && (
