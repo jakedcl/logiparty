@@ -1,10 +1,12 @@
 "use server";
 
+import { randomUUID } from "crypto";
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { activityLogInsert } from "@/lib/activity/log";
 import { canManageClientInventory } from "@/lib/auth/permissions";
-import { db, withOrgQuery } from "@/lib/db";
+import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import {
   clientCompanies,
   clientInventoryItems,
@@ -36,9 +38,7 @@ function parseQuantity(raw: FormDataEntryValue | null): number {
 }
 
 async function assertCompanyInOrg(orgId: string, clientCompanyId: string) {
-  const companies = await withOrgQuery<
-    { id: string }[]
-  >(orgId, (database) =>
+  const companies = await withOrgQuery<{ id: string }[]>(orgId, (database) =>
     database
       .select({ id: clientCompanies.id })
       .from(clientCompanies)
@@ -68,16 +68,26 @@ export async function createClientInventoryItem(formData: FormData) {
 
   await assertCompanyInOrg(session.user.orgId, clientCompanyId);
 
-  await withOrgQuery(session.user.orgId, (database) =>
+  const id = randomUUID();
+  await withOrgQueries(session.user.orgId, (database) => [
     database.insert(clientInventoryItems).values({
+      id,
       orgId: session.user.orgId,
       clientCompanyId,
       sku,
       name,
       description,
       totalQuantity,
-    })
-  );
+    }),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      action: `Created client inventory "${name}"`,
+      entityType: "client_inventory_item",
+      entityId: id,
+      metadata: { clientCompanyId, sku, name, totalQuantity },
+    }),
+  ]);
 
   revalidatePath("/dashboard/client-inventory");
   revalidatePath("/portal");
@@ -99,7 +109,7 @@ export async function updateClientInventoryItem(formData: FormData) {
   if (!sku) throw new Error("SKU is required");
   if (!name) throw new Error("Name is required");
 
-  await withOrgQuery(session.user.orgId, (database) =>
+  await withOrgQueries(session.user.orgId, (database) => [
     database
       .update(clientInventoryItems)
       .set({ sku, name, description, totalQuantity })
@@ -108,8 +118,16 @@ export async function updateClientInventoryItem(formData: FormData) {
           eq(clientInventoryItems.id, id),
           eq(clientInventoryItems.orgId, session.user.orgId)
         )
-      )
-  );
+      ),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      action: `Updated client inventory "${name}"`,
+      entityType: "client_inventory_item",
+      entityId: id,
+      metadata: { clientCompanyId, sku, name, totalQuantity },
+    }),
+  ]);
 
   revalidatePath("/dashboard/client-inventory");
   revalidatePath("/portal");
@@ -125,7 +143,7 @@ export async function deleteClientInventoryItem(formData: FormData) {
   const clientCompanyId = formData.get("clientCompanyId") as string;
   if (!id) throw new Error("Missing item id");
 
-  await withOrgQuery(session.user.orgId, (database) =>
+  await withOrgQueries(session.user.orgId, (database) => [
     database
       .delete(clientInventoryItems)
       .where(
@@ -133,8 +151,16 @@ export async function deleteClientInventoryItem(formData: FormData) {
           eq(clientInventoryItems.id, id),
           eq(clientInventoryItems.orgId, session.user.orgId)
         )
-      )
-  );
+      ),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      action: "Deleted client inventory item",
+      entityType: "client_inventory_item",
+      entityId: id,
+      metadata: { clientCompanyId },
+    }),
+  ]);
 
   revalidatePath("/dashboard/client-inventory");
   revalidatePath("/portal");
