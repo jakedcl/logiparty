@@ -44,7 +44,8 @@
 - [x] M3-1 `jobs` CRUD + statuses
 - [x] M3-2 `job_locations` max 5
 - [x] M3-3 Job detail panels
-- [ ] M3-4 through M3-12
+- [x] M3-4 Assign inventory
+- [ ] M3-5 through M3-12
 
 **M3 milestone complete:** [ ]
 

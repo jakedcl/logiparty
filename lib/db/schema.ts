@@ -17,6 +17,11 @@ export const jobStatusEnum = pgEnum("job_status", [
   "completed",
 ]);
 
+export const jobInventoryItemTypeEnum = pgEnum("job_inventory_item_type", [
+  "client",
+  "org",
+]);
+
 export const organizations = pgTable("organizations", {
   id: uuid("id").primaryKey().defaultRandom(),
   slug: text("slug").notNull().unique(),
@@ -259,6 +264,25 @@ export const jobLocations = pgTable(
   (t) => [unique().on(t.jobId, t.sortOrder)]
 );
 
+export const jobInventoryLines = pgTable("job_inventory_lines", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  jobId: uuid("job_id")
+    .notNull()
+    .references(() => jobs.id, { onDelete: "cascade" }),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  itemType: jobInventoryItemTypeEnum("item_type").notNull(),
+  clientItemId: uuid("client_item_id").references(() => clientInventoryItems.id, {
+    onDelete: "restrict",
+  }),
+  orgItemId: uuid("org_item_id").references(() => inventoryItems.id, {
+    onDelete: "restrict",
+  }),
+  quantityAssigned: integer("quantity_assigned").notNull().default(0),
+  quantityLoaded: integer("quantity_loaded").notNull().default(0),
+});
+
 export type Organization = typeof organizations.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type OrgMembership = typeof orgMemberships.$inferSelect;
@@ -271,9 +295,13 @@ export type Tool = typeof tools.$inferSelect;
 export type ActivityLog = typeof activityLogs.$inferSelect;
 export type Job = typeof jobs.$inferSelect;
 export type JobLocation = typeof jobLocations.$inferSelect;
+export type JobInventoryLine = typeof jobInventoryLines.$inferSelect;
 export type JobStatus = (typeof jobStatusEnum.enumValues)[number];
+export type JobInventoryItemType =
+  (typeof jobInventoryItemTypeEnum.enumValues)[number];
 
 export const JOB_STATUSES = jobStatusEnum.enumValues;
+export const JOB_INVENTORY_ITEM_TYPES = jobInventoryItemTypeEnum.enumValues;
 
 export const STAFF_TAGS = [
   "driver",
