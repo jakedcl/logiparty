@@ -1,10 +1,19 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { InventorySourceToggle } from "@/components/jobs/inventory-source-toggle";
 import {
   JobPanel,
   JobPanelPlaceholder,
 } from "@/components/jobs/job-panel";
 import { canManageJobs } from "@/lib/auth/permissions";
+import {
+  addJobInventoryLine,
+  deleteJobInventoryLine,
+  listAssignableClientInventory,
+  listAssignableOrgInventory,
+  listJobInventoryLines,
+  updateJobInventoryLine,
+} from "@/lib/actions/job-inventory";
 import {
   deleteJob,
   getJob,
@@ -36,20 +45,43 @@ const PANEL_LINKS = [
 
 export default async function JobDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ inv?: string }>;
 }) {
   const session = await requireSession();
   if (!canManageJobs(session.user)) redirect("/dashboard");
 
   const { id } = await params;
+  const { inv } = await searchParams;
+  const inventorySource = inv === "org" ? "org" : "client";
+
   const job = await getJob(session.user.orgId, id);
   if (!job) notFound();
 
-  const [companies, locations] = await Promise.all([
-    listJobClientCompanies(session.user.orgId),
-    listJobLocations(session.user.orgId, id),
-  ]);
+  const [companies, locations, inventoryLines, clientItems, orgItems] =
+    await Promise.all([
+      listJobClientCompanies(session.user.orgId),
+      listJobLocations(session.user.orgId, id),
+      listJobInventoryLines(session.user.orgId, id),
+      listAssignableClientInventory(
+        session.user.orgId,
+        job.clientCompanyId
+      ),
+      listAssignableOrgInventory(session.user.orgId),
+    ]);
+
+  const pickerItems =
+    inventorySource === "org"
+      ? orgItems.map((i) => ({
+          id: i.id,
+          label: `${i.sku} — ${i.name} (qty ${i.totalQuantity})`,
+        }))
+      : clientItems.map((i) => ({
+          id: i.id,
+          label: `${i.sku} — ${i.name} (qty ${i.totalQuantity})`,
+        }));
 
   const companyName =
     companies.find((c) => c.id === job.clientCompanyId)?.name ?? "Client";
@@ -287,9 +319,107 @@ export default async function JobDetailPage({
       <JobPanel
         id="inventory"
         title="Inventory"
-        description="Assign client/org inventory lines and track loaded qty."
+        description="Defaults to this job's client catalog; switch to org items when needed."
       >
-        <JobPanelPlaceholder message="Inventory assignment arrives in M3-4 / M3-5." />
+        <InventorySourceToggle jobId={job.id} source={inventorySource} />
+
+        {inventoryLines.length === 0 ? (
+          <p className="text-sm text-neutral-500">No inventory assigned yet.</p>
+        ) : (
+          <ul className="space-y-3">
+            {inventoryLines.map((line) => (
+              <li key={line.id} className="border rounded p-3 space-y-2">
+                <p className="text-sm font-medium">
+                  {line.itemSku ? `${line.itemSku} — ` : ""}
+                  {line.itemName}{" "}
+                  <span className="text-neutral-500 font-normal">
+                    ({line.itemType})
+                  </span>
+                </p>
+                <p className="text-xs text-neutral-500">
+                  Loaded {line.quantityLoaded} / assigned {line.quantityAssigned}
+                </p>
+                <form action={updateJobInventoryLine} className="flex gap-2 items-end">
+                  <input type="hidden" name="id" value={line.id} />
+                  <input type="hidden" name="jobId" value={job.id} />
+                  <label className="text-sm text-neutral-600">
+                    Assigned qty
+                    <input
+                      name="quantityAssigned"
+                      type="number"
+                      min={1}
+                      required
+                      defaultValue={line.quantityAssigned}
+                      className="mt-1 w-28 border rounded px-3 py-2 text-sm"
+                    />
+                  </label>
+                  <button
+                    type="submit"
+                    className="rounded px-3 py-2 text-sm border border-neutral-300 h-[42px]"
+                  >
+                    Save
+                  </button>
+                </form>
+                <form action={deleteJobInventoryLine}>
+                  <input type="hidden" name="id" value={line.id} />
+                  <input type="hidden" name="jobId" value={job.id} />
+                  <button
+                    type="submit"
+                    className="text-sm text-red-600 hover:text-red-800"
+                  >
+                    Remove
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <form action={addJobInventoryLine} className="space-y-2 border-t pt-3">
+          <input type="hidden" name="jobId" value={job.id} />
+          <input type="hidden" name="itemType" value={inventorySource} />
+          {pickerItems.length === 0 ? (
+            <p className="text-sm text-neutral-500">
+              No {inventorySource} inventory items available. Add them in the
+              catalog first.
+            </p>
+          ) : (
+            <>
+              <label className="block text-sm text-neutral-600">
+                Item
+                <select
+                  name="itemId"
+                  required
+                  className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                >
+                  <option value="">Select…</option>
+                  {pickerItems.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="block text-sm text-neutral-600">
+                Qty assigned
+                <input
+                  name="quantityAssigned"
+                  type="number"
+                  min={1}
+                  required
+                  defaultValue={1}
+                  className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                />
+              </label>
+              <button
+                type="submit"
+                className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
+              >
+                Assign to job
+              </button>
+            </>
+          )}
+        </form>
       </JobPanel>
 
       <JobPanel
