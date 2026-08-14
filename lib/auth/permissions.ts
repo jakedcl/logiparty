@@ -49,3 +49,11 @@ export function canManageOrgInventory(
   if (m.isOrgAdmin || m.isManager) return true;
   return m.isStaff && staffTags.includes("warehouse");
 }
+
+/** Same people as org inventory: managers + warehouse staff */
+export function canManageClientInventory(
+  m: SessionMembership,
+  staffTags: readonly string[] = []
+): boolean {
+  return canManageOrgInventory(m, staffTags);
+}

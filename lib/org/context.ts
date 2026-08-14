@@ -7,6 +7,8 @@ import {
   orgMemberships,
   organizations,
   staffCapabilityTags,
+  clientCompanies,
+  clientUsers,
 } from "@/lib/db/schema";
 
 export async function requireSession(): Promise<Session> {
@@ -47,4 +49,26 @@ export async function getSessionStaffTags(
     .from(staffCapabilityTags)
     .where(eq(staffCapabilityTags.membershipId, mem.id));
   return rows.map((r) => r.tag);
+}
+
+/** Client company linked to this user (portal scope). Null for staff. */
+export async function getSessionClientCompany(session: Session) {
+  if (!db || !session.user.isClient) return null;
+  const [row] = await db
+    .select({
+      company: clientCompanies,
+    })
+    .from(clientUsers)
+    .innerJoin(
+      clientCompanies,
+      eq(clientUsers.clientCompanyId, clientCompanies.id)
+    )
+    .where(
+      and(
+        eq(clientUsers.orgId, session.user.orgId),
+        eq(clientUsers.userId, session.user.id)
+      )
+    )
+    .limit(1);
+  return row?.company ?? null;
 }
