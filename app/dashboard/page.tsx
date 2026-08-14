@@ -10,7 +10,7 @@ export default async function DashboardPage() {
         Signed in as {session.user.email}
       </p>
       <p className="text-neutral-600 text-sm">
-        Org inventory, client inventory, and fleet are live. Tools next (M2).
+        Four catalogs are live (org inventory, client inventory, fleet, tools).
         Jobs arrive in M3.
       </p>
     </>
