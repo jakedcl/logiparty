@@ -4,8 +4,12 @@ import { randomUUID } from "crypto";
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { activityLogInsert } from "@/lib/activity/log";
-import { canManageJobs } from "@/lib/auth/permissions";
+import {
+  canManageJobs,
+  canUpdateQuantityLoaded,
+} from "@/lib/auth/permissions";
 import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
+import { assertAssignmentFits } from "@/lib/jobs/inventory-locks";
 import {
   clientInventoryItems,
   inventoryItems,
@@ -17,7 +21,7 @@ import {
   type JobInventoryItemType,
   type JobInventoryLine,
 } from "@/lib/db/schema";
-import { requireSession } from "@/lib/org/context";
+import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
 async function requireJobsAccess() {
   const session = await requireSession();
@@ -199,6 +203,14 @@ export async function addJobInventoryLine(formData: FormData) {
     }
   }
 
+  await assertAssignmentFits({
+    orgId: session.user.orgId,
+    jobId,
+    itemType,
+    itemId,
+    quantityAssigned,
+  });
+
   await withOrgQueries(session.user.orgId, (database) => [
     database.insert(jobInventoryLines).values(values),
     activityLogInsert(database, {
@@ -224,6 +236,41 @@ export async function updateJobInventoryLine(formData: FormData) {
 
   await getJobOrThrow(session.user.orgId, jobId);
 
+  const existing = await withOrgQuery<JobInventoryLine[]>(
+    session.user.orgId,
+    (database) =>
+      database
+        .select()
+        .from(jobInventoryLines)
+        .where(
+          and(
+            eq(jobInventoryLines.id, id),
+            eq(jobInventoryLines.jobId, jobId),
+            eq(jobInventoryLines.orgId, session.user.orgId)
+          )
+        )
+        .limit(1)
+  );
+  const line = existing[0];
+  if (!line) throw new Error("Inventory line not found");
+
+  const itemId =
+    line.itemType === "client" ? line.clientItemId : line.orgItemId;
+  if (!itemId) throw new Error("Inventory line is missing item reference");
+
+  await assertAssignmentFits({
+    orgId: session.user.orgId,
+    jobId,
+    itemType: line.itemType,
+    itemId,
+    quantityAssigned,
+    excludeLineId: id,
+  });
+
+  if (quantityAssigned < line.quantityLoaded) {
+    throw new Error("Assigned qty cannot be less than already loaded qty");
+  }
+
   await withOrgQueries(session.user.orgId, (database) => [
     database
       .update(jobInventoryLines)
@@ -243,6 +290,87 @@ export async function updateJobInventoryLine(formData: FormData) {
       entityType: "job_inventory_line",
       entityId: id,
       metadata: { quantityAssigned },
+    }),
+  ]);
+
+  revalidatePath(`/dashboard/jobs/${jobId}`);
+}
+
+export async function updateQuantityLoaded(formData: FormData) {
+  const session = await requireSession();
+  const tags = await getSessionStaffTags(session);
+  if (!canUpdateQuantityLoaded(session.user, tags)) {
+    throw new Error("Forbidden");
+  }
+  if (!db) throw new Error("Database not configured");
+
+  const id = formData.get("id") as string;
+  const jobId = formData.get("jobId") as string;
+  if (!id || !jobId) throw new Error("Missing line id");
+
+  const quantityLoaded = Number.parseInt(
+    String(formData.get("quantityLoaded") ?? ""),
+    10
+  );
+  if (!Number.isFinite(quantityLoaded) || quantityLoaded < 0) {
+    throw new Error("Loaded qty must be a non-negative integer");
+  }
+
+  const existing = await withOrgQuery<JobInventoryLine[]>(
+    session.user.orgId,
+    (database) =>
+      database
+        .select()
+        .from(jobInventoryLines)
+        .where(
+          and(
+            eq(jobInventoryLines.id, id),
+            eq(jobInventoryLines.jobId, jobId),
+            eq(jobInventoryLines.orgId, session.user.orgId)
+          )
+        )
+        .limit(1)
+  );
+  const line = existing[0];
+  if (!line) throw new Error("Inventory line not found");
+
+  if (quantityLoaded > line.quantityAssigned) {
+    throw new Error("Loaded qty cannot exceed assigned qty");
+  }
+
+  const itemId =
+    line.itemType === "client" ? line.clientItemId : line.orgItemId;
+  if (!itemId) throw new Error("Inventory line is missing item reference");
+
+  // Loading does not increase lock beyond assigned; still ensure catalog has stock
+  await assertAssignmentFits({
+    orgId: session.user.orgId,
+    jobId,
+    itemType: line.itemType,
+    itemId,
+    quantityAssigned: line.quantityAssigned,
+    excludeLineId: id,
+  });
+
+  await withOrgQueries(session.user.orgId, (database) => [
+    database
+      .update(jobInventoryLines)
+      .set({ quantityLoaded })
+      .where(
+        and(
+          eq(jobInventoryLines.id, id),
+          eq(jobInventoryLines.jobId, jobId),
+          eq(jobInventoryLines.orgId, session.user.orgId)
+        )
+      ),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      jobId,
+      action: "Updated quantity loaded",
+      entityType: "job_inventory_line",
+      entityId: id,
+      metadata: { quantityLoaded, quantityAssigned: line.quantityAssigned },
     }),
   ]);
 
