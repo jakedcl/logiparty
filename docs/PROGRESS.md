@@ -1,6 +1,6 @@
 # PROGRESS.md — Ticket tracker
 
-**Current milestone:** M2 (catalogs)
+**Current milestone:** M3 (jobs core)
 
 ---
 
@@ -41,7 +41,8 @@
 
 ## M3 — Jobs core
 
-- [ ] M3-1 through M3-12
+- [x] M3-1 `jobs` CRUD + statuses
+- [ ] M3-2 through M3-12
 
 **M3 milestone complete:** [ ]
 

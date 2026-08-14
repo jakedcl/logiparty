@@ -2,12 +2,20 @@ import {
   boolean,
   integer,
   jsonb,
+  pgEnum,
   pgTable,
   text,
   timestamp,
   unique,
   uuid,
 } from "drizzle-orm/pg-core";
+
+export const jobStatusEnum = pgEnum("job_status", [
+  "draft",
+  "upcoming",
+  "ready",
+  "completed",
+]);
 
 export const organizations = pgTable("organizations", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -201,6 +209,39 @@ export const activityLogs = pgTable("activity_logs", {
     .defaultNow(),
 });
 
+export const jobs = pgTable("jobs", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  clientCompanyId: uuid("client_company_id")
+    .notNull()
+    .references(() => clientCompanies.id, { onDelete: "restrict" }),
+  name: text("name").notNull(),
+  status: jobStatusEnum("status").notNull().default("upcoming"),
+  jobStart: timestamp("job_start", { withTimezone: true }),
+  jobEnd: timestamp("job_end", { withTimezone: true }),
+  loadInStart: timestamp("load_in_start", { withTimezone: true }),
+  loadInEnd: timestamp("load_in_end", { withTimezone: true }),
+  loadOutStart: timestamp("load_out_start", { withTimezone: true }),
+  loadOutEnd: timestamp("load_out_end", { withTimezone: true }),
+  clientPocName: text("client_poc_name"),
+  clientPocPhone: text("client_poc_phone"),
+  jobLeadUserId: uuid("job_lead_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  notes: text("notes"),
+  createdBy: uuid("created_by").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export type Organization = typeof organizations.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type OrgMembership = typeof orgMemberships.$inferSelect;
@@ -211,6 +252,10 @@ export type ClientInventoryItem = typeof clientInventoryItems.$inferSelect;
 export type FleetVehicle = typeof fleetVehicles.$inferSelect;
 export type Tool = typeof tools.$inferSelect;
 export type ActivityLog = typeof activityLogs.$inferSelect;
+export type Job = typeof jobs.$inferSelect;
+export type JobStatus = (typeof jobStatusEnum.enumValues)[number];
+
+export const JOB_STATUSES = jobStatusEnum.enumValues;
 
 export const STAFF_TAGS = [
   "driver",

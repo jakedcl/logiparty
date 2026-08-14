@@ -19,6 +19,7 @@ npm run db:migrate:sql
 | `0008_m2_tools.sql` | tools catalog |
 | `0009_m2_catalog_rls_role.sql` | app role so catalog RLS applies |
 | `0010_m2_activity_logs.sql` | activity_logs + RLS |
+| `0011_m3_jobs.sql` | jobs table + job_status enum |
 
 Then seed (optional):
 

@@ -4,6 +4,7 @@ import type { Session } from "next-auth";
 import {
   canManageClientInventory,
   canManageFleet,
+  canManageJobs,
   canManageOrgInventory,
   canManageOrgSettings,
   canManageTools,
@@ -32,6 +33,7 @@ export function InternalShell({
   const showClientInventory = canManageClientInventory(session.user, staffTags);
   const showFleet = canManageFleet(session.user);
   const showTools = canManageTools(session.user, staffTags);
+  const showJobs = canManageJobs(session.user);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -53,6 +55,11 @@ export function InternalShell({
             <Link href="/dashboard" className="hover:text-neutral-900">
               Dashboard
             </Link>
+            {showJobs && (
+              <Link href="/dashboard/jobs" className="hover:text-neutral-900">
+                Jobs
+              </Link>
+            )}
             {showInventory && (
               <Link
                 href="/dashboard/inventory"
