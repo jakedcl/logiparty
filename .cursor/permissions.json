@@ -1,0 +1,93 @@
+{
+  // Logiparty agent permissions — Auto-review mode recommended.
+  // Settings → Agents → Approvals & Execution → Auto-review
+  // This file overrides the in-app allowlists for keys defined here.
+
+  "terminalAllowlist": [
+    // Read-only git (do NOT allow bare "git" — that includes push/commit)
+    "git status",
+    "git diff",
+    "git log",
+    "git show",
+    "git branch",
+    "git rev-parse",
+    "git remote",
+    "git ls-files",
+    "git stash list",
+
+    // Local app / DB tooling
+    "npm",
+    "npx",
+    "node",
+    "tsx",
+
+    // Common inspection
+    "ls",
+    "pwd",
+    "cat",
+    "head",
+    "tail",
+    "rg",
+    "find",
+    "wc",
+    "echo",
+    "test",
+    "which",
+    "mkdir",
+    "cp",
+    "mv"
+  ],
+
+  "mcpAllowlist": [
+    // Cursor app (chat rename, open resource — low risk)
+    "cursor-app-control:*",
+
+    // Neon: schema/docs/read + migrations we write (classifier still gates destructive)
+    "plugin-neon-postgres-neon:list_projects",
+    "plugin-neon-postgres-neon:list_organizations",
+    "plugin-neon-postgres-neon:describe_project",
+    "plugin-neon-postgres-neon:describe_branch",
+    "plugin-neon-postgres-neon:describe_table_schema",
+    "plugin-neon-postgres-neon:get_database_tables",
+    "plugin-neon-postgres-neon:get_connection_string",
+    "plugin-neon-postgres-neon:run_sql",
+    "plugin-neon-postgres-neon:run_sql_transaction",
+    "plugin-neon-postgres-neon:search",
+    "plugin-neon-postgres-neon:fetch",
+    "plugin-neon-postgres-neon:list_docs_resources",
+    "plugin-neon-postgres-neon:get_doc_resource",
+
+    // Vercel: docs + read-only project/deploy inspection (not deploy/buy)
+    "plugin-vercel-vercel:search_vercel_documentation",
+    "plugin-vercel-vercel:list_projects",
+    "plugin-vercel-vercel:get_project",
+    "plugin-vercel-vercel:list_deployments",
+    "plugin-vercel-vercel:get_deployment",
+    "plugin-vercel-vercel:get_deployment_build_logs",
+    "plugin-vercel-vercel:get_runtime_logs",
+    "plugin-vercel-vercel:list_teams",
+
+    // Stripe: docs + account read (not write/refunds)
+    "plugin-stripe-stripe:search_stripe_documentation",
+    "plugin-stripe-stripe:get_stripe_account_info",
+    "plugin-stripe-stripe:list_available_accounts_or_orgs",
+    "plugin-stripe-stripe:stripe_api_search",
+    "plugin-stripe-stripe:stripe_api_details",
+    "plugin-stripe-stripe:stripe_api_read"
+  ],
+
+  "autoRun": {
+    "allow_instructions": [
+      "Allow local Next.js/npm scripts: lint, build, typecheck, db:migrate, db:seed, and applying SQL migration files from lib/db/migrations/.",
+      "Allow CREATE TABLE IF NOT EXISTS, CREATE INDEX IF NOT EXISTS, ENABLE ROW LEVEL SECURITY, and CREATE POLICY for new catalog tables matching docs/SCHEMA.md.",
+      "Allow reading .env.example and non-secret project files; allow loading DATABASE_URL from .env.local only to run migrations against the linked Neon branch."
+    ],
+    "block_instructions": [
+      "Require approval for git commit, git push, git pull --rebase, force push, reset --hard, amend, and any destructive git history rewrite.",
+      "Require approval for DROP TABLE, TRUNCATE, DELETE without a tight WHERE, database reset_from_parent, deleting Neon branches/projects, or production schema changes.",
+      "Require approval for disabling the sandbox (required_permissions all), writing secrets into the repo, or committing .env / credentials.",
+      "Require approval for Vercel production deploys, buying domains/credits, Stripe write/refunds, and any live billing or DNS changes.",
+      "Require approval before creating a pull request or pushing a branch to origin unless the user explicitly asked in that turn."
+    ]
+  }
+}
