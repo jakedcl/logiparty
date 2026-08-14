@@ -167,6 +167,20 @@ export const fleetVehicles = pgTable("fleet_vehicles", {
     .defaultNow(),
 });
 
+/** Tool catalog — separate from fleet and org inventory */
+export const tools = pgTable("tools", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  sku: text("sku"),
+  name: text("name").notNull(),
+  totalQuantity: integer("total_quantity").notNull().default(1),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export type Organization = typeof organizations.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type OrgMembership = typeof orgMemberships.$inferSelect;
@@ -175,6 +189,7 @@ export type Invite = typeof invites.$inferSelect;
 export type InventoryItem = typeof inventoryItems.$inferSelect;
 export type ClientInventoryItem = typeof clientInventoryItems.$inferSelect;
 export type FleetVehicle = typeof fleetVehicles.$inferSelect;
+export type Tool = typeof tools.$inferSelect;
 
 export const STAFF_TAGS = [
   "driver",
