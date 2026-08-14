@@ -10,8 +10,8 @@ export default async function DashboardPage() {
         Signed in as {session.user.email}
       </p>
       <p className="text-neutral-600 text-sm">
-        Four catalogs are live (org inventory, client inventory, fleet, tools).
-        Jobs arrive in M3.
+        Four catalogs are live (org inventory, client inventory, fleet, tools)
+        with RLS and activity logging. Jobs arrive in M3.
       </p>
     </>
   );

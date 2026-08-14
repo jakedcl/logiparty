@@ -1,9 +1,11 @@
 "use server";
 
+import { randomUUID } from "crypto";
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { activityLogInsert } from "@/lib/activity/log";
 import { canManageTools } from "@/lib/auth/permissions";
-import { db, withOrgQuery } from "@/lib/db";
+import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import { tools, type Tool } from "@/lib/db/schema";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
@@ -32,14 +34,24 @@ export async function createTool(formData: FormData) {
 
   if (!name) throw new Error("Name is required");
 
-  await withOrgQuery(session.user.orgId, (database) =>
+  const id = randomUUID();
+  await withOrgQueries(session.user.orgId, (database) => [
     database.insert(tools).values({
+      id,
       orgId: session.user.orgId,
       sku,
       name,
       totalQuantity,
-    })
-  );
+    }),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      action: `Created tool "${name}"`,
+      entityType: "tool",
+      entityId: id,
+      metadata: { sku, name, totalQuantity },
+    }),
+  ]);
 
   revalidatePath("/dashboard/tools");
 }
@@ -56,12 +68,20 @@ export async function updateTool(formData: FormData) {
 
   if (!name) throw new Error("Name is required");
 
-  await withOrgQuery(session.user.orgId, (database) =>
+  await withOrgQueries(session.user.orgId, (database) => [
     database
       .update(tools)
       .set({ name, sku, totalQuantity })
-      .where(and(eq(tools.id, id), eq(tools.orgId, session.user.orgId)))
-  );
+      .where(and(eq(tools.id, id), eq(tools.orgId, session.user.orgId))),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      action: `Updated tool "${name}"`,
+      entityType: "tool",
+      entityId: id,
+      metadata: { sku, name, totalQuantity },
+    }),
+  ]);
 
   revalidatePath("/dashboard/tools");
 }
@@ -72,11 +92,18 @@ export async function deleteTool(formData: FormData) {
   const id = formData.get("id") as string;
   if (!id) throw new Error("Missing tool id");
 
-  await withOrgQuery(session.user.orgId, (database) =>
+  await withOrgQueries(session.user.orgId, (database) => [
     database
       .delete(tools)
-      .where(and(eq(tools.id, id), eq(tools.orgId, session.user.orgId)))
-  );
+      .where(and(eq(tools.id, id), eq(tools.orgId, session.user.orgId))),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      action: "Deleted tool",
+      entityType: "tool",
+      entityId: id,
+    }),
+  ]);
 
   revalidatePath("/dashboard/tools");
 }

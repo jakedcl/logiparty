@@ -18,6 +18,7 @@ npm run db:migrate:sql
 | `0007_m2_fleet.sql` | fleet vehicles catalog |
 | `0008_m2_tools.sql` | tools catalog |
 | `0009_m2_catalog_rls_role.sql` | app role so catalog RLS applies |
+| `0010_m2_activity_logs.sql` | activity_logs + RLS |
 
 Then seed (optional):
 
