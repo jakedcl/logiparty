@@ -29,7 +29,7 @@
 ## M2 — Catalogs
 
 - [x] M2-1 Org inventory CRUD
-- [ ] M2-2 Client inventory CRUD
+- [x] M2-2 Client inventory CRUD
 - [ ] M2-3 Fleet vehicles CRUD
 - [ ] M2-4 Tools CRUD
 - [ ] M2-5 RLS on catalog tables

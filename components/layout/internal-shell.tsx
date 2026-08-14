@@ -2,6 +2,7 @@ import Link from "next/link";
 import { signOut } from "@/lib/auth";
 import type { Session } from "next-auth";
 import {
+  canManageClientInventory,
   canManageOrgInventory,
   canManageOrgSettings,
   canInviteUsers,
@@ -26,6 +27,7 @@ export function InternalShell({
   const showSettings = canManageOrgSettings(session.user);
   const showTeam = canInviteUsers(session.user);
   const showInventory = canManageOrgInventory(session.user, staffTags);
+  const showClientInventory = canManageClientInventory(session.user, staffTags);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -53,6 +55,14 @@ export function InternalShell({
                 className="hover:text-neutral-900"
               >
                 Inventory
+              </Link>
+            )}
+            {showClientInventory && (
+              <Link
+                href="/dashboard/client-inventory"
+                className="hover:text-neutral-900"
+              >
+                Client inventory
               </Link>
             )}
             {showTeam && (
