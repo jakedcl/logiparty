@@ -21,6 +21,7 @@ npm run db:migrate:sql
 | `0010_m2_activity_logs.sql` | activity_logs + RLS |
 | `0011_m3_jobs.sql` | jobs table + job_status enum |
 | `0012_m3_job_locations.sql` | job locations (max 5) |
+| `0013_m3_job_inventory.sql` | job inventory lines |
 
 Then seed (optional):
 
