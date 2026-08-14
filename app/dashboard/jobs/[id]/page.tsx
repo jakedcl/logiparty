@@ -1,5 +1,9 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import {
+  JobPanel,
+  JobPanelPlaceholder,
+} from "@/components/jobs/job-panel";
 import { canManageJobs } from "@/lib/auth/permissions";
 import {
   deleteJob,
@@ -22,6 +26,14 @@ function toLocalInputValue(d: Date | null | undefined): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
+const PANEL_LINKS = [
+  { href: "#summary", label: "Summary" },
+  { href: "#locations", label: "Locations" },
+  { href: "#inventory", label: "Inventory" },
+  { href: "#fleet", label: "Fleet" },
+  { href: "#crew", label: "Crew" },
+] as const;
+
 export default async function JobDetailPage({
   params,
 }: {
@@ -39,8 +51,11 @@ export default async function JobDetailPage({
     listJobLocations(session.user.orgId, id),
   ]);
 
+  const companyName =
+    companies.find((c) => c.id === job.clientCompanyId)?.name ?? "Client";
+
   return (
-    <div className="space-y-8 max-w-2xl">
+    <div className="space-y-6 max-w-3xl">
       <div>
         <Link
           href="/dashboard/jobs"
@@ -49,11 +64,28 @@ export default async function JobDetailPage({
           ← Jobs
         </Link>
         <h1 className="text-2xl font-semibold mt-2 mb-1">{job.name}</h1>
-        <p className="text-sm text-neutral-500">Status: {job.status}</p>
+        <p className="text-sm text-neutral-500">
+          {companyName} · <span className="capitalize">{job.status}</span>
+        </p>
       </div>
 
-      <section className="border rounded-lg p-4 bg-white">
-        <h2 className="font-medium mb-3">Edit job</h2>
+      <nav className="flex flex-wrap gap-2 text-sm">
+        {PANEL_LINKS.map((link) => (
+          <a
+            key={link.href}
+            href={link.href}
+            className="rounded-full border px-3 py-1 text-neutral-600 hover:bg-neutral-50"
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
+
+      <JobPanel
+        id="summary"
+        title="Summary"
+        description="Job meta, windows, client POC, and internal notes."
+      >
         <form action={updateJob} className="space-y-3">
           <input type="hidden" name="id" value={job.id} />
           <input
@@ -176,19 +208,16 @@ export default async function JobDetailPage({
             type="submit"
             className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
           >
-            Save
+            Save summary
           </button>
         </form>
-      </section>
+      </JobPanel>
 
-      <section className="border rounded-lg p-4 bg-white space-y-4">
-        <div>
-          <h2 className="font-medium">Locations ({locations.length}/5)</h2>
-          <p className="text-xs text-neutral-500 mt-1">
-            Up to 5 labels + addresses (e.g. Warehouse, Venue).
-          </p>
-        </div>
-
+      <JobPanel
+        id="locations"
+        title={`Locations (${locations.length}/5)`}
+        description="Up to 5 labels + addresses (e.g. Warehouse, Venue)."
+      >
         {locations.map((loc) => (
           <div key={loc.id} className="border rounded p-3 space-y-2">
             <form action={updateJobLocation} className="space-y-2">
@@ -253,7 +282,31 @@ export default async function JobDetailPage({
         ) : (
           <p className="text-sm text-neutral-500">Maximum of 5 locations.</p>
         )}
-      </section>
+      </JobPanel>
+
+      <JobPanel
+        id="inventory"
+        title="Inventory"
+        description="Assign client/org inventory lines and track loaded qty."
+      >
+        <JobPanelPlaceholder message="Inventory assignment arrives in M3-4 / M3-5." />
+      </JobPanel>
+
+      <JobPanel
+        id="fleet"
+        title="Fleet"
+        description="Vehicles assigned to this job (needed for auto-ready)."
+      >
+        <JobPanelPlaceholder message="Fleet assignment arrives in M3-6." />
+      </JobPanel>
+
+      <JobPanel
+        id="crew"
+        title="Crew"
+        description="Load-in / load-out assignments and job lead."
+      >
+        <JobPanelPlaceholder message="Crew assignments arrive in M3-7 / M3-8." />
+      </JobPanel>
 
       <form action={deleteJob}>
         <input type="hidden" name="id" value={job.id} />
