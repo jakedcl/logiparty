@@ -1,0 +1,102 @@
+"use server";
+
+import { and, asc, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { canManageOrgInventory } from "@/lib/auth/permissions";
+import { db } from "@/lib/db";
+import { inventoryItems } from "@/lib/db/schema";
+import { getSessionStaffTags, requireSession } from "@/lib/org/context";
+
+async function requireInventoryAccess() {
+  const session = await requireSession();
+  const tags = await getSessionStaffTags(session);
+  if (!canManageOrgInventory(session.user, tags)) {
+    throw new Error("Forbidden");
+  }
+  if (!db) throw new Error("Database not configured");
+  return session;
+}
+
+function parseQuantity(raw: FormDataEntryValue | null): number {
+  const n = Number.parseInt(String(raw ?? ""), 10);
+  if (!Number.isFinite(n) || n < 0) {
+    throw new Error("Quantity must be a non-negative integer");
+  }
+  return n;
+}
+
+export async function createOrgInventoryItem(formData: FormData) {
+  const session = await requireInventoryAccess();
+
+  const sku = (formData.get("sku") as string)?.trim();
+  const name = (formData.get("name") as string)?.trim();
+  const description = (formData.get("description") as string)?.trim() || null;
+  const totalQuantity = parseQuantity(formData.get("totalQuantity"));
+
+  if (!sku) throw new Error("SKU is required");
+  if (!name) throw new Error("Name is required");
+
+  await db!.insert(inventoryItems).values({
+    orgId: session.user.orgId,
+    sku,
+    name,
+    description,
+    totalQuantity,
+  });
+
+  revalidatePath("/dashboard/inventory");
+}
+
+export async function updateOrgInventoryItem(formData: FormData) {
+  const session = await requireInventoryAccess();
+
+  const id = formData.get("id") as string;
+  if (!id) throw new Error("Missing item id");
+
+  const sku = (formData.get("sku") as string)?.trim();
+  const name = (formData.get("name") as string)?.trim();
+  const description = (formData.get("description") as string)?.trim() || null;
+  const totalQuantity = parseQuantity(formData.get("totalQuantity"));
+
+  if (!sku) throw new Error("SKU is required");
+  if (!name) throw new Error("Name is required");
+
+  await db!
+    .update(inventoryItems)
+    .set({ sku, name, description, totalQuantity })
+    .where(
+      and(
+        eq(inventoryItems.id, id),
+        eq(inventoryItems.orgId, session.user.orgId)
+      )
+    );
+
+  revalidatePath("/dashboard/inventory");
+}
+
+export async function deleteOrgInventoryItem(formData: FormData) {
+  const session = await requireInventoryAccess();
+
+  const id = formData.get("id") as string;
+  if (!id) throw new Error("Missing item id");
+
+  await db!
+    .delete(inventoryItems)
+    .where(
+      and(
+        eq(inventoryItems.id, id),
+        eq(inventoryItems.orgId, session.user.orgId)
+      )
+    );
+
+  revalidatePath("/dashboard/inventory");
+}
+
+export async function listOrgInventoryItems(orgId: string) {
+  if (!db) return [];
+  return db
+    .select()
+    .from(inventoryItems)
+    .where(eq(inventoryItems.orgId, orgId))
+    .orderBy(asc(inventoryItems.name));
+}
