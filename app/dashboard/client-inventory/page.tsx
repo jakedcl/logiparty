@@ -133,6 +133,11 @@ export default async function ClientInventoryPage({
               >
                 <form action={updateClientInventoryItem} className="space-y-2">
                   <input type="hidden" name="id" value={item.id} />
+                  <input
+                    type="hidden"
+                    name="clientCompanyId"
+                    value={selectedId}
+                  />
                   <div className="grid gap-2 sm:grid-cols-2">
                     <input
                       name="sku"
@@ -175,6 +180,11 @@ export default async function ClientInventoryPage({
                 </form>
                 <form action={deleteClientInventoryItem}>
                   <input type="hidden" name="id" value={item.id} />
+                  <input
+                    type="hidden"
+                    name="clientCompanyId"
+                    value={selectedId}
+                  />
                   <button
                     type="submit"
                     className="text-sm text-red-600 hover:text-red-800"
