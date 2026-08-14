@@ -42,7 +42,8 @@
 ## M3 — Jobs core
 
 - [x] M3-1 `jobs` CRUD + statuses
-- [ ] M3-2 through M3-12
+- [x] M3-2 `job_locations` max 5
+- [ ] M3-3 through M3-12
 
 **M3 milestone complete:** [ ]
 
