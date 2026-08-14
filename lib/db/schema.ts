@@ -153,6 +153,20 @@ export const inventoryItems = pgTable("inventory_items", {
     .defaultNow(),
 });
 
+export const fleetVehicles = pgTable("fleet_vehicles", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  plate: text("plate"),
+  description: text("description"),
+  isActive: boolean("is_active").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export type Organization = typeof organizations.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type OrgMembership = typeof orgMemberships.$inferSelect;
@@ -160,6 +174,7 @@ export type ClientCompany = typeof clientCompanies.$inferSelect;
 export type Invite = typeof invites.$inferSelect;
 export type InventoryItem = typeof inventoryItems.$inferSelect;
 export type ClientInventoryItem = typeof clientInventoryItems.$inferSelect;
+export type FleetVehicle = typeof fleetVehicles.$inferSelect;
 
 export const STAFF_TAGS = [
   "driver",

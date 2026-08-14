@@ -30,7 +30,7 @@
 
 - [x] M2-1 Org inventory CRUD
 - [x] M2-2 Client inventory CRUD
-- [ ] M2-3 Fleet vehicles CRUD
+- [x] M2-3 Fleet vehicles CRUD
 - [ ] M2-4 Tools CRUD
 - [ ] M2-5 RLS on catalog tables
 - [ ] M2-6 Activity log on catalog mutations

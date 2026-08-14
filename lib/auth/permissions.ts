@@ -57,3 +57,8 @@ export function canManageClientInventory(
 ): boolean {
   return canManageOrgInventory(m, staffTags);
 }
+
+/** Managers only — warehouse staff cannot CRUD fleet (APP_CONTEXT matrix) */
+export function canManageFleet(m: SessionMembership): boolean {
+  return m.isOrgAdmin || m.isManager;
+}
