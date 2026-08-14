@@ -2,6 +2,7 @@
 
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { canManageClientInventory } from "@/lib/auth/permissions";
 import { db } from "@/lib/db";
 import { clientCompanies, clientInventoryItems } from "@/lib/db/schema";
@@ -65,12 +66,14 @@ export async function createClientInventoryItem(formData: FormData) {
 
   revalidatePath("/dashboard/client-inventory");
   revalidatePath("/portal");
+  redirect(`/dashboard/client-inventory?companyId=${clientCompanyId}`);
 }
 
 export async function updateClientInventoryItem(formData: FormData) {
   const session = await requireClientInventoryAccess();
 
   const id = formData.get("id") as string;
+  const clientCompanyId = formData.get("clientCompanyId") as string;
   if (!id) throw new Error("Missing item id");
 
   const sku = (formData.get("sku") as string)?.trim();
@@ -93,12 +96,16 @@ export async function updateClientInventoryItem(formData: FormData) {
 
   revalidatePath("/dashboard/client-inventory");
   revalidatePath("/portal");
+  if (clientCompanyId) {
+    redirect(`/dashboard/client-inventory?companyId=${clientCompanyId}`);
+  }
 }
 
 export async function deleteClientInventoryItem(formData: FormData) {
   const session = await requireClientInventoryAccess();
 
   const id = formData.get("id") as string;
+  const clientCompanyId = formData.get("clientCompanyId") as string;
   if (!id) throw new Error("Missing item id");
 
   await db!
@@ -112,6 +119,9 @@ export async function deleteClientInventoryItem(formData: FormData) {
 
   revalidatePath("/dashboard/client-inventory");
   revalidatePath("/portal");
+  if (clientCompanyId) {
+    redirect(`/dashboard/client-inventory?companyId=${clientCompanyId}`);
+  }
 }
 
 export async function listClientCompaniesForOrg(orgId: string) {
