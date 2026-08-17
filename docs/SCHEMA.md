@@ -288,6 +288,8 @@ Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`,
 
 **Conflict rule:** Cannot assign/load more units than `total_quantity - locked_qty_other_jobs`.
 
+**Implementation:** `lib/jobs/lock-window.ts` (`lockActiveConditions`) is shared by inventory and fleet lock queries. Release is evaluated at read/assign time — no separate unlock job required.
+
 ---
 
 ## RLS pattern
