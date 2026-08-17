@@ -40,6 +40,7 @@ import {
   updateJobLocation,
 } from "@/lib/actions/job-locations";
 import { ASSIGNMENT_PHASES, ASSIGNMENT_ROLES, JOB_STATUSES } from "@/lib/db/schema";
+import { evaluateAutoReady } from "@/lib/jobs/auto-ready";
 import { requireSession } from "@/lib/org/context";
 
 function toLocalInputValue(d: Date | null | undefined): string {
@@ -103,6 +104,11 @@ export default async function JobDetailPage({
   const jobLeadLabel =
     leadCandidates.find((c) => c.userId === job.jobLeadUserId)?.label ?? null;
 
+  const autoReady =
+    job.status === "upcoming"
+      ? await evaluateAutoReady(session.user.orgId, id)
+      : null;
+
   const pickerItems =
     inventorySource === "org"
       ? orgItems.map((i) => ({
@@ -155,6 +161,28 @@ export default async function JobDetailPage({
         title="Summary"
         description="Job meta, windows, client POC, and internal notes."
       >
+        {autoReady ? (
+          <div
+            className={`mb-4 rounded border px-3 py-2 text-sm ${
+              autoReady.eligible
+                ? "border-emerald-300 bg-emerald-50 text-emerald-900"
+                : "border-amber-200 bg-amber-50 text-amber-950"
+            }`}
+          >
+            <p className="font-medium">
+              {autoReady.eligible
+                ? "Auto-ready rules met — status flips to ready when you save crew, fleet, or loaded qty."
+                : "Auto-ready checklist"}
+            </p>
+            {!autoReady.eligible ? (
+              <ul className="mt-1 list-disc pl-5 text-xs space-y-0.5">
+                {autoReady.reasons.map((r) => (
+                  <li key={r}>{r}</li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        ) : null}
         <form action={updateJob} className="space-y-3">
           <input type="hidden" name="id" value={job.id} />
           <input

@@ -49,7 +49,8 @@
 - [x] M3-6 Assign fleet to job
 - [x] M3-7 Crew assignments; exclude manager-only
 - [x] M3-8 `job_lead_user_id` display
-- [ ] M3-9 through M3-12
+- [x] M3-9 Auto-ready service (TypeScript)
+- [ ] M3-10 through M3-12
 
 **M3 milestone complete:** [ ]
 

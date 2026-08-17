@@ -17,6 +17,7 @@ import {
   type AssignmentRole,
   type JobAssignment,
 } from "@/lib/db/schema";
+import { maybePromoteJobToReady } from "@/lib/jobs/auto-ready";
 import { requireSession } from "@/lib/org/context";
 
 async function requireJobsAccess() {
@@ -199,6 +200,12 @@ export async function addJobAssignment(formData: FormData) {
     }
     throw e;
   }
+
+  await maybePromoteJobToReady({
+    orgId: session.user.orgId,
+    jobId,
+    actorUserId: session.user.id,
+  });
 
   revalidatePath(`/dashboard/jobs/${jobId}`);
 }
