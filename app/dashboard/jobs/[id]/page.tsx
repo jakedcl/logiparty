@@ -27,6 +27,7 @@ import {
   listJobAssignments,
 } from "@/lib/actions/job-crew";
 import {
+  acceptDraftJob,
   deleteJob,
   getJob,
   listJobClientCompanies,
@@ -172,6 +173,24 @@ export default async function JobDetailPage({
         title="Summary"
         description="Job meta, windows, client POC, and internal notes."
       >
+        {job.status === "draft" ? (
+          <div className="mb-4 rounded border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-950 space-y-2">
+            <p className="font-medium">Client request — draft</p>
+            <p className="text-xs">
+              Accept to move this job to upcoming so you can assign inventory,
+              fleet, and crew.
+            </p>
+            <form action={acceptDraftJob}>
+              <input type="hidden" name="id" value={job.id} />
+              <button
+                type="submit"
+                className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white"
+              >
+                Accept request
+              </button>
+            </form>
+          </div>
+        ) : null}
         {autoReady ? (
           <div
             className={`mb-4 rounded border px-3 py-2 text-sm ${
