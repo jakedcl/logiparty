@@ -16,6 +16,12 @@ import {
   updateQuantityLoaded,
 } from "@/lib/actions/job-inventory";
 import {
+  assignFleetToJob,
+  listAssignableFleetVehicles,
+  listJobFleetAssignments,
+  unassignFleetFromJob,
+} from "@/lib/actions/job-fleet";
+import {
   deleteJob,
   getJob,
   listJobClientCompanies,
@@ -61,8 +67,15 @@ export default async function JobDetailPage({
   const job = await getJob(session.user.orgId, id);
   if (!job) notFound();
 
-  const [companies, locations, inventoryLines, clientItems, orgItems] =
-    await Promise.all([
+  const [
+    companies,
+    locations,
+    inventoryLines,
+    clientItems,
+    orgItems,
+    fleetAssignments,
+    assignableFleet,
+  ] = await Promise.all([
       listJobClientCompanies(session.user.orgId),
       listJobLocations(session.user.orgId, id),
       listJobInventoryLines(session.user.orgId, id),
@@ -71,6 +84,8 @@ export default async function JobDetailPage({
         job.clientCompanyId
       ),
       listAssignableOrgInventory(session.user.orgId),
+      listJobFleetAssignments(session.user.orgId, id),
+      listAssignableFleetVehicles(session.user.orgId, id),
     ]);
 
   const pickerItems =
@@ -453,9 +468,76 @@ export default async function JobDetailPage({
       <JobPanel
         id="fleet"
         title="Fleet"
-        description="Vehicles assigned to this job (needed for auto-ready)."
+        description="Vehicles assigned to this job (needed for auto-ready). Locked on upcoming/ready jobs until load-out ends."
       >
-        <JobPanelPlaceholder message="Fleet assignment arrives in M3-6." />
+        {fleetAssignments.length === 0 ? (
+          <p className="text-sm text-neutral-500">No vehicles assigned yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {fleetAssignments.map((row) => (
+              <li
+                key={row.fleetVehicleId}
+                className="flex items-center justify-between border rounded p-3"
+              >
+                <div>
+                  <p className="text-sm font-medium">{row.vehicleName}</p>
+                  {row.vehiclePlate ? (
+                    <p className="text-xs text-neutral-500">{row.vehiclePlate}</p>
+                  ) : null}
+                </div>
+                <form action={unassignFleetFromJob}>
+                  <input type="hidden" name="jobId" value={job.id} />
+                  <input
+                    type="hidden"
+                    name="fleetVehicleId"
+                    value={row.fleetVehicleId}
+                  />
+                  <button
+                    type="submit"
+                    className="text-sm text-red-600 hover:text-red-800"
+                  >
+                    Remove
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <form action={assignFleetToJob} className="space-y-2 border-t pt-3">
+          <input type="hidden" name="jobId" value={job.id} />
+          {assignableFleet.length === 0 ? (
+            <p className="text-sm text-neutral-500">
+              No more active vehicles to assign. Add them under Fleet, or remove
+              an assignment first.
+            </p>
+          ) : (
+            <>
+              <label className="block text-sm text-neutral-600">
+                Vehicle
+                <select
+                  name="fleetVehicleId"
+                  required
+                  className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                >
+                  <option value="">Select…</option>
+                  {assignableFleet.map((v) => (
+                    <option key={v.id} value={v.id}>
+                      {v.name}
+                      {v.plate ? ` (${v.plate})` : ""}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <button
+                type="submit"
+                className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
+              >
+                Assign vehicle
+              </button>
+            </>
+          )}
+        </form>
       </JobPanel>
 
       <JobPanel
