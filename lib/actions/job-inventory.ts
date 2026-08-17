@@ -10,6 +10,7 @@ import {
 } from "@/lib/auth/permissions";
 import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import { assertAssignmentFits } from "@/lib/jobs/inventory-locks";
+import { maybePromoteJobToReady } from "@/lib/jobs/auto-ready";
 import {
   clientInventoryItems,
   inventoryItems,
@@ -373,6 +374,12 @@ export async function updateQuantityLoaded(formData: FormData) {
       metadata: { quantityLoaded, quantityAssigned: line.quantityAssigned },
     }),
   ]);
+
+  await maybePromoteJobToReady({
+    orgId: session.user.orgId,
+    jobId,
+    actorUserId: session.user.id,
+  });
 
   revalidatePath(`/dashboard/jobs/${jobId}`);
 }
