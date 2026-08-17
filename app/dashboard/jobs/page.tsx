@@ -123,7 +123,8 @@ export default async function JobsPage() {
                   <p className="font-medium text-sm">{job.name}</p>
                   <p className="text-xs text-neutral-500">
                     {companyName.get(job.clientCompanyId) ?? "Client"} ·{" "}
-                    {job.status}
+                    <span className="capitalize">{job.status}</span>
+                    {job.status === "draft" ? " · needs accept" : ""}
                   </p>
                 </div>
                 <span className="text-xs text-neutral-400">Edit →</span>
