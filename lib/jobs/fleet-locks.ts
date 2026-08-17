@@ -1,8 +1,7 @@
-import { and, eq, inArray, isNull, ne, or, sql } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import { withOrgQuery } from "@/lib/db";
 import { jobFleetAssignments, jobs } from "@/lib/db/schema";
-
-const LOCKING_STATUSES = ["upcoming", "ready"] as const;
+import { lockActiveConditions } from "@/lib/jobs/lock-window";
 
 /** True when this vehicle is locked on another upcoming/ready job. */
 export async function isFleetVehicleLocked(args: {
@@ -11,13 +10,11 @@ export async function isFleetVehicleLocked(args: {
   excludeJobId?: string;
 }): Promise<{ locked: boolean; jobId: string | null }> {
   const { orgId, fleetVehicleId, excludeJobId } = args;
-  const now = new Date();
 
   const filters = [
     eq(jobFleetAssignments.orgId, orgId),
     eq(jobFleetAssignments.fleetVehicleId, fleetVehicleId),
-    inArray(jobs.status, [...LOCKING_STATUSES]),
-    or(isNull(jobs.loadOutEnd), sql`${jobs.loadOutEnd} >= ${now}`),
+    ...lockActiveConditions(),
   ];
   if (excludeJobId) {
     filters.push(ne(jobs.id, excludeJobId));
