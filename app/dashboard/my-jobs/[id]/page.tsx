@@ -65,17 +65,27 @@ export default async function MyJobDetailPage({
         >
           ← My Jobs
         </Link>
-        <h1 className="text-2xl font-semibold mt-2 mb-1">{job.name}</h1>
-        <p className="text-sm text-neutral-500">
-          {job.clientCompanyName} ·{" "}
-          <span className="capitalize">{job.status}</span>
-        </p>
-        <p className="text-sm text-neutral-600 mt-1">
-          Your assignment:{" "}
-          {job.myPhases
-            .map((p, i) => `${p} (${job.myRoles[i] ?? "—"})`)
-            .join(" · ")}
-        </p>
+        <div className="flex flex-wrap items-start justify-between gap-3 mt-2">
+          <div>
+            <h1 className="text-2xl font-semibold mb-1">{job.name}</h1>
+            <p className="text-sm text-neutral-500">
+              {job.clientCompanyName} ·{" "}
+              <span className="capitalize">{job.status}</span>
+            </p>
+            <p className="text-sm text-neutral-600 mt-1">
+              Your assignment:{" "}
+              {job.myPhases
+                .map((p, i) => `${p} (${job.myRoles[i] ?? "—"})`)
+                .join(" · ")}
+            </p>
+          </div>
+          <Link
+            href={`/dashboard/my-jobs/${job.id}/print`}
+            className="rounded px-3 py-2 text-sm border border-neutral-300 hover:bg-neutral-50"
+          >
+            Print run sheet
+          </Link>
+        </div>
       </div>
 
       <section className="border rounded p-4 space-y-2 text-sm">
