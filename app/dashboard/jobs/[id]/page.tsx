@@ -30,6 +30,7 @@ import {
   deleteJob,
   getJob,
   listJobClientCompanies,
+  listJobLeadCandidates,
   updateJob,
 } from "@/lib/actions/jobs";
 import {
@@ -82,6 +83,7 @@ export default async function JobDetailPage({
     assignableFleet,
     crewAssignments,
     crewCandidates,
+    leadCandidates,
   ] = await Promise.all([
       listJobClientCompanies(session.user.orgId),
       listJobLocations(session.user.orgId, id),
@@ -95,7 +97,11 @@ export default async function JobDetailPage({
       listAssignableFleetVehicles(session.user.orgId, id),
       listJobAssignments(session.user.orgId, id),
       listCrewCandidates(session.user.orgId),
+      listJobLeadCandidates(session.user.orgId),
     ]);
+
+  const jobLeadLabel =
+    leadCandidates.find((c) => c.userId === job.jobLeadUserId)?.label ?? null;
 
   const pickerItems =
     inventorySource === "org"
@@ -123,6 +129,12 @@ export default async function JobDetailPage({
         <h1 className="text-2xl font-semibold mt-2 mb-1">{job.name}</h1>
         <p className="text-sm text-neutral-500">
           {companyName} · <span className="capitalize">{job.status}</span>
+          {jobLeadLabel ? (
+            <>
+              {" "}
+              · Job lead: <span className="text-neutral-800">{jobLeadLabel}</span>
+            </>
+          ) : null}
         </p>
       </div>
 
@@ -254,6 +266,21 @@ export default async function JobDetailPage({
               className="border rounded px-3 py-2 text-sm"
             />
           </div>
+          <label className="block text-sm text-neutral-600">
+            Job lead (who to ask)
+            <select
+              name="jobLeadUserId"
+              defaultValue={job.jobLeadUserId ?? ""}
+              className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+            >
+              <option value="">None</option>
+              {leadCandidates.map((c) => (
+                <option key={c.userId} value={c.userId}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </label>
           <textarea
             name="notes"
             rows={3}
