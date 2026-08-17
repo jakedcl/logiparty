@@ -93,3 +93,13 @@ export function canUploadDocuments(m: SessionMembership): boolean {
 export function canDeleteDocuments(m: SessionMembership): boolean {
   return canManageJobs(m) || m.isClient;
 }
+
+/** Staff submit time-off requests */
+export function canSubmitAvailability(m: SessionMembership): boolean {
+  return m.isStaff;
+}
+
+/** Managers approve or deny availability */
+export function canReviewAvailability(m: SessionMembership): boolean {
+  return m.isOrgAdmin || m.isManager;
+}

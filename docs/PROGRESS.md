@@ -1,6 +1,6 @@
 # PROGRESS.md — Ticket tracker
 
-**Current milestone:** M4 (client portal)
+**Current milestone:** M5 (ops polish)
 
 ---
 
@@ -74,7 +74,8 @@
 
 ## M5 — Ops polish
 
-- [ ] M5-1 through M5-6
+- [x] M5-1 Availability requests
+- [ ] M5-2 through M5-6
 
 **M5 milestone complete:** [ ]
 

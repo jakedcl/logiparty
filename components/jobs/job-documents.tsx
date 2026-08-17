@@ -14,12 +14,14 @@ export function JobDocuments({
   jobId,
   documents: docs,
   canUpload,
+  storageConfigured,
   currentUserId,
   canDeleteAny,
 }: {
   jobId: string;
   documents: JobDocumentView[];
   canUpload: boolean;
+  storageConfigured: boolean;
   currentUserId: string;
   canDeleteAny: boolean;
 }) {
@@ -75,7 +77,14 @@ export function JobDocuments({
         </ul>
       )}
 
-      {canUpload ? (
+      {canUpload && !storageConfigured ? (
+        <p className="text-sm text-neutral-500 border rounded-lg bg-neutral-50 px-3 py-3">
+          File uploads will work once Cloudflare R2 is connected. Everything else
+          on this job still works without it.
+        </p>
+      ) : null}
+
+      {canUpload && storageConfigured ? (
         <form
           action={uploadJobDocument}
           className="space-y-3 border-t pt-4 sticky bottom-20 sm:static sm:bottom-auto bg-neutral-50 sm:bg-transparent -mx-4 px-4 sm:mx-0 sm:px-0 pb-2 sm:pb-0"

@@ -18,6 +18,15 @@ const ALLOWED_MIME = new Set([
 
 const MAX_BYTES = 20 * 1024 * 1024;
 
+export function isStorageConfigured(): boolean {
+  return Boolean(
+    process.env.R2_ACCOUNT_ID &&
+      process.env.R2_ACCESS_KEY_ID &&
+      process.env.R2_SECRET_ACCESS_KEY &&
+      process.env.R2_BUCKET_NAME
+  );
+}
+
 function r2Config() {
   const accountId = process.env.R2_ACCOUNT_ID;
   const accessKeyId = process.env.R2_ACCESS_KEY_ID;

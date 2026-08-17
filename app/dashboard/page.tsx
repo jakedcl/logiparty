@@ -10,8 +10,7 @@ export default async function DashboardPage() {
         Signed in as {session.user.email}
       </p>
       <p className="text-neutral-600 text-sm">
-        Milestone M3 jobs core is nearly done. Staff: use My Jobs for assigned
-        work.
+        Staff: use My Jobs for assigned work. Request time off under Availability.
       </p>
     </>
   );
