@@ -216,6 +216,47 @@ export async function updateJob(formData: FormData) {
   redirect(`/dashboard/jobs/${id}`);
 }
 
+export async function acceptDraftJob(formData: FormData) {
+  const session = await requireJobsAccess();
+  const id = formData.get("id") as string;
+  if (!id) throw new Error("Missing job id");
+
+  const job = await getJob(session.user.orgId, id);
+  if (!job) throw new Error("Job not found");
+  if (job.status !== "draft") {
+    throw new Error("Only draft requests can be accepted");
+  }
+
+  await withOrgQueries(session.user.orgId, (database) => [
+    database
+      .update(jobs)
+      .set({ status: "upcoming", updatedAt: new Date() })
+      .where(and(eq(jobs.id, id), eq(jobs.orgId, session.user.orgId))),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      jobId: id,
+      action: `Accepted job request "${job.name}"`,
+      entityType: "job",
+      entityId: id,
+      isClientVisible: true,
+      metadata: { from: "draft", to: "upcoming" },
+    }),
+  ]);
+
+  await maybePromoteJobToReady({
+    orgId: session.user.orgId,
+    jobId: id,
+    actorUserId: session.user.id,
+  });
+
+  revalidatePath("/dashboard/jobs");
+  revalidatePath(`/dashboard/jobs/${id}`);
+  revalidatePath("/portal/jobs");
+  revalidatePath(`/portal/jobs/${id}`);
+  redirect(`/dashboard/jobs/${id}`);
+}
+
 export async function deleteJob(formData: FormData) {
   const session = await requireJobsAccess();
   const id = formData.get("id") as string;

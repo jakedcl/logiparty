@@ -63,7 +63,8 @@
 - [x] M4-1 Portal layout (org brand only)
 - [x] M4-2 Client auth routes on subdomain
 - [x] M4-3 Job request → `draft`
-- [ ] M4-4 through M4-7
+- [x] M4-4 Manager accept draft → `upcoming`
+- [ ] M4-5 through M4-7
 
 **M4 milestone complete:** [ ]
 
