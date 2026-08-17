@@ -34,6 +34,12 @@ export const assignmentRoleEnum = pgEnum("assignment_role", [
   "Lead",
 ]);
 
+export const availabilityStatusEnum = pgEnum("availability_status", [
+  "Pending",
+  "Approved",
+  "Denied",
+]);
+
 export const uploaderRoleEnum = pgEnum("uploader_role", ["manager", "client"]);
 
 export const organizations = pgTable("organizations", {
@@ -356,6 +362,26 @@ export const documents = pgTable("documents", {
     .defaultNow(),
 });
 
+export const availabilityRequests = pgTable("availability_requests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  startTime: timestamp("start_time", { withTimezone: true }).notNull(),
+  endTime: timestamp("end_time", { withTimezone: true }).notNull(),
+  reason: text("reason"),
+  status: availabilityStatusEnum("status").notNull().default("Pending"),
+  reviewedBy: uuid("reviewed_by").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export type Organization = typeof organizations.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type OrgMembership = typeof orgMemberships.$inferSelect;
@@ -372,11 +398,14 @@ export type JobInventoryLine = typeof jobInventoryLines.$inferSelect;
 export type JobFleetAssignment = typeof jobFleetAssignments.$inferSelect;
 export type JobAssignment = typeof jobAssignments.$inferSelect;
 export type Document = typeof documents.$inferSelect;
+export type AvailabilityRequest = typeof availabilityRequests.$inferSelect;
 export type JobStatus = (typeof jobStatusEnum.enumValues)[number];
 export type JobInventoryItemType =
   (typeof jobInventoryItemTypeEnum.enumValues)[number];
 export type AssignmentPhase = (typeof assignmentPhaseEnum.enumValues)[number];
 export type AssignmentRole = (typeof assignmentRoleEnum.enumValues)[number];
+export type AvailabilityStatus =
+  (typeof availabilityStatusEnum.enumValues)[number];
 export type UploaderRole = (typeof uploaderRoleEnum.enumValues)[number];
 
 export const JOB_STATUSES = jobStatusEnum.enumValues;
@@ -384,6 +413,7 @@ export const JOB_INVENTORY_ITEM_TYPES = jobInventoryItemTypeEnum.enumValues;
 export const ASSIGNMENT_PHASES = assignmentPhaseEnum.enumValues;
 export const ASSIGNMENT_ROLES = assignmentRoleEnum.enumValues;
 export const UPLOADER_ROLES = uploaderRoleEnum.enumValues;
+export const AVAILABILITY_STATUSES = availabilityStatusEnum.enumValues;
 
 export const STAFF_TAGS = [
   "driver",

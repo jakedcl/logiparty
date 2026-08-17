@@ -45,6 +45,7 @@ import {
 import { ASSIGNMENT_PHASES, ASSIGNMENT_ROLES, JOB_STATUSES } from "@/lib/db/schema";
 import { evaluateAutoReady } from "@/lib/jobs/auto-ready";
 import { requireSession } from "@/lib/org/context";
+import { isStorageConfigured } from "@/lib/storage/r2";
 
 function toLocalInputValue(d: Date | null | undefined): string {
   if (!d) return "";
@@ -751,6 +752,7 @@ export default async function JobDetailPage({
           jobId={job.id}
           documents={jobDocuments}
           canUpload={canUploadDocuments(session.user)}
+          storageConfigured={isStorageConfigured()}
           currentUserId={session.user.id}
           canDeleteAny={canManageJobs(session.user)}
         />
