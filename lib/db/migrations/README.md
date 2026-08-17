@@ -25,6 +25,7 @@ npm run db:migrate:sql
 | `0014_m3_job_fleet.sql` | job fleet assignments |
 | `0015_m3_job_assignments.sql` | job crew assignments |
 | `0016_m4_documents.sql` | job documents (R2 metadata) |
+| `0017_m5_availability.sql` | availability_requests |
 
 Then seed (optional):
 
