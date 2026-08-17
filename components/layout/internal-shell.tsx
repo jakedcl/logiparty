@@ -37,6 +37,7 @@ export function InternalShell({
   const showFleet = canManageFleet(session.user);
   const showTools = canManageTools(session.user, staffTags);
   const showJobs = canManageJobs(session.user);
+  const showActivityLog = canManageJobs(session.user);
   const showMyJobs = canViewMyJobs(session.user);
   const showAvailability =
     canSubmitAvailability(session.user) || canReviewAvailability(session.user);
@@ -127,6 +128,14 @@ export function InternalShell({
                 className="hover:text-neutral-900"
               >
                 Settings
+              </Link>
+            )}
+            {showActivityLog && (
+              <Link
+                href="/dashboard/activity"
+                className="text-neutral-400 hover:text-neutral-600"
+              >
+                Activity
               </Link>
             )}
           </nav>
