@@ -76,7 +76,8 @@
 
 - [x] M5-1 Availability requests
 - [x] M5-2 Crew picker respects time-off
-- [ ] M5-3 through M5-6
+- [x] M5-3 Activity log page (managers; low prominence)
+- [ ] M5-4 through M5-6
 
 **M5 milestone complete:** [ ]
 
