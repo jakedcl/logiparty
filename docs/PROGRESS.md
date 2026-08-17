@@ -60,7 +60,8 @@
 
 ## M4 — Client portal
 
-- [ ] M4-1 through M4-7
+- [x] M4-1 Portal layout (org brand only)
+- [ ] M4-2 through M4-7
 
 **M4 milestone complete:** [ ]
 
