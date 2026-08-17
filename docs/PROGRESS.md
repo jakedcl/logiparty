@@ -52,9 +52,9 @@
 - [x] M3-9 Auto-ready service (TypeScript)
 - [x] M3-10 Release locks after `load_out_end`
 - [x] M3-11 Staff "My Jobs" list
-- [ ] M3-12 Print run sheet
+- [x] M3-12 Print run sheet
 
-**M3 milestone complete:** [ ]
+**M3 milestone complete:** [x]
 
 ---
 
