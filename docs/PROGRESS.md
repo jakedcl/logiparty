@@ -65,7 +65,8 @@
 - [x] M4-3 Job request → `draft`
 - [x] M4-4 Manager accept draft → `upcoming`
 - [x] M4-5 R2 document upload + list
-- [ ] M4-6 through M4-7
+- [x] M4-6 Client delete own docs
+- [ ] M4-7 Mobile-responsive job list + upload
 
 **M4 milestone complete:** [ ]
 

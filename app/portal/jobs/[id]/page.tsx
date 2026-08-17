@@ -63,6 +63,8 @@ export default async function PortalJobDetailPage({
           jobId={job.id}
           documents={docs}
           canUpload={canUploadDocuments(session.user)}
+          currentUserId={session.user.id}
+          canDeleteAny={false}
         />
       </section>
     </div>
