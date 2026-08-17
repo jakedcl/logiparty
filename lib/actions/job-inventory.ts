@@ -15,6 +15,7 @@ import {
   clientInventoryItems,
   inventoryItems,
   JOB_INVENTORY_ITEM_TYPES,
+  jobAssignments,
   jobInventoryLines,
   jobs,
   type ClientInventoryItem,
@@ -309,6 +310,26 @@ export async function updateQuantityLoaded(formData: FormData) {
   const jobId = formData.get("jobId") as string;
   if (!id || !jobId) throw new Error("Missing line id");
 
+  // Warehouse staff may only update loaded qty on jobs they are assigned to
+  if (!canManageJobs(session.user)) {
+    const mine = await withOrgQuery<{ id: string }[]>(
+      session.user.orgId,
+      (database) =>
+        database
+          .select({ id: jobAssignments.id })
+          .from(jobAssignments)
+          .where(
+            and(
+              eq(jobAssignments.orgId, session.user.orgId),
+              eq(jobAssignments.jobId, jobId),
+              eq(jobAssignments.userId, session.user.id)
+            )
+          )
+          .limit(1)
+    );
+    if (!mine[0]) throw new Error("Forbidden — not assigned to this job");
+  }
+
   const quantityLoaded = Number.parseInt(
     String(formData.get("quantityLoaded") ?? ""),
     10
@@ -382,6 +403,8 @@ export async function updateQuantityLoaded(formData: FormData) {
   });
 
   revalidatePath(`/dashboard/jobs/${jobId}`);
+  revalidatePath(`/dashboard/my-jobs/${jobId}`);
+  revalidatePath("/dashboard/my-jobs");
 }
 
 export async function deleteJobInventoryLine(formData: FormData) {
