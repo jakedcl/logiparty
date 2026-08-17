@@ -1,4 +1,5 @@
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -81,5 +82,12 @@ export async function getObjectDownloadUrl(storageKey: string): Promise<string> 
     client(),
     new GetObjectCommand({ Bucket: bucket, Key: storageKey }),
     { expiresIn: 60 * 10 }
+  );
+}
+
+export async function deleteJobObject(storageKey: string): Promise<void> {
+  const { bucket } = r2Config();
+  await client().send(
+    new DeleteObjectCommand({ Bucket: bucket, Key: storageKey })
   );
 }
