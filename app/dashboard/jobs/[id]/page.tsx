@@ -3,7 +3,6 @@ import { notFound, redirect } from "next/navigation";
 import { InventorySourceToggle } from "@/components/jobs/inventory-source-toggle";
 import {
   JobPanel,
-  JobPanelPlaceholder,
 } from "@/components/jobs/job-panel";
 import { canManageJobs } from "@/lib/auth/permissions";
 import {
@@ -22,6 +21,12 @@ import {
   unassignFleetFromJob,
 } from "@/lib/actions/job-fleet";
 import {
+  addJobAssignment,
+  deleteJobAssignment,
+  listCrewCandidates,
+  listJobAssignments,
+} from "@/lib/actions/job-crew";
+import {
   deleteJob,
   getJob,
   listJobClientCompanies,
@@ -33,7 +38,7 @@ import {
   listJobLocations,
   updateJobLocation,
 } from "@/lib/actions/job-locations";
-import { JOB_STATUSES } from "@/lib/db/schema";
+import { ASSIGNMENT_PHASES, ASSIGNMENT_ROLES, JOB_STATUSES } from "@/lib/db/schema";
 import { requireSession } from "@/lib/org/context";
 
 function toLocalInputValue(d: Date | null | undefined): string {
@@ -75,6 +80,8 @@ export default async function JobDetailPage({
     orgItems,
     fleetAssignments,
     assignableFleet,
+    crewAssignments,
+    crewCandidates,
   ] = await Promise.all([
       listJobClientCompanies(session.user.orgId),
       listJobLocations(session.user.orgId, id),
@@ -86,6 +93,8 @@ export default async function JobDetailPage({
       listAssignableOrgInventory(session.user.orgId),
       listJobFleetAssignments(session.user.orgId, id),
       listAssignableFleetVehicles(session.user.orgId, id),
+      listJobAssignments(session.user.orgId, id),
+      listCrewCandidates(session.user.orgId),
     ]);
 
   const pickerItems =
@@ -543,9 +552,104 @@ export default async function JobDetailPage({
       <JobPanel
         id="crew"
         title="Crew"
-        description="Load-in / load-out assignments and job lead."
+        description="Load-in / load-out assignments. Manager-only users are excluded from the picker."
       >
-        <JobPanelPlaceholder message="Crew assignments arrive in M3-7 / M3-8." />
+        {crewAssignments.length === 0 ? (
+          <p className="text-sm text-neutral-500">No crew assigned yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {crewAssignments.map((row) => (
+              <li
+                key={row.id}
+                className="flex items-center justify-between border rounded p-3 gap-3"
+              >
+                <div>
+                  <p className="text-sm font-medium">{row.userLabel}</p>
+                  <p className="text-xs text-neutral-500">
+                    {row.phase} · {row.assignedRole}
+                    {row.userEmail ? ` · ${row.userEmail}` : ""}
+                  </p>
+                </div>
+                <form action={deleteJobAssignment}>
+                  <input type="hidden" name="id" value={row.id} />
+                  <input type="hidden" name="jobId" value={job.id} />
+                  <button
+                    type="submit"
+                    className="text-sm text-red-600 hover:text-red-800"
+                  >
+                    Remove
+                  </button>
+                </form>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <form action={addJobAssignment} className="space-y-2 border-t pt-3">
+          <input type="hidden" name="jobId" value={job.id} />
+          {crewCandidates.length === 0 ? (
+            <p className="text-sm text-neutral-500">
+              No staff members available. Invite or mark users as Staff on the
+              Team page.
+            </p>
+          ) : (
+            <>
+              <label className="block text-sm text-neutral-600">
+                Person
+                <select
+                  name="userId"
+                  required
+                  className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                >
+                  <option value="">Select…</option>
+                  {crewCandidates.map((c) => (
+                    <option key={c.userId} value={c.userId}>
+                      {c.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <label className="block text-sm text-neutral-600">
+                  Phase
+                  <select
+                    name="phase"
+                    required
+                    className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                    defaultValue="LoadIn"
+                  >
+                    {ASSIGNMENT_PHASES.map((p) => (
+                      <option key={p} value={p}>
+                        {p}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-sm text-neutral-600">
+                  Role
+                  <select
+                    name="assignedRole"
+                    required
+                    className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                    defaultValue="Laborer"
+                  >
+                    {ASSIGNMENT_ROLES.map((r) => (
+                      <option key={r} value={r}>
+                        {r}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+              <button
+                type="submit"
+                className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
+              >
+                Assign crew
+              </button>
+            </>
+          )}
+        </form>
       </JobPanel>
 
       <form action={deleteJob}>

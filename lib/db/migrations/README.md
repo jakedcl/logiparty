@@ -23,6 +23,7 @@ npm run db:migrate:sql
 | `0012_m3_job_locations.sql` | job locations (max 5) |
 | `0013_m3_job_inventory.sql` | job inventory lines |
 | `0014_m3_job_fleet.sql` | job fleet assignments |
+| `0015_m3_job_assignments.sql` | job crew assignments |
 
 Then seed (optional):
 
