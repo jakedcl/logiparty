@@ -34,6 +34,15 @@ export async function middleware(request: NextRequest) {
     );
   }
 
+  // Apex / unknown host: still allow login UI, but API + app routes need an org slug.
+  if (!orgSlug && !isAuthPage && !isInvitePage && !isPublicApi) {
+    const isLocalBare =
+      host.split(":")[0] === "localhost" || host.split(":")[0] === "127.0.0.1";
+    if (!isLocalBare && !process.env.NEXT_PUBLIC_DEV_ORG_SLUG) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+  }
+
   if (token && pathname.startsWith("/dashboard")) {
     const canInternal =
       token.isOrgAdmin || token.isManager || token.isStaff;

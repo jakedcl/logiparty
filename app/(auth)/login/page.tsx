@@ -1,40 +1,82 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
 import { auth, signIn } from "@/lib/auth";
-import { getOrgSlugFromHost } from "@/lib/org/subdomain";
+import { postAuthPath } from "@/lib/auth/redirect";
 import { db } from "@/lib/db";
 import { organizations } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { getOrgSlugFromHost } from "@/lib/org/subdomain";
 
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{ error?: string; missingOrg?: string }>;
 }) {
   const session = await auth();
-  if (session?.user) redirect("/dashboard");
+  if (session?.user) redirect(postAuthPath(session.user));
 
   const host = (await headers()).get("host") ?? "";
   const orgSlug =
-    getOrgSlugFromHost(host) ?? process.env.NEXT_PUBLIC_DEV_ORG_SLUG ?? "acme";
-
-  let orgName = orgSlug;
-  if (db) {
-    const [org] = await db
-      .select({ name: organizations.name })
-      .from(organizations)
-      .where(eq(organizations.slug, orgSlug))
-      .limit(1);
-    if (org) orgName = org.name;
-  }
+    getOrgSlugFromHost(host) ?? process.env.NEXT_PUBLIC_DEV_ORG_SLUG ?? null;
 
   const params = await searchParams;
 
+  if (!orgSlug) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="w-full max-w-sm border rounded-lg bg-white p-6 shadow-sm">
+          <h1 className="text-xl font-semibold mb-2">Sign in</h1>
+          <p className="text-sm text-neutral-600">
+            Open your organization subdomain to sign in (for example{" "}
+            <code className="text-xs bg-neutral-100 px-1 rounded">
+              your-org.localhost:3000
+            </code>{" "}
+            locally).
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  let org: {
+    name: string;
+    primaryColor: string | null;
+    logoUrl: string | null;
+  } | null = null;
+
+  if (db) {
+    const [row] = await db
+      .select({
+        name: organizations.name,
+        primaryColor: organizations.primaryColor,
+        logoUrl: organizations.logoUrl,
+      })
+      .from(organizations)
+      .where(eq(organizations.slug, orgSlug))
+      .limit(1);
+    org = row ?? null;
+  }
+
+  const orgName = org?.name ?? orgSlug;
+  const primaryColor = org?.primaryColor ?? "#2563eb";
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-neutral-50">
       <div className="w-full max-w-sm border rounded-lg bg-white p-6 shadow-sm">
-        <h1 className="text-xl font-semibold mb-1">{orgName}</h1>
-        <p className="text-sm text-neutral-500 mb-6">Sign in to continue</p>
+        <div className="mb-6 flex flex-col items-start gap-3">
+          {org?.logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={org.logoUrl}
+              alt=""
+              className="h-10 w-auto max-w-[160px]"
+            />
+          ) : null}
+          <div>
+            <h1 className="text-xl font-semibold">{orgName}</h1>
+            <p className="text-sm text-neutral-500">Sign in to continue</p>
+          </div>
+        </div>
         {params.error && (
           <p className="text-sm text-red-600 mb-4">Invalid email or password.</p>
         )}
@@ -44,13 +86,25 @@ export default async function LoginPage({
             const email = formData.get("email") as string;
             const password = formData.get("password") as string;
             try {
+              // Land on `/` so role-aware home routing sends clients to portal.
               await signIn("credentials", {
                 email,
                 password,
                 orgSlug,
-                redirectTo: "/dashboard",
+                redirectTo: "/",
               });
-            } catch {
+            } catch (error) {
+              // Auth.js throws a redirect on success — rethrow so it isn't treated as failure.
+              if (
+                typeof error === "object" &&
+                error &&
+                "digest" in error &&
+                String((error as { digest?: string }).digest).startsWith(
+                  "NEXT_REDIRECT"
+                )
+              ) {
+                throw error;
+              }
               redirect("/login?error=1");
             }
           }}
@@ -85,7 +139,7 @@ export default async function LoginPage({
           <button
             type="submit"
             className="w-full rounded py-2 text-sm font-medium text-white"
-            style={{ backgroundColor: "#2563eb" }}
+            style={{ backgroundColor: primaryColor }}
           >
             Sign in
           </button>
