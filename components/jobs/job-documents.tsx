@@ -24,7 +24,7 @@ export function JobDocuments({
   canDeleteAny: boolean;
 }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {docs.length === 0 ? (
         <p className="text-sm text-neutral-500">No documents yet.</p>
       ) : (
@@ -35,21 +35,21 @@ export function JobDocuments({
             return (
               <li
                 key={doc.id}
-                className="flex items-center justify-between gap-3 border rounded px-3 py-2 text-sm"
+                className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border rounded-lg px-3 py-3 text-sm bg-white"
               >
                 <div className="min-w-0">
-                  <p className="truncate font-medium">{doc.fileName}</p>
+                  <p className="truncate font-medium text-base">{doc.fileName}</p>
                   <p className="text-xs text-neutral-500">
                     {doc.uploaderRole} · {formatSize(doc.fileSizeBytes)}
                   </p>
                 </div>
-                <div className="flex shrink-0 items-center gap-3">
+                <div className="flex items-center gap-3 shrink-0">
                   {doc.downloadUrl ? (
                     <a
                       href={doc.downloadUrl}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-sm text-neutral-700 underline"
+                      className="inline-flex items-center justify-center min-h-[44px] px-3 rounded-lg border text-sm font-medium"
                     >
                       Open
                     </a>
@@ -62,7 +62,7 @@ export function JobDocuments({
                       <input type="hidden" name="id" value={doc.id} />
                       <button
                         type="submit"
-                        className="text-sm text-red-600 hover:text-red-800"
+                        className="min-h-[44px] px-3 text-sm text-red-600 hover:text-red-800"
                       >
                         Delete
                       </button>
@@ -76,23 +76,27 @@ export function JobDocuments({
       )}
 
       {canUpload ? (
-        <form action={uploadJobDocument} className="space-y-2 border-t pt-3">
+        <form
+          action={uploadJobDocument}
+          className="space-y-3 border-t pt-4 sticky bottom-20 sm:static sm:bottom-auto bg-neutral-50 sm:bg-transparent -mx-4 px-4 sm:mx-0 sm:px-0 pb-2 sm:pb-0"
+        >
           <input type="hidden" name="jobId" value={jobId} />
-          <label className="block text-sm text-neutral-600">
-            PDF or image
+          <label className="block text-sm font-medium text-neutral-700">
+            Upload PDF or photo
             <input
               type="file"
               name="file"
               required
               accept="application/pdf,image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif"
-              className="mt-1 block w-full text-sm"
+              capture="environment"
+              className="mt-2 block w-full text-base file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-900 file:px-4 file:py-3 file:text-white file:font-medium file:min-h-[48px]"
             />
           </label>
           <button
             type="submit"
-            className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
+            className="w-full rounded-lg px-4 py-3 text-base font-medium bg-neutral-900 text-white min-h-[48px]"
           >
-            Upload
+            Upload document
           </button>
         </form>
       ) : null}
