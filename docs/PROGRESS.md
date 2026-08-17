@@ -64,7 +64,8 @@
 - [x] M4-2 Client auth routes on subdomain
 - [x] M4-3 Job request → `draft`
 - [x] M4-4 Manager accept draft → `upcoming`
-- [ ] M4-5 through M4-7
+- [x] M4-5 R2 document upload + list
+- [ ] M4-6 through M4-7
 
 **M4 milestone complete:** [ ]
 

@@ -13,6 +13,7 @@ import {
   jobFleetAssignments,
   jobInventoryLines,
   jobLocations,
+  documents,
   jobs,
   users,
   type AssignmentPhase,
@@ -103,6 +104,7 @@ export async function getJobRunSheet(
     orgItems,
     fleetRows,
     crewRows,
+    docRows,
   ] = await Promise.all([
     withOrgQuery<{ id: string; name: string }[]>(orgId, (database) =>
       database
@@ -174,6 +176,13 @@ export async function getJobRunSheet(
           and(eq(jobAssignments.jobId, jobId), eq(jobAssignments.orgId, orgId))
         )
         .orderBy(asc(jobAssignments.phase), asc(jobAssignments.createdAt))
+    ),
+    withOrgQuery<{ fileName: string }[]>(orgId, (database) =>
+      database
+        .select({ fileName: documents.fileName })
+        .from(documents)
+        .where(and(eq(documents.jobId, jobId), eq(documents.orgId, orgId)))
+        .orderBy(asc(documents.createdAt))
     ),
   ]);
 
@@ -253,6 +262,6 @@ export async function getJobRunSheet(
     inventory,
     fleet: fleetRows,
     crewByPhase,
-    documentNames: [],
+    documentNames: docRows.map((d) => d.fileName),
   };
 }
