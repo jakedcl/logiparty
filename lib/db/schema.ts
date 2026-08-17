@@ -23,6 +23,17 @@ export const jobInventoryItemTypeEnum = pgEnum("job_inventory_item_type", [
   "org",
 ]);
 
+export const assignmentPhaseEnum = pgEnum("assignment_phase", [
+  "LoadIn",
+  "LoadOut",
+]);
+
+export const assignmentRoleEnum = pgEnum("assignment_role", [
+  "Driver",
+  "Laborer",
+  "Lead",
+]);
+
 export const organizations = pgTable("organizations", {
   id: uuid("id").primaryKey().defaultRandom(),
   slug: text("slug").notNull().unique(),
@@ -300,6 +311,28 @@ export const jobFleetAssignments = pgTable(
   (t) => [primaryKey({ columns: [t.jobId, t.fleetVehicleId] })]
 );
 
+export const jobAssignments = pgTable(
+  "job_assignments",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    jobId: uuid("job_id")
+      .notNull()
+      .references(() => jobs.id, { onDelete: "cascade" }),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    phase: assignmentPhaseEnum("phase").notNull(),
+    assignedRole: assignmentRoleEnum("assigned_role").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique().on(t.jobId, t.userId, t.phase)]
+);
+
 export type Organization = typeof organizations.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type OrgMembership = typeof orgMemberships.$inferSelect;
@@ -314,12 +347,17 @@ export type Job = typeof jobs.$inferSelect;
 export type JobLocation = typeof jobLocations.$inferSelect;
 export type JobInventoryLine = typeof jobInventoryLines.$inferSelect;
 export type JobFleetAssignment = typeof jobFleetAssignments.$inferSelect;
+export type JobAssignment = typeof jobAssignments.$inferSelect;
 export type JobStatus = (typeof jobStatusEnum.enumValues)[number];
 export type JobInventoryItemType =
   (typeof jobInventoryItemTypeEnum.enumValues)[number];
+export type AssignmentPhase = (typeof assignmentPhaseEnum.enumValues)[number];
+export type AssignmentRole = (typeof assignmentRoleEnum.enumValues)[number];
 
 export const JOB_STATUSES = jobStatusEnum.enumValues;
 export const JOB_INVENTORY_ITEM_TYPES = jobInventoryItemTypeEnum.enumValues;
+export const ASSIGNMENT_PHASES = assignmentPhaseEnum.enumValues;
+export const ASSIGNMENT_ROLES = assignmentRoleEnum.enumValues;
 
 export const STAFF_TAGS = [
   "driver",
