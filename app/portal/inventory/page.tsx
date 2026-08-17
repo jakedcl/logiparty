@@ -27,8 +27,8 @@ export default async function PortalInventoryPage() {
         <p className="text-sm text-neutral-500">No inventory listed yet.</p>
       )}
       {items.length > 0 && (
-        <div className="border rounded-lg bg-white overflow-hidden">
-          <table className="w-full text-sm text-left">
+        <div className="border rounded-lg bg-white overflow-x-auto -mx-4 sm:mx-0">
+          <table className="w-full min-w-[280px] text-sm text-left">
             <thead>
               <tr className="border-b text-neutral-500 bg-neutral-50">
                 <th className="py-2 px-3 font-medium">SKU</th>
