@@ -61,7 +61,8 @@
 ## M4 — Client portal
 
 - [x] M4-1 Portal layout (org brand only)
-- [ ] M4-2 through M4-7
+- [x] M4-2 Client auth routes on subdomain
+- [ ] M4-3 through M4-7
 
 **M4 milestone complete:** [ ]
 
