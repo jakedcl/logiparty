@@ -1,7 +1,7 @@
 "use server";
 
 import { randomUUID } from "crypto";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
@@ -11,6 +11,8 @@ import {
   clientCompanies,
   JOB_STATUSES,
   jobs,
+  orgMemberships,
+  users,
   type ClientCompany,
   type Job,
   type JobStatus,
@@ -49,6 +51,8 @@ function jobFieldsFromForm(formData: FormData) {
   const clientPocPhone =
     (formData.get("clientPocPhone") as string)?.trim() || null;
   const notes = (formData.get("notes") as string)?.trim() || null;
+  const jobLeadRaw = String(formData.get("jobLeadUserId") ?? "").trim();
+  const jobLeadUserId = jobLeadRaw.length > 0 ? jobLeadRaw : null;
 
   if (!name) throw new Error("Name is required");
   if (!clientCompanyId) throw new Error("Client company is required");
@@ -60,6 +64,7 @@ function jobFieldsFromForm(formData: FormData) {
     clientPocName,
     clientPocPhone,
     notes,
+    jobLeadUserId,
     jobStart: parseOptionalDate(formData.get("jobStart")),
     jobEnd: parseOptionalDate(formData.get("jobEnd")),
     loadInStart: parseOptionalDate(formData.get("loadInStart")),
@@ -93,6 +98,38 @@ export async function listJobs(orgId: string): Promise<Job[]> {
       .where(eq(jobs.orgId, orgId))
       .orderBy(desc(jobs.createdAt))
   );
+}
+
+export async function listJobLeadCandidates(orgId: string): Promise<
+  { userId: string; label: string }[]
+> {
+  await requireJobsAccess();
+  if (!db) return [];
+
+  const rows = await db
+    .select({
+      userId: users.id,
+      firstName: users.firstName,
+      lastName: users.lastName,
+      email: users.email,
+    })
+    .from(orgMemberships)
+    .innerJoin(users, eq(orgMemberships.userId, users.id))
+    .where(
+      and(
+        eq(orgMemberships.orgId, orgId),
+        or(
+          eq(orgMemberships.isStaff, true),
+          eq(orgMemberships.isManager, true)
+        )
+      )
+    )
+    .orderBy(asc(users.lastName), asc(users.firstName), asc(users.email));
+
+  return rows.map((r) => {
+    const name = [r.firstName, r.lastName].filter(Boolean).join(" ").trim();
+    return { userId: r.userId, label: name || r.email };
+  });
 }
 
 export async function getJob(orgId: string, jobId: string): Promise<Job | null> {
