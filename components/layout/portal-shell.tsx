@@ -10,6 +10,12 @@ type Props = {
   children: React.ReactNode;
 };
 
+const NAV = [
+  { href: "/portal", label: "Home" },
+  { href: "/portal/jobs", label: "Jobs" },
+  { href: "/portal/inventory", label: "Inventory" },
+] as const;
+
 export function PortalShell({
   session,
   primaryColor = "#2563eb",
@@ -22,66 +28,68 @@ export function PortalShell({
   return (
     <div className="min-h-screen flex flex-col bg-neutral-50">
       <header
-        className="border-b bg-white px-4 py-3 flex items-center justify-between"
+        className="border-b bg-white px-4 py-3 flex items-center justify-between shrink-0"
         style={{ borderBottomColor: primaryColor }}
       >
-        <div className="flex items-center gap-6 min-w-0">
-          <div className="flex items-center gap-2 min-w-0">
-            {logoUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="" className="h-8 w-auto max-w-[120px]" />
+        <div className="flex items-center gap-2 min-w-0">
+          {logoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={logoUrl} alt="" className="h-8 w-auto max-w-[120px]" />
+          ) : null}
+          <div className="min-w-0">
+            <p className="font-semibold text-lg tracking-tight truncate">
+              {orgName}
+            </p>
+            {companyName ? (
+              <p className="text-xs text-neutral-500 truncate">{companyName}</p>
             ) : null}
-            <div className="min-w-0">
-              <p className="font-semibold text-lg tracking-tight truncate">
-                {orgName}
-              </p>
-              {companyName ? (
-                <p className="text-xs text-neutral-500 truncate">{companyName}</p>
-              ) : null}
-            </div>
           </div>
-          <nav className="hidden sm:flex gap-4 text-sm text-neutral-600">
-            <Link href="/portal" className="hover:text-neutral-900">
-              Home
-            </Link>
-            <Link href="/portal/jobs" className="hover:text-neutral-900">
-              Jobs
-            </Link>
-            <Link href="/portal/inventory" className="hover:text-neutral-900">
-              Inventory
-            </Link>
-          </nav>
         </div>
         <form
           action={async () => {
             "use server";
             await signOut({ redirectTo: "/login" });
           }}
+          className="hidden sm:block"
         >
           <button
             type="submit"
-            className="text-sm text-neutral-500 hover:text-neutral-800"
+            className="text-sm text-neutral-500 hover:text-neutral-800 min-h-[44px] px-2"
           >
             Sign out
           </button>
         </form>
       </header>
 
-      <nav className="sm:hidden flex gap-4 text-sm text-neutral-600 px-4 py-2 border-b bg-white">
-        <Link href="/portal" className="hover:text-neutral-900">
-          Home
-        </Link>
-        <Link href="/portal/jobs" className="hover:text-neutral-900">
-          Jobs
-        </Link>
-        <Link href="/portal/inventory" className="hover:text-neutral-900">
-          Inventory
-        </Link>
+      <nav className="hidden sm:flex gap-4 text-sm text-neutral-600 px-4 md:px-6 py-2 border-b bg-white max-w-3xl mx-auto w-full">
+        {NAV.map((item) => (
+          <Link key={item.href} href={item.href} className="hover:text-neutral-900 py-1">
+            {item.label}
+          </Link>
+        ))}
       </nav>
 
-      <main className="flex-1 p-4 md:p-6 max-w-3xl mx-auto w-full">
+      <main className="flex-1 p-4 md:p-6 max-w-3xl mx-auto w-full pb-24 sm:pb-6">
         {children}
       </main>
+
+      <nav
+        className="sm:hidden fixed bottom-0 inset-x-0 z-10 border-t bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80"
+        style={{ borderTopColor: primaryColor }}
+        aria-label="Portal navigation"
+      >
+        <div className="flex justify-around items-stretch max-w-3xl mx-auto pb-[env(safe-area-inset-bottom,0px)]">
+          {NAV.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="flex-1 text-center py-3 text-sm font-medium text-neutral-600 active:bg-neutral-100 min-h-[48px] flex items-center justify-center"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 }
