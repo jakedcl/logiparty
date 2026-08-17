@@ -51,7 +51,8 @@
 - [x] M3-8 `job_lead_user_id` display
 - [x] M3-9 Auto-ready service (TypeScript)
 - [x] M3-10 Release locks after `load_out_end`
-- [ ] M3-11 through M3-12
+- [x] M3-11 Staff "My Jobs" list
+- [ ] M3-12 Print run sheet
 
 **M3 milestone complete:** [ ]
 
