@@ -46,7 +46,8 @@
 - [x] M3-3 Job detail panels
 - [x] M3-4 Assign inventory
 - [x] M3-5 `quantity_loaded` + lock rules
-- [ ] M3-6 through M3-12
+- [x] M3-6 Assign fleet to job
+- [ ] M3-7 through M3-12
 
 **M3 milestone complete:** [ ]
 
