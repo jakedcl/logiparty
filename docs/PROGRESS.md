@@ -50,7 +50,8 @@
 - [x] M3-7 Crew assignments; exclude manager-only
 - [x] M3-8 `job_lead_user_id` display
 - [x] M3-9 Auto-ready service (TypeScript)
-- [ ] M3-10 through M3-12
+- [x] M3-10 Release locks after `load_out_end`
+- [ ] M3-11 through M3-12
 
 **M3 milestone complete:** [ ]
 
