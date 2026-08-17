@@ -1,6 +1,26 @@
 import { neon } from "@neondatabase/serverless";
-import { readFileSync, readdirSync } from "fs";
+import { existsSync, readFileSync, readdirSync } from "fs";
 import { join } from "path";
+
+function loadEnvLocal() {
+  const path = join(process.cwd(), ".env.local");
+  if (!existsSync(path)) return;
+  for (const line of readFileSync(path, "utf8").split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eq = trimmed.indexOf("=");
+    if (eq < 1) continue;
+    const key = trimmed.slice(0, eq).trim();
+    let value = trimmed.slice(eq + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    if (!process.env[key]) process.env[key] = value;
+  }
+}
 
 /** Split SQL on `;` while keeping DO $body$ ... $body$ blocks intact. */
 function splitStatements(content: string): string[] {
@@ -24,13 +44,16 @@ function splitStatements(content: string): string[] {
 }
 
 async function main() {
+  loadEnvLocal();
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL required");
   const sql = neon(url);
   const dir = join(process.cwd(), "lib/db/migrations");
+  const only = process.argv.slice(2);
   const files = readdirSync(dir)
     .filter((f) => f.endsWith(".sql"))
-    .sort();
+    .sort()
+    .filter((f) => (only.length === 0 ? true : only.includes(f)));
 
   for (const file of files) {
     const content = readFileSync(join(dir, file), "utf8");
