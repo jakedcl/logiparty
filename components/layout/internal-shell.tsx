@@ -9,6 +9,7 @@ import {
   canManageOrgSettings,
   canManageTools,
   canInviteUsers,
+  canViewMyJobs,
 } from "@/lib/auth/permissions";
 
 type Props = {
@@ -34,6 +35,7 @@ export function InternalShell({
   const showFleet = canManageFleet(session.user);
   const showTools = canManageTools(session.user, staffTags);
   const showJobs = canManageJobs(session.user);
+  const showMyJobs = canViewMyJobs(session.user);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -58,6 +60,14 @@ export function InternalShell({
             {showJobs && (
               <Link href="/dashboard/jobs" className="hover:text-neutral-900">
                 Jobs
+              </Link>
+            )}
+            {showMyJobs && (
+              <Link
+                href="/dashboard/my-jobs"
+                className="hover:text-neutral-900"
+              >
+                My Jobs
               </Link>
             )}
             {showInventory && (

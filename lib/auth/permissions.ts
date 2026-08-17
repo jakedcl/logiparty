@@ -29,6 +29,11 @@ export function canManageJobs(m: SessionMembership): boolean {
   return m.isOrgAdmin || m.isManager;
 }
 
+/** Staff (and dual manager+staff) — see assigned jobs only */
+export function canViewMyJobs(m: SessionMembership): boolean {
+  return m.isStaff;
+}
+
 export function canAccessInternalDashboard(m: SessionMembership): boolean {
   return m.isOrgAdmin || m.isManager || m.isStaff;
 }

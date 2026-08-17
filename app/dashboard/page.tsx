@@ -10,7 +10,8 @@ export default async function DashboardPage() {
         Signed in as {session.user.email}
       </p>
       <p className="text-neutral-600 text-sm">
-        Milestone M2 catalogs are done. Jobs CRUD is starting (M3).
+        Milestone M3 jobs core is nearly done. Staff: use My Jobs for assigned
+        work.
       </p>
     </>
   );
