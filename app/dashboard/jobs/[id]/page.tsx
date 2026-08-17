@@ -751,6 +751,8 @@ export default async function JobDetailPage({
           jobId={job.id}
           documents={jobDocuments}
           canUpload={canUploadDocuments(session.user)}
+          currentUserId={session.user.id}
+          canDeleteAny={canManageJobs(session.user)}
         />
       </JobPanel>
 

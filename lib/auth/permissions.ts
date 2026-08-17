@@ -88,3 +88,8 @@ export function canUpdateQuantityLoaded(
 export function canUploadDocuments(m: SessionMembership): boolean {
   return canManageJobs(m) || m.isClient;
 }
+
+/** Managers delete any job doc; clients delete own uploads only (enforced in action). */
+export function canDeleteDocuments(m: SessionMembership): boolean {
+  return canManageJobs(m) || m.isClient;
+}
