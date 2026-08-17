@@ -25,4 +25,27 @@ body {
   .no-print {
     display: none !important;
   }
+
+  body {
+    background: white;
+    color: black;
+  }
+
+  main {
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .run-sheet {
+    font-size: 11pt;
+  }
+
+  .run-sheet table {
+    page-break-inside: avoid;
+  }
+
+  .run-sheet section {
+    break-inside: avoid;
+  }
 }
