@@ -5,6 +5,7 @@ import { listJobDocuments } from "@/lib/actions/documents";
 import { getPortalJob } from "@/lib/actions/portal-jobs";
 import { canUploadDocuments } from "@/lib/auth/permissions";
 import { requireSession } from "@/lib/org/context";
+import { isStorageConfigured } from "@/lib/storage/r2";
 
 function fmt(d: Date | null | undefined): string {
   if (!d) return "—";
@@ -63,6 +64,7 @@ export default async function PortalJobDetailPage({
           jobId={job.id}
           documents={docs}
           canUpload={canUploadDocuments(session.user)}
+          storageConfigured={isStorageConfigured()}
           currentUserId={session.user.id}
           canDeleteAny={false}
         />

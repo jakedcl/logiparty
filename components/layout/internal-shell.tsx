@@ -9,6 +9,8 @@ import {
   canManageOrgSettings,
   canManageTools,
   canInviteUsers,
+  canReviewAvailability,
+  canSubmitAvailability,
   canViewMyJobs,
 } from "@/lib/auth/permissions";
 
@@ -36,6 +38,8 @@ export function InternalShell({
   const showTools = canManageTools(session.user, staffTags);
   const showJobs = canManageJobs(session.user);
   const showMyJobs = canViewMyJobs(session.user);
+  const showAvailability =
+    canSubmitAvailability(session.user) || canReviewAvailability(session.user);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -68,6 +72,14 @@ export function InternalShell({
                 className="hover:text-neutral-900"
               >
                 My Jobs
+              </Link>
+            )}
+            {showAvailability && (
+              <Link
+                href="/dashboard/availability"
+                className="hover:text-neutral-900"
+              >
+                Availability
               </Link>
             )}
             {showInventory && (
