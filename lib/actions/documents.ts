@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { activityLogInsert } from "@/lib/activity/log";
 import {
   canAccessClientPortal,
+  canDeleteDocuments,
   canManageJobs,
   canUploadDocuments,
 } from "@/lib/auth/permissions";
@@ -19,6 +20,7 @@ import {
 import { getSessionClientCompany, requireSession } from "@/lib/org/context";
 import {
   assertAllowedUpload,
+  deleteJobObject,
   getObjectDownloadUrl,
   putJobObject,
 } from "@/lib/storage/r2";
@@ -131,6 +133,69 @@ export async function uploadJobDocument(formData: FormData) {
         uploaderRole,
         clientCompanyId: job.clientCompanyId,
       },
+    }),
+  ]);
+
+  revalidatePath(`/dashboard/jobs/${jobId}`);
+  revalidatePath(`/portal/jobs/${jobId}`);
+}
+
+export async function deleteJobDocument(formData: FormData) {
+  const session = await requireSession();
+  if (!canDeleteDocuments(session.user)) throw new Error("Forbidden");
+
+  const jobId = formData.get("jobId") as string;
+  const id = formData.get("id") as string;
+  if (!jobId || !id) throw new Error("Missing document id");
+
+  await assertCanAccessJob(session.user.orgId, jobId);
+
+  const rows = await withOrgQuery<Document[]>(session.user.orgId, (database) =>
+    database
+      .select()
+      .from(documents)
+      .where(
+        and(
+          eq(documents.id, id),
+          eq(documents.jobId, jobId),
+          eq(documents.orgId, session.user.orgId)
+        )
+      )
+      .limit(1)
+  );
+  const doc = rows[0];
+  if (!doc) throw new Error("Document not found");
+
+  const isManager = canManageJobs(session.user);
+  if (!isManager && doc.uploadedBy !== session.user.id) {
+    throw new Error("You can only delete documents you uploaded");
+  }
+
+  try {
+    await deleteJobObject(doc.storageKey);
+  } catch {
+    // Still remove DB row if object already gone
+  }
+
+  await withOrgQueries(session.user.orgId, (database) => [
+    database
+      .delete(documents)
+      .where(
+        and(
+          eq(documents.id, id),
+          eq(documents.jobId, jobId),
+          eq(documents.orgId, session.user.orgId)
+        )
+      ),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      jobId,
+      action: `Deleted document "${doc.fileName}"`,
+      entityType: "document",
+      entityId: id,
+      isClientVisible: true,
+      metadata: { fileName: doc.fileName },
     }),
   ]);
 

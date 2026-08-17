@@ -1,4 +1,8 @@
-import { uploadJobDocument, type JobDocumentView } from "@/lib/actions/documents";
+import {
+  deleteJobDocument,
+  uploadJobDocument,
+  type JobDocumentView,
+} from "@/lib/actions/documents";
 
 function formatSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -10,10 +14,14 @@ export function JobDocuments({
   jobId,
   documents: docs,
   canUpload,
+  currentUserId,
+  canDeleteAny,
 }: {
   jobId: string;
   documents: JobDocumentView[];
   canUpload: boolean;
+  currentUserId: string;
+  canDeleteAny: boolean;
 }) {
   return (
     <div className="space-y-3">
@@ -21,31 +29,49 @@ export function JobDocuments({
         <p className="text-sm text-neutral-500">No documents yet.</p>
       ) : (
         <ul className="space-y-2">
-          {docs.map((doc) => (
-            <li
-              key={doc.id}
-              className="flex items-center justify-between gap-3 border rounded px-3 py-2 text-sm"
-            >
-              <div className="min-w-0">
-                <p className="truncate font-medium">{doc.fileName}</p>
-                <p className="text-xs text-neutral-500">
-                  {doc.uploaderRole} · {formatSize(doc.fileSizeBytes)}
-                </p>
-              </div>
-              {doc.downloadUrl ? (
-                <a
-                  href={doc.downloadUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="shrink-0 text-sm text-neutral-700 underline"
-                >
-                  Open
-                </a>
-              ) : (
-                <span className="text-xs text-neutral-400">Unavailable</span>
-              )}
-            </li>
-          ))}
+          {docs.map((doc) => {
+            const canDelete =
+              canDeleteAny || doc.uploadedBy === currentUserId;
+            return (
+              <li
+                key={doc.id}
+                className="flex items-center justify-between gap-3 border rounded px-3 py-2 text-sm"
+              >
+                <div className="min-w-0">
+                  <p className="truncate font-medium">{doc.fileName}</p>
+                  <p className="text-xs text-neutral-500">
+                    {doc.uploaderRole} · {formatSize(doc.fileSizeBytes)}
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-3">
+                  {doc.downloadUrl ? (
+                    <a
+                      href={doc.downloadUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-sm text-neutral-700 underline"
+                    >
+                      Open
+                    </a>
+                  ) : (
+                    <span className="text-xs text-neutral-400">Unavailable</span>
+                  )}
+                  {canDelete ? (
+                    <form action={deleteJobDocument}>
+                      <input type="hidden" name="jobId" value={jobId} />
+                      <input type="hidden" name="id" value={doc.id} />
+                      <button
+                        type="submit"
+                        className="text-sm text-red-600 hover:text-red-800"
+                      >
+                        Delete
+                      </button>
+                    </form>
+                  ) : null}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
 
