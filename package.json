@@ -13,7 +13,8 @@
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx lib/db/seed.ts",
     "db:migrate:sql": "tsx scripts/run-migrations.ts",
-    "db:verify-rls": "tsx scripts/verify-catalog-rls.ts"
+    "db:verify-rls": "tsx scripts/verify-catalog-rls.ts",
+    "test:integration": "tsx scripts/integration-tests.ts"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.11.1",
