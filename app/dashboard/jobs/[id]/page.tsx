@@ -1,10 +1,11 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { InventorySourceToggle } from "@/components/jobs/inventory-source-toggle";
+import { JobDocuments } from "@/components/jobs/job-documents";
 import {
   JobPanel,
 } from "@/components/jobs/job-panel";
-import { canManageJobs } from "@/lib/auth/permissions";
+import { canManageJobs, canUploadDocuments } from "@/lib/auth/permissions";
 import {
   addJobInventoryLine,
   deleteJobInventoryLine,
@@ -26,6 +27,7 @@ import {
   listCrewCandidates,
   listJobAssignments,
 } from "@/lib/actions/job-crew";
+import { listJobDocuments } from "@/lib/actions/documents";
 import {
   acceptDraftJob,
   deleteJob,
@@ -56,6 +58,7 @@ const PANEL_LINKS = [
   { href: "#inventory", label: "Inventory" },
   { href: "#fleet", label: "Fleet" },
   { href: "#crew", label: "Crew" },
+  { href: "#documents", label: "Documents" },
 ] as const;
 
 export default async function JobDetailPage({
@@ -86,6 +89,7 @@ export default async function JobDetailPage({
     crewAssignments,
     crewCandidates,
     leadCandidates,
+    jobDocuments,
   ] = await Promise.all([
       listJobClientCompanies(session.user.orgId),
       listJobLocations(session.user.orgId, id),
@@ -100,6 +104,7 @@ export default async function JobDetailPage({
       listJobAssignments(session.user.orgId, id),
       listCrewCandidates(session.user.orgId),
       listJobLeadCandidates(session.user.orgId),
+      listJobDocuments(session.user.orgId, id),
     ]);
 
   const jobLeadLabel =
@@ -735,6 +740,18 @@ export default async function JobDetailPage({
             </>
           )}
         </form>
+      </JobPanel>
+
+      <JobPanel
+        id="documents"
+        title="Documents"
+        description="PDFs and images for this job (permits, overlays, notes)."
+      >
+        <JobDocuments
+          jobId={job.id}
+          documents={jobDocuments}
+          canUpload={canUploadDocuments(session.user)}
+        />
       </JobPanel>
 
       <form action={deleteJob}>

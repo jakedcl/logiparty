@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { JobDocuments } from "@/components/jobs/job-documents";
+import { listJobDocuments } from "@/lib/actions/documents";
 import { getPortalJob } from "@/lib/actions/portal-jobs";
+import { canUploadDocuments } from "@/lib/auth/permissions";
 import { requireSession } from "@/lib/org/context";
 
 function fmt(d: Date | null | undefined): string {
@@ -17,6 +20,7 @@ export default async function PortalJobDetailPage({
   const { id } = await params;
   const job = await getPortalJob(session.user.orgId, id);
   if (!job) notFound();
+  const docs = await listJobDocuments(session.user.orgId, id);
 
   return (
     <div className="space-y-6">
@@ -51,6 +55,15 @@ export default async function PortalJobDetailPage({
         {job.notes ? (
           <p className="pt-2 border-t text-neutral-700">Notes: {job.notes}</p>
         ) : null}
+      </section>
+
+      <section className="border rounded-lg bg-white p-4 space-y-3">
+        <h2 className="font-medium text-sm">Documents</h2>
+        <JobDocuments
+          jobId={job.id}
+          documents={docs}
+          canUpload={canUploadDocuments(session.user)}
+        />
       </section>
     </div>
   );
