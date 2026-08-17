@@ -13,6 +13,7 @@ import {
   type JobFleetAssignment,
 } from "@/lib/db/schema";
 import { assertFleetAssignable } from "@/lib/jobs/fleet-locks";
+import { maybePromoteJobToReady } from "@/lib/jobs/auto-ready";
 import { requireSession } from "@/lib/org/context";
 
 async function requireJobsAccess() {
@@ -167,6 +168,12 @@ export async function assignFleetToJob(formData: FormData) {
       metadata: { fleetVehicleId, name: vehicles[0].name },
     }),
   ]);
+
+  await maybePromoteJobToReady({
+    orgId: session.user.orgId,
+    jobId,
+    actorUserId: session.user.id,
+  });
 
   revalidatePath(`/dashboard/jobs/${jobId}`);
 }

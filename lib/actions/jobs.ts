@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
 import { canManageJobs } from "@/lib/auth/permissions";
 import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
+import { maybePromoteJobToReady } from "@/lib/jobs/auto-ready";
 import {
   clientCompanies,
   JOB_STATUSES,
@@ -201,6 +202,14 @@ export async function updateJob(formData: FormData) {
       },
     }),
   ]);
+
+  if (fields.status === "upcoming") {
+    await maybePromoteJobToReady({
+      orgId: session.user.orgId,
+      jobId: id,
+      actorUserId: session.user.id,
+    });
+  }
 
   revalidatePath("/dashboard/jobs");
   revalidatePath(`/dashboard/jobs/${id}`);
