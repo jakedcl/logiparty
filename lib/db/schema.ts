@@ -4,6 +4,7 @@ import {
   jsonb,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   unique,
@@ -283,6 +284,22 @@ export const jobInventoryLines = pgTable("job_inventory_lines", {
   quantityLoaded: integer("quantity_loaded").notNull().default(0),
 });
 
+export const jobFleetAssignments = pgTable(
+  "job_fleet_assignments",
+  {
+    jobId: uuid("job_id")
+      .notNull()
+      .references(() => jobs.id, { onDelete: "cascade" }),
+    fleetVehicleId: uuid("fleet_vehicle_id")
+      .notNull()
+      .references(() => fleetVehicles.id, { onDelete: "restrict" }),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+  },
+  (t) => [primaryKey({ columns: [t.jobId, t.fleetVehicleId] })]
+);
+
 export type Organization = typeof organizations.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type OrgMembership = typeof orgMemberships.$inferSelect;
@@ -296,6 +313,7 @@ export type ActivityLog = typeof activityLogs.$inferSelect;
 export type Job = typeof jobs.$inferSelect;
 export type JobLocation = typeof jobLocations.$inferSelect;
 export type JobInventoryLine = typeof jobInventoryLines.$inferSelect;
+export type JobFleetAssignment = typeof jobFleetAssignments.$inferSelect;
 export type JobStatus = (typeof jobStatusEnum.enumValues)[number];
 export type JobInventoryItemType =
   (typeof jobInventoryItemTypeEnum.enumValues)[number];
