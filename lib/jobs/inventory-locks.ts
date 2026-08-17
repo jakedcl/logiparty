@@ -1,4 +1,4 @@
-import { and, eq, inArray, isNull, ne, or, sql, sum } from "drizzle-orm";
+import { and, eq, ne, sum } from "drizzle-orm";
 import { withOrgQuery } from "@/lib/db";
 import {
   clientInventoryItems,
@@ -7,8 +7,7 @@ import {
   jobs,
   type JobInventoryItemType,
 } from "@/lib/db/schema";
-
-const LOCKING_STATUSES = ["upcoming", "ready"] as const;
+import { lockActiveConditions } from "@/lib/jobs/lock-window";
 
 /**
  * Units locked on other upcoming/ready jobs until load_out_end passes or job completes.
@@ -20,7 +19,6 @@ export async function getLockedQuantity(args: {
   excludeJobId?: string;
 }): Promise<number> {
   const { orgId, itemType, itemId, excludeJobId } = args;
-  const now = new Date();
 
   const itemMatch =
     itemType === "client"
@@ -31,8 +29,7 @@ export async function getLockedQuantity(args: {
     eq(jobInventoryLines.orgId, orgId),
     eq(jobInventoryLines.itemType, itemType),
     itemMatch,
-    inArray(jobs.status, [...LOCKING_STATUSES]),
-    or(isNull(jobs.loadOutEnd), sql`${jobs.loadOutEnd} >= ${now}`),
+    ...lockActiveConditions(),
   ];
   if (excludeJobId) {
     filters.push(ne(jobs.id, excludeJobId));
