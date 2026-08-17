@@ -83,3 +83,8 @@ export function canUpdateQuantityLoaded(
 ): boolean {
   return canManageOrgInventory(m, staffTags);
 }
+
+/** Managers or clients — upload job documents (staff cannot). */
+export function canUploadDocuments(m: SessionMembership): boolean {
+  return canManageJobs(m) || m.isClient;
+}
