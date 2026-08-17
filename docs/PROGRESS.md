@@ -1,6 +1,6 @@
 # PROGRESS.md — Ticket tracker
 
-**Current milestone:** M3 (jobs core)
+**Current milestone:** M4 (client portal)
 
 ---
 
@@ -62,7 +62,8 @@
 
 - [x] M4-1 Portal layout (org brand only)
 - [x] M4-2 Client auth routes on subdomain
-- [ ] M4-3 through M4-7
+- [x] M4-3 Job request → `draft`
+- [ ] M4-4 through M4-7
 
 **M4 milestone complete:** [ ]
 
