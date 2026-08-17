@@ -103,7 +103,7 @@ export default async function JobDetailPage({
       listJobFleetAssignments(session.user.orgId, id),
       listAssignableFleetVehicles(session.user.orgId, id),
       listJobAssignments(session.user.orgId, id),
-      listCrewCandidates(session.user.orgId),
+      listCrewCandidates(session.user.orgId, id),
       listJobLeadCandidates(session.user.orgId),
       listJobDocuments(session.user.orgId, id),
     ]);
@@ -643,7 +643,7 @@ export default async function JobDetailPage({
       <JobPanel
         id="crew"
         title="Crew"
-        description="Load-in / load-out assignments. Manager-only users are excluded from the picker."
+        description="Load-in / load-out assignments. Staff with approved time-off during this job are hidden."
       >
         {crewAssignments.length === 0 ? (
           <p className="text-sm text-neutral-500">No crew assigned yet.</p>

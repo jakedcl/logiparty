@@ -18,6 +18,10 @@ import {
   type JobAssignment,
 } from "@/lib/db/schema";
 import { maybePromoteJobToReady } from "@/lib/jobs/auto-ready";
+import {
+  getUsersWithApprovedTimeOff,
+  jobAssignmentWindow,
+} from "@/lib/jobs/availability-blocks";
 import { requireSession } from "@/lib/org/context";
 
 async function requireJobsAccess() {
@@ -73,9 +77,33 @@ export type CrewCandidate = {
 };
 
 /** Staff only — manager-only memberships are excluded (D10). */
-export async function listCrewCandidates(orgId: string): Promise<CrewCandidate[]> {
+export async function listCrewCandidates(
+  orgId: string,
+  jobId?: string
+): Promise<CrewCandidate[]> {
   await requireJobsAccess();
   if (!db) return [];
+
+  let blocked = new Set<string>();
+  if (jobId) {
+    const jobRows = await withOrgQuery<(typeof jobs.$inferSelect)[]>(
+      orgId,
+      (database) =>
+        database
+          .select()
+          .from(jobs)
+          .where(and(eq(jobs.id, jobId), eq(jobs.orgId, orgId)))
+          .limit(1)
+    );
+    const window = jobRows[0] ? jobAssignmentWindow(jobRows[0]) : null;
+    if (window) {
+      blocked = await getUsersWithApprovedTimeOff({
+        orgId,
+        windowStart: window.start,
+        windowEnd: window.end,
+      });
+    }
+  }
 
   const rows = await db
     .select({
@@ -91,7 +119,9 @@ export async function listCrewCandidates(orgId: string): Promise<CrewCandidate[]
     )
     .orderBy(asc(users.lastName), asc(users.firstName), asc(users.email));
 
-  return rows.map((r) => ({
+  return rows
+    .filter((r) => !blocked.has(r.userId))
+    .map((r) => ({
     userId: r.userId,
     email: r.email,
     label: displayName(r),
