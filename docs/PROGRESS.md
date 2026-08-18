@@ -78,7 +78,8 @@
 - [x] M5-2 Crew picker respects time-off
 - [x] M5-3 Activity log page (managers; low prominence)
 - [x] M5-4 Cross-org + RBAC integration tests
-- [ ] M5-5 through M5-6
+- [x] M5-5 Staging Neon branch notes + seed script
+- [ ] M5-6 Security pass (cookies, rate limit login)
 
 **M5 milestone complete:** [ ]
 

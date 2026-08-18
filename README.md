@@ -2,7 +2,7 @@
 
 Multi-tenant SaaS for third-party logistics (3PL) companies — jobs, warehouse inventory, fleet, crew, and a white-label client portal.
 
-**Status:** M1 complete (onboarding, invites, client companies). Neon project `logiparty` provisioned — use `.env.local` (not committed).
+**Status:** M5 in progress. Neon project `logiparty` provisioned — use `.env.local` (not committed). R2/Resend optional until you connect them.
 
 ---
 
@@ -54,11 +54,24 @@ Alternatively set `NEXT_PUBLIC_DEV_ORG_SLUG=acme` if using a dev fallback (see m
 
 ```bash
 npm install
-npm run dev          # http://acme.localhost:3000
-npm run db:generate  # Drizzle migrations
-npm run db:migrate
-npm run db:studio    # optional Drizzle Studio
+npm run db:migrate:sql   # apply SQL in lib/db/migrations/
+npm run db:seed          # golden-path users (password123)
+npm run test:integration
+npm run dev              # http://acme.localhost:3000
 ```
+
+Seed accounts (all password `password123`):
+
+| Email | Role |
+|-------|------|
+| `admin@acme.test` | OrgAdmin (Alex) |
+| `morgan@acme.test` | Manager |
+| `sam@acme.test` | Staff / warehouse |
+| `dana@acme.test` | Staff / driver |
+| `rep1@redbull.test` | Client portal (Red Bull) |
+| `admin@demo.test` | Demo org (RLS isolation) |
+
+A second Neon **branch** (staging) is optional — see [docs/STAGING.md](docs/STAGING.md). You can keep using one DATABASE_URL until you are ready to connect more services.
 
 ---
 
