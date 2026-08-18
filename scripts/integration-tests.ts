@@ -39,7 +39,9 @@ function assert(condition: boolean, message: string) {
 }
 
 async function verifyCatalogRls(
-  sql: ReturnType<typeof neon>,
+  // neon() generic vs transaction helper — keep this script simple
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sql: any,
   orgA: { id: string; slug: string },
   orgB: { id: string; slug: string }
 ) {
@@ -63,7 +65,8 @@ async function verifyCatalogRls(
 }
 
 async function verifyJobsRls(
-  sql: ReturnType<typeof neon>,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sql: any,
   orgA: { id: string; slug: string },
   orgB: { id: string; slug: string }
 ) {
@@ -144,7 +147,10 @@ async function main() {
   }
 
   const sql = neon(url);
-  const orgs = await sql`SELECT id, slug FROM organizations ORDER BY slug LIMIT 2`;
+  const orgs = (await sql`SELECT id, slug FROM organizations ORDER BY slug LIMIT 2`) as {
+    id: string;
+    slug: string;
+  }[];
   if (orgs.length < 2) {
     throw new Error("Need acme + demo orgs — run npm run db:seed");
   }
