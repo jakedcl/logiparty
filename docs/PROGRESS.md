@@ -79,9 +79,9 @@
 - [x] M5-3 Activity log page (managers; low prominence)
 - [x] M5-4 Cross-org + RBAC integration tests
 - [x] M5-5 Staging Neon branch notes + seed script
-- [ ] M5-6 Security pass (cookies, rate limit login)
+- [x] M5-6 Security pass (cookies, rate limit login)
 
-**M5 milestone complete:** [ ]
+**M5 milestone complete:** [x]
 
 ---
 
