@@ -4,6 +4,9 @@ import bcrypt from "bcryptjs";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orgMemberships, organizations, users } from "@/lib/db/schema";
+import { clearLoginAttempts, loginAllowed } from "@/lib/auth/rate-limit";
+
+const isProd = process.env.NODE_ENV === "production";
 
 export const authConfig = {
   providers: [
@@ -20,6 +23,8 @@ export const authConfig = {
         const password = credentials?.password as string | undefined;
         const orgSlug = credentials?.orgSlug as string | undefined;
         if (!email || !password || !orgSlug) return null;
+
+        if (!loginAllowed(orgSlug, email)) return null;
 
         const [org] = await db
           .select()
@@ -50,6 +55,8 @@ export const authConfig = {
           .limit(1);
         if (!mem) return null;
 
+        clearLoginAttempts(orgSlug, email);
+
         return {
           id: user.id,
           email: user.email,
@@ -70,6 +77,18 @@ export const authConfig = {
   pages: {
     signIn: "/login",
   },
+  useSecureCookies: isProd,
+  cookies: {
+    sessionToken: {
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: isProd,
+      },
+    },
+  },
+  session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 7 },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -97,5 +116,4 @@ export const authConfig = {
       return session;
     },
   },
-  session: { strategy: "jwt" },
 } satisfies NextAuthConfig;
