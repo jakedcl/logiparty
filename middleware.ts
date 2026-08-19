@@ -9,6 +9,8 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const requestHeaders = new Headers(request.headers);
+  // Only middleware may set tenant context (ignore client-supplied values).
+  requestHeaders.delete("x-org-slug");
   if (orgSlug) {
     requestHeaders.set("x-org-slug", orgSlug);
   }
