@@ -1,5 +1,5 @@
 /**
- * Re-link an existing personal account as TestTenant org admin (idempotent).
+ * Re-link an existing personal account as TestTenant3PL org admin (idempotent).
  *
  * Run: npm run db:relink-admin
  * Or:  PERSONAL_ADMIN_EMAIL=you@example.com npm run db:relink-admin
@@ -52,7 +52,7 @@ async function relink() {
     INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
     SELECT o.id, u.id, true, true, false, false
     FROM organizations o, users u
-    WHERE o.slug = 'testtenant' AND u.email = ${email}
+    WHERE o.slug = 'testtenant3pl' AND u.email = ${email}
     ON CONFLICT (org_id, user_id) DO UPDATE SET
       is_org_admin = true,
       is_manager = true
@@ -61,7 +61,7 @@ async function relink() {
 
   console.log(
     result.length
-      ? `Linked ${email} as TestTenant org admin (org_id ${result[0].org_id}).`
+      ? `Linked ${email} as TestTenant3PL org admin (org_id ${result[0].org_id}).`
       : `No change for ${email}.`
   );
 }
