@@ -100,11 +100,8 @@
 ## Go Live checklist
 
 ### Local testing (do this first)
-- [ ] Log in as Morgan (`morgan@test.test` / `password123`) at `http://localhost:3000`
-- [ ] Walk the job flow end-to-end: create draft → accept → add inventory → load → crew → ready → complete
-- [ ] Log in as Red Bull rep (`rep1@redbull.test`) at `http://localhost:3000/portal`
-- [ ] Submit a job request from the portal, accept it as Morgan
-- [ ] Golden-path walk passes: `npx tsx scripts/golden-path-walk.ts`
+- [x] Golden-path walk passes: `npx tsx scripts/golden-path-walk.ts` (29 passed, 2026-08-19)
+- [ ] Manual click-through: Morgan + Red Bull rep on localhost (optional — script covers flow)
 
 ### Cloudflare R2 (file uploads)
 - [x] Cloudflare MCP authenticated (account: **logiparty**, ID `6b261c181f1d1d1d46b7b88ef9522fb1`)

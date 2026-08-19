@@ -7,11 +7,12 @@ Instructions for AI coding agents (Cursor, etc.).
 ## Read order (every session)
 
 1. **AGENTS.md** (this file)
-2. **[HOW_TO_BUILD.md](HOW_TO_BUILD.md)** — find your ticket ID and Definition of Done
-3. **[APP_CONTEXT.md](APP_CONTEXT.md)** — product rules
-4. **[docs/SCHEMA.md](docs/SCHEMA.md)** — tables and columns (do not invent schema)
-5. **[docs/DECISIONS.md](docs/DECISIONS.md)** — defaults for ambiguous cases
-6. **[docs/GOLDEN_PATH.md](docs/GOLDEN_PATH.md)** — when ticket touches jobs/portal flows
+2. **[docs/OPEN_TABS.md](docs/OPEN_TABS.md)** — what's active, blocked, done (update when you finish)
+3. **[HOW_TO_BUILD.md](HOW_TO_BUILD.md)** — find your ticket ID and Definition of Done
+4. **[APP_CONTEXT.md](APP_CONTEXT.md)** — product rules
+5. **[docs/SCHEMA.md](docs/SCHEMA.md)** — tables and columns (do not invent schema)
+6. **[docs/DECISIONS.md](docs/DECISIONS.md)** — defaults for ambiguous cases
+7. **[docs/GOLDEN_PATH.md](docs/GOLDEN_PATH.md)** — when ticket touches jobs/portal flows
 
 ---
 
@@ -21,20 +22,19 @@ Instructions for AI coding agents (Cursor, etc.).
 2. **Cite ticket ID** in branch name and commit message.
 3. **Stop at milestone DoD** — do not start the next milestone unless the user asks.
 4. **Update [docs/PROGRESS.md](docs/PROGRESS.md)** when the ticket is complete.
-5. **Do not edit `thirdpartylogistics/`** — legacy reference only.
-6. **Do not commit secrets** — use `.env.local` and `.env.example`.
-7. **Match [docs/SCHEMA.md](docs/SCHEMA.md)** — if schema must change, update SCHEMA.md in the same PR.
+5. **Update [docs/OPEN_TABS.md](docs/OPEN_TABS.md)** when finishing or starting queue items (go-live / ops work).
+6. **Do not edit `thirdpartylogistics/`** — legacy reference only.
+7. **Do not commit secrets** — use `.env.local` and `.env.example`.
+8. **Match [docs/SCHEMA.md](docs/SCHEMA.md)** — if schema must change, update SCHEMA.md in the same PR.
 
 ---
 
 ## Copy-paste session prompt
 
 ```
-Ticket: [ID from HOW_TO_BUILD.md]
-Read: AGENTS.md, HOW_TO_BUILD.md, APP_CONTEXT.md, docs/SCHEMA.md
-Implement ONLY ticket [ID]. Do not implement the next ticket.
-Definition of done: [paste from HOW_TO_BUILD.md]
-Update docs/PROGRESS.md when finished.
+Read: AGENTS.md, docs/OPEN_TABS.md, HOW_TO_BUILD.md, APP_CONTEXT.md, docs/SCHEMA.md
+Work ONLY on OPEN_TABS item [A?] OR ticket [ID]. Do not start other active items.
+Update docs/OPEN_TABS.md and docs/PROGRESS.md when finished.
 ```
 
 ---
