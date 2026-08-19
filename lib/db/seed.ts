@@ -36,12 +36,22 @@ async function seed() {
   const sql = neon(url);
   const passwordHash = await bcrypt.hash("password123", 10);
 
+  const testLogoUrl = "/seed/test-tenant-logo.svg";
+  const testPrimaryColor = "#ea580c";
+
   await sql`
-    INSERT INTO organizations (slug, name, primary_color, email_from_name)
+    INSERT INTO organizations (slug, name, primary_color, email_from_name, logo_url)
     VALUES
-      ('test', 'TestTenant3PL', '#2563eb', 'TestTenant3PL'),
-      ('demo', 'Demo Warehouse Co', '#059669', 'Demo Warehouse')
+      ('test', 'TestTenant3PL', ${testPrimaryColor}, 'TestTenant3PL', ${testLogoUrl}),
+      ('demo', 'Demo Warehouse Co', '#059669', 'Demo Warehouse', NULL)
     ON CONFLICT (slug) DO NOTHING
+  `;
+
+  // Always refresh test-tenant branding so re-seed applies logo without full reset.
+  await sql`
+    UPDATE organizations
+    SET logo_url = ${testLogoUrl}, primary_color = ${testPrimaryColor}
+    WHERE slug = 'test'
   `;
 
   const people = [
