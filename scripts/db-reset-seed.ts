@@ -1,5 +1,5 @@
 /**
- * Wipe seeded orgs (testtenant3pl, demo) and re-run golden-path seed.
+ * Wipe seeded orgs (test, demo) and re-run golden-path seed.
  *
  * Run: npm run db:reset-seed -- --confirm
  *
@@ -11,9 +11,13 @@ import { join } from "path";
 import { neon } from "@neondatabase/serverless";
 import { execSync } from "child_process";
 
-const SEED_ORG_SLUGS = ["testtenant3pl", "demo", "acme", "testtenant3pl"] as const;
+const SEED_ORG_SLUGS = ["test", "demo", "acme", "testtenant3pl"] as const;
 
 const SEED_USER_EMAILS = [
+  "admin@test.test",
+  "morgan@test.test",
+  "sam@test.test",
+  "dana@test.test",
   "admin@testtenant3pl.test",
   "morgan@testtenant3pl.test",
   "sam@testtenant3pl.test",
@@ -75,7 +79,7 @@ async function resetAndSeed() {
   console.log(`Target database: ${target}`);
   console.warn(
     "\n⚠️  If Vercel Production uses the SAME DATABASE_URL hostname as .env.local,\n" +
-      "    this reset affects production too (testtenant3pl/demo jobs and seed data wiped).\n" +
+      "    this reset affects production too (test/demo jobs and seed data wiped).\n" +
       "    Compare hostnames in Vercel → Settings → Environment Variables before running.\n" +
       "    Use a separate Neon branch for local dev (see docs/STAGING.md).\n"
   );
@@ -173,14 +177,14 @@ async function resetAndSeed() {
     SELECT o.slug, i.sku, i.name
     FROM inventory_items i
     JOIN organizations o ON o.id = i.org_id
-    WHERE o.slug = 'testtenant3pl'
+    WHERE o.slug = 'test'
     ORDER BY i.sku
   `;
   const fleetAfter = await sql`
     SELECT o.slug, f.name, f.plate
     FROM fleet_vehicles f
     JOIN organizations o ON o.id = f.org_id
-    WHERE o.slug = 'testtenant3pl'
+    WHERE o.slug = 'test'
     ORDER BY f.name
   `;
 
@@ -190,7 +194,7 @@ async function resetAndSeed() {
   console.log("TestTenant3PL inventory:", inventoryAfter);
   console.log("TestTenant3PL fleet:", fleetAfter);
   console.log(
-    "\nNon-seed users preserved (e.g. personal accounts) — re-invite to testtenant3pl if needed."
+    "\nNon-seed users preserved (e.g. personal accounts) — re-invite to test if needed."
   );
 }
 
