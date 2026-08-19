@@ -38,7 +38,8 @@ export async function sendInviteEmail(params: InviteEmailParams) {
 }
 
 export function buildInviteUrl(token: string, orgSlug: string) {
-  const root = process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "logiparty.com";
+  const configured = process.env.NEXT_PUBLIC_ROOT_DOMAIN?.trim();
+  const root = (configured ? configured.replace(/^www\./, "") : null) ?? "logiparty.com";
   const isDev = process.env.NODE_ENV === "development";
   if (isDev) {
     return `http://${orgSlug}.localhost:3000/invite/${token}`;
