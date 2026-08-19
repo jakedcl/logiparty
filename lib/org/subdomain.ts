@@ -7,8 +7,12 @@
 function getRootDomain(): string {
   const configured = process.env.NEXT_PUBLIC_ROOT_DOMAIN?.trim();
   if (!configured) return "logiparty.com";
-  // Tolerate www.logiparty.com misconfig in Vercel env.
-  return configured.replace(/^www\./, "").toLowerCase();
+  // Tolerate https://logiparty.com or www.logiparty.com misconfig in Vercel env.
+  return configured
+    .replace(/^https?:\/\//, "")
+    .replace(/^www\./, "")
+    .split("/")[0]
+    .toLowerCase();
 }
 
 export function getOrgSlugFromHost(host: string): string | null {

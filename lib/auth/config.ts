@@ -9,6 +9,7 @@ import { clearLoginAttempts, loginAllowed } from "@/lib/auth/rate-limit";
 const isProd = process.env.NODE_ENV === "production";
 
 export const authConfig = {
+  trustHost: true,
   providers: [
     Credentials({
       name: "credentials",
