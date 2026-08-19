@@ -10,7 +10,7 @@ Ambiguous product choices resolved here. Agents follow these unless the user ove
 | D4 | Client edit draft? | **Defer** — manager accepts/rejects only | Reduce portal scope |
 | D5 | Cancelled job status? | **Defer** — use `completed` + internal notes | Simpler enum |
 | D6 | Realtime updates? | **Defer** — page refresh OK | M5+ |
-| D7 | Local subdomain dev | `/etc/hosts` → `testtenant.localhost` + port 3000 | See README |
+| D7 | Local subdomain dev | `/etc/hosts` → `testtenant3pl.localhost` + port 3000 | See README |
 | D8 | Logiparty visible to staff? | **No** except optional help footer | White-label positioning |
 | D9 | Multi-org per user? | **No** | v1 simplicity |
 | D10 | Manager in crew picker? | Only if `is_staff = true` on membership | Dual manager+staff allowed |

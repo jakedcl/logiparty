@@ -79,7 +79,7 @@ async function login(email: string) {
       csrfToken,
       email,
       password: PASSWORD,
-      orgSlug: "testtenant",
+      orgSlug: "testtenant3pl",
       redirect: "false",
       callbackUrl: `${BASE}/dashboard`,
     }),
@@ -116,21 +116,21 @@ async function main() {
   const { assertAssignmentFits } = await import("../lib/jobs/inventory-locks");
   const { maybePromoteJobToReady } = await import("../lib/jobs/auto-ready");
 
-  const [tenant] = await sql`SELECT id FROM organizations WHERE slug = 'testtenant'`;
+  const [tenant] = await sql`SELECT id FROM organizations WHERE slug = 'testtenant3pl'`;
   const [rb] =
     await sql`SELECT id FROM client_companies WHERE org_id = ${tenant.id} AND name = 'Red Bull'`;
 
   // --- Setup / catalogs via UI ---
-  const alex = await login("admin@testtenant.test");
+  const alex = await login("admin@acme.test");
   const alexDash = await getHtml(alex, "/dashboard");
-  assertIncludes(alexDash.html, "TestTenant");
+  assertIncludes(alexDash.html, "TestTenant3PL");
   assertNotIncludes(alexDash.html, "Logiparty");
-  mark("1", alexDash.status === 200, "Alex dashboard branded TestTenant, no Logiparty");
+  mark("1", alexDash.status === 200, "Alex dashboard branded TestTenant3PL, no Logiparty");
 
   const settings = await getHtml(alex, "/dashboard/settings");
   mark(
     "2",
-    settings.status === 200 && settings.html.includes("TestTenant"),
+    settings.status === 200 && settings.html.includes("TestTenant3PL"),
     "Alex can open white-label settings"
   );
 
@@ -140,7 +140,7 @@ async function main() {
 
   const rep1 = await login("rep1@redbull.test");
   const portalHome = await getHtml(rep1, "/portal");
-  assertIncludes(portalHome.html, "TestTenant");
+  assertIncludes(portalHome.html, "TestTenant3PL");
   assertNotIncludes(portalHome.html, "Logiparty");
   const rep2 = await login("rep2@redbull.test");
   const portal2 = await getHtml(rep2, "/portal");
@@ -150,7 +150,7 @@ async function main() {
     "Both client users land on branded portal"
   );
 
-  const morgan = await login("morgan@testtenant.test");
+  const morgan = await login("morgan@acme.test");
   const clientInv = await getHtml(
     morgan,
     `/dashboard/client-inventory?companyId=${rb.id}`
@@ -191,10 +191,10 @@ async function main() {
     await sql`SELECT id FROM inventory_items WHERE org_id = ${tenant.id} AND sku = 'DOLLY-01'`;
   const [truck] =
     await sql`SELECT id FROM fleet_vehicles WHERE org_id = ${tenant.id} AND name = 'Box Truck 12'`;
-  const [sam] = await sql`SELECT id FROM users WHERE email = 'sam@testtenant.test'`;
-  const [dana] = await sql`SELECT id FROM users WHERE email = 'dana@testtenant.test'`;
+  const [sam] = await sql`SELECT id FROM users WHERE email = 'sam@acme.test'`;
+  const [dana] = await sql`SELECT id FROM users WHERE email = 'dana@acme.test'`;
   const [morganUser] =
-    await sql`SELECT id FROM users WHERE email = 'morgan@testtenant.test'`;
+    await sql`SELECT id FROM users WHERE email = 'morgan@acme.test'`;
   const [rep1User] =
     await sql`SELECT id FROM users WHERE email = 'rep1@redbull.test'`;
 
@@ -312,7 +312,7 @@ async function main() {
   const [readyJob] = await sql`SELECT status FROM jobs WHERE id = ${jobId}`;
   mark("18", promoted && readyJob.status === "ready", `Auto-ready → ${readyJob.status}`);
 
-  const danaJar = await login("dana@testtenant.test");
+  const danaJar = await login("dana@acme.test");
   const myJobs = await getHtml(danaJar, "/dashboard/my-jobs");
   const myJob = await getHtml(danaJar, `/dashboard/my-jobs/${jobId}`);
   mark(
@@ -424,7 +424,7 @@ async function main() {
     sql`SELECT name FROM jobs WHERE id = ${jobId}`,
   ]);
   const leaked = (underDemo[2] as { name: string }[]).length;
-  mark("F3", leaked === 0, `Demo org seeing testtenant job rows: ${leaked}`);
+  mark("F3", leaked === 0, `Demo org seeing testtenant3pl job rows: ${leaked}`);
 
   const jobA = randomUUID();
   const jobB = randomUUID();
