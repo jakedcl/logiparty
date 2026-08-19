@@ -5,7 +5,7 @@ import { auth, signIn } from "@/lib/auth";
 import { postAuthPath } from "@/lib/auth/redirect";
 import { db } from "@/lib/db";
 import { organizations } from "@/lib/db/schema";
-import { getOrgSlugFromHost } from "@/lib/org/subdomain";
+import { getOrgSlugFromHeaders } from "@/lib/org/subdomain";
 
 export default async function LoginPage({
   searchParams,
@@ -15,9 +15,7 @@ export default async function LoginPage({
   const session = await auth();
   if (session?.user) redirect(postAuthPath(session.user));
 
-  const host = (await headers()).get("host") ?? "";
-  const orgSlug =
-    getOrgSlugFromHost(host) ?? process.env.NEXT_PUBLIC_DEV_ORG_SLUG ?? null;
+  const orgSlug = getOrgSlugFromHeaders(await headers());
 
   const params = await searchParams;
 
