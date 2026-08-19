@@ -8,22 +8,24 @@ export async function middleware(request: NextRequest) {
   const orgSlug = getOrgSlugFromHost(host);
   const { pathname } = request.nextUrl;
 
+  const token = await getToken({
+    req: request,
+    secret: process.env.AUTH_SECRET,
+  });
+
   const requestHeaders = new Headers(request.headers);
   // Only middleware may set tenant context (ignore client-supplied values).
   requestHeaders.delete("x-org-slug");
-  if (orgSlug) {
-    requestHeaders.set("x-org-slug", orgSlug);
+  const tenantSlug =
+    orgSlug ?? (token?.orgSlug ? String(token.orgSlug) : null);
+  if (tenantSlug) {
+    requestHeaders.set("x-org-slug", tenantSlug);
   }
 
   const isAuthPage = pathname === "/login";
   const isInvitePage = pathname.startsWith("/invite/");
   const isPublicApi =
     pathname.startsWith("/api/auth") || pathname === "/api/health";
-
-  const token = await getToken({
-    req: request,
-    secret: process.env.AUTH_SECRET,
-  });
 
   if (!token && !isAuthPage && !isInvitePage && !isPublicApi) {
     return NextResponse.redirect(new URL("/login", request.url));
@@ -36,8 +38,9 @@ export async function middleware(request: NextRequest) {
     );
   }
 
-  // Apex / unknown host: still allow login UI, but API + app routes need an org slug.
-  if (!orgSlug && !isAuthPage && !isInvitePage && !isPublicApi) {
+  // Unauthenticated app routes on apex / unknown host need a tenant subdomain.
+  // Signed-in users carry org context in the JWT — do not bounce them back to /login.
+  if (!token && !orgSlug && !isAuthPage && !isInvitePage && !isPublicApi) {
     const isLocalBare =
       host.split(":")[0] === "localhost" || host.split(":")[0] === "127.0.0.1";
     if (!isLocalBare && !process.env.NEXT_PUBLIC_DEV_ORG_SLUG) {
