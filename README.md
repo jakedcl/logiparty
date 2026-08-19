@@ -44,12 +44,12 @@ Production uses `{slug}.logiparty.com`. For local dev:
 
 1. Add to `/etc/hosts`:
    ```
-   127.0.0.1 testtenant3pl.localhost
+   127.0.0.1 test.localhost
    127.0.0.1 demo.localhost
    ```
-2. Run `npm run dev` and open `http://testtenant3pl.localhost:3000`
+2. Run `npm run dev` and open `http://test.localhost:3000`
 
-Alternatively set `NEXT_PUBLIC_DEV_ORG_SLUG=testtenant3pl` if using a dev fallback (see middleware).
+Alternatively set `NEXT_PUBLIC_DEV_ORG_SLUG=test` if using a dev fallback (see middleware).
 
 ### Commands
 
@@ -57,19 +57,19 @@ Alternatively set `NEXT_PUBLIC_DEV_ORG_SLUG=testtenant3pl` if using a dev fallba
 npm install
 npm run db:migrate:sql   # apply SQL in lib/db/migrations/
 npm run db:seed          # golden-path users (password123)
-npm run db:reset-seed -- --confirm  # wipe testtenant3pl/demo filler + re-seed
+npm run db:reset-seed -- --confirm  # wipe test/demo filler + re-seed
 npm run test:integration
-npm run dev              # http://testtenant3pl.localhost:3000
+npm run dev              # http://test.localhost:3000
 ```
 
 Seed accounts (all password `password123`):
 
 | Email | Role |
 |-------|------|
-| `admin@testtenant3pl.test` | OrgAdmin (Alex) |
-| `morgan@testtenant3pl.test` | Manager |
-| `sam@testtenant3pl.test` | Staff / warehouse |
-| `dana@testtenant3pl.test` | Staff / driver |
+| `admin@test.test` | OrgAdmin (Alex) |
+| `morgan@test.test` | Manager |
+| `sam@test.test` | Staff / warehouse |
+| `dana@test.test` | Staff / driver |
 | `rep1@redbull.test` | Client portal (Red Bull) |
 | `admin@demo.test` | Demo org (RLS isolation) |
 

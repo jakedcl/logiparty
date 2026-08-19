@@ -39,16 +39,16 @@ async function seed() {
   await sql`
     INSERT INTO organizations (slug, name, primary_color, email_from_name)
     VALUES
-      ('testtenant3pl', 'TestTenant3PL', '#2563eb', 'TestTenant3PL'),
+      ('test', 'TestTenant3PL', '#2563eb', 'TestTenant3PL'),
       ('demo', 'Demo Warehouse Co', '#059669', 'Demo Warehouse')
     ON CONFLICT (slug) DO NOTHING
   `;
 
   const people = [
-    { email: "admin@testtenant3pl.test", first: "Alex", last: "Admin" },
-    { email: "morgan@testtenant3pl.test", first: "Morgan", last: "Manager" },
-    { email: "sam@testtenant3pl.test", first: "Sam", last: "Warehouse" },
-    { email: "dana@testtenant3pl.test", first: "Dana", last: "Driver" },
+    { email: "admin@test.test", first: "Alex", last: "Admin" },
+    { email: "morgan@test.test", first: "Morgan", last: "Manager" },
+    { email: "sam@test.test", first: "Sam", last: "Warehouse" },
+    { email: "dana@test.test", first: "Dana", last: "Driver" },
     { email: "rep1@redbull.test", first: "Riley", last: "Rep" },
     { email: "rep2@redbull.test", first: "Robin", last: "Rep" },
     { email: "admin@demo.test", first: "Devon", last: "Demo" },
@@ -66,28 +66,28 @@ async function seed() {
     INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
     SELECT o.id, u.id, true, true, false, false
     FROM organizations o, users u
-    WHERE o.slug = 'testtenant3pl' AND u.email = 'admin@testtenant3pl.test'
+    WHERE o.slug = 'test' AND u.email = 'admin@test.test'
     ON CONFLICT (org_id, user_id) DO NOTHING
   `;
   await sql`
     INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
     SELECT o.id, u.id, false, true, false, false
     FROM organizations o, users u
-    WHERE o.slug = 'testtenant3pl' AND u.email = 'morgan@testtenant3pl.test'
+    WHERE o.slug = 'test' AND u.email = 'morgan@test.test'
     ON CONFLICT (org_id, user_id) DO NOTHING
   `;
   await sql`
     INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
     SELECT o.id, u.id, false, false, true, false
     FROM organizations o, users u
-    WHERE o.slug = 'testtenant3pl' AND u.email IN ('sam@testtenant3pl.test', 'dana@testtenant3pl.test')
+    WHERE o.slug = 'test' AND u.email IN ('sam@test.test', 'dana@test.test')
     ON CONFLICT (org_id, user_id) DO NOTHING
   `;
   await sql`
     INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
     SELECT o.id, u.id, false, false, false, true
     FROM organizations o, users u
-    WHERE o.slug = 'testtenant3pl' AND u.email IN ('rep1@redbull.test', 'rep2@redbull.test')
+    WHERE o.slug = 'test' AND u.email IN ('rep1@redbull.test', 'rep2@redbull.test')
     ON CONFLICT (org_id, user_id) DO NOTHING
   `;
   await sql`
@@ -104,7 +104,7 @@ async function seed() {
     FROM org_memberships m
     JOIN users u ON u.id = m.user_id
     JOIN organizations o ON o.id = m.org_id
-    WHERE o.slug = 'testtenant3pl' AND u.email = 'sam@testtenant3pl.test'
+    WHERE o.slug = 'test' AND u.email = 'sam@test.test'
     ON CONFLICT DO NOTHING
   `;
   await sql`
@@ -113,7 +113,7 @@ async function seed() {
     FROM org_memberships m
     JOIN users u ON u.id = m.user_id
     JOIN organizations o ON o.id = m.org_id
-    WHERE o.slug = 'testtenant3pl' AND u.email = 'dana@testtenant3pl.test'
+    WHERE o.slug = 'test' AND u.email = 'dana@test.test'
     ON CONFLICT DO NOTHING
   `;
 
@@ -121,7 +121,7 @@ async function seed() {
     INSERT INTO client_companies (org_id, name)
     SELECT o.id, 'Red Bull'
     FROM organizations o
-    WHERE o.slug = 'testtenant3pl'
+    WHERE o.slug = 'test'
       AND NOT EXISTS (
         SELECT 1 FROM client_companies c
         WHERE c.org_id = o.id AND c.name = 'Red Bull'
@@ -134,7 +134,7 @@ async function seed() {
     FROM organizations o
     JOIN client_companies c ON c.org_id = o.id AND c.name = 'Red Bull'
     JOIN users u ON u.email IN ('rep1@redbull.test', 'rep2@redbull.test')
-    WHERE o.slug = 'testtenant3pl'
+    WHERE o.slug = 'test'
     ON CONFLICT (client_company_id, user_id) DO NOTHING
   `;
 
@@ -143,7 +143,7 @@ async function seed() {
     SELECT o.id, c.id, 'RB-BAR-01', 'Branded Bar', 10
     FROM organizations o
     JOIN client_companies c ON c.org_id = o.id AND c.name = 'Red Bull'
-    WHERE o.slug = 'testtenant3pl'
+    WHERE o.slug = 'test'
       AND NOT EXISTS (
         SELECT 1 FROM client_inventory_items i
         WHERE i.org_id = o.id AND i.sku = 'RB-BAR-01'
@@ -153,7 +153,7 @@ async function seed() {
     INSERT INTO inventory_items (org_id, sku, name, total_quantity)
     SELECT o.id, 'DOLLY-01', 'Dolly', 20
     FROM organizations o
-    WHERE o.slug = 'testtenant3pl'
+    WHERE o.slug = 'test'
       AND NOT EXISTS (
         SELECT 1 FROM inventory_items i WHERE i.org_id = o.id AND i.sku = 'DOLLY-01'
       )
@@ -162,7 +162,7 @@ async function seed() {
     INSERT INTO fleet_vehicles (org_id, name, plate)
     SELECT o.id, 'Box Truck 12', 'TST-012'
     FROM organizations o
-    WHERE o.slug = 'testtenant3pl'
+    WHERE o.slug = 'test'
       AND NOT EXISTS (
         SELECT 1 FROM fleet_vehicles f WHERE f.org_id = o.id AND f.name = 'Box Truck 12'
       )
@@ -171,11 +171,11 @@ async function seed() {
   console.log(`
 Seed complete. Password for all accounts: password123
 
-  testtenant3pl (http://testtenant3pl.localhost:3000)
-    admin@testtenant3pl.test     OrgAdmin (Alex)
-    morgan@testtenant3pl.test    Manager
-    sam@testtenant3pl.test       Staff / warehouse
-    dana@testtenant3pl.test      Staff / driver
+  test (http://test.localhost:3000)
+    admin@test.test     OrgAdmin (Alex)
+    morgan@test.test    Manager
+    sam@test.test       Staff / warehouse
+    dana@test.test      Staff / driver
     rep1@redbull.test         Client (Red Bull)
     rep2@redbull.test         Client (Red Bull)
 
