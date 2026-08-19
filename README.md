@@ -18,6 +18,7 @@ Multi-tenant SaaS for third-party logistics (3PL) companies — jobs, warehouse 
 | [docs/GOLDEN_PATH.md](docs/GOLDEN_PATH.md) | Pilot acceptance test |
 | [docs/DECISIONS.md](docs/DECISIONS.md) | Locked v1 defaults |
 | [docs/PROGRESS.md](docs/PROGRESS.md) | Ticket checklist |
+| [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) | **Start here** — local, prod, Neon, Vercel |
 
 **Legacy reference only:** [`thirdpartylogistics/`](thirdpartylogistics/) — school capstone; do not modify.
 
@@ -56,6 +57,7 @@ Alternatively set `NEXT_PUBLIC_DEV_ORG_SLUG=acme` if using a dev fallback (see m
 npm install
 npm run db:migrate:sql   # apply SQL in lib/db/migrations/
 npm run db:seed          # golden-path users (password123)
+npm run db:reset-seed -- --confirm  # wipe acme/demo filler + re-seed
 npm run test:integration
 npm run dev              # http://acme.localhost:3000
 ```

@@ -134,3 +134,4 @@
 ### First real tenant
 - [ ] Create the first real org in production DB (or build the sign-up flow in M6)
 - [ ] Set their subdomain slug, run seed or manual insert
+- [ ] **Use separate Neon branches:** local `.env.local` → dev branch; Vercel Production → `main` (never run `db:reset-seed` against prod URL)

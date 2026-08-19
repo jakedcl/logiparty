@@ -12,6 +12,8 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:seed": "tsx lib/db/seed.ts",
+    "db:reset-seed": "tsx scripts/db-reset-seed.ts",
+    "db:relink-admin": "tsx scripts/relink-personal-admin.ts",
     "db:migrate:sql": "tsx scripts/run-migrations.ts",
     "db:verify-rls": "tsx scripts/verify-catalog-rls.ts",
     "test:integration": "tsx scripts/integration-tests.ts"
