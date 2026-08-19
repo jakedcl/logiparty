@@ -113,7 +113,7 @@ export async function listJobInventoryLines(
     const item = line.orgItemId ? orgById.get(line.orgItemId) : undefined;
     return {
       ...line,
-      itemName: item?.name ?? "Unknown org item",
+      itemName: item?.name ?? "Unknown our inventory item",
       itemSku: item?.sku ?? null,
     };
   });
@@ -201,7 +201,7 @@ export async function addJobInventoryLine(formData: FormData) {
   } else {
     const items = await listAssignableOrgInventory(session.user.orgId);
     if (!items.some((i) => i.id === itemId)) {
-      throw new Error("Org inventory item not found");
+      throw new Error("Our inventory item not found");
     }
   }
 

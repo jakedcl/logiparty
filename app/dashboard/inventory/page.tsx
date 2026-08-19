@@ -18,10 +18,10 @@ export default async function OrgInventoryPage() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-2xl font-semibold mb-2">Org inventory</h1>
+        <h1 className="text-2xl font-semibold mb-2">Our inventory</h1>
         <p className="text-sm text-neutral-500">
           Gear your company owns (dollies, machines, general stock). Not client
-          assets, fleet, or tools.
+          assets or fleet.
         </p>
       </div>
 
@@ -72,7 +72,7 @@ export default async function OrgInventoryPage() {
       <section className="space-y-3">
         <h2 className="font-medium">Items ({items.length})</h2>
         {items.length === 0 && (
-          <p className="text-sm text-neutral-500">No org inventory yet.</p>
+          <p className="text-sm text-neutral-500">No items yet.</p>
         )}
         {items.map((item) => (
           <div

@@ -435,7 +435,7 @@ export default async function JobDetailPage({
       <JobPanel
         id="inventory"
         title="Inventory"
-        description="Defaults to this job's client catalog; switch to org items when needed."
+        description="Defaults to this job's client catalog; switch to our inventory when needed."
       >
         <InventorySourceToggle jobId={job.id} source={inventorySource} />
 

@@ -20,6 +20,15 @@ Ambiguous product choices resolved here. Agents follow these unless the user ove
 | D14 | Document retention | **Defer** hard immutability | Soft delete rules in M5+ |
 | D15 | Auth method v1 | Email + password via NextAuth | SSO later |
 | D16 | Org onboarding v1 | Manual seed + invite for pilot; self-serve later | ~5 orgs year one |
+| D17 | Separate tools catalog? | **No** — unified into `inventory_items` ("Our inventory") | Dollies, hand tools, and general gear share one catalog; simpler ops and job assignment |
+
+---
+
+## Resolved open questions
+
+| # | Question | Decision | Rationale |
+|---|----------|----------|-----------|
+| O2 | Tools on job lines or catalog only? | **Deprecated separate `tools` table** — use our inventory | Hand tools tracked like dollies in `inventory_items`; assign via `job_inventory_lines` with `item_type = org` |
 
 ---
 
@@ -28,7 +37,6 @@ Ambiguous product choices resolved here. Agents follow these unless the user ove
 | # | Question | Status |
 |---|----------|--------|
 | O1 | Assign managers to staff (reporting line)? | TBD — not MVP |
-| O2 | Tools on job lines or catalog only? | Catalog only v1; job assignment later |
 | O3 | Minimum crew count beyond 1+1 phases? | At least 1 LoadIn + 1 LoadOut assignment |
 
-*Last updated: documentation phase.*
+*Last updated: post-MVP cleanup (tools → our inventory).*

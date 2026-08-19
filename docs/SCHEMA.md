@@ -93,7 +93,7 @@ Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`,
 
 ## Catalogs
 
-### `inventory_items` (org-owned)
+### `inventory_items` (our inventory)
 | Column | Type | Notes |
 |--------|------|-------|
 | id | uuid PK | |
@@ -103,6 +103,8 @@ Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`,
 | description | text | |
 | total_quantity | int | |
 | created_at | timestamptz | |
+
+3PL-owned gear (dollies, hand tools, general stock). UI label: **Our inventory**. Not fleet; not client-owned assets.
 
 ### `client_inventory_items`
 | Column | Type | Notes |
@@ -127,7 +129,10 @@ Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`,
 | is_active | boolean | default true |
 | created_at | timestamptz | |
 
-### `tools`
+### `tools` *(deprecated — do not use)*
+
+**Deprecated:** v1 unified hand tools and small equipment into `inventory_items` ("Our inventory"). Table kept in DB for migration safety; no app reads/writes.
+
 | Column | Type | Notes |
 |--------|------|-------|
 | id | uuid PK | |

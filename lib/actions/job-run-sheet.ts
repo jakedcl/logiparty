@@ -205,7 +205,7 @@ export async function getJobRunSheet(
     return {
       id: line.id,
       itemType: line.itemType,
-      itemName: item?.name ?? "Unknown org item",
+      itemName: item?.name ?? "Unknown our inventory item",
       itemSku: item?.sku ?? null,
       quantityAssigned: line.quantityAssigned,
       quantityLoaded: line.quantityLoaded,
