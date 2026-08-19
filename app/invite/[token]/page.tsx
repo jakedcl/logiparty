@@ -1,8 +1,10 @@
 import { eq } from "drizzle-orm";
+import { headers } from "next/headers";
 import { db } from "@/lib/db";
 import { invites, organizations } from "@/lib/db/schema";
 import { acceptInvite } from "@/lib/actions/invites";
 import { signIn } from "@/lib/auth";
+import { absoluteRedirectUrl } from "@/lib/auth/redirect";
 
 export default async function InviteAcceptPage({
   params,
@@ -52,11 +54,13 @@ export default async function InviteAcceptPage({
               .from(organizations)
               .where(eq(organizations.id, result.orgId))
               .limit(1);
+            const headersList = await headers();
+            const dest = invite.isClient ? "/portal" : "/dashboard";
             await signIn("credentials", {
               email: result.email,
               password: formData.get("password") as string,
               orgSlug: orgRow?.slug ?? "test",
-              redirectTo: invite.isClient ? "/portal" : "/dashboard",
+              redirectTo: absoluteRedirectUrl(headersList, dest),
             });
           }}
           className="space-y-4"

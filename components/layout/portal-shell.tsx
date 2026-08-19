@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { signOut } from "@/lib/auth";
+import { absoluteRedirectUrl } from "@/lib/auth/redirect";
 import type { Session } from "next-auth";
 
 type Props = {
@@ -48,7 +50,10 @@ export function PortalShell({
         <form
           action={async () => {
             "use server";
-            await signOut({ redirectTo: "/login" });
+            const headersList = await headers();
+            await signOut({
+              redirectTo: absoluteRedirectUrl(headersList, "/login"),
+            });
           }}
           className="hidden sm:block"
         >
