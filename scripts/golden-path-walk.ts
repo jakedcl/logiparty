@@ -79,7 +79,7 @@ async function login(email: string) {
       csrfToken,
       email,
       password: PASSWORD,
-      orgSlug: "acme",
+      orgSlug: "testtenant",
       redirect: "false",
       callbackUrl: `${BASE}/dashboard`,
     }),
@@ -116,21 +116,21 @@ async function main() {
   const { assertAssignmentFits } = await import("../lib/jobs/inventory-locks");
   const { maybePromoteJobToReady } = await import("../lib/jobs/auto-ready");
 
-  const [acme] = await sql`SELECT id FROM organizations WHERE slug = 'acme'`;
+  const [tenant] = await sql`SELECT id FROM organizations WHERE slug = 'testtenant'`;
   const [rb] =
-    await sql`SELECT id FROM client_companies WHERE org_id = ${acme.id} AND name = 'Red Bull'`;
+    await sql`SELECT id FROM client_companies WHERE org_id = ${tenant.id} AND name = 'Red Bull'`;
 
   // --- Setup / catalogs via UI ---
-  const alex = await login("admin@acme.test");
+  const alex = await login("admin@testtenant.test");
   const alexDash = await getHtml(alex, "/dashboard");
-  assertIncludes(alexDash.html, "Acme Logistics");
+  assertIncludes(alexDash.html, "TestTenant");
   assertNotIncludes(alexDash.html, "Logiparty");
-  mark("1", alexDash.status === 200, "Alex dashboard branded Acme, no Logiparty");
+  mark("1", alexDash.status === 200, "Alex dashboard branded TestTenant, no Logiparty");
 
   const settings = await getHtml(alex, "/dashboard/settings");
   mark(
     "2",
-    settings.status === 200 && settings.html.includes("Acme Logistics"),
+    settings.status === 200 && settings.html.includes("TestTenant"),
     "Alex can open white-label settings"
   );
 
@@ -140,7 +140,7 @@ async function main() {
 
   const rep1 = await login("rep1@redbull.test");
   const portalHome = await getHtml(rep1, "/portal");
-  assertIncludes(portalHome.html, "Acme Logistics");
+  assertIncludes(portalHome.html, "TestTenant");
   assertNotIncludes(portalHome.html, "Logiparty");
   const rep2 = await login("rep2@redbull.test");
   const portal2 = await getHtml(rep2, "/portal");
@@ -150,7 +150,7 @@ async function main() {
     "Both client users land on branded portal"
   );
 
-  const morgan = await login("morgan@acme.test");
+  const morgan = await login("morgan@testtenant.test");
   const clientInv = await getHtml(
     morgan,
     `/dashboard/client-inventory?companyId=${rb.id}`
@@ -177,7 +177,7 @@ async function main() {
   // --- Job request + ops via same tables the app uses ---
   await sql`
     UPDATE jobs SET status = 'completed', updated_at = NOW()
-    WHERE org_id = ${acme.id}
+    WHERE org_id = ${tenant.id}
       AND status IN ('draft', 'upcoming', 'ready')
       AND (
         name LIKE 'Summer Festival Activation%'
@@ -186,15 +186,15 @@ async function main() {
   `;
 
   const [bar] =
-    await sql`SELECT id, total_quantity FROM client_inventory_items WHERE org_id = ${acme.id} AND sku = 'RB-BAR-01'`;
+    await sql`SELECT id, total_quantity FROM client_inventory_items WHERE org_id = ${tenant.id} AND sku = 'RB-BAR-01'`;
   const [dolly] =
-    await sql`SELECT id FROM inventory_items WHERE org_id = ${acme.id} AND sku = 'DOLLY-01'`;
+    await sql`SELECT id FROM inventory_items WHERE org_id = ${tenant.id} AND sku = 'DOLLY-01'`;
   const [truck] =
-    await sql`SELECT id FROM fleet_vehicles WHERE org_id = ${acme.id} AND name = 'Box Truck 12'`;
-  const [sam] = await sql`SELECT id FROM users WHERE email = 'sam@acme.test'`;
-  const [dana] = await sql`SELECT id FROM users WHERE email = 'dana@acme.test'`;
+    await sql`SELECT id FROM fleet_vehicles WHERE org_id = ${tenant.id} AND name = 'Box Truck 12'`;
+  const [sam] = await sql`SELECT id FROM users WHERE email = 'sam@testtenant.test'`;
+  const [dana] = await sql`SELECT id FROM users WHERE email = 'dana@testtenant.test'`;
   const [morganUser] =
-    await sql`SELECT id FROM users WHERE email = 'morgan@acme.test'`;
+    await sql`SELECT id FROM users WHERE email = 'morgan@testtenant.test'`;
   const [rep1User] =
     await sql`SELECT id FROM users WHERE email = 'rep1@redbull.test'`;
 
@@ -212,7 +212,7 @@ async function main() {
       job_start, job_end, load_in_start, load_out_end, created_by
     )
     VALUES (
-      ${jobId}, ${acme.id}, ${rb.id}, ${jobName}, 'draft',
+      ${jobId}, ${tenant.id}, ${rb.id}, ${jobName}, 'draft',
       ${jobStart.toISOString()}, ${jobEnd.toISOString()},
       ${loadInStart.toISOString()}, ${loadOutEnd.toISOString()},
       ${rep1User.id}
@@ -230,7 +230,7 @@ async function main() {
   await sql`UPDATE jobs SET status = 'upcoming', updated_at = NOW() WHERE id = ${jobId}`;
   await sql`
     INSERT INTO activity_logs (org_id, user_id, job_id, action, entity_type, entity_id, is_client_visible)
-    VALUES (${acme.id}, ${morganUser.id}, ${jobId}, 'Accepted job request', 'job', ${jobId}, true)
+    VALUES (${tenant.id}, ${morganUser.id}, ${jobId}, 'Accepted job request', 'job', ${jobId}, true)
   `;
   const afterAccept = await getHtml(morgan, `/dashboard/jobs/${jobId}`);
   mark(
@@ -242,8 +242,8 @@ async function main() {
   await sql`
     INSERT INTO job_locations (job_id, org_id, label, address, sort_order)
     VALUES
-      (${jobId}, ${acme.id}, 'Warehouse', '100 Dock St', 0),
-      (${jobId}, ${acme.id}, 'Venue', '200 Festival Ave', 1)
+      (${jobId}, ${tenant.id}, 'Warehouse', '100 Dock St', 0),
+      (${jobId}, ${tenant.id}, 'Venue', '200 Festival Ave', 1)
   `;
   const locPage = await getHtml(morgan, `/dashboard/jobs/${jobId}`);
   mark(
@@ -253,14 +253,14 @@ async function main() {
   );
 
   await assertAssignmentFits({
-    orgId: acme.id,
+    orgId: tenant.id,
     jobId,
     itemType: "client",
     itemId: bar.id,
     quantityAssigned: 5,
   });
   await assertAssignmentFits({
-    orgId: acme.id,
+    orgId: tenant.id,
     jobId,
     itemType: "org",
     itemId: dolly.id,
@@ -273,46 +273,46 @@ async function main() {
       id, job_id, org_id, item_type, client_item_id, org_item_id,
       quantity_assigned, quantity_loaded
     ) VALUES
-      (${barLine}, ${jobId}, ${acme.id}, 'client', ${bar.id}, NULL, 5, 0),
-      (${dollyLine}, ${jobId}, ${acme.id}, 'org', NULL, ${dolly.id}, 2, 0)
+      (${barLine}, ${jobId}, ${tenant.id}, 'client', ${bar.id}, NULL, 5, 0),
+      (${dollyLine}, ${jobId}, ${tenant.id}, 'org', NULL, ${dolly.id}, 2, 0)
   `;
   mark("14", true, "Assigned 5× RB-BAR-01 and 2× Dolly");
 
   await sql`UPDATE job_inventory_lines SET quantity_loaded = quantity_assigned WHERE job_id = ${jobId}`;
   await sql`
     INSERT INTO activity_logs (org_id, user_id, job_id, action, entity_type, entity_id)
-    VALUES (${acme.id}, ${sam.id}, ${jobId}, 'Updated quantity loaded', 'job_inventory_line', ${barLine})
+    VALUES (${tenant.id}, ${sam.id}, ${jobId}, 'Updated quantity loaded', 'job_inventory_line', ${barLine})
   `;
   mark("15", true, "Sam loaded all assigned qty");
 
   await sql`
     INSERT INTO job_fleet_assignments (job_id, fleet_vehicle_id, org_id)
-    VALUES (${jobId}, ${truck.id}, ${acme.id})
+    VALUES (${jobId}, ${truck.id}, ${tenant.id})
   `;
   mark("16", true, "Assigned Box Truck 12");
 
   await sql`
     INSERT INTO job_assignments (job_id, org_id, user_id, phase, assigned_role)
     VALUES
-      (${jobId}, ${acme.id}, ${sam.id}, 'LoadIn', 'Laborer'),
-      (${jobId}, ${acme.id}, ${dana.id}, 'LoadOut', 'Driver')
+      (${jobId}, ${tenant.id}, ${sam.id}, 'LoadIn', 'Laborer'),
+      (${jobId}, ${tenant.id}, ${dana.id}, 'LoadOut', 'Driver')
   `;
   await sql`UPDATE jobs SET job_lead_user_id = ${sam.id} WHERE id = ${jobId}`;
   await sql`
     INSERT INTO activity_logs (org_id, user_id, job_id, action, entity_type, entity_id)
-    VALUES (${acme.id}, ${morganUser.id}, ${jobId}, 'Assigned crew', 'job_assignment', ${jobId})
+    VALUES (${tenant.id}, ${morganUser.id}, ${jobId}, 'Assigned crew', 'job_assignment', ${jobId})
   `;
   mark("17", true, "Crew: Sam LoadIn Laborer, Dana LoadOut Driver, lead=Sam");
 
   const promoted = await maybePromoteJobToReady({
-    orgId: acme.id,
+    orgId: tenant.id,
     jobId,
     actorUserId: morganUser.id,
   });
   const [readyJob] = await sql`SELECT status FROM jobs WHERE id = ${jobId}`;
   mark("18", promoted && readyJob.status === "ready", `Auto-ready → ${readyJob.status}`);
 
-  const danaJar = await login("dana@acme.test");
+  const danaJar = await login("dana@testtenant.test");
   const myJobs = await getHtml(danaJar, "/dashboard/my-jobs");
   const myJob = await getHtml(danaJar, `/dashboard/my-jobs/${jobId}`);
   mark(
@@ -335,7 +335,7 @@ async function main() {
     );
     const file = new File([pdf], fileName, { type: "application/pdf" });
     const stored = await putJobObject({
-      orgId: acme.id,
+      orgId: tenant.id,
       jobId,
       documentId: docId,
       file,
@@ -346,7 +346,7 @@ async function main() {
         file_name, storage_key, file_size_bytes, mime_type
       )
       VALUES (
-        ${docId}, ${acme.id}, ${jobId}, ${rep1User.id}, 'client',
+        ${docId}, ${tenant.id}, ${jobId}, ${rep1User.id}, 'client',
         ${fileName}, ${stored.storageKey}, ${stored.size}, ${stored.mimeType}
       )
     `;
@@ -379,11 +379,11 @@ async function main() {
   const otherJob = randomUUID();
   await sql`
     INSERT INTO jobs (id, org_id, client_company_id, name, status, created_by)
-    VALUES (${otherJob}, ${acme.id}, ${rb.id}, 'Lock release check', 'upcoming', ${morganUser.id})
+    VALUES (${otherJob}, ${tenant.id}, ${rb.id}, 'Lock release check', 'upcoming', ${morganUser.id})
   `;
   try {
     await assertAssignmentFits({
-      orgId: acme.id,
+      orgId: tenant.id,
       jobId: otherJob,
       itemType: "client",
       itemId: bar.id,
@@ -424,23 +424,23 @@ async function main() {
     sql`SELECT name FROM jobs WHERE id = ${jobId}`,
   ]);
   const leaked = (underDemo[2] as { name: string }[]).length;
-  mark("F3", leaked === 0, `Demo org seeing acme job rows: ${leaked}`);
+  mark("F3", leaked === 0, `Demo org seeing testtenant job rows: ${leaked}`);
 
   const jobA = randomUUID();
   const jobB = randomUUID();
   await sql`
     INSERT INTO jobs (id, org_id, client_company_id, name, status)
     VALUES
-      (${jobA}, ${acme.id}, ${rb.id}, 'Overlap A', 'upcoming'),
-      (${jobB}, ${acme.id}, ${rb.id}, 'Overlap B', 'upcoming')
+      (${jobA}, ${tenant.id}, ${rb.id}, 'Overlap A', 'upcoming'),
+      (${jobB}, ${tenant.id}, ${rb.id}, 'Overlap B', 'upcoming')
   `;
   await sql`
     INSERT INTO job_inventory_lines (job_id, org_id, item_type, client_item_id, quantity_assigned)
-    VALUES (${jobA}, ${acme.id}, 'client', ${bar.id}, 10)
+    VALUES (${jobA}, ${tenant.id}, 'client', ${bar.id}, 10)
   `;
   try {
     await assertAssignmentFits({
-      orgId: acme.id,
+      orgId: tenant.id,
       jobId: jobB,
       itemType: "client",
       itemId: bar.id,

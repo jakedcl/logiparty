@@ -67,7 +67,7 @@ async function login(email: string) {
       csrfToken,
       email,
       password: PASSWORD,
-      orgSlug: "acme",
+      orgSlug: "testtenant",
       redirect: "false",
       callbackUrl: `${BASE}/dashboard`,
     }),
@@ -101,11 +101,11 @@ async function main() {
   if (!url) throw new Error("DATABASE_URL required");
   const sql = neon(url);
 
-  const [acme] = await sql`SELECT id FROM organizations WHERE slug = 'acme'`;
+  const [tenant] = await sql`SELECT id FROM organizations WHERE slug = 'testtenant'`;
   const [job] = await sql`
     SELECT j.id FROM jobs j
     JOIN client_companies c ON c.id = j.client_company_id
-    WHERE j.org_id = ${acme.id} AND c.name = 'Red Bull'
+    WHERE j.org_id = ${tenant.id} AND c.name = 'Red Bull'
       AND j.status IN ('upcoming', 'ready', 'draft')
     ORDER BY j.created_at DESC
     LIMIT 1
@@ -121,7 +121,7 @@ async function main() {
   const file = new File([pdf], FILE_NAME, { type: "application/pdf" });
 
   const stored = await putJobObject({
-    orgId: acme.id,
+    orgId: tenant.id,
     jobId: job.id,
     documentId: docId,
     file,
@@ -133,14 +133,14 @@ async function main() {
       file_name, storage_key, file_size_bytes, mime_type
     )
     VALUES (
-      ${docId}, ${acme.id}, ${job.id}, ${rep1.id}, 'client',
+      ${docId}, ${tenant.id}, ${job.id}, ${rep1.id}, 'client',
       ${FILE_NAME}, ${stored.storageKey}, ${stored.size}, ${stored.mimeType}
     )
   `;
 
   const rep1Jar = await login("rep1@redbull.test");
   const portal = await getHtml(rep1Jar, `/portal/jobs/${job.id}`);
-  const morganJar = await login("morgan@acme.test");
+  const morganJar = await login("morgan@testtenant.test");
   const internal = await getHtml(morganJar, `/dashboard/jobs/${job.id}`);
 
   const portalOk =
