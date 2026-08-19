@@ -1,6 +1,6 @@
 /**
  * Cross-org RLS + RBAC smoke tests.
- * Run: npm run test:integration (requires DATABASE_URL, acme + demo orgs seeded)
+ * Run: npm run test:integration (requires DATABASE_URL, testtenant + demo orgs seeded)
  */
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
@@ -57,7 +57,7 @@ async function verifyCatalogRls(
       sql`SELECT sku FROM inventory_items WHERE sku = ${marker}`,
     ]);
     const seenB = (underB[2] as { sku: string }[]).length;
-    assert(seenB === 0, `Catalog RLS: ${orgB.slug} saw acme inventory`);
+    assert(seenB === 0, `Catalog RLS: ${orgB.slug} saw testtenant inventory`);
     console.log("OK: catalog cross-org isolation");
   } finally {
     await sql`DELETE FROM inventory_items WHERE sku = ${marker}`;
@@ -74,7 +74,7 @@ async function verifyJobsRls(
     SELECT id FROM client_companies WHERE org_id = ${orgA.id} LIMIT 1
   `;
   if (companies.length === 0) {
-    console.log("SKIP: jobs RLS (no client company on acme — run db:seed:demo)");
+    console.log("SKIP: jobs RLS (no client company on testtenant — run db:seed:demo)");
     return;
   }
 
@@ -93,7 +93,7 @@ async function verifyJobsRls(
       sql`SELECT name FROM jobs WHERE id = ${jobId}`,
     ]);
     const seenB = (underB[2] as { name: string }[]).length;
-    assert(seenB === 0, `Jobs RLS: ${orgB.slug} saw acme job`);
+    assert(seenB === 0, `Jobs RLS: ${orgB.slug} saw testtenant job`);
     console.log("OK: jobs cross-org isolation");
   } finally {
     await sql`DELETE FROM jobs WHERE id = ${jobId}`;
@@ -152,7 +152,7 @@ async function main() {
     slug: string;
   }[];
   if (orgs.length < 2) {
-    throw new Error("Need acme + demo orgs — run npm run db:seed");
+    throw new Error("Need testtenant + demo orgs — run npm run db:seed");
   }
 
   await verifyCatalogRls(sql, orgs[0], orgs[1]);
