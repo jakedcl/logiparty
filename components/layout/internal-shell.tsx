@@ -7,7 +7,6 @@ import {
   canManageJobs,
   canManageOrgInventory,
   canManageOrgSettings,
-  canManageTools,
   canInviteUsers,
   canReviewAvailability,
   canSubmitAvailability,
@@ -35,7 +34,6 @@ export function InternalShell({
   const showInventory = canManageOrgInventory(session.user, staffTags);
   const showClientInventory = canManageClientInventory(session.user, staffTags);
   const showFleet = canManageFleet(session.user);
-  const showTools = canManageTools(session.user, staffTags);
   const showJobs = canManageJobs(session.user);
   const showActivityLog = canManageJobs(session.user);
   const showMyJobs = canViewMyJobs(session.user);
@@ -88,7 +86,7 @@ export function InternalShell({
                 href="/dashboard/inventory"
                 className="hover:text-neutral-900"
               >
-                Inventory
+                Our inventory
               </Link>
             )}
             {showClientInventory && (
@@ -102,11 +100,6 @@ export function InternalShell({
             {showFleet && (
               <Link href="/dashboard/fleet" className="hover:text-neutral-900">
                 Fleet
-              </Link>
-            )}
-            {showTools && (
-              <Link href="/dashboard/tools" className="hover:text-neutral-900">
-                Tools
               </Link>
             )}
             {showTeam && (

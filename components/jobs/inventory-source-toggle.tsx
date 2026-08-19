@@ -7,7 +7,7 @@ type Props = {
   source: "client" | "org";
 };
 
-/** Switch inventory picker between job client catalog (default) and org catalog. */
+/** Switch inventory picker between job client catalog (default) and our inventory. */
 export function InventorySourceToggle({ jobId, source }: Props) {
   const router = useRouter();
 
@@ -33,7 +33,7 @@ export function InventorySourceToggle({ jobId, source }: Props) {
         }`}
         onClick={() => router.push(`/dashboard/jobs/${jobId}?inv=org#inventory`)}
       >
-        Org items
+        Our items
       </button>
     </div>
   );

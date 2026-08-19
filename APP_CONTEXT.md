@@ -165,9 +165,9 @@ Out of scope for v1.
 
 ---
 
-## 5. Catalogs: Inventory, Fleet, Tools
+## 5. Catalogs: Inventory & Fleet
 
-Four separate catalogs per org (see [docs/SCHEMA.md](docs/SCHEMA.md)).
+Three active catalogs per org (see [docs/SCHEMA.md](docs/SCHEMA.md)). The legacy `tools` table is deprecated — hand tools belong in our inventory.
 
 ### Client inventory (`client_inventory_items`)
 - Belongs to a **client_company**
@@ -175,18 +175,15 @@ Four separate catalogs per org (see [docs/SCHEMA.md](docs/SCHEMA.md)).
 - Clients see only their company in portal
 - Managers filter by client when maintaining catalog
 
-### Org inventory (`inventory_items`)
-- 3PL-owned: dollies, machines, general gear (not fleet, not tools)
+### Our inventory (`inventory_items`)
+- 3PL-owned: dollies, hand tools, machines, general gear (not fleet)
+- UI label: **Our inventory**
 - Managers + staff with `warehouse` tag: CRUD
 
 ### Fleet (`fleet_vehicles`)
-- Box trucks, vans, etc. — **separate module** from inventory and tools
+- Box trucks, vans, etc. — **separate module** from our inventory
 - Assigned to jobs via `job_fleet_assignments`
 - Required for auto-ready (≥1 vehicle)
-
-### Tools (`tools`)
-- Tool catalog — separate from fleet and org inventory
-- Thin v1: name, optional SKU/qty
 
 ### Per-job inventory (`job_inventory_lines`)
 | Field | Notes |
@@ -328,7 +325,7 @@ See [docs/SCHEMA.md](docs/SCHEMA.md) for full table list.
 | Request job (draft) | — | — | — | — | ✓ |
 | View jobs | All | All | Assigned | Assigned | Own company |
 | Client inventory catalog | — | ✓ | ✓ | — | Read own |
-| Org inventory / tools | — | ✓ | ✓ | — | — |
+| Our inventory | — | ✓ | ✓ | — | — |
 | Fleet catalog | — | ✓ | — | — | — |
 | Assign inventory / fleet / crew | — | ✓ | — | — | — |
 | Update quantity_loaded | — | ✓ | ✓ (assigned job) | — | — |
@@ -350,7 +347,7 @@ Protected by middleware; org from subdomain + session. Prefer server actions whe
 | Users / invites | Invite token, complete profile |
 | Client companies | CRUD + link client users |
 | Jobs | CRUD, status, locations, accept draft |
-| Catalogs | client inventory, org inventory, fleet, tools |
+| Catalogs | client inventory, our inventory, fleet |
 | Job lines | inventory assign, loaded qty, fleet assign |
 | Assignments | crew CRUD |
 | Documents | R2 presign upload, list, delete |

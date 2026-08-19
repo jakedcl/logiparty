@@ -172,7 +172,7 @@ export const clientInventoryItems = pgTable("client_inventory_items", {
     .defaultNow(),
 });
 
-/** Org-owned inventory (dollies, gear) — not fleet, not tools */
+/** 3PL-owned inventory (dollies, gear, hand tools) — not fleet */
 export const inventoryItems = pgTable("inventory_items", {
   id: uuid("id").primaryKey().defaultRandom(),
   orgId: uuid("org_id")
@@ -201,7 +201,7 @@ export const fleetVehicles = pgTable("fleet_vehicles", {
     .defaultNow(),
 });
 
-/** Tool catalog — separate from fleet and org inventory */
+/** @deprecated Table retained for migration safety; use inventory_items instead */
 export const tools = pgTable("tools", {
   id: uuid("id").primaryKey().defaultRandom(),
   orgId: uuid("org_id")

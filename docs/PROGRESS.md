@@ -88,3 +88,49 @@
 ## Documentation phase
 
 - [x] All documentation deliverables
+
+---
+
+## Post-MVP cleanup
+
+- [x] **Tools → Our inventory (Option A):** Deprecated separate `tools` catalog; dollies/hand tools live in `inventory_items`. Removed `/dashboard/tools` nav and page. UI label "Org inventory" → **Our inventory**. See DECISIONS D17 / O2.
+
+---
+
+## Go Live checklist
+
+### Local testing (do this first)
+- [ ] Log in as Morgan (`morgan@acme.test` / `password123`) at `http://localhost:3000`
+- [ ] Walk the job flow end-to-end: create draft → accept → add inventory → load → crew → ready → complete
+- [ ] Log in as Red Bull rep (`rep1@redbull.test`) at `http://localhost:3000/portal`
+- [ ] Submit a job request from the portal, accept it as Morgan
+- [ ] Golden-path walk passes: `npx tsx scripts/golden-path-walk.ts`
+
+### Cloudflare R2 (file uploads)
+- [x] Cloudflare MCP authenticated (account: **logiparty**, ID `6b261c181f1d1d1d46b7b88ef9522fb1`)
+- [x] **Enable R2** in dashboard (required first — API returns `10042 NotEntitled` until subscribed)
+- [x] Create R2 bucket `logiparty-docs`
+- [x] Create R2 API token (Object Read & Write, scoped to `logiparty-docs`)
+- [x] Paste `R2_ACCESS_KEY_ID` + `R2_SECRET_ACCESS_KEY` into `.env.local` (account ID + bucket name already set)
+- [x] Test: upload a PDF from the client portal job detail page (automated smoke: portal upload UI enabled + `putJobObject` write/delete OK)
+- [x] Test: Morgan sees the document on the internal job detail (`scripts/r2-morgan-smoke.ts`)
+
+### Vercel deployment
+- [ ] Install Vercel CLI: `npm i -g vercel`
+- [ ] Import GitHub repo at vercel.com → New Project
+- [ ] Add all env vars to Vercel project (copy from `.env.local`, add prod `AUTH_URL` = `https://logiparty.com`)
+- [ ] Add `NEXT_PUBLIC_ROOT_DOMAIN=logiparty.com` in Vercel env vars
+- [ ] Add `AUTH_SECRET` (generate: `openssl rand -base64 32`)
+- [ ] Add `CRON_SECRET` for `/api/cron/auto-ready`
+- [ ] Add domain `logiparty.com` and wildcard `*.logiparty.com` in Vercel project settings
+- [ ] Point DNS to Vercel (they'll give you the records)
+- [ ] Smoke test production: log in at `acme.logiparty.com`
+
+### Resend (email — invites)
+- [ ] Create account at resend.com, verify your sending domain
+- [ ] Add `RESEND_API_KEY` and `RESEND_FROM_EMAIL` to Vercel env vars
+- [ ] Test: invite a user and confirm the email arrives
+
+### First real tenant
+- [ ] Create the first real org in production DB (or build the sign-up flow in M6)
+- [ ] Set their subdomain slug, run seed or manual insert

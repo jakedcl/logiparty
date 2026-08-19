@@ -82,7 +82,7 @@ export async function getItemTotalQuantity(args: {
       )
       .limit(1)
   );
-  if (!rows[0]) throw new Error("Org inventory item not found");
+  if (!rows[0]) throw new Error("Our inventory item not found");
   return rows[0].totalQuantity;
 }
 

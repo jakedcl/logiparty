@@ -20,7 +20,7 @@ export default async function FleetPage() {
         <h1 className="text-2xl font-semibold mb-2">Fleet</h1>
         <p className="text-sm text-neutral-500">
           Box trucks, vans, and other vehicles assigned to jobs. Separate from
-          inventory and tools.
+          our inventory and client inventory.
         </p>
       </div>
 

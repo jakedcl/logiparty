@@ -51,7 +51,7 @@ export async function createOrgInventoryItem(formData: FormData) {
     activityLogInsert(database, {
       orgId: session.user.orgId,
       userId: session.user.id,
-      action: `Created org inventory "${name}"`,
+      action: `Created our inventory item "${name}"`,
       entityType: "inventory_item",
       entityId: id,
       metadata: { sku, name, totalQuantity },
@@ -88,7 +88,7 @@ export async function updateOrgInventoryItem(formData: FormData) {
     activityLogInsert(database, {
       orgId: session.user.orgId,
       userId: session.user.id,
-      action: `Updated org inventory "${name}"`,
+      action: `Updated our inventory item "${name}"`,
       entityType: "inventory_item",
       entityId: id,
       metadata: { sku, name, totalQuantity },
@@ -116,7 +116,7 @@ export async function deleteOrgInventoryItem(formData: FormData) {
     activityLogInsert(database, {
       orgId: session.user.orgId,
       userId: session.user.id,
-      action: "Deleted org inventory item",
+      action: "Deleted our inventory item",
       entityType: "inventory_item",
       entityId: id,
     }),

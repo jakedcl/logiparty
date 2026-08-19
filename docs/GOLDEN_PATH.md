@@ -32,7 +32,7 @@ End-to-end flow the first paying 3PL must complete. QA and agents use this to ve
 ### Catalogs (M2)
 
 7. **[ ]** Morgan adds client inventory: SKU `RB-BAR-01`, "Branded Bar", qty 10 (Red Bull).
-8. **[ ]** Morgan adds org inventory: "Dolly", qty 20.
+8. **[ ]** Morgan adds our inventory: "Dolly", qty 20.
 9. **[ ]** Morgan adds fleet: "Box Truck 12".
 10. **[ ]** Red Bull Rep 1 sees only Red Bull inventory in portal (not dollies or truck).
 
