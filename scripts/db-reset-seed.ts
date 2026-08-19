@@ -1,5 +1,5 @@
 /**
- * Wipe seeded orgs (testtenant, demo) and re-run golden-path seed.
+ * Wipe seeded orgs (testtenant3pl, demo) and re-run golden-path seed.
  *
  * Run: npm run db:reset-seed -- --confirm
  *
@@ -11,13 +11,9 @@ import { join } from "path";
 import { neon } from "@neondatabase/serverless";
 import { execSync } from "child_process";
 
-const SEED_ORG_SLUGS = ["testtenant", "demo", "acme", "testtenant3pl"] as const;
+const SEED_ORG_SLUGS = ["testtenant3pl", "demo", "acme"] as const;
 
 const SEED_USER_EMAILS = [
-  "admin@testtenant.test",
-  "morgan@testtenant.test",
-  "sam@testtenant.test",
-  "dana@testtenant.test",
   "admin@acme.test",
   "morgan@acme.test",
   "sam@acme.test",
@@ -75,7 +71,7 @@ async function resetAndSeed() {
   console.log(`Target database: ${target}`);
   console.warn(
     "\n⚠️  If Vercel Production uses the SAME DATABASE_URL hostname as .env.local,\n" +
-      "    this reset affects production too (testtenant/demo jobs and seed data wiped).\n" +
+      "    this reset affects production too (testtenant3pl/demo jobs and seed data wiped).\n" +
       "    Compare hostnames in Vercel → Settings → Environment Variables before running.\n" +
       "    Use a separate Neon branch for local dev (see docs/STAGING.md).\n"
   );
@@ -173,24 +169,24 @@ async function resetAndSeed() {
     SELECT o.slug, i.sku, i.name
     FROM inventory_items i
     JOIN organizations o ON o.id = i.org_id
-    WHERE o.slug = 'testtenant'
+    WHERE o.slug = 'testtenant3pl'
     ORDER BY i.sku
   `;
   const fleetAfter = await sql`
     SELECT o.slug, f.name, f.plate
     FROM fleet_vehicles f
     JOIN organizations o ON o.id = f.org_id
-    WHERE o.slug = 'testtenant'
+    WHERE o.slug = 'testtenant3pl'
     ORDER BY f.name
   `;
 
   console.log("\n--- After seed ---");
   console.log("Orgs:", orgsAfter);
   console.log("Client companies:", clientsAfter);
-  console.log("TestTenant inventory:", inventoryAfter);
-  console.log("TestTenant fleet:", fleetAfter);
+  console.log("TestTenant3PL inventory:", inventoryAfter);
+  console.log("TestTenant3PL fleet:", fleetAfter);
   console.log(
-    "\nNon-seed users preserved (e.g. personal accounts) — re-invite to testtenant if needed."
+    "\nNon-seed users preserved (e.g. personal accounts) — re-invite to testtenant3pl if needed."
   );
 }
 

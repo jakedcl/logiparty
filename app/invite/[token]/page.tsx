@@ -55,7 +55,7 @@ export default async function InviteAcceptPage({
             await signIn("credentials", {
               email: result.email,
               password: formData.get("password") as string,
-              orgSlug: orgRow?.slug ?? "testtenant",
+              orgSlug: orgRow?.slug ?? "testtenant3pl",
               redirectTo: invite.isClient ? "/portal" : "/dashboard",
             });
           }}

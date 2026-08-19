@@ -67,7 +67,7 @@ async function login(email: string) {
       csrfToken,
       email,
       password: PASSWORD,
-      orgSlug: "testtenant",
+      orgSlug: "testtenant3pl",
       redirect: "false",
       callbackUrl: `${BASE}/dashboard`,
     }),
@@ -101,7 +101,7 @@ async function main() {
   if (!url) throw new Error("DATABASE_URL required");
   const sql = neon(url);
 
-  const [tenant] = await sql`SELECT id FROM organizations WHERE slug = 'testtenant'`;
+  const [tenant] = await sql`SELECT id FROM organizations WHERE slug = 'testtenant3pl'`;
   const [job] = await sql`
     SELECT j.id FROM jobs j
     JOIN client_companies c ON c.id = j.client_company_id
@@ -140,7 +140,7 @@ async function main() {
 
   const rep1Jar = await login("rep1@redbull.test");
   const portal = await getHtml(rep1Jar, `/portal/jobs/${job.id}`);
-  const morganJar = await login("morgan@testtenant.test");
+  const morganJar = await login("morgan@acme.test");
   const internal = await getHtml(morganJar, `/dashboard/jobs/${job.id}`);
 
   const portalOk =
