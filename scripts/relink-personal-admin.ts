@@ -52,7 +52,7 @@ async function relink() {
     INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
     SELECT o.id, u.id, true, true, false, false
     FROM organizations o, users u
-    WHERE o.slug = 'testtenant3pl' AND u.email = ${email}
+    WHERE o.slug = 'test' AND u.email = ${email}
     ON CONFLICT (org_id, user_id) DO UPDATE SET
       is_org_admin = true,
       is_manager = true
