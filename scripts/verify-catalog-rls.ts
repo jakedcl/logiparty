@@ -11,7 +11,7 @@ async function main() {
 
   const orgs = await sql`SELECT id, slug FROM organizations ORDER BY slug LIMIT 2`;
   if (orgs.length < 2) {
-    throw new Error("Need two orgs (seed testtenant3pl + demo) to verify isolation");
+    throw new Error("Need two orgs (seed test + demo) to verify isolation");
   }
   const [a, b] = orgs;
 

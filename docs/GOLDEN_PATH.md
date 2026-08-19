@@ -22,7 +22,7 @@ End-to-end flow the first paying 3PL must complete. QA and agents use this to ve
 
 ### Setup (M1)
 
-1. **[ ]** Alex logs in at `testtenant3pl.logiparty.com` (no "Logiparty" in header).
+1. **[ ]** Alex logs in at `test.logiparty.com` (no "Logiparty" in header).
 2. **[ ]** Alex sets white-label: org name "TestTenant3PL", logo, primary color.
 3. **[ ]** Alex invites Morgan as Manager.
 4. **[ ]** Morgan invites Sam (`warehouse`) and Dana (`driver`).
@@ -70,7 +70,7 @@ End-to-end flow the first paying 3PL must complete. QA and agents use this to ve
 |---|------|----------|
 | F1 | Dana tries URL of unassigned job | 403 or not listed |
 | F2 | Red Bull user tries another client's job | 403 |
-| F3 | User from `demo` org guesses `testtenant3pl` job UUID | 403 / empty (RLS) |
+| F3 | User from `demo` org guesses `test` job UUID | 403 / empty (RLS) |
 | F4 | Assign same 10 bars to two overlapping upcoming jobs | Blocked or partial qty only |
 
 ---
