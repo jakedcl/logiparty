@@ -100,7 +100,7 @@
 ## Go Live checklist
 
 ### Local testing (do this first)
-- [ ] Log in as Morgan (`morgan@acme.test` / `password123`) at `http://localhost:3000`
+- [ ] Log in as Morgan (`morgan@testtenant.test` / `password123`) at `http://localhost:3000`
 - [ ] Walk the job flow end-to-end: create draft → accept → add inventory → load → crew → ready → complete
 - [ ] Log in as Red Bull rep (`rep1@redbull.test`) at `http://localhost:3000/portal`
 - [ ] Submit a job request from the portal, accept it as Morgan
@@ -119,12 +119,12 @@
 - [ ] Install Vercel CLI: `npm i -g vercel`
 - [ ] Import GitHub repo at vercel.com → New Project
 - [ ] Add all env vars to Vercel project (copy from `.env.local`, add prod `AUTH_URL` = `https://logiparty.com`)
-- [ ] Add `NEXT_PUBLIC_ROOT_DOMAIN=logiparty.com` in Vercel env vars
+- [x] Add `NEXT_PUBLIC_ROOT_DOMAIN=logiparty.com` in Vercel env vars (no `www`, not blank — redeploy after change)
 - [ ] Add `AUTH_SECRET` (generate: `openssl rand -base64 32`)
 - [ ] Add `CRON_SECRET` for `/api/cron/auto-ready`
 - [ ] Add domain `logiparty.com` and wildcard `*.logiparty.com` in Vercel project settings
 - [ ] Point DNS to Vercel (they'll give you the records)
-- [ ] Smoke test production: log in at `acme.logiparty.com`
+- [ ] Smoke test production: log in at `testtenant.logiparty.com`
 
 ### Resend (email — invites)
 - [ ] Create account at resend.com, verify your sending domain

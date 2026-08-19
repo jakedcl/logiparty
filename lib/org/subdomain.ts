@@ -1,7 +1,7 @@
 /**
  * Resolve org slug from Host header.
- * Production: acme.logiparty.com → acme
- * Local: acme.localhost → acme
+ * Production: testtenant.logiparty.com → testtenant
+ * Local: testtenant.localhost → testtenant
  */
 
 function getRootDomain(): string {
