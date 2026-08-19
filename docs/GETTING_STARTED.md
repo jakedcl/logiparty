@@ -10,14 +10,14 @@ One page to go from zero → local dev → production. Read this first.
 cd /Users/jakedcl/Dev/logiparty
 npm install
 npm run db:migrate:sql   # first time only
-npm run db:seed          # acme + demo orgs, test users
-npm run dev              # http://acme.localhost:3000
+npm run db:seed          # testtenant + demo orgs, test users
+npm run dev              # http://testtenant.localhost:3000
 ```
 
 Add to `/etc/hosts` if you haven't:
 
 ```
-127.0.0.1 acme.localhost
+127.0.0.1 testtenant.localhost
 127.0.0.1 demo.localhost
 ```
 
@@ -27,13 +27,13 @@ Copy `.env.example` → `.env.local` and fill `DATABASE_URL`, `AUTH_SECRET`, etc
 
 | URL | Email | Role |
 |-----|-------|------|
-| http://acme.localhost:3000 | `admin@acme.test` | Org admin |
-| http://acme.localhost:3000 | `morgan@acme.test` | Manager |
-| http://acme.localhost:3000 | `sam@acme.test` | Staff (warehouse) |
-| http://acme.localhost:3000 | `rep1@redbull.test` | Client portal |
+| http://testtenant.localhost:3000 | `admin@testtenant.test` | Org admin |
+| http://testtenant.localhost:3000 | `morgan@testtenant.test` | Manager |
+| http://testtenant.localhost:3000 | `sam@testtenant.test` | Staff (warehouse) |
+| http://testtenant.localhost:3000 | `rep1@redbull.test` | Client portal |
 | http://demo.localhost:3000 | `admin@demo.test` | Demo org (RLS checks) |
 
-**Your personal account:** `jakedcl73@gmail.com` is linked as Acme org admin on the current database. Use your existing password (not `password123`). Re-run anytime:
+**Your personal account:** `jakedcl73@gmail.com` is linked as TestTenant org admin on the current database. Use your existing password (not `password123`). Re-run anytime:
 
 ```bash
 npm run db:relink-admin
@@ -47,9 +47,9 @@ npm run db:relink-admin
 |-----|------------------------------|
 | https://logiparty.com/api/health | **200** — `{"status":"ok"}` |
 | https://logiparty.com/login | **200** (redirects to `www.logiparty.com/login`) |
-| https://acme.logiparty.com/api/health | **Fails** — wildcard subdomain not configured yet |
+| https://testtenant.logiparty.com/api/health | **Fails** — wildcard subdomain not configured yet |
 
-After wildcard DNS is live, log in at **https://acme.logiparty.com** with the same seed accounts (or your personal admin account).
+After wildcard DNS is live, log in at **https://testtenant.logiparty.com** with the same seed accounts (or your personal admin account).
 
 Latest Vercel deployment: **success** on commit `2653b5f` (main).
 
@@ -61,11 +61,11 @@ If you ran `npm run db:reset-seed -- --confirm` earlier:
 
 | Removed | Kept |
 |---------|------|
-| `acme` and `demo` orgs and all their jobs, catalogs, fleet | Other orgs (if any) |
-| Seven seed test accounts (`admin@acme.test`, etc.) | Personal accounts like `jakedcl73@gmail.com` |
-| Client companies under acme/demo | — |
+| `testtenant` and `demo` orgs and all their jobs, catalogs, fleet | Other orgs (if any) |
+| Seven seed test accounts (`admin@testtenant.test`, etc.) | Personal accounts like `jakedcl73@gmail.com` |
+| Client companies under testtenant/demo | — |
 
-**Current state (after `npm run db:seed`):** acme + demo exist, **0 jobs**, catalogs re-seeded, test users back. Personal admin re-linked to acme.
+**Current state (after `npm run db:seed`):** testtenant + demo exist, **0 jobs**, catalogs re-seeded, test users back. Personal admin re-linked to testtenant.
 
 `db:reset-seed` only touches seed orgs/users — it does **not** drop the whole database. But if Production shares the same `DATABASE_URL`, production sees the same wipe.
 
@@ -97,7 +97,7 @@ Open [vercel.com](https://vercel.com) → **logiparty** project:
 
 **Settings → Domains** → Add `*.logiparty.com` (and ensure `logiparty.com` / `www.logiparty.com` are verified).
 
-Without this, `acme.logiparty.com` will not resolve (SSL/connect errors).
+Without this, `testtenant.logiparty.com` will not resolve (SSL/connect errors).
 
 ### 2. Environment variables checklist
 
@@ -107,7 +107,7 @@ Without this, `acme.logiparty.com` will not resolve (SSL/connect errors).
 |----------|-------|
 | `DATABASE_URL` | Neon **main** branch pooled URL — must differ from local dev after you split branches |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
-| `AUTH_URL` | `https://acme.logiparty.com` (or your primary tenant URL) |
+| `AUTH_URL` | `https://testtenant.logiparty.com` (or your primary tenant URL) |
 | `AUTH_TRUST_HOST` | `true` |
 | `NEXT_PUBLIC_ROOT_DOMAIN` | `logiparty.com` |
 | `R2_*` | If using document uploads (M4+) |
@@ -126,8 +126,8 @@ Never commit `.env.local`.
 ```bash
 npm run dev                    # local app
 npm run db:seed                # idempotent — safe to re-run
-npm run db:reset-seed -- --confirm   # wipe acme/demo filler only
-npm run db:relink-admin        # re-link personal email as acme admin
+npm run db:reset-seed -- --confirm   # wipe testtenant/demo filler only
+npm run db:relink-admin        # re-link personal email as testtenant admin
 npm run test:integration       # RLS / RBAC smoke tests
 ```
 

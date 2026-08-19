@@ -195,7 +195,7 @@ M0 Foundation
 
 | Week | Milestone | Demo |
 |------|-----------|------|
-| 1 | M0 | Login on `acme.*` subdomain, empty dashboard |
+| 1 | M0 | Login on `testtenant.*` subdomain, empty dashboard |
 | 2 | M1 | Invites + client company |
 | 3 | M2 | Four catalogs |
 | 4–5 | M3 | Job upcoming → ready |
