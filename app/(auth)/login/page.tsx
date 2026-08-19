@@ -2,7 +2,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { auth, signIn } from "@/lib/auth";
-import { postAuthPath } from "@/lib/auth/redirect";
+import { absoluteRedirectUrl, postAuthPath } from "@/lib/auth/redirect";
 import { db } from "@/lib/db";
 import { organizations } from "@/lib/db/schema";
 import { getOrgSlugFromHeaders } from "@/lib/org/subdomain";
@@ -84,12 +84,13 @@ export default async function LoginPage({
             const email = formData.get("email") as string;
             const password = formData.get("password") as string;
             try {
-              // Land on `/` so role-aware home routing sends clients to portal.
+              const headersList = await headers();
+              // Absolute URL keeps post-login on tenant subdomain (AUTH_URL is apex).
               await signIn("credentials", {
                 email,
                 password,
                 orgSlug,
-                redirectTo: "/",
+                redirectTo: absoluteRedirectUrl(headersList, "/"),
               });
             } catch (error) {
               // Auth.js throws a redirect on success — rethrow so it isn't treated as failure.

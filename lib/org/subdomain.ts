@@ -4,7 +4,7 @@
  * Local: test.localhost → test
  */
 
-function getRootDomain(): string {
+export function getRootDomain(): string {
   const configured = process.env.NEXT_PUBLIC_ROOT_DOMAIN?.trim();
   if (!configured) return "logiparty.com";
   // Tolerate https://logiparty.com or www.logiparty.com misconfig in Vercel env.

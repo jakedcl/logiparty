@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orgMemberships, organizations, users } from "@/lib/db/schema";
+import { authRedirectCallback } from "@/lib/auth/redirect";
 import { clearLoginAttempts, loginAllowed } from "@/lib/auth/rate-limit";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -91,6 +92,7 @@ export const authConfig = {
   },
   session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 7 },
   callbacks: {
+    redirect: authRedirectCallback,
     async jwt({ token, user }) {
       if (user) {
         token.orgId = user.orgId;
