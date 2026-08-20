@@ -1550,6 +1550,27 @@ async function seedNydacRich(sql: Sql, passwordHash: string) {
       )
   `;
 
+  // —— Sample unread client note (Red Bull / Michaela) ——
+  await sql`
+    INSERT INTO client_notes (
+      org_id, client_company_id, sent_by_user_id, subject, body
+    )
+    SELECT o.id, c.id, u.id,
+      'Loading dock access Friday',
+      'Hi team — we may need after-hours dock access this Friday for a Red Bull drop. Can someone confirm the window?'
+    FROM organizations o
+    JOIN client_companies c ON c.org_id = o.id AND c.name = 'Red Bull'
+    JOIN users u ON u.email = 'michaela@redbull.test'
+    WHERE o.slug = 'nydac'
+      AND NOT EXISTS (
+        SELECT 1 FROM client_notes n
+        WHERE n.org_id = o.id
+          AND n.client_company_id = c.id
+          AND n.subject = 'Loading dock access Friday'
+          AND n.read_at IS NULL
+      )
+  `;
+
   console.log("  nydac rich: clients + inventory + fleet + 6 jobs seeded");
 }
 

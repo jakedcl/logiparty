@@ -20,6 +20,8 @@ inventory_request_type: 'add' | 'qty_change' | 'remove'
 inventory_request_status: 'pending' | 'approved' | 'denied'
 ```
 
+*Client notes have no enum — unread = `read_at IS NULL`.*
+
 Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`, `rigger`, `staging`
 
 ---
@@ -148,6 +150,21 @@ Clients do **not** edit this catalog directly. They submit rows in `client_inven
 | updated_at | timestamptz | |
 
 *Approve applies to `client_inventory_items`: `add` inserts a row; `qty_change` updates `total_quantity`; `remove` deletes the catalog row (same as staff delete). Deny only updates status + review fields.*
+
+### `client_notes`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | uuid PK | |
+| org_id | uuid FK | RLS |
+| client_company_id | uuid FK | |
+| sent_by_user_id | uuid FK → users | Client who sent |
+| subject | text | Optional |
+| body | text | Required |
+| read_at | timestamptz | Nullable — null = unread (staff inbox) |
+| read_by_user_id | uuid FK → users | Nullable until a manager marks read |
+| created_at | timestamptz | |
+
+*One-way v1: client → 3PL only. Not tied to a job or inventory SKU. No threading. Managers/OrgAdmins see unread in Notifications and can mark read.*
 
 ### `fleet_vehicles`
 | Column | Type | Notes |

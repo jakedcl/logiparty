@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (portal jobs sort by job_start desc).*
+*Last updated: 2026-08-20 (A14 client → tenant notes).*
 
 ---
 
@@ -70,6 +70,7 @@
 - [x] **A13** Portal inventory **requests** v1 — clients request add / qty change / remove with reason; managers Approve (apply to `client_inventory_items`) or Deny (+ optional note). Table `client_inventory_requests` + migration `0021`. Portal `/portal/inventory` list-first + collapsed + Request new item + Your requests. Staff: Notifications + Client inventory pending panel. Seed: 2 Red Bull pending samples (cooler qty + umbrella add). Neon **dev** migrated + seeded.
 - [x] **A13b** Portal inventory request UX — row **⋯** menu (Change quantity / Remove from storage) → dedicated `/portal/inventory/requests/new?type=…&itemId=…` form page; + Request new item → same page `type=add`. No inline stacked forms. Your requests list kept.
 - [x] **Portal jobs date sort** — `/portal/jobs` ordered by `job_start` desc (then `created_at`); was `created_at` only so Date column looked jumbled. Inventory requests already newest-first by `created_at`.
+- [x] **A14** Client → tenant general notes v1 — portal `/portal/notes` (list newest-first + collapsed compose); table `client_notes` + migration `0022`; managers see unread in Notifications + Mark read; one-way (D18). Seed: Red Bull Michaela unread sample. Neon **dev** migrated + seedable.
 ---
 
 ## Current environments

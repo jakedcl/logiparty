@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { acceptDraftJob, denyDraftJob } from "@/lib/actions/jobs";
+import { markClientNoteRead } from "@/lib/actions/client-notes";
 import {
   approveInventoryRequest,
   denyInventoryRequest,
@@ -19,13 +20,15 @@ function fmt(d: Date): string {
 }
 
 function kindLabel(
-  kind: "draft_request" | "inventory_request" | "assignment"
+  kind: "draft_request" | "inventory_request" | "client_note" | "assignment"
 ): string {
   switch (kind) {
     case "draft_request":
       return "Job request";
     case "inventory_request":
       return "Inventory";
+    case "client_note":
+      return "Note";
     case "assignment":
       return "Assignment";
   }
@@ -49,6 +52,7 @@ export default async function NotificationsPage() {
         <p className="text-sm text-neutral-500">
           {[
             canManager ? "draft job requests" : null,
+            canManager ? "client notes" : null,
             canInventory ? "inventory change requests" : null,
             canStaff ? "your assignments" : null,
           ]
@@ -96,6 +100,8 @@ export default async function NotificationsPage() {
                     item.kind === "inventory_request"
                       ? item.inventoryRequestId
                       : null;
+                  const noteId =
+                    item.kind === "client_note" ? item.clientNoteId : null;
                   return (
                     <tr
                       key={item.id}
@@ -105,15 +111,28 @@ export default async function NotificationsPage() {
                         {kindLabel(item.kind)}
                       </td>
                       <td className="py-2 px-3">
-                        <Link
-                          href={item.href}
-                          className="font-medium text-neutral-900 hover:underline"
-                        >
-                          {item.title}
-                        </Link>
-                        <p className="text-neutral-500 text-xs mt-0.5">
-                          {item.detail}
-                        </p>
+                        {item.kind === "client_note" ? (
+                          <>
+                            <p className="font-medium text-neutral-900">
+                              {item.title}
+                            </p>
+                            <p className="text-neutral-500 text-xs mt-0.5">
+                              {item.detail}
+                            </p>
+                          </>
+                        ) : (
+                          <>
+                            <Link
+                              href={item.href}
+                              className="font-medium text-neutral-900 hover:underline"
+                            >
+                              {item.title}
+                            </Link>
+                            <p className="text-neutral-500 text-xs mt-0.5">
+                              {item.detail}
+                            </p>
+                          </>
+                        )}
                       </td>
                       <td className="py-2 px-3 text-right text-xs text-neutral-400 whitespace-nowrap">
                         <time>{fmt(item.createdAt)}</time>
@@ -149,6 +168,16 @@ export default async function NotificationsPage() {
                                 </ConfirmSubmitButton>
                               </form>
                             </div>
+                          ) : noteId && canManager ? (
+                            <form action={markClientNoteRead}>
+                              <input type="hidden" name="id" value={noteId} />
+                              <button
+                                type="submit"
+                                className="text-xs font-medium text-neutral-900 hover:underline"
+                              >
+                                Mark read
+                              </button>
+                            </form>
                           ) : invId && canInventory ? (
                             <div className="inline-flex items-center gap-2">
                               <form action={approveInventoryRequest}>

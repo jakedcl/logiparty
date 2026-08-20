@@ -22,6 +22,7 @@ Ambiguous product choices resolved here. Agents follow these unless the user ove
 | D15 | Auth method v1 | Email + password via NextAuth | SSO later |
 | D16 | Org onboarding v1 | Manual seed + invite for pilot; self-serve later | ~5 orgs year one |
 | D17 | Separate tools catalog? | **No** — unified into `inventory_items` ("Our inventory") | Dollies, hand tools, and general gear share one catalog; simpler ops and job assignment |
+| D18 | Client → tenant general notes? | **One-way v1** — optional subject + body; unread via `read_at`; managers/OrgAdmins see in Notifications; no threading | Thin inbox; not job/SKU scoped |
 
 ---
 
@@ -40,4 +41,4 @@ Ambiguous product choices resolved here. Agents follow these unless the user ove
 | O1 | Assign managers to staff (reporting line)? | TBD — not MVP |
 | O3 | Minimum crew count beyond 1+1 phases? | At least 1 LoadIn + 1 LoadOut assignment |
 
-*Last updated: 2026-08-20 (D5b denied status for portal drafts).*
+*Last updated: 2026-08-20 (D18 client notes one-way v1).*
