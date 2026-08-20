@@ -31,9 +31,18 @@ export default async function LoginPage({
           <p className="text-sm text-neutral-600">
             Open your organization subdomain to sign in (for example{" "}
             <code className="text-xs bg-neutral-100 px-1 rounded">
+              your-org.logiparty.com
+            </code>
+            , or locally{" "}
+            <code className="text-xs bg-neutral-100 px-1 rounded">
               your-org.localhost:3000
-            </code>{" "}
-            locally).
+            </code>
+            ).
+          </p>
+          <p className="mt-4 text-sm text-neutral-600">
+            <a href="/" className="text-neutral-900 underline underline-offset-2">
+              ← Back to Logiparty
+            </a>
           </p>
         </div>
       </div>

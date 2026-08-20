@@ -13,8 +13,7 @@
 | ID | Task | Owner | Notes |
 |----|------|-------|-------|
 | **A1** | Jake tests job flow locally | Jake | Automated: `npx tsx scripts/golden-path-walk.ts` → **29 passed, 0 failed** (2026-08-19). Still worth one manual click-through on prod. |
-| **A3** | Homepage at `logiparty.com` | Agent | Marketing / leads landing page (does not exist yet) |
-| **A4** | Unknown subdomain → homepage | Agent | If `{slug}.logiparty.com` has no org in DB, redirect to `https://logiparty.com` (depends on A3 or stub page) |
+| **A4** | Unknown subdomain → homepage | Agent | If `{slug}.logiparty.com` has no org in DB, redirect to `https://logiparty.com` (A3 homepage exists — ready to wire) |
 | **A6** | Client inventory UI polish | Agent (when Jake picks it) | **Docs-only queue item — do not start until Jake asks.** Polish Client inventory first; same pattern likely later for **Our inventory** and **Fleet**. (1) **SKU:** keep label "SKU"; auto-uppercase on input/blur; soft format (letters/numbers/`-`) — not a hard regex. (2) **Demote "Add item"** — collapsed or bottom; list is primary (managers mostly adjust qty). (3) **Items list:** dense table/rows, not big card containers per item. |
 
 ---
@@ -24,7 +23,7 @@
 | ID | Task | Blocked by |
 |----|------|------------|
 | B1 | Prod smoke test + logo on login | Login works (A2 done). Remaining: full smoke + logo on login |
-| B2 | First real paying customer | Jake tested app + A3 homepage optional |
+| B2 | First real paying customer | Jake tested app + A3 homepage live |
 | B3 | Resend invite emails | Resend account + domain verify |
 | B4 | M6 (Stripe, self-serve signup, custom domains) | Post-pilot — do not start unless Jake asks |
 
@@ -43,6 +42,7 @@
 - [x] Cloudflare MCP connected
 - [x] **A2** Fix Vercel Production env + login redirect loop — Jake confirmed login works on prod (`test.logiparty.com`, 2026-08-20). Env checklist + `secureCookie: true` for `__Secure-authjs.session-token` in middleware.
 - [x] **A5** Neon `dev` branch — local `.env.local` `DATABASE_URL` → pooled `dev` (`ep-lucky-water-aphwec7q-pooler…`); Vercel Production stays on Neon `main`. Fork had schema + `test`/`demo` already; no reset of `main`. Only run `db:reset-seed` against `dev`.
+- [x] **A3** Marketing / leads homepage at apex `logiparty.com` — invite-only “Request access” form → `marketing_leads` (+ optional Resend notify). Tenant `{slug}.logiparty.com` unchanged. Follow-up: **A4** unknown subdomain → homepage.
 
 ---
 
@@ -51,6 +51,8 @@
 | What | URL / value |
 |------|-------------|
 | **Prod tenant login** | https://test.logiparty.com/login |
+| **Prod marketing** | https://logiparty.com |
+| **Local marketing** | http://localhost:3000 (unset `NEXT_PUBLIC_DEV_ORG_SLUG`) |
 | **Local tenant** | http://test.localhost:3000 (`.env.local` → Neon **`dev`**) |
 | **Seed manager** | `morgan@test.test` / `password123` |
 | **Jake admin** | `jakedcl73@gmail.com` (your password) |

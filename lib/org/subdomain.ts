@@ -39,6 +39,15 @@ export function getOrgSlugFromHost(host: string): string | null {
   return null;
 }
 
+/** Absolute origin for a tenant subdomain (local or prod). */
+export function buildTenantOrigin(orgSlug: string, port = "3000"): string {
+  const root = getRootDomain();
+  if (process.env.NODE_ENV === "development") {
+    return `http://${orgSlug}.localhost:${port}`;
+  }
+  return `https://${orgSlug}.${root}`;
+}
+
 /** Prefer slug injected by middleware; fall back to Host / x-forwarded-host. */
 export function getOrgSlugFromHeaders(headersList: Headers): string | null {
   const fromMiddleware = headersList.get("x-org-slug")?.trim();

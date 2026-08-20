@@ -382,6 +382,18 @@ export const availabilityRequests = pgTable("availability_requests", {
     .defaultNow(),
 });
 
+/** Platform-level waitlist / access requests (not org-scoped; no RLS). */
+export const marketingLeads = pgTable("marketing_leads", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  company: text("company"),
+  message: text("message"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 export type Organization = typeof organizations.$inferSelect;
 export type User = typeof users.$inferSelect;
 export type OrgMembership = typeof orgMemberships.$inferSelect;
@@ -399,6 +411,7 @@ export type JobFleetAssignment = typeof jobFleetAssignments.$inferSelect;
 export type JobAssignment = typeof jobAssignments.$inferSelect;
 export type Document = typeof documents.$inferSelect;
 export type AvailabilityRequest = typeof availabilityRequests.$inferSelect;
+export type MarketingLead = typeof marketingLeads.$inferSelect;
 export type JobStatus = (typeof jobStatusEnum.enumValues)[number];
 export type JobInventoryItemType =
   (typeof jobInventoryItemTypeEnum.enumValues)[number];

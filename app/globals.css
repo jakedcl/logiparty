@@ -21,6 +21,186 @@ body {
   font-family: var(--font-sans);
 }
 
+/* —— A3 marketing (apex logiparty.com) —— */
+.marketing {
+  --m-bg: #0a0c0f;
+  --m-fg: #eef1f4;
+  --m-muted: #8b949e;
+  --m-accent: #c8f542;
+  --m-accent-ink: #0a0c0f;
+  --m-line: rgba(238, 241, 244, 0.12);
+  --m-panel: rgba(238, 241, 244, 0.04);
+  position: relative;
+  background: var(--m-bg);
+  overflow-x: clip;
+}
+
+.m-atmosphere {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 55% at 70% 15%, rgba(200, 245, 66, 0.09), transparent 55%),
+    radial-gradient(ellipse 60% 50% at 10% 80%, rgba(56, 120, 180, 0.14), transparent 50%),
+    linear-gradient(165deg, #0a0c0f 0%, #12161c 45%, #0a0c0f 100%);
+  animation: m-ambient 18s ease-in-out infinite alternate;
+}
+
+@keyframes m-ambient {
+  from {
+    filter: hue-rotate(0deg) saturate(1);
+    transform: scale(1);
+  }
+  to {
+    filter: hue-rotate(12deg) saturate(1.08);
+    transform: scale(1.03);
+  }
+}
+
+.m-visual-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(238, 241, 244, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(238, 241, 244, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse 70% 60% at 75% 40%, black, transparent 75%);
+  opacity: 0.7;
+}
+
+.m-visual-glow {
+  position: absolute;
+  right: -8%;
+  top: 12%;
+  width: min(52vw, 520px);
+  height: min(52vw, 520px);
+  border-radius: 40% 60% 55% 45%;
+  background: radial-gradient(
+    circle at 40% 40%,
+    rgba(200, 245, 66, 0.22),
+    rgba(200, 245, 66, 0.04) 45%,
+    transparent 70%
+  );
+  animation: m-glow-drift 14s ease-in-out infinite alternate;
+}
+
+@keyframes m-glow-drift {
+  from {
+    transform: translate(0, 0) rotate(0deg);
+  }
+  to {
+    transform: translate(-4%, 6%) rotate(8deg);
+  }
+}
+
+.m-visual-dock {
+  position: absolute;
+  right: 4%;
+  bottom: 8%;
+  width: min(42vw, 380px);
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(200, 245, 66, 0.55),
+    transparent
+  );
+  box-shadow: 0 0 40px 8px rgba(200, 245, 66, 0.12);
+}
+
+.m-fade-up {
+  opacity: 0;
+  transform: translateY(18px);
+  animation: m-rise 0.75s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.m-delay-0 {
+  animation-delay: 0.05s;
+}
+.m-delay-1 {
+  animation-delay: 0.18s;
+}
+.m-delay-2 {
+  animation-delay: 0.32s;
+}
+.m-delay-3 {
+  animation-delay: 0.46s;
+}
+
+@keyframes m-rise {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.m-btn-primary {
+  border-radius: 0.375rem;
+  background: var(--m-accent);
+  color: var(--m-accent-ink);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.m-btn-primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+  box-shadow: 0 8px 24px rgba(200, 245, 66, 0.2);
+}
+
+.m-btn-ghost {
+  border-radius: 0.375rem;
+  border: 1px solid var(--m-line);
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.m-btn-ghost:hover {
+  color: var(--m-fg);
+  border-color: rgba(238, 241, 244, 0.28);
+  background: var(--m-panel);
+}
+
+.m-input {
+  border-radius: 0.375rem;
+  border: 1px solid var(--m-line);
+  background: rgba(10, 12, 15, 0.55);
+  color: var(--m-fg);
+  padding: 0.625rem 0.75rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.m-input::placeholder {
+  color: rgba(139, 148, 158, 0.7);
+}
+
+.m-input:focus {
+  border-color: rgba(200, 245, 66, 0.55);
+  box-shadow: 0 0 0 3px rgba(200, 245, 66, 0.12);
+}
+
+.m-lead-success {
+  animation: m-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .m-atmosphere,
+  .m-visual-glow {
+    animation: none;
+  }
+
+  .m-fade-up,
+  .m-lead-success {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .m-btn-primary:hover {
+    transform: none;
+  }
+}
+
 @media print {
   .no-print {
     display: none !important;
