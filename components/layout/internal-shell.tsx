@@ -10,10 +10,10 @@ import {
 import { SessionIdentity } from "@/components/layout/session-identity";
 import {
   canManageClientInventory,
-  canManageFleet,
   canManageJobs,
   canManageOrgInventory,
   canInviteUsers,
+  canViewFleet,
   canViewMyJobs,
 } from "@/lib/auth/permissions";
 import { FALLBACK_PRIMARY_COLOR } from "@/lib/theme/primary-color";
@@ -46,7 +46,7 @@ export function InternalShell({
   const showInventory =
     canManageOrgInventory(session.user, staffTags) ||
     canManageClientInventory(session.user, staffTags) ||
-    canManageFleet(session.user);
+    canViewFleet(session.user);
   const showJobs = canManageJobs(session.user);
   const showMyJobs = canViewMyJobs(session.user);
   const showNotifications = showJobs || showMyJobs;

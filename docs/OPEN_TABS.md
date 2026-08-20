@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (A18a Client hero + Add-above-table).*
+*Last updated: 2026-08-20 (A18 fleet view-all + Equipment ⋯).*
 
 ---
 
@@ -77,6 +77,7 @@
 - [x] **A17** Rejected out of primary feeds — denied jobs leave staff Jobs + portal Your jobs (collapsed **Rejected**); Notifications Inbox stays pending-only + collapsed **Rejected** history (`listRejectedItems`); Needs attention unchanged (already pending-only). Rows kept (`denied` status).
 - [x] **A18a** Inventory IA — single staff nav **Inventory**; tabs Client \| Equipment \| Fleet; `?tab=` deep-links; legacy redirects; A16 open tables. (**A18b** warehouses deferred.)
 - [x] **A18 Client cleanup** — big client title (no truncate) + switcher; quiet **N pending** toggle (closed by default); caption left / **+ Add …** button right (plain button, form below — no `<details>`); Client items view-first with ⋯ Edit/Delete; Equipment/Fleet only move Add top-right (tables unchanged).
+- [x] **A18 fleet view + Equipment ⋯** — all staff roles **view** Fleet tab (D21); Manager/OrgAdmin only Add/Edit/Delete; Equipment rows match Client ⋯ Edit/Delete (no Save/Delete on every row). Clients stay portal-only. PR #40.
 ---
 
 ## Current environments

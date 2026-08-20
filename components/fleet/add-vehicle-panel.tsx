@@ -3,8 +3,14 @@
 import { useState } from "react";
 import { createFleetVehicle } from "@/lib/actions/fleet";
 
-/** Caption left, + Add vehicle right. Form opens below the row. Tables unchanged. */
-export function AddFleetVehiclePanel({ caption }: { caption?: string }) {
+/** Caption left, + Add vehicle right (managers only). Form opens below the row. */
+export function AddFleetVehiclePanel({
+  caption,
+  canAdd = true,
+}: {
+  caption?: string;
+  canAdd?: boolean;
+}) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -15,15 +21,17 @@ export function AddFleetVehiclePanel({ caption }: { caption?: string }) {
         ) : (
           <span />
         )}
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          className="shrink-0 text-sm font-medium text-neutral-900 hover:underline underline-offset-2"
-        >
-          {open ? "Cancel" : "+ Add vehicle"}
-        </button>
+        {canAdd ? (
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            className="shrink-0 text-sm font-medium text-neutral-900 hover:underline underline-offset-2"
+          >
+            {open ? "Cancel" : "+ Add vehicle"}
+          </button>
+        ) : null}
       </div>
-      {open ? (
+      {canAdd && open ? (
         <form
           action={createFleetVehicle}
           className="grid gap-2 sm:grid-cols-2 lg:grid-cols-6 lg:items-end border-t border-neutral-200 pt-3"

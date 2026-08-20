@@ -25,6 +25,7 @@ Ambiguous product choices resolved here. Agents follow these unless the user ove
 | D18 | Client → tenant general notes? | **One-way v1** — optional subject + body; unread via `read_at`; managers/OrgAdmins see in Notifications; no threading | Thin inbox; not job/SKU scoped |
 | D19 | Org warehouses / item locations? | **Defer** — nice-to-know, not required for v1 | Adds schema + filter UI without enough ops value yet |
 | D20 | Inventory IA? | **One nav item** Inventory with tabs Client \| Equipment \| Fleet; deep-link `?tab=` | Same house, three rooms |
+| D21 | Who sees Fleet? | **All staff** (OrgAdmin / Manager / Staff) can **view**; only Manager / OrgAdmin **Add / Edit / Delete**. Clients stay portal-only (no staff Fleet). | Jake: everyone can see trucks; mutate stays managers |
 
 ---
 
@@ -43,4 +44,4 @@ Ambiguous product choices resolved here. Agents follow these unless the user ove
 | O1 | Assign managers to staff (reporting line)? | TBD — not MVP |
 | O3 | Minimum crew count beyond 1+1 phases? | At least 1 LoadIn + 1 LoadOut assignment |
 
-*Last updated: 2026-08-20 (D20 Inventory IA; D19 warehouses deferred).*
+*Last updated: 2026-08-20 (D21 fleet view-all staff; D20 Inventory IA).*
