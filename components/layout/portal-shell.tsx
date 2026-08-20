@@ -107,7 +107,7 @@ export function PortalShell({
           ))}
         </div>
       </nav>
-      <DevRoleSwitchPanel />
+      <DevRoleSwitchPanel orgSlug={session.user.orgSlug} />
     </div>
   );
 }

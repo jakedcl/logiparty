@@ -1,5 +1,5 @@
 /**
- * Wipe seeded orgs (nydac + legacy test/demo/acme/…) and re-run golden-path seed.
+ * Wipe seeded orgs (nydac + test + legacy demo/acme/…) and re-run golden-path seed.
  *
  * Run: npm run db:reset-seed -- --confirm
  *
@@ -7,18 +7,18 @@
  * (CASCADE org-scoped rows / memberships — users are NOT auto-deleted), then
  * seed-only users by email. Non-seed users are kept.
  *
- * After re-seed, only `nydac` exists (test/demo/… are legacy cleanup only).
+ * After re-seed, both `nydac` and `test` exist (fully populated).
  */
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { neon } from "@neondatabase/serverless";
 import { execSync } from "child_process";
 
-/** Orgs wiped on reset. Seed recreates `nydac` only; others are legacy cleanup. */
+/** Orgs wiped on reset. Seed recreates `nydac` + `test`; others are legacy cleanup. */
 const SEED_ORG_SLUGS = ["nydac", "test", "demo", "acme", "testtenant3pl"] as const;
 
 const SEED_USER_EMAILS = [
-  // Current cast
+  // NYDAC cast
   "ed@test.test",
   "mike@test.test",
   "don@test.test",
@@ -28,6 +28,14 @@ const SEED_USER_EMAILS = [
   "jerome@test.test",
   "michaela@redbull.test",
   "dom@redbull.test",
+  // Test / Acme playground cast
+  "boss@playground.test",
+  "riley@playground.test",
+  "chris@playground.test",
+  "pat@playground.test",
+  "jamie@playground.test",
+  "nina@monster.test",
+  "kai@monster.test",
   // Legacy cast (cleanup on reset — includes former demo OrgAdmin Devon)
   "admin@demo.test",
   "admin@test.test",
@@ -93,6 +101,16 @@ async function resetAndSeed() {
 
   const target = dbTarget(url);
   console.log(`Target database: ${target}`);
+
+  // Hard guard: never wipe Neon production (main) from this script.
+  if (url.includes("ep-red-surf-apcicxpa")) {
+    console.error(
+      "\nREFUSING: DATABASE_URL looks like Neon production (main).\n" +
+        "  Reset-seed is for the local Neon `dev` branch only.\n"
+    );
+    process.exit(1);
+  }
+
   console.warn(
     "\n⚠️  If Vercel Production uses the SAME DATABASE_URL hostname as .env.local,\n" +
       "    this reset affects production too (seed orgs/jobs wiped).\n" +
@@ -178,7 +196,7 @@ async function resetAndSeed() {
   execSync("npm run db:seed", { stdio: "inherit", cwd: process.cwd() });
 
   const orgsAfter = await sql`
-    SELECT slug, name FROM organizations
+    SELECT slug, name, logo_url FROM organizations
     WHERE slug = ANY(${SEED_ORG_SLUGS})
     ORDER BY slug
   `;
@@ -193,24 +211,24 @@ async function resetAndSeed() {
     SELECT o.slug, i.sku, i.name
     FROM inventory_items i
     JOIN organizations o ON o.id = i.org_id
-    WHERE o.slug = 'nydac'
-    ORDER BY i.sku
+    WHERE o.slug IN ('nydac', 'test')
+    ORDER BY o.slug, i.sku
   `;
   const fleetAfter = await sql`
     SELECT o.slug, f.name, f.plate
     FROM fleet_vehicles f
     JOIN organizations o ON o.id = f.org_id
-    WHERE o.slug = 'nydac'
-    ORDER BY f.name
+    WHERE o.slug IN ('nydac', 'test')
+    ORDER BY o.slug, f.name
   `;
 
   console.log("\n--- After seed ---");
   console.log("Orgs:", orgsAfter);
   console.log("Client companies:", clientsAfter);
-  console.log("NYDAC inventory:", inventoryAfter);
-  console.log("NYDAC fleet:", fleetAfter);
+  console.log("Inventory:", inventoryAfter);
+  console.log("Fleet:", fleetAfter);
   console.log(
-    "\nNon-seed users preserved (e.g. personal accounts) — re-invite to nydac if needed."
+    "\nNon-seed users preserved (e.g. personal accounts) — re-invite to nydac/test if needed."
   );
 }
 

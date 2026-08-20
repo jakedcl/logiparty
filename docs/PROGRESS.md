@@ -94,7 +94,7 @@
 ## Post-MVP cleanup
 
 - [x] **Tools → Our inventory (Option A):** Deprecated separate `tools` catalog; dollies/hand tools live in `inventory_items`. Removed `/dashboard/tools` nav and page. UI label "Org inventory" → **Our inventory**. See DECISIONS D17 / O2.
-- [x] **Removed `demo` org** from seed (and Devon / `admin@demo.test`). Seed is `test` only. Neon **dev** cleaned; prod `main` untouched.
+- [x] **Removed `demo` org** from seed (and Devon / `admin@demo.test`). Seed is `nydac` + `test`. Neon **dev** dual-seeded; prod `main` untouched.
 
 ---
 
@@ -104,7 +104,8 @@
 - [x] **A4** Unknown subdomain → redirect to apex homepage (middleware + Neon slug check)
 - [x] **A6** Client inventory UI polish (dense table; demoted add; soft SKU)
 - [x] **A7** Dashboard UI consistency — list-first tables + collapsed add on Our inventory, Fleet, Jobs, Team, Clients, Availability, Activity; SKU soft-normalize on Our inventory
-- [x] **A8** Dev role / persona switcher (`ALLOW_DEV_ROLE_SWITCH`; never Vercel Production; seed quick-login + header identity)
+- [x] **A8** Dev role / persona switcher (`ALLOW_DEV_ROLE_SWITCH`; never Vercel Production; seed quick-login + header identity; personas keyed by org slug)
+- [x] **A10** Dual-tenant seed: `nydac` (NYDAC logo) + `test` (Acme / orange TEST badge); Neon **dev** only
 
 ---
 
