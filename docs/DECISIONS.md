@@ -16,7 +16,7 @@ Ambiguous product choices resolved here. Agents follow these unless the user ove
 | D10 | Manager in crew picker? | Only if `is_staff = true` on membership | Dual manager+staff allowed |
 | D11 | Job lead vs Lead role | `job_lead_user_id` on job + optional `Lead` assignment | Display "who to ask" |
 | D12 | Custom domain per org? | **Post-pilot** (M6) | Subdomain first |
-| D13 | Stripe billing? | **Manual** invoices | User focus on product |
+| D13 | Stripe billing? | **Optional Stripe scaffold** (Checkout + portal + webhook); soft `billing_status` only — **no hard lockout** in pilot. Manual invoices still fine until keys exist. | Plug-and-play like Resend/R2; self-serve org signup stays later (M6) |
 | D14 | Document retention | **Defer** hard immutability | Soft delete rules in M5+ |
 | D15 | Auth method v1 | Email + password via NextAuth | SSO later |
 | D16 | Org onboarding v1 | Manual seed + invite for pilot; self-serve later | ~5 orgs year one |

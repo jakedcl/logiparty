@@ -33,6 +33,9 @@ Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`,
 | logo_url | text | Nullable |
 | primary_color | text | Hex, e.g. `#2563eb` |
 | email_from_name | text | Resend from name |
+| stripe_customer_id | text | Nullable — Stripe Customer for org billing |
+| stripe_subscription_id | text | Nullable — Stripe Subscription id |
+| billing_status | text | Nullable soft gate: `none` \| `active` \| `past_due` \| `canceled` (no hard lockout in pilot) |
 | created_at | timestamptz | |
 
 ### `users`

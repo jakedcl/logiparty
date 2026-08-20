@@ -27,6 +27,7 @@ npm run db:migrate:sql
 | `0016_m4_documents.sql` | job documents (R2 metadata) |
 | `0017_m5_availability.sql` | availability_requests |
 | `0018_a3_marketing_leads.sql` | apex marketing / waitlist leads |
+| `0019_m6_org_billing.sql` | org Stripe billing columns (soft status) |
 
 Then seed (optional):
 
