@@ -9,6 +9,8 @@ import {
 } from "@/lib/auth/permissions";
 import type { Job } from "@/lib/db/schema";
 import { requireSession } from "@/lib/org/context";
+import { PageHeader } from "@/components/ui/page-header";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 const NEEDS_LIMIT = 5;
 const UPCOMING_LIMIT = 8;
@@ -16,23 +18,6 @@ const UPCOMING_LIMIT = 8;
 function firstNameFrom(name: string | null | undefined): string | null {
   const part = name?.trim().split(/\s+/)[0];
   return part || null;
-}
-
-function statusClass(status: string): string {
-  switch (status) {
-    case "draft":
-      return "bg-amber-100 text-amber-900";
-    case "upcoming":
-      return "bg-sky-100 text-sky-900";
-    case "ready":
-      return "bg-emerald-100 text-emerald-900";
-    case "completed":
-      return "bg-neutral-200 text-neutral-700";
-    case "denied":
-      return "bg-red-100 text-red-900";
-    default:
-      return "bg-neutral-100 text-neutral-700";
-  }
 }
 
 function kindLabel(
@@ -150,113 +135,98 @@ export default async function DashboardPage() {
     : "Your assigned jobs and time off — what’s next for you.";
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h1 className="text-2xl font-semibold mb-1">
-            {firstName ? `Welcome, ${firstName}` : "Welcome"}
-          </h1>
-          <p className="text-sm text-neutral-500">
+    <div className="space-y-8">
+      <PageHeader
+        title={firstName ? `Welcome, ${firstName}` : "Welcome"}
+        description={
+          <>
             {orgName}
-            <span className="text-neutral-300"> · </span>
+            <span className="text-[var(--faint)]"> · </span>
             {roleLine}
-          </p>
-        </div>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm shrink-0">
-          {isManager ? (
-            <Link
-              href="/dashboard/jobs"
-              className="inline-flex items-center rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white hover:bg-neutral-800"
-            >
-              + New job
-            </Link>
-          ) : null}
-          {isStaff && !isManager ? (
-            <>
-              <Link
-                href="/dashboard/my-jobs"
-                className="font-medium text-neutral-900 hover:underline"
-              >
-                My Jobs
+          </>
+        }
+        actions={
+          <>
+            {isManager ? (
+              <Link href="/dashboard/jobs" className="lp-btn">
+                + New job
               </Link>
-              {canTimeOff ? (
+            ) : null}
+            {isStaff && !isManager ? (
+              <>
                 <Link
-                  href="/dashboard/settings/time-off"
-                  className="text-neutral-600 hover:text-neutral-900 hover:underline"
+                  href="/dashboard/my-jobs"
+                  className="font-semibold text-[var(--foreground)] hover:underline"
                 >
-                  Time off
+                  My Jobs
                 </Link>
-              ) : null}
-            </>
-          ) : null}
-          {isManager && canTimeOff ? (
-            <Link
-              href="/dashboard/settings/time-off"
-              className="text-neutral-500 hover:text-neutral-800 hover:underline"
-            >
-              Time off
-            </Link>
-          ) : null}
-        </div>
-      </div>
+                {canTimeOff ? (
+                  <Link
+                    href="/dashboard/settings/time-off"
+                    className="text-[var(--muted)] hover:text-[var(--foreground)] hover:underline"
+                  >
+                    Time off
+                  </Link>
+                ) : null}
+              </>
+            ) : null}
+            {isManager && canTimeOff ? (
+              <Link
+                href="/dashboard/settings/time-off"
+                className="text-[var(--muted)] hover:text-[var(--foreground)] hover:underline"
+              >
+                Time off
+              </Link>
+            ) : null}
+          </>
+        }
+      />
 
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-2">
-          <h2 className="text-sm font-medium text-neutral-800">
+          <h2 className="lp-section-title">
             Needs attention
             {needs.length > 0 ? (
-              <span className="ml-1.5 text-neutral-400 font-normal">
-                ({notifications.length})
-              </span>
+              <span className="lp-section-meta">({notifications.length})</span>
             ) : null}
           </h2>
-          <Link
-            href="/dashboard/notifications"
-            className="text-xs text-neutral-400 hover:text-neutral-700"
-          >
+          <Link href="/dashboard/notifications" className="lp-link-quiet">
             View all →
           </Link>
         </div>
 
         {needs.length === 0 ? (
-          <p className="text-sm text-neutral-500 py-4">Nothing pending.</p>
+          <p className="py-4 text-sm text-[var(--muted)]">Nothing pending.</p>
         ) : (
-          <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto -mx-4 sm:mx-0">
-            <table className="w-full min-w-[480px] text-sm text-left">
+          <div className="lp-table-wrap">
+            <table className="lp-table min-w-[480px]">
               <thead>
-                <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
-                  <th className="py-2 px-3 font-medium w-[6.5rem]">Type</th>
-                  <th className="py-2 px-3 font-medium">Item</th>
-                  <th className="py-2 px-3 font-medium w-[7.5rem] text-right">
-                    When
-                  </th>
+                <tr>
+                  <th className="w-[6.5rem]">Type</th>
+                  <th>Item</th>
+                  <th className="w-[7.5rem] text-right">When</th>
                 </tr>
               </thead>
               <tbody>
                 {needs.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50/80"
-                  >
-                    <td className="py-2 px-3 text-neutral-500 whitespace-nowrap">
-                      {kindLabel(item.kind)}
-                    </td>
-                    <td className="py-2 px-3">
+                  <tr key={item.id}>
+                    <td className="whitespace-nowrap">{kindLabel(item.kind)}</td>
+                    <td>
                       <Link
                         href={
                           item.kind === "client_note"
                             ? "/dashboard/notifications"
                             : item.href
                         }
-                        className="font-medium text-neutral-900 hover:underline"
+                        className="lp-cell-strong hover:underline"
                       >
                         {item.title}
                       </Link>
-                      <p className="text-neutral-500 text-xs mt-0.5 line-clamp-1">
+                      <p className="mt-0.5 line-clamp-1 text-xs text-[var(--subtle)]">
                         {item.detail}
                       </p>
                     </td>
-                    <td className="py-2 px-3 text-right text-xs text-neutral-400 whitespace-nowrap">
+                    <td className="whitespace-nowrap text-right text-xs text-[var(--faint)]">
                       <time>{fmtWhen(item.createdAt)}</time>
                     </td>
                   </tr>
@@ -269,68 +239,54 @@ export default async function DashboardPage() {
 
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-2">
-          <h2 className="text-sm font-medium text-neutral-800">
+          <h2 className="lp-section-title">
             Upcoming work
             {upcoming.length > 0 ? (
-              <span className="ml-1.5 text-neutral-400 font-normal">
+              <span className="lp-section-meta">
                 ({upcoming.length}
                 {upcoming.length >= UPCOMING_LIMIT ? "+" : ""})
               </span>
             ) : null}
           </h2>
-          <Link
-            href={upcomingAllHref}
-            className="text-xs text-neutral-400 hover:text-neutral-700"
-          >
+          <Link href={upcomingAllHref} className="lp-link-quiet">
             View all →
           </Link>
         </div>
 
         {upcoming.length === 0 ? (
-          <p className="text-sm text-neutral-500 py-4">{upcomingEmpty}</p>
+          <p className="py-4 text-sm text-[var(--muted)]">{upcomingEmpty}</p>
         ) : (
-          <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto -mx-4 sm:mx-0">
-            <table className="w-full min-w-[560px] text-sm text-left">
+          <div className="lp-table-wrap">
+            <table className="lp-table min-w-[560px]">
               <thead>
-                <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
-                  <th className="py-2 px-3 font-medium">Name</th>
-                  <th className="py-2 px-3 font-medium">Client</th>
-                  <th className="py-2 px-3 font-medium w-[7rem]">Status</th>
-                  <th className="py-2 px-3 font-medium w-[7.5rem]">Date</th>
-                  <th className="py-2 px-3 font-medium w-[4rem] text-right">
-                    {" "}
-                  </th>
+                <tr>
+                  <th>Name</th>
+                  <th>Client</th>
+                  <th className="w-[7rem]">Status</th>
+                  <th className="w-[7.5rem]">Date</th>
+                  <th className="w-[4rem] text-right"> </th>
                 </tr>
               </thead>
               <tbody>
                 {upcoming.map((job) => (
-                  <tr
-                    key={job.id}
-                    className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50/80"
-                  >
-                    <td className="py-2 px-3 font-medium text-neutral-900">
-                      <Link href={job.href} className="hover:underline">
+                  <tr key={job.id}>
+                    <td>
+                      <Link
+                        href={job.href}
+                        className="lp-cell-strong hover:underline"
+                      >
                         {job.name}
                       </Link>
                     </td>
-                    <td className="py-2 px-3 text-neutral-600">
-                      {job.clientName}
+                    <td>{job.clientName}</td>
+                    <td>
+                      <StatusBadge status={job.status} kind="job" />
                     </td>
-                    <td className="py-2 px-3">
-                      <span
-                        className={`inline-block rounded-full px-2 py-0.5 text-xs capitalize ${statusClass(job.status)}`}
-                      >
-                        {job.status}
-                      </span>
-                    </td>
-                    <td className="py-2 px-3 text-neutral-600 whitespace-nowrap">
+                    <td className="whitespace-nowrap">
                       {fmtJobDate(job.jobStart)}
                     </td>
-                    <td className="py-2 px-3 text-right">
-                      <Link
-                        href={job.href}
-                        className="text-xs text-neutral-400 hover:text-neutral-700"
-                      >
+                    <td className="text-right">
+                      <Link href={job.href} className="lp-link-quiet">
                         View →
                       </Link>
                     </td>

@@ -16,6 +16,7 @@ import {
   canInviteUsers,
   canViewMyJobs,
 } from "@/lib/auth/permissions";
+import { FALLBACK_PRIMARY_COLOR } from "@/lib/theme/primary-color";
 
 type Props = {
   session: Session;
@@ -35,7 +36,7 @@ async function signOutAction() {
 
 export function InternalShell({
   session,
-  primaryColor = "#2563eb",
+  primaryColor = FALLBACK_PRIMARY_COLOR,
   logoUrl,
   staffTags = [],
   children,

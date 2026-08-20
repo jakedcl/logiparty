@@ -1,10 +1,12 @@
-import Link from "next/link";
 import { headers } from "next/headers";
 import { signOut } from "@/lib/auth";
 import { absoluteRedirectUrl } from "@/lib/auth/redirect";
 import type { Session } from "next-auth";
 import { DevRoleSwitchPanel } from "@/components/dev/dev-role-switch-panel";
+import { OrgTheme } from "@/components/layout/org-theme";
+import { PortalNav } from "@/components/layout/portal-nav";
 import { SessionIdentity } from "@/components/layout/session-identity";
+import { FALLBACK_PRIMARY_COLOR } from "@/lib/theme/primary-color";
 
 type Props = {
   session: Session;
@@ -13,13 +15,6 @@ type Props = {
   companyName?: string | null;
   children: React.ReactNode;
 };
-
-const NAV = [
-  { href: "/portal", label: "Home" },
-  { href: "/portal/jobs", label: "Jobs" },
-  { href: "/portal/inventory", label: "Inventory" },
-  { href: "/portal/notes", label: "Notes" },
-] as const;
 
 async function signOutAction() {
   "use server";
@@ -31,7 +26,7 @@ async function signOutAction() {
 
 export function PortalShell({
   session,
-  primaryColor = "#2563eb",
+  primaryColor = FALLBACK_PRIMARY_COLOR,
   logoUrl,
   companyName,
   children,
@@ -39,69 +34,62 @@ export function PortalShell({
   const orgName = session.user.orgName;
 
   return (
-    <div className="min-h-screen flex flex-col bg-neutral-50">
-      <header
-        className="border-b bg-white px-4 py-3 flex items-center justify-between shrink-0"
-        style={{ borderBottomColor: primaryColor }}
-      >
-        <div className="flex items-center gap-2 min-w-0">
-          {logoUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={logoUrl} alt="" className="h-8 w-auto max-w-[120px]" />
-          ) : null}
-          <div className="min-w-0">
-            <p className="font-semibold text-lg tracking-tight truncate">
-              {orgName}
-            </p>
-            {companyName ? (
-              <p className="text-xs text-neutral-500 truncate">{companyName}</p>
+    <OrgTheme primaryColor={primaryColor} className="flex flex-col">
+      <header className="shrink-0 border-b border-[var(--border-subtle)] bg-[var(--surface)]">
+        <div className="h-[3px] bg-[var(--primary)]" aria-hidden />
+        <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3.5 md:px-6">
+          <div className="flex min-w-0 items-center gap-2.5">
+            {logoUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={logoUrl} alt="" className="h-8 w-auto max-w-[120px]" />
             ) : null}
+            <div className="min-w-0">
+              <p className="truncate text-lg font-semibold tracking-tight text-[var(--foreground)]">
+                {orgName}
+              </p>
+              {companyName ? (
+                <p className="truncate text-xs text-[var(--muted)]">
+                  {companyName}
+                </p>
+              ) : null}
+            </div>
+          </div>
+          <div className="flex shrink-0 items-center">
+            <SessionIdentity
+              name={session.user.name}
+              email={session.user.email}
+              isOrgAdmin={session.user.isOrgAdmin}
+              isManager={session.user.isManager}
+              isStaff={session.user.isStaff}
+              isClient={session.user.isClient}
+              profileHref="/portal/profile"
+              signOutAction={signOutAction}
+            />
           </div>
         </div>
-        <div className="flex items-center shrink-0">
-          <SessionIdentity
-            name={session.user.name}
-            email={session.user.email}
-            isOrgAdmin={session.user.isOrgAdmin}
-            isManager={session.user.isManager}
-            isStaff={session.user.isStaff}
-            isClient={session.user.isClient}
-            profileHref="/portal/profile"
-            signOutAction={signOutAction}
-          />
-        </div>
+        <PortalNav
+          underline
+          className="mx-auto hidden max-w-3xl gap-5 px-4 sm:flex md:px-6"
+          itemClassName="py-2.5 text-sm transition-colors"
+        />
       </header>
 
-      <nav className="hidden sm:flex gap-4 text-sm text-neutral-600 px-4 md:px-6 py-2 border-b bg-white max-w-3xl mx-auto w-full">
-        {NAV.map((item) => (
-          <Link key={item.href} href={item.href} className="hover:text-neutral-900 py-1">
-            {item.label}
-          </Link>
-        ))}
-      </nav>
-
-      <main className="flex-1 p-4 md:p-6 max-w-3xl mx-auto w-full pb-24 sm:pb-6">
+      <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 pb-24 md:px-6 md:py-8 sm:pb-8">
         {children}
       </main>
 
       <nav
-        className="sm:hidden fixed bottom-0 inset-x-0 z-10 border-t bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80"
-        style={{ borderTopColor: primaryColor }}
+        className="fixed inset-x-0 bottom-0 z-10 border-t border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_94%,transparent)] backdrop-blur sm:hidden"
         aria-label="Portal navigation"
       >
-        <div className="flex justify-around items-stretch max-w-3xl mx-auto pb-[env(safe-area-inset-bottom,0px)]">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex-1 text-center py-3 text-sm font-medium text-neutral-600 active:bg-neutral-100 min-h-[48px] flex items-center justify-center"
-            >
-              {item.label}
-            </Link>
-          ))}
+        <div className="mx-auto flex max-w-3xl items-stretch justify-around pb-[env(safe-area-inset-bottom,0px)]">
+          <PortalNav
+            className="flex w-full"
+            itemClassName="flex flex-1 items-center justify-center py-3 text-sm min-h-[48px] active:bg-[var(--surface-hover)]"
+          />
         </div>
       </nav>
       <DevRoleSwitchPanel />
-    </div>
+    </OrgTheme>
   );
 }

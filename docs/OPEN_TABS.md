@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (A15 staff dashboard home).*
+*Last updated: 2026-08-20 (A16 visual system).*
 
 ---
 
@@ -72,6 +72,7 @@
 - [x] **Portal jobs date sort** — `/portal/jobs` ordered by `job_start` desc (then `created_at`); was `created_at` only so Date column looked jumbled. Inventory requests already newest-first by `created_at`.
 - [x] **A14** Client → tenant general notes v1 — portal `/portal/notes` (list newest-first + collapsed compose); table `client_notes` + migration `0022`; managers see unread in Notifications + Mark read; one-way (D18). Seed: Red Bull Michaela unread sample. Neon **dev** migrated + seedable.
 - [x] **A15** Staff `/dashboard` home — role-aware welcome (first name + org); Needs attention (top 5 from `listNotifications`, incl. notes/inventory/drafts/assignments); Upcoming work dense table (soonest `job_start` first, cap 8); manager **+ New job** / staff My Jobs + Time off; A6/A7 list density. Time-off tip → Settings.
+- [x] **A16** Product visual system — high-contrast tokens (`globals.css`); tenant `--primary` via `OrgTheme` + `lib/theme/primary-color` (fallback navy `#1e3a5f`); ink staff sidebar; open tables (no decorative card chrome); portal + login white-label; `PageHeader` / `StatusBadge`. Smoke: nydac Mike + Michaela.
 ---
 
 ## Current environments

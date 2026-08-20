@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { OrgTheme } from "@/components/layout/org-theme";
 import { cn } from "@/lib/utils";
+import { FALLBACK_PRIMARY_COLOR } from "@/lib/theme/primary-color";
 
 export type DashboardNavItem = {
   href: string;
@@ -32,14 +34,20 @@ function Brand({
   logoUrl,
   /** Horizontal beside logo — only for the sticky mobile top bar */
   inline = false,
+  onInk = false,
 }: {
   orgName: string;
   logoUrl?: string | null;
   inline?: boolean;
+  onInk?: boolean;
 }) {
+  const nameClass = onInk
+    ? "text-[var(--sidebar-fg)]"
+    : "text-[var(--foreground)]";
+
   if (inline) {
     return (
-      <div className="flex min-w-0 items-center gap-1.5">
+      <div className="flex min-w-0 items-center gap-2">
         {logoUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -48,7 +56,12 @@ function Brand({
             className="h-7 w-auto max-w-[100px] shrink-0"
           />
         ) : null}
-        <span className="truncate text-base font-semibold tracking-tight text-neutral-900">
+        <span
+          className={cn(
+            "truncate text-base font-semibold tracking-tight",
+            nameClass
+          )}
+        >
           {orgName}
         </span>
       </div>
@@ -56,16 +69,23 @@ function Brand({
   }
 
   return (
-    <div className="flex min-w-0 flex-col items-start gap-2">
+    <div className="flex min-w-0 flex-col items-start gap-2.5">
       {logoUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={logoUrl}
-          alt=""
-          className="h-9 w-auto max-w-[140px] shrink-0"
-        />
+        <div className="rounded-md bg-white px-2 py-1.5">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={logoUrl}
+            alt=""
+            className="h-8 w-auto max-w-[140px] shrink-0"
+          />
+        </div>
       ) : null}
-      <span className="whitespace-normal break-words text-balance text-base font-semibold leading-snug tracking-tight text-neutral-900">
+      <span
+        className={cn(
+          "whitespace-normal break-words text-balance text-[0.9375rem] font-semibold leading-snug tracking-tight",
+          nameClass
+        )}
+      >
         {orgName}
       </span>
     </div>
@@ -75,12 +95,10 @@ function Brand({
 function NavLinks({
   items,
   pathname,
-  primaryColor,
   onNavigate,
 }: {
   items: DashboardNavItem[];
   pathname: string;
-  primaryColor: string;
   onNavigate?: () => void;
 }) {
   return (
@@ -93,17 +111,18 @@ function NavLinks({
             href={item.href}
             onClick={onNavigate}
             className={cn(
-              "rounded-md px-3 py-2 text-sm transition-colors",
+              "relative rounded-md px-3 py-2 text-sm transition-colors",
               active
-                ? "bg-neutral-100 font-medium text-neutral-900"
-                : "text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900"
+                ? "bg-[var(--sidebar-active)] font-medium text-[var(--sidebar-fg)]"
+                : "text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-fg)]"
             )}
-            style={
-              active
-                ? { boxShadow: `inset 3px 0 0 ${primaryColor}` }
-                : undefined
-            }
           >
+            {active ? (
+              <span
+                className="absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-[var(--primary)]"
+                aria-hidden
+              />
+            ) : null}
             {item.label}
           </Link>
         );
@@ -115,7 +134,7 @@ function NavLinks({
 export function DashboardShell({
   orgName,
   logoUrl,
-  primaryColor = "#2563eb",
+  primaryColor = FALLBACK_PRIMARY_COLOR,
   navItems,
   accountMenu,
   children,
@@ -142,21 +161,15 @@ export function DashboardShell({
   }, [drawerOpen]);
 
   return (
-    <div className="min-h-screen bg-neutral-50">
-      {/* Desktop sidebar */}
-      <aside
-        className="no-print fixed inset-y-0 left-0 z-30 hidden w-56 flex-col border-r border-neutral-200 bg-white lg:flex"
-        style={{ borderTop: `3px solid ${primaryColor}` }}
-      >
-        <div className="border-b border-neutral-100 px-4 py-4">
-          <Brand orgName={orgName} logoUrl={logoUrl} />
+    <OrgTheme primaryColor={primaryColor}>
+      {/* Desktop sidebar — ink chrome, brand accent */}
+      <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-56 flex-col bg-[var(--sidebar)] lg:flex">
+        <div className="h-[3px] shrink-0 bg-[var(--primary)]" aria-hidden />
+        <div className="border-b border-white/10 px-4 py-5">
+          <Brand orgName={orgName} logoUrl={logoUrl} onInk />
         </div>
         <div className="flex-1 overflow-y-auto py-3">
-          <NavLinks
-            items={navItems}
-            pathname={pathname}
-            primaryColor={primaryColor}
-          />
+          <NavLinks items={navItems} pathname={pathname} />
         </div>
       </aside>
 
@@ -165,22 +178,22 @@ export function DashboardShell({
         <div className="no-print fixed inset-0 z-40 lg:hidden">
           <button
             type="button"
-            className="absolute inset-0 bg-neutral-900/40"
+            className="absolute inset-0 bg-[var(--foreground)]/50"
             aria-label="Close menu"
             onClick={() => setDrawerOpen(false)}
           />
           <aside
-            className="absolute inset-y-0 left-0 flex w-[min(18rem,85vw)] flex-col bg-white shadow-lg"
-            style={{ borderTop: `3px solid ${primaryColor}` }}
+            className="absolute inset-y-0 left-0 flex w-[min(18rem,85vw)] flex-col bg-[var(--sidebar)]"
             role="dialog"
             aria-modal="true"
             aria-label="Navigation"
           >
-            <div className="flex items-start justify-between gap-2 border-b border-neutral-100 px-4 py-3">
-              <Brand orgName={orgName} logoUrl={logoUrl} />
+            <div className="h-[3px] shrink-0 bg-[var(--primary)]" aria-hidden />
+            <div className="flex items-start justify-between gap-2 border-b border-white/10 px-4 py-4">
+              <Brand orgName={orgName} logoUrl={logoUrl} onInk />
               <button
                 type="button"
-                className="shrink-0 rounded-md p-2 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
+                className="shrink-0 rounded-md p-2 text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-fg)]"
                 aria-label="Close menu"
                 onClick={() => setDrawerOpen(false)}
               >
@@ -191,7 +204,6 @@ export function DashboardShell({
               <NavLinks
                 items={navItems}
                 pathname={pathname}
-                primaryColor={primaryColor}
                 onNavigate={() => setDrawerOpen(false)}
               />
             </div>
@@ -200,14 +212,11 @@ export function DashboardShell({
       ) : null}
 
       <div className="lg:pl-56">
-        <header
-          className="no-print sticky top-0 z-20 flex h-12 items-center justify-between gap-3 border-b border-neutral-200 bg-white/95 px-3 backdrop-blur supports-[backdrop-filter]:bg-white/80 sm:px-4"
-          style={{ borderBottomColor: `${primaryColor}33` }}
-        >
+        <header className="no-print sticky top-0 z-20 flex h-12 items-center justify-between gap-3 border-b border-[var(--border-subtle)] bg-[color-mix(in_srgb,var(--surface)_92%,transparent)] px-3 backdrop-blur supports-[backdrop-filter]:bg-[color-mix(in_srgb,var(--surface)_85%,transparent)] sm:px-5">
           <div className="flex min-w-0 items-center gap-2 lg:hidden">
             <button
               type="button"
-              className="shrink-0 rounded-md p-2 text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+              className="shrink-0 rounded-md p-2 text-[var(--muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)]"
               aria-label="Open menu"
               aria-expanded={drawerOpen}
               onClick={() => setDrawerOpen(true)}
@@ -217,15 +226,13 @@ export function DashboardShell({
             <Brand orgName={orgName} logoUrl={logoUrl} inline />
           </div>
           <div className="hidden lg:block" />
-          <div className="flex shrink-0 items-center">
-            {accountMenu}
-          </div>
+          <div className="flex shrink-0 items-center">{accountMenu}</div>
         </header>
 
-        <main className="mx-auto w-full max-w-6xl flex-1 p-4 md:p-6">
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-6 md:py-8">
           {children}
         </main>
       </div>
-    </div>
+    </OrgTheme>
   );
 }

@@ -26,10 +26,10 @@ export function PortalNotesList({ notes }: { notes: ClientNoteView[] }) {
   }
 
   return (
-    <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto -mx-4 sm:mx-0">
-      <table className="w-full min-w-[420px] text-sm text-left">
+    <div className="lp-table-wrap">
+      <table className="lp-table min-w-[420px]">
         <thead>
-          <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
+          <tr>
             <th className="py-2 px-3 font-medium">Subject</th>
             <th className="py-2 px-3 font-medium">Message</th>
             <th className="py-2 px-3 font-medium w-[7rem]">Status</th>
@@ -40,7 +40,7 @@ export function PortalNotesList({ notes }: { notes: ClientNoteView[] }) {
           {notes.map((note) => (
             <tr
               key={note.id}
-              className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50/80"
+              className=""
             >
               <td className="py-2 px-3 text-neutral-900 font-medium">
                 {note.subject?.trim() || (

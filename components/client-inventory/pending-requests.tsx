@@ -45,10 +45,10 @@ export function PendingInventoryRequestsPanel({
   }
 
   return (
-    <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto -mx-4 sm:mx-0">
-      <table className="w-full min-w-[560px] text-sm text-left">
+    <div className="lp-table-wrap">
+      <table className="lp-table min-w-[560px]">
         <thead>
-          <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
+          <tr>
             <th className="py-2 px-3 font-medium w-[6.5rem]">Type</th>
             <th className="py-2 px-3 font-medium">Request</th>
             <th className="py-2 px-3 font-medium">Reason</th>

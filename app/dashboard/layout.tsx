@@ -6,6 +6,7 @@ import {
   getSessionStaffTags,
   requireSession,
 } from "@/lib/org/context";
+import { resolvePrimaryColor } from "@/lib/theme/primary-color";
 
 export default async function DashboardLayout({
   children,
@@ -24,7 +25,7 @@ export default async function DashboardLayout({
   return (
     <InternalShell
       session={session}
-      primaryColor={org?.primaryColor ?? "#2563eb"}
+      primaryColor={resolvePrimaryColor(org?.primaryColor)}
       logoUrl={org?.logoUrl}
       staffTags={staffTags}
     >

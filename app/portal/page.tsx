@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getSessionClientCompany, requireSession } from "@/lib/org/context";
+import { PageHeader } from "@/components/ui/page-header";
 
 export default async function PortalHomePage() {
   const session = await requireSession();
@@ -7,48 +8,39 @@ export default async function PortalHomePage() {
   const firstName = session.user.name?.split(" ")[0];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">
-          {firstName ? `Welcome, ${firstName}` : "Welcome"}
-        </h1>
-        <p className="text-sm text-neutral-500 mt-1">
-          {company
+    <div className="space-y-8">
+      <PageHeader
+        title={firstName ? `Welcome, ${firstName}` : "Welcome"}
+        description={
+          company
             ? `${company.name} · requests and documents for your jobs`
-            : "Your client portal"}
-        </p>
-      </div>
+            : "Your client portal"
+        }
+      />
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Link
-          href="/portal/jobs"
-          className="border rounded-lg bg-white p-4 hover:border-neutral-400 transition-colors"
-        >
-          <p className="font-medium">Jobs</p>
-          <p className="text-sm text-neutral-500 mt-1">
+      <nav className="lp-nav-list" aria-label="Portal sections">
+        <Link href="/portal/jobs">
+          <span className="font-semibold text-[var(--foreground)]">Jobs</span>
+          <span className="mt-0.5 block text-sm text-[var(--muted)]">
             Track status and submit requests
-          </p>
+          </span>
         </Link>
-        <Link
-          href="/portal/inventory"
-          className="border rounded-lg bg-white p-4 hover:border-neutral-400 transition-colors"
-        >
-          <p className="font-medium">Inventory</p>
-          <p className="text-sm text-neutral-500 mt-1">
+        <Link href="/portal/inventory">
+          <span className="font-semibold text-[var(--foreground)]">
+            Inventory
+          </span>
+          <span className="mt-0.5 block text-sm text-[var(--muted)]">
             Items stored with {session.user.orgName} for{" "}
             {company?.name ?? "your company"}
-          </p>
+          </span>
         </Link>
-        <Link
-          href="/portal/notes"
-          className="border rounded-lg bg-white p-4 hover:border-neutral-400 transition-colors sm:col-span-2"
-        >
-          <p className="font-medium">Notes</p>
-          <p className="text-sm text-neutral-500 mt-1">
+        <Link href="/portal/notes">
+          <span className="font-semibold text-[var(--foreground)]">Notes</span>
+          <span className="mt-0.5 block text-sm text-[var(--muted)]">
             Send a general message to {session.user.orgName}
-          </p>
+          </span>
         </Link>
-      </div>
+      </nav>
     </div>
   );
 }

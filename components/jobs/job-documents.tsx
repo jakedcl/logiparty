@@ -32,7 +32,7 @@ export function JobDocuments({
       {docs.length === 0 ? (
         <p className="text-sm text-neutral-500">No documents yet.</p>
       ) : (
-        <div className="border border-neutral-200 rounded-md bg-white overflow-hidden">
+        <div className="lp-table-wrap">
           <ul className="divide-y divide-neutral-100">
             {docs.map((doc) => {
               const canDelete =

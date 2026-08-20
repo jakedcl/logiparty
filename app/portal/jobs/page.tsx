@@ -1,23 +1,8 @@
 import Link from "next/link";
 import { requestJob, listPortalJobs } from "@/lib/actions/portal-jobs";
 import { getSessionClientCompany, requireSession } from "@/lib/org/context";
-
-function statusClass(status: string): string {
-  switch (status) {
-    case "draft":
-      return "bg-amber-100 text-amber-900";
-    case "upcoming":
-      return "bg-sky-100 text-sky-900";
-    case "ready":
-      return "bg-emerald-100 text-emerald-900";
-    case "completed":
-      return "bg-neutral-200 text-neutral-700";
-    case "denied":
-      return "bg-red-100 text-red-900";
-    default:
-      return "bg-neutral-100 text-neutral-700";
-  }
-}
+import { PageHeader } from "@/components/ui/page-header";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 function fmtShort(d: Date | null): string | null {
   if (!d) return null;
@@ -33,75 +18,59 @@ export default async function PortalJobsPage() {
   const jobList = company ? await listPortalJobs(session.user.orgId) : [];
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Jobs</h1>
-        <p className="text-sm text-neutral-500 mt-1">
-          Track status for {company?.name ?? "your company"}. Submit a new
-          request when you need one.
-        </p>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="Jobs"
+        description={`Track status for ${company?.name ?? "your company"}. Submit a new request when you need one.`}
+      />
 
       {!company ? (
-        <p className="text-sm text-neutral-500">
+        <p className="app-empty">
           Your account is not linked to a client company yet.
         </p>
       ) : (
         <section className="space-y-3">
-          <h2 className="text-sm font-medium text-neutral-800">
+          <h2 className="lp-section-title">
             Your jobs
-            <span className="ml-1.5 text-neutral-400 font-normal">
-              ({jobList.length})
-            </span>
+            <span className="lp-section-meta">({jobList.length})</span>
           </h2>
 
           {jobList.length === 0 ? (
-            <p className="text-sm text-neutral-500 py-4">
+            <p className="app-empty">
               No jobs yet. Use + New request below when you need one.
             </p>
           ) : (
-            <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto -mx-4 sm:mx-0">
-              <table className="w-full min-w-[420px] text-sm text-left">
+            <div className="lp-table-wrap">
+              <table className="lp-table min-w-[420px]">
                 <thead>
-                  <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
-                    <th className="py-2 px-3 font-medium">Name</th>
-                    <th className="py-2 px-3 font-medium w-[6rem]">Date</th>
-                    <th className="py-2 px-3 font-medium w-[7rem]">Status</th>
-                    <th className="py-2 px-3 font-medium w-[4rem] text-right">
-                      {" "}
-                    </th>
+                  <tr>
+                    <th>Name</th>
+                    <th className="w-[6rem]">Date</th>
+                    <th className="w-[7rem]">Status</th>
+                    <th className="w-[4rem] text-right"> </th>
                   </tr>
                 </thead>
                 <tbody>
                   {jobList.map((job) => {
                     const when = fmtShort(job.jobStart);
                     return (
-                      <tr
-                        key={job.id}
-                        className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50/80"
-                      >
-                        <td className="py-2 px-3 font-medium text-neutral-900">
+                      <tr key={job.id}>
+                        <td>
                           <Link
                             href={`/portal/jobs/${job.id}`}
-                            className="hover:underline"
+                            className="lp-cell-strong hover:underline"
                           >
                             {job.name}
                           </Link>
                         </td>
-                        <td className="py-2 px-3 text-neutral-600">
-                          {when ?? "—"}
+                        <td>{when ?? "—"}</td>
+                        <td>
+                          <StatusBadge status={job.status} kind="job" />
                         </td>
-                        <td className="py-2 px-3">
-                          <span
-                            className={`inline-block rounded-full px-2 py-0.5 text-xs capitalize ${statusClass(job.status)}`}
-                          >
-                            {job.status}
-                          </span>
-                        </td>
-                        <td className="py-2 px-3 text-right">
+                        <td className="text-right">
                           <Link
                             href={`/portal/jobs/${job.id}`}
-                            className="text-xs text-neutral-400 hover:text-neutral-700"
+                            className="lp-link-quiet"
                           >
                             View →
                           </Link>
@@ -114,14 +83,14 @@ export default async function PortalJobsPage() {
             </div>
           )}
 
-          <details className="group border-t border-neutral-200 pt-4">
-            <summary className="cursor-pointer list-none text-sm text-neutral-600 hover:text-neutral-900 select-none [&::-webkit-details-marker]:hidden">
+          <details className="group border-t border-[var(--border)] pt-4">
+            <summary className="cursor-pointer list-none text-sm text-[var(--muted)] hover:text-[var(--foreground)] select-none [&::-webkit-details-marker]:hidden">
               <span className="inline-flex items-center gap-1.5 font-medium">
-                <span className="text-neutral-400 group-open:hidden" aria-hidden>
+                <span className="text-[var(--faint)] group-open:hidden" aria-hidden>
                   +
                 </span>
                 <span
-                  className="hidden text-neutral-400 group-open:inline"
+                  className="hidden text-[var(--faint)] group-open:inline"
                   aria-hidden
                 >
                   −
@@ -130,70 +99,67 @@ export default async function PortalJobsPage() {
               </span>
             </summary>
             <div className="mt-3 max-w-xl space-y-3">
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-[var(--muted)]">
                 Submits as a draft for the team to accept or deny. You cannot
                 edit after sending.
               </p>
               <form action={requestJob} className="space-y-3">
-                <label className="block text-xs text-neutral-500">
+                <label className="app-label">
                   Job name
                   <input
                     name="name"
                     required
                     placeholder="Job name"
-                    className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
+                    className="lp-input mt-1"
                   />
                 </label>
                 <div className="grid gap-2 sm:grid-cols-2">
-                  <label className="text-xs text-neutral-500">
+                  <label className="app-label">
                     Job start
                     <input
                       type="datetime-local"
                       name="jobStart"
-                      className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
+                      className="lp-input mt-1"
                     />
                   </label>
-                  <label className="text-xs text-neutral-500">
+                  <label className="app-label">
                     Job end
                     <input
                       type="datetime-local"
                       name="jobEnd"
-                      className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
+                      className="lp-input mt-1"
                     />
                   </label>
                 </div>
                 <div className="grid gap-2 sm:grid-cols-2">
-                  <label className="text-xs text-neutral-500">
+                  <label className="app-label">
                     On-site contact name
                     <input
                       name="clientPocName"
                       placeholder="Name"
-                      className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
+                      className="lp-input mt-1"
                     />
                   </label>
-                  <label className="text-xs text-neutral-500">
+                  <label className="app-label">
                     On-site contact phone
                     <input
                       name="clientPocPhone"
                       type="tel"
                       placeholder="Phone"
-                      className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
+                      className="lp-input mt-1"
                     />
                   </label>
                 </div>
-                <label className="block text-xs text-neutral-500">
+                <label className="app-label">
                   Details for the team
                   <textarea
                     name="notes"
                     rows={3}
                     placeholder="Notes"
-                    className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
+                    className="lp-input mt-1"
                   />
                 </label>
-                <button
-                  type="submit"
-                  className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white"
-                >
+                <button type="submit" className="lp-btn">
                   Submit request
                 </button>
               </form>
