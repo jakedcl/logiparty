@@ -136,14 +136,14 @@ async function main() {
 
   mark("3", true, "Mike Oso exists via seed (invite flow not re-run)");
   mark("4", true, "Tom/Rob warehouse + Paul/Jerome driver exist via seed");
-  mark("5", true, "Red Bull + Michaela/Alex exist via seed");
+  mark("5", true, "Red Bull + Michaela/Dom exist via seed");
 
   const michaela = await login("michaela@redbull.test");
   const portalHome = await getHtml(michaela, "/portal");
   assertIncludes(portalHome.html, "TestTenant3PL");
   assertNotIncludes(portalHome.html, "Logiparty");
-  const alex = await login("alex@redbull.test");
-  const portal2 = await getHtml(alex, "/portal");
+  const dom = await login("dom@redbull.test");
+  const portal2 = await getHtml(dom, "/portal");
   mark(
     "6",
     portalHome.status === 200 && portal2.status === 200,

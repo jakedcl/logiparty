@@ -45,7 +45,7 @@
 - [x] **A6** Client inventory UI polish — dense items table (SKU/Name/Description/Qty/Actions); inline qty + description edit; SKU/name read-only after create; soft SKU normalize (trim, uppercase, `A-Z0-9_-`); “+ Add item” collapsed at bottom. Files: `app/dashboard/client-inventory/page.tsx`, `components/client-inventory/*`, `lib/inventory/sku.ts`, `lib/actions/client-inventory.ts`.
 - [x] **A7** Dashboard UI consistency — same A6 list-first / create-last pattern on: **Our inventory**, **Fleet**, **Jobs**, **Team**, **Clients**, **Availability**, **Activity**. Soft SKU normalize on Our inventory. Job detail / portal / marketing unchanged.
 - [x] **A8** Dev role / persona switcher — Option A quick-login via `signIn("credentials")`; gate `ALLOW_DEV_ROLE_SWITCH=true` + hard deny when `VERCEL_ENV=production`; floating Dev panel; always show name+role in dashboard/portal headers. Personas: Ed, Mike Oso, Don, Tom, Paul, Michaela. Do **not** enable on Vercel Production.
-- [x] **A9** Seed cast → Jake’s old company (Ed/Mike/Don/Paul/Tom/Rob/Jerome + Michaela/Alex @ Red Bull). Local Neon **dev** re-seeded; prod Neon **main** still old cast until intentional re-seed.
+- [x] **A9** Seed cast → Jake’s old company (Ed/Mike/Don/Paul/Tom/Rob/Jerome + Michaela/Dom @ Red Bull). Local Neon **dev** re-seeded; prod Neon **main** still old cast until intentional re-seed.
 
 ---
 

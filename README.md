@@ -72,7 +72,7 @@ Seed accounts (all password `password123`):
 | `tom@test.test` / `rob@test.test` | Staff / warehouse |
 | `paul@test.test` / `jerome@test.test` | Staff / driver |
 | `michaela@redbull.test` | Client POC (Red Bull) |
-| `alex@redbull.test` | Client (Red Bull) |
+| `dom@redbull.test` | Client (Red Bull) |
 | `admin@demo.test` | Demo org (RLS isolation) |
 
 A second Neon **branch** (staging) is optional — see [docs/STAGING.md](docs/STAGING.md). You can keep using one DATABASE_URL until you are ready to connect more services.
