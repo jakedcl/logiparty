@@ -1,40 +1,61 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { acceptDraftJob, denyDraftJob } from "@/lib/actions/jobs";
+import {
+  approveInventoryRequest,
+  denyInventoryRequest,
+} from "@/lib/actions/inventory-requests";
 import { listNotifications } from "@/lib/actions/notifications";
 import {
+  canManageClientInventory,
   canManageJobs,
   canViewMyJobs,
 } from "@/lib/auth/permissions";
 import { ConfirmSubmitButton } from "@/components/ui/confirm-submit-button";
-import { requireSession } from "@/lib/org/context";
+import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
 function fmt(d: Date): string {
   return d.toLocaleString();
 }
 
-function kindLabel(kind: "draft_request" | "assignment"): string {
-  return kind === "draft_request" ? "Request" : "Assignment";
+function kindLabel(
+  kind: "draft_request" | "inventory_request" | "assignment"
+): string {
+  switch (kind) {
+    case "draft_request":
+      return "Job request";
+    case "inventory_request":
+      return "Inventory";
+    case "assignment":
+      return "Assignment";
+  }
 }
 
 export default async function NotificationsPage() {
   const session = await requireSession();
+  const tags = await getSessionStaffTags(session);
   const canManager = canManageJobs(session.user);
   const canStaff = canViewMyJobs(session.user);
-  if (!canManager && !canStaff) redirect("/dashboard");
+  const canInventory = canManageClientInventory(session.user, tags);
+  if (!canManager && !canStaff && !canInventory) redirect("/dashboard");
 
   const items = await listNotifications(session.user.orgId);
+  const showActions = canManager || canInventory;
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold mb-1">Notifications</h1>
         <p className="text-sm text-neutral-500">
-          {canManager && canStaff
-            ? "Draft job requests needing attention, and jobs you are assigned to."
-            : canManager
-              ? "Client portal job requests waiting for review."
-              : "Jobs you have been assigned to."}
+          {[
+            canManager ? "draft job requests" : null,
+            canInventory ? "inventory change requests" : null,
+            canStaff ? "your assignments" : null,
+          ]
+            .filter(Boolean)
+            .join(", ")
+            .replace(/^./, (c) => c.toUpperCase()) || "Inbox"}
+          .
         </p>
       </div>
 
@@ -58,7 +79,7 @@ export default async function NotificationsPage() {
                   <th className="py-2 px-3 font-medium w-[9rem] text-right">
                     When
                   </th>
-                  {canManager ? (
+                  {showActions ? (
                     <th className="py-2 px-3 font-medium w-[10rem] text-right">
                       {" "}
                     </th>
@@ -70,6 +91,10 @@ export default async function NotificationsPage() {
                   const draftJobId =
                     item.kind === "draft_request"
                       ? item.id.replace(/^draft:/, "")
+                      : null;
+                  const invId =
+                    item.kind === "inventory_request"
+                      ? item.inventoryRequestId
                       : null;
                   return (
                     <tr
@@ -93,9 +118,9 @@ export default async function NotificationsPage() {
                       <td className="py-2 px-3 text-right text-xs text-neutral-400 whitespace-nowrap">
                         <time>{fmt(item.createdAt)}</time>
                       </td>
-                      {canManager ? (
+                      {showActions ? (
                         <td className="py-2 px-3 text-right whitespace-nowrap">
-                          {draftJobId ? (
+                          {draftJobId && canManager ? (
                             <div className="inline-flex items-center gap-2">
                               <form action={acceptDraftJob}>
                                 <input
@@ -118,6 +143,27 @@ export default async function NotificationsPage() {
                                 />
                                 <ConfirmSubmitButton
                                   message="Deny this client job request? They will see it as denied."
+                                  className="text-xs font-medium text-red-600 hover:underline"
+                                >
+                                  Deny
+                                </ConfirmSubmitButton>
+                              </form>
+                            </div>
+                          ) : invId && canInventory ? (
+                            <div className="inline-flex items-center gap-2">
+                              <form action={approveInventoryRequest}>
+                                <input type="hidden" name="id" value={invId} />
+                                <button
+                                  type="submit"
+                                  className="text-xs font-medium text-neutral-900 hover:underline"
+                                >
+                                  Approve
+                                </button>
+                              </form>
+                              <form action={denyInventoryRequest}>
+                                <input type="hidden" name="id" value={invId} />
+                                <ConfirmSubmitButton
+                                  message="Deny this inventory request? The client will see it as denied."
                                   className="text-xs font-medium text-red-600 hover:underline"
                                 >
                                   Deny

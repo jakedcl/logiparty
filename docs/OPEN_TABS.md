@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (portal jobs list-first / create-last).*
+*Last updated: 2026-08-20 (A13 portal inventory requests).*
 
 ---
 
@@ -67,7 +67,7 @@
 - [x] **Manager deny portal draft** — New job status `denied` (migration `0020`). Managers Accept / Deny on job detail + Notifications; client portal shows denied (not stuck pending). D5b; distinct from **A12** staff assignment accept/deny. Neon **dev** migrated; seed example Monster Rooftop Soft Ask.
 - [x] **Clients tab contacts** — `/dashboard/clients` lists each company with a dense Name/Email/Title table of `client_users` (seed Michaela POC + Dom Rep under Red Bull on nydac). Invite contact + Add company stays collapsed create-last; invite flow unchanged.
 - [x] **Portal jobs list-first** — `/portal/jobs` matches A6/A7: dense Your jobs table (name/date/status chips/View) first; **+ New request** collapsed at bottom; subtitle tracks status first. Draft accept/deny copy unchanged. Auth/company scope untouched.
-
+- [x] **A13** Portal inventory **requests** v1 — clients request add / qty change / remove with reason; managers Approve (apply to `client_inventory_items`) or Deny (+ optional note). Table `client_inventory_requests` + migration `0021`. Portal `/portal/inventory` list-first + collapsed + Request new item + Your requests. Staff: Notifications + Client inventory pending panel. Seed: 2 Red Bull pending samples (cooler qty + umbrella add). Neon **dev** migrated + seeded.
 ---
 
 ## Current environments

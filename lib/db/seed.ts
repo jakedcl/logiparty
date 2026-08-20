@@ -1500,6 +1500,56 @@ async function seedNydacRich(sql: Sql, passwordHash: string) {
     "job"
   );
 
+  // —— Sample pending inventory requests (Red Bull / Michaela) ——
+  await sql`
+    INSERT INTO client_inventory_requests (
+      org_id, client_company_id, requested_by_user_id, type,
+      client_inventory_item_id, proposed_sku, proposed_name,
+      proposed_quantity, reason, status
+    )
+    SELECT o.id, c.id, u.id, 'qty_change'::inventory_request_type,
+      i.id, i.sku, i.name, 60, 'Need more coolers for summer activations',
+      'pending'::inventory_request_status
+    FROM organizations o
+    JOIN client_companies c ON c.org_id = o.id AND c.name = 'Red Bull'
+    JOIN users u ON u.email = 'michaela@redbull.test'
+    JOIN client_inventory_items i
+      ON i.org_id = o.id AND i.client_company_id = c.id AND i.sku = 'RB-COOLER-24'
+    WHERE o.slug = 'nydac'
+      AND NOT EXISTS (
+        SELECT 1 FROM client_inventory_requests r
+        WHERE r.org_id = o.id
+          AND r.client_company_id = c.id
+          AND r.type = 'qty_change'
+          AND r.status = 'pending'
+          AND r.client_inventory_item_id = i.id
+      )
+  `;
+
+  await sql`
+    INSERT INTO client_inventory_requests (
+      org_id, client_company_id, requested_by_user_id, type,
+      proposed_sku, proposed_name, proposed_description, proposed_quantity,
+      reason, status
+    )
+    SELECT o.id, c.id, u.id, 'add'::inventory_request_type,
+      'RB-UMBRELLA-01', 'Branded Patio Umbrella', '8ft market umbrella with wings',
+      6, 'New patio set for outdoor pop-ups',
+      'pending'::inventory_request_status
+    FROM organizations o
+    JOIN client_companies c ON c.org_id = o.id AND c.name = 'Red Bull'
+    JOIN users u ON u.email = 'michaela@redbull.test'
+    WHERE o.slug = 'nydac'
+      AND NOT EXISTS (
+        SELECT 1 FROM client_inventory_requests r
+        WHERE r.org_id = o.id
+          AND r.client_company_id = c.id
+          AND r.type = 'add'
+          AND r.status = 'pending'
+          AND r.proposed_sku = 'RB-UMBRELLA-01'
+      )
+  `;
+
   console.log("  nydac rich: clients + inventory + fleet + 6 jobs seeded");
 }
 
