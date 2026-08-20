@@ -8,6 +8,8 @@ import {
 } from "@/lib/actions/jobs";
 import { JOB_STATUSES } from "@/lib/db/schema";
 import { requireSession } from "@/lib/org/context";
+import { PageHeader } from "@/components/ui/page-header";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 export default async function JobsPage() {
   const session = await requireSession();
@@ -21,18 +23,15 @@ export default async function JobsPage() {
   const companyName = new Map(companies.map((c) => [c.id, c.name]));
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold mb-1">Jobs</h1>
-        <p className="text-sm text-neutral-500">
-          Create and manage jobs. Statuses: draft → upcoming → ready →
-          completed (or draft → denied).
-        </p>
-      </div>
+    <div className="space-y-8">
+      <PageHeader
+        title="Jobs"
+        description="Create and manage jobs. Statuses: draft → upcoming → ready → completed (or draft → denied)."
+      />
 
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-2">
-          <h2 className="text-sm font-medium text-neutral-800">
+          <h2 className="app-section-label">
             All jobs
             <span className="ml-1.5 text-neutral-400 font-normal">
               ({jobList.length})
@@ -41,13 +40,13 @@ export default async function JobsPage() {
         </div>
 
         {jobList.length === 0 ? (
-          <p className="text-sm text-neutral-500 py-4">
+          <p className="app-empty">
             No jobs yet.
             {companies.length === 0 ? (
               <>
                 {" "}
                 Add a{" "}
-                <Link href="/dashboard/clients" className="underline">
+                <Link href="/dashboard/clients" className="app-link">
                   client company
                 </Link>{" "}
                 before creating jobs.
@@ -57,45 +56,44 @@ export default async function JobsPage() {
             )}
           </p>
         ) : (
-          <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto -mx-4 sm:mx-0">
-            <table className="w-full min-w-[520px] text-sm text-left">
+          <div className="app-table-wrap -mx-4 sm:mx-0">
+            <table className="app-table min-w-[520px]">
               <thead>
-                <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
-                  <th className="py-2 px-3 font-medium">Name</th>
-                  <th className="py-2 px-3 font-medium">Client</th>
-                  <th className="py-2 px-3 font-medium w-[7rem]">Status</th>
-                  <th className="py-2 px-3 font-medium w-[4rem] text-right">
-                    {" "}
-                  </th>
+                <tr>
+                  <th>Name</th>
+                  <th>Client</th>
+                  <th className="w-[9rem]">Status</th>
+                  <th className="w-[4rem] text-right"> </th>
                 </tr>
               </thead>
               <tbody>
                 {jobList.map((job) => (
-                  <tr
-                    key={job.id}
-                    className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50/80"
-                  >
-                    <td className="py-2 px-3 font-medium text-neutral-900">
+                  <tr key={job.id}>
+                    <td className="font-medium text-neutral-900">
                       <Link
                         href={`/dashboard/jobs/${job.id}`}
-                        className="hover:underline"
+                        className="hover:underline underline-offset-2"
                       >
                         {job.name}
                       </Link>
                     </td>
-                    <td className="py-2 px-3 text-neutral-600">
+                    <td className="text-neutral-600">
                       {companyName.get(job.clientCompanyId) ?? "Client"}
                     </td>
-                    <td className="py-2 px-3 capitalize text-neutral-600">
-                      {job.status}
+                    <td>
+                      <StatusBadge status={job.status} kind="job" />
                       {job.status === "draft" ? (
-                        <span className="text-neutral-400"> · needs accept</span>
+                        <span className="ml-1.5 text-xs text-neutral-400">
+                          needs accept
+                        </span>
                       ) : null}
                       {job.status === "denied" ? (
-                        <span className="text-neutral-400"> · rejected</span>
+                        <span className="ml-1.5 text-xs text-neutral-400">
+                          rejected
+                        </span>
                       ) : null}
                     </td>
-                    <td className="py-2 px-3 text-right">
+                    <td className="text-right">
                       <Link
                         href={`/dashboard/jobs/${job.id}`}
                         className="text-xs text-neutral-400 hover:text-neutral-700"
@@ -111,7 +109,7 @@ export default async function JobsPage() {
         )}
 
         {companies.length > 0 ? (
-          <details className="group border-t border-neutral-200 pt-4">
+          <details className="group border-t border-border pt-5">
             <summary className="cursor-pointer list-none text-sm text-neutral-600 hover:text-neutral-900 select-none [&::-webkit-details-marker]:hidden">
               <span className="inline-flex items-center gap-1.5 font-medium">
                 <span className="text-neutral-400 group-open:hidden" aria-hidden>
@@ -126,23 +124,23 @@ export default async function JobsPage() {
                 New job
               </span>
             </summary>
-            <form action={createJob} className="mt-3 space-y-3 max-w-xl">
-              <label className="block text-xs text-neutral-500">
+            <form action={createJob} className="mt-4 space-y-3 max-w-xl">
+              <label className="app-label">
                 Job name
                 <input
                   name="name"
                   required
                   placeholder="Job name"
-                  className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
+                  className="app-input mt-1"
                 />
               </label>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <label className="text-xs text-neutral-500">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="app-label">
                   Client company
                   <select
                     name="clientCompanyId"
                     required
-                    className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm bg-white"
+                    className="app-input mt-1"
                   >
                     <option value="">Select…</option>
                     {companies.map((c) => (
@@ -152,12 +150,12 @@ export default async function JobsPage() {
                     ))}
                   </select>
                 </label>
-                <label className="text-xs text-neutral-500">
+                <label className="app-label">
                   Status
                   <select
                     name="status"
                     defaultValue="upcoming"
-                    className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm bg-white"
+                    className="app-input mt-1"
                   >
                     {JOB_STATUSES.filter((s) => s !== "denied").map((s) => (
                       <option key={s} value={s}>
@@ -167,28 +165,25 @@ export default async function JobsPage() {
                   </select>
                 </label>
               </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                <label className="text-xs text-neutral-500">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className="app-label">
                   Job start
                   <input
                     type="datetime-local"
                     name="jobStart"
-                    className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
+                    className="app-input mt-1"
                   />
                 </label>
-                <label className="text-xs text-neutral-500">
+                <label className="app-label">
                   Job end
                   <input
                     type="datetime-local"
                     name="jobEnd"
-                    className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
+                    className="app-input mt-1"
                   />
                 </label>
               </div>
-              <button
-                type="submit"
-                className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white"
-              >
+              <button type="submit" className="app-btn app-btn-primary">
                 Create job
               </button>
             </form>

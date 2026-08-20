@@ -23,7 +23,7 @@ export function JobInventoryLineRow({
   };
 }) {
   return (
-    <tr className="border-b border-neutral-100 last:border-0 align-middle hover:bg-neutral-50/80">
+    <tr className="align-middle">
       <td className="py-2 px-3 font-mono text-xs text-neutral-600 whitespace-nowrap">
         {line.itemSku ?? "—"}
       </td>

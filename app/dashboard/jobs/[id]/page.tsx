@@ -377,7 +377,7 @@ export default async function JobDetailPage({
           {locations.length === 0 ? (
             <p className="text-sm text-neutral-500 py-2">No locations yet.</p>
           ) : (
-            <div className="border border-neutral-200 rounded-md bg-white px-3">
+            <div className="border-t border-[var(--border)] pt-1">
               {locations.map((loc) => (
                 <JobLocationRow key={loc.id} jobId={job.id} location={loc} />
               ))}
@@ -423,10 +423,10 @@ export default async function JobDetailPage({
               No inventory assigned yet.
             </p>
           ) : (
-            <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto">
+            <div className="lp-table-wrap">
               <table className="w-full min-w-[28rem] text-sm text-left">
                 <thead>
-                  <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
+                  <tr>
                     <th className="py-2 px-3 font-medium w-[6.5rem]">SKU</th>
                     <th className="py-2 px-3 font-medium">Item</th>
                     <th className="py-2 px-3 font-medium w-[11rem]">Qty</th>
@@ -505,10 +505,10 @@ export default async function JobDetailPage({
               No vehicles assigned yet.
             </p>
           ) : (
-            <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto">
+            <div className="lp-table-wrap">
               <table className="w-full text-sm text-left">
                 <thead>
-                  <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
+                  <tr>
                     <th className="py-2 px-3 font-medium">Vehicle</th>
                     <th className="py-2 px-3 font-medium">Plate</th>
                     <th className="py-2 px-2 font-medium w-10">
@@ -520,7 +520,7 @@ export default async function JobDetailPage({
                   {fleetAssignments.map((row) => (
                     <tr
                       key={row.fleetVehicleId}
-                      className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50/80"
+                      className=""
                     >
                       <td className="py-2 px-3 font-medium text-neutral-900">
                         {row.vehicleName}
@@ -592,10 +592,10 @@ export default async function JobDetailPage({
           {crewAssignments.length === 0 ? (
             <p className="text-sm text-neutral-500 py-2">No crew assigned yet.</p>
           ) : (
-            <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto">
+            <div className="lp-table-wrap">
               <table className="w-full min-w-[28rem] text-sm text-left">
                 <thead>
-                  <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
+                  <tr>
                     <th className="py-2 px-3 font-medium">Person</th>
                     <th className="py-2 px-3 font-medium">Phase</th>
                     <th className="py-2 px-3 font-medium">Role</th>
@@ -608,7 +608,7 @@ export default async function JobDetailPage({
                   {crewAssignments.map((row) => (
                     <tr
                       key={row.id}
-                      className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50/80"
+                      className=""
                     >
                       <td className="py-2 px-3">
                         <p className="font-medium text-neutral-900">

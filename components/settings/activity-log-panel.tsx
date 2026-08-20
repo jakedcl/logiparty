@@ -24,10 +24,10 @@ export async function ActivityLogPanel({ orgId }: Props) {
       {logs.length === 0 ? (
         <p className="text-sm text-neutral-500 py-4">No activity recorded yet.</p>
       ) : (
-        <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto -mx-4 sm:mx-0">
-          <table className="w-full min-w-[560px] text-sm text-left">
+        <div className="lp-table-wrap">
+          <table className="lp-table min-w-[560px]">
             <thead>
-              <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
+              <tr>
                 <th className="py-2 px-3 font-medium">Action</th>
                 <th className="py-2 px-3 font-medium">Actor</th>
                 <th className="py-2 px-3 font-medium">Context</th>

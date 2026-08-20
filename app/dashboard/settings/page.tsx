@@ -38,10 +38,10 @@ export default async function SettingsPage({
         : null;
 
   return (
-    <div className="space-y-6 max-w-md">
+    <div className="max-w-md space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold mb-1">Settings</h1>
-        <p className="text-sm text-neutral-500">
+        <h1 className="lp-page-title">Settings</h1>
+        <p className="lp-page-sub">
           {canSettings
             ? "Your profile, organization branding, billing, time off, and activity."
             : canBilling && !canTimeOff && !canActivity
@@ -50,26 +50,21 @@ export default async function SettingsPage({
         </p>
       </div>
 
-      <nav
-        className="flex flex-col gap-1 border border-neutral-200 rounded-md bg-white divide-y divide-neutral-100"
-        aria-label="Settings sections"
-      >
-        <Link
-          href="/dashboard/settings/profile"
-          className="px-3 py-2.5 text-sm hover:bg-neutral-50"
-        >
-          <span className="font-medium text-neutral-900">My Profile</span>
-          <span className="block text-xs text-neutral-500 mt-0.5">
+      <nav className="lp-nav-list" aria-label="Settings sections">
+        <Link href="/dashboard/settings/profile">
+          <span className="font-semibold text-[var(--foreground)]">
+            My Profile
+          </span>
+          <span className="mt-0.5 block text-xs text-[var(--muted)]">
             Name and password
           </span>
         </Link>
         {canTimeOff ? (
-          <Link
-            href="/dashboard/settings/time-off"
-            className="px-3 py-2.5 text-sm hover:bg-neutral-50"
-          >
-            <span className="font-medium text-neutral-900">Time off</span>
-            <span className="block text-xs text-neutral-500 mt-0.5">
+          <Link href="/dashboard/settings/time-off">
+            <span className="font-semibold text-[var(--foreground)]">
+              Time off
+            </span>
+            <span className="mt-0.5 block text-xs text-[var(--muted)]">
               {canReviewAvailability(session.user)
                 ? "Request PTO and approve or deny pending requests"
                 : "Request time off"}
@@ -77,27 +72,28 @@ export default async function SettingsPage({
           </Link>
         ) : null}
         {canActivity ? (
-          <Link
-            href="/dashboard/settings/activity"
-            className="px-3 py-2.5 text-sm hover:bg-neutral-50"
-          >
-            <span className="font-medium text-neutral-900">Activity log</span>
-            <span className="block text-xs text-neutral-500 mt-0.5">
+          <Link href="/dashboard/settings/activity">
+            <span className="font-semibold text-[var(--foreground)]">
+              Activity log
+            </span>
+            <span className="mt-0.5 block text-xs text-[var(--muted)]">
               Recent org actions
             </span>
           </Link>
         ) : null}
       </nav>
 
-      {billingFlash && (
-        <p className="text-sm rounded border border-neutral-200 bg-neutral-50 px-3 py-2 text-neutral-700">
+      {billingFlash ? (
+        <p className="border-t border-[var(--border)] py-3 text-sm text-[var(--muted)]">
           {billingFlash}
         </p>
-      )}
+      ) : null}
 
       {canSettings && org ? (
         <section id="branding" className="space-y-3">
-          <h2 className="text-lg font-medium">Organization</h2>
+          <h2 className="text-base font-semibold tracking-tight text-[var(--foreground)]">
+            Organization
+          </h2>
           <OrgSettingsEditor
             org={{
               name: org.name,

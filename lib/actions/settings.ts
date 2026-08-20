@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { organizations } from "@/lib/db/schema";
 import { requireSession } from "@/lib/org/context";
+import { FALLBACK_PRIMARY_COLOR } from "@/lib/theme/primary-color";
 import { canManageOrgSettings } from "@/lib/auth/permissions";
 
 export async function updateOrgSettings(formData: FormData) {
@@ -26,7 +27,7 @@ export async function updateOrgSettings(formData: FormData) {
     .set({
       name,
       logoUrl,
-      primaryColor: primaryColor || "#2563eb",
+      primaryColor: primaryColor || FALLBACK_PRIMARY_COLOR,
       emailFromName,
     })
     .where(eq(organizations.id, session.user.orgId));

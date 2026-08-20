@@ -18,10 +18,10 @@ export function FleetVehiclesTable({
   }
 
   return (
-    <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto -mx-4 sm:mx-0">
-      <table className="w-full min-w-[640px] text-sm text-left">
+    <div className="lp-table-wrap">
+      <table className="lp-table min-w-[640px]">
         <thead>
-          <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
+          <tr>
             <th className="py-2 px-3 font-medium w-[10rem]">Name</th>
             <th className="py-2 px-3 font-medium w-[7rem]">Plate</th>
             <th className="py-2 px-3 font-medium">Description</th>
@@ -37,7 +37,7 @@ export function FleetVehiclesTable({
             return (
               <tr
                 key={vehicle.id}
-                className="border-b border-neutral-100 last:border-0 align-middle hover:bg-neutral-50/80"
+                className="align-middle"
               >
                 <td className="py-1.5 px-3">
                   <input

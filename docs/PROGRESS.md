@@ -163,3 +163,6 @@
 - [x] Settings → Billing UI (calm “not configured” without keys; soft status only)
 - [ ] Jake: create Stripe product/price, add keys to Vercel + `.env.local`, register webhook URL
 - [ ] Jake: apply `0019_m6_org_billing.sql` on Neon **prod `main`** (dev can be migrated anytime)
+
+### Go-live ops (OPEN_TABS)
+- [x] **A16** Visual system — tokens, tenant primary, open layouts (2026-08-20)

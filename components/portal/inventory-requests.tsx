@@ -78,10 +78,10 @@ export function PortalInventoryItemsTable({
   }
 
   return (
-    <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto -mx-4 sm:mx-0">
-      <table className="w-full min-w-[420px] text-sm text-left">
+    <div className="lp-table-wrap">
+      <table className="lp-table min-w-[420px]">
         <thead>
-          <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
+          <tr>
             <th className="py-2 px-3 font-medium">SKU</th>
             <th className="py-2 px-3 font-medium">Name</th>
             <th className="py-2 px-3 font-medium w-[4.5rem]">Qty</th>
@@ -94,7 +94,7 @@ export function PortalInventoryItemsTable({
           {items.map((item) => (
             <tr
               key={item.id}
-              className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50/80"
+              className=""
             >
               <td className="py-2 px-3 font-mono text-xs text-neutral-700 whitespace-nowrap">
                 {item.sku}
@@ -367,10 +367,10 @@ export function PortalInventoryRequestsList({
   }
 
   return (
-    <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto -mx-4 sm:mx-0">
-      <table className="w-full min-w-[480px] text-sm text-left">
+    <div className="lp-table-wrap">
+      <table className="lp-table min-w-[480px]">
         <thead>
-          <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
+          <tr>
             <th className="py-2 px-3 font-medium w-[7rem]">Type</th>
             <th className="py-2 px-3 font-medium">Item</th>
             <th className="py-2 px-3 font-medium">Reason</th>

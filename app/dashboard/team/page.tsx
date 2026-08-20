@@ -36,7 +36,7 @@ export default async function TeamPage() {
             No team members yet. Use + Invite below.
           </p>
         ) : (
-          <ul className="border border-neutral-200 rounded-md bg-white divide-y divide-neutral-100 -mx-4 sm:mx-0">
+          <ul className="-mx-4 divide-y divide-[var(--border-subtle)] border-t border-[var(--border)] sm:mx-0">
             {internalMembers.map(({ membership, user, tags }) => (
               <TeamMemberRow
                 key={membership.id}

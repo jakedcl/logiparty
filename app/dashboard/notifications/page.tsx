@@ -13,6 +13,7 @@ import {
   canViewMyJobs,
 } from "@/lib/auth/permissions";
 import { ConfirmSubmitButton } from "@/components/ui/confirm-submit-button";
+import { PageHeader } from "@/components/ui/page-header";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
 function fmt(d: Date): string {
@@ -46,11 +47,11 @@ export default async function NotificationsPage() {
   const showActions = canManager || canInventory;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold mb-1">Notifications</h1>
-        <p className="text-sm text-neutral-500">
-          {[
+    <div className="space-y-8">
+      <PageHeader
+        title="Notifications"
+        description={
+          ([
             canManager ? "draft job requests" : null,
             canManager ? "client notes" : null,
             canInventory ? "inventory change requests" : null,
@@ -58,26 +59,23 @@ export default async function NotificationsPage() {
           ]
             .filter(Boolean)
             .join(", ")
-            .replace(/^./, (c) => c.toUpperCase()) || "Inbox"}
-          .
-        </p>
-      </div>
+            .replace(/^./, (c) => c.toUpperCase()) || "Inbox") + "."
+        }
+      />
 
       <section className="space-y-3">
-        <h2 className="text-sm font-medium text-neutral-800">
+        <h2 className="lp-section-title">
           Inbox
-          <span className="ml-1.5 text-neutral-400 font-normal">
-            ({items.length})
-          </span>
+          <span className="lp-section-meta">({items.length})</span>
         </h2>
 
         {items.length === 0 ? (
-          <p className="text-sm text-neutral-500 py-4">Nothing new right now.</p>
+          <p className="app-empty">Nothing new right now.</p>
         ) : (
-          <div className="border border-neutral-200 rounded-md bg-white overflow-x-auto -mx-4 sm:mx-0">
-            <table className="w-full min-w-[520px] text-sm text-left">
+          <div className="lp-table-wrap">
+            <table className="lp-table min-w-[520px]">
               <thead>
-                <tr className="border-b border-neutral-200 text-neutral-500 bg-neutral-50">
+                <tr>
                   <th className="py-2 px-3 font-medium w-[6.5rem]">Type</th>
                   <th className="py-2 px-3 font-medium">Item</th>
                   <th className="py-2 px-3 font-medium w-[9rem] text-right">
@@ -105,7 +103,7 @@ export default async function NotificationsPage() {
                   return (
                     <tr
                       key={item.id}
-                      className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50/80"
+                      className=""
                     >
                       <td className="py-2 px-3 text-neutral-500 whitespace-nowrap">
                         {kindLabel(item.kind)}

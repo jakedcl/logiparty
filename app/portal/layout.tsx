@@ -6,6 +6,7 @@ import {
   getSessionClientCompany,
   requireSession,
 } from "@/lib/org/context";
+import { resolvePrimaryColor } from "@/lib/theme/primary-color";
 
 export default async function PortalLayout({
   children,
@@ -25,7 +26,7 @@ export default async function PortalLayout({
   return (
     <PortalShell
       session={session}
-      primaryColor={org?.primaryColor ?? "#2563eb"}
+      primaryColor={resolvePrimaryColor(org?.primaryColor)}
       logoUrl={org?.logoUrl}
       companyName={company?.name ?? null}
     >

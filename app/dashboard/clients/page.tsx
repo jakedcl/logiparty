@@ -47,7 +47,7 @@ export default async function ClientsPage() {
             No client companies yet. Use + Add company below.
           </p>
         ) : (
-          <ul className="border border-neutral-200 rounded-md bg-white divide-y divide-neutral-100 -mx-4 sm:mx-0">
+          <ul className="divide-y divide-[var(--border-subtle)] border-t border-[var(--border)] -mx-4 sm:mx-0">
             {rows.map(({ company, contacts }) => (
               <li key={company.id} className="px-3 py-3 space-y-2">
                 <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">

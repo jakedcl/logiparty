@@ -1,5 +1,6 @@
 "use client";
 
+import { FALLBACK_PRIMARY_COLOR } from "@/lib/theme/primary-color";
 import {
   DetailFields,
   EditFormActions,
@@ -17,7 +18,7 @@ export function OrgSettingsEditor({
     emailFromName: string | null;
   };
 }) {
-  const primary = org.primaryColor ?? "#2563eb";
+  const primary = org.primaryColor ?? FALLBACK_PRIMARY_COLOR;
 
   return (
     <ViewEdit
@@ -76,7 +77,7 @@ export function OrgSettingsEditor({
               name="name"
               defaultValue={org.name}
               required
-              className="w-full border rounded px-3 py-2 text-sm"
+              className="lp-input"
             />
           </div>
           <div>
@@ -89,7 +90,7 @@ export function OrgSettingsEditor({
               type="url"
               defaultValue={org.logoUrl ?? ""}
               placeholder="https://..."
-              className="w-full border rounded px-3 py-2 text-sm"
+              className="lp-input"
             />
           </div>
           <div>
@@ -118,7 +119,7 @@ export function OrgSettingsEditor({
               id="emailFromName"
               name="emailFromName"
               defaultValue={org.emailFromName ?? org.name}
-              className="w-full border rounded px-3 py-2 text-sm"
+              className="lp-input"
             />
           </div>
           <EditFormActions onCancel={onCancel} />

@@ -52,7 +52,7 @@ export function SessionIdentity({
     <div ref={rootRef} className="relative">
       <button
         type="button"
-        className="flex items-center gap-1.5 rounded-md px-1.5 py-1 text-right leading-tight min-w-0 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300"
+        className="flex items-center gap-1.5 rounded-md px-1.5 py-1 text-right leading-tight min-w-0 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
         aria-expanded={open}
         aria-haspopup="menu"
         aria-controls={menuId}
