@@ -20,7 +20,6 @@ import {
   canSubmitAvailability,
   canViewMyJobs,
 } from "@/lib/auth/permissions";
-import { isStripeConfigured } from "@/lib/stripe";
 
 type Props = {
   session: Session;
@@ -38,31 +37,27 @@ export function InternalShell({
   children,
 }: Props) {
   const orgName = session.user.orgName ?? "Organization";
-  const showSettings = canManageOrgSettings(session.user);
-  const showBilling =
-    canManageBilling(session.user) && isStripeConfigured();
-  // Managers without org-settings still need a settings entry when Stripe isn't live
-  const showSettingsFallback =
-    !showSettings &&
-    !showBilling &&
-    canManageBilling(session.user);
   const showTeam = canInviteUsers(session.user);
   const showInventory = canManageOrgInventory(session.user, staffTags);
   const showClientInventory = canManageClientInventory(session.user, staffTags);
   const showFleet = canManageFleet(session.user);
   const showJobs = canManageJobs(session.user);
-  const showActivityLog = canManageJobs(session.user);
   const showMyJobs = canViewMyJobs(session.user);
-  const showAvailability =
-    canSubmitAvailability(session.user) || canReviewAvailability(session.user);
+  const showNotifications = showJobs || showMyJobs;
+  const showSettings =
+    canManageOrgSettings(session.user) ||
+    canManageBilling(session.user) ||
+    canSubmitAvailability(session.user) ||
+    canReviewAvailability(session.user) ||
+    canManageJobs(session.user);
 
   const navItems: DashboardNavItem[] = [
     { href: "/dashboard", label: "Dashboard" },
   ];
   if (showJobs) navItems.push({ href: "/dashboard/jobs", label: "Jobs" });
   if (showMyJobs) navItems.push({ href: "/dashboard/my-jobs", label: "My Jobs" });
-  if (showAvailability) {
-    navItems.push({ href: "/dashboard/availability", label: "Availability" });
+  if (showNotifications) {
+    navItems.push({ href: "/dashboard/notifications", label: "Notifications" });
   }
   if (showInventory) {
     navItems.push({ href: "/dashboard/inventory", label: "Our inventory" });
@@ -78,14 +73,8 @@ export function InternalShell({
     navItems.push({ href: "/dashboard/team", label: "Team" });
     navItems.push({ href: "/dashboard/clients", label: "Clients" });
   }
-  if (showActivityLog) {
-    navItems.push({ href: "/dashboard/activity", label: "Activity" });
-  }
-  if (showSettings || showSettingsFallback) {
+  if (showSettings) {
     navItems.push({ href: "/dashboard/settings", label: "Settings" });
-  }
-  if (showBilling) {
-    navItems.push({ href: "/dashboard/settings#billing", label: "Billing" });
   }
 
   return (

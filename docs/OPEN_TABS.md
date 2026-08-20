@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (nydac rich seed)*
+*Last updated: 2026-08-20 (staff nav: Notifications + Settings)*
 
 ---
 
@@ -18,7 +18,9 @@
 
 ## Future / backlog (do not start unless Jake asks)
 
-_None queued._
+| ID | Task | Notes |
+|----|------|-------|
+| **A12** | Staff accept/deny job assignments | Not in schema/APP_CONTEXT today (`job_assignments` has no accept status). Notifications v1 is **inbox of links** only. Needs product decision + small schema (status / responded_at) before UI. |
 
 ---
 
@@ -60,6 +62,7 @@ _None queued._
 - [x] **B4 partial** Stripe billing scaffold (optional, no keys required) — Checkout + portal + webhook + Settings Billing; soft `billing_status`; keys TBD.
 - [x] **Nav shell** Staff dashboard — left sidebar + mobile drawer (`DashboardShell`); portal unchanged; run-sheet location bullets → `ul`.
 - [x] **NYDAC rich seed** — `seedNydacRich()` in `lib/db/seed.ts`: Monster Energy + Gotham Glow clients, fat catalogs, 5 fleet, 6 jobs across draft/upcoming/ready/completed with locations/crew/fleet/qty_loaded + activity. Crew spread: Tom/Rob/Paul/Jerome each on 5 jobs; Mike/Don lead multiple; ready jobs full LI+LO. Neon **dev** only.
+- [x] **Staff nav UX** — Primary: Dashboard, Jobs / My Jobs, **Notifications**, inventory, Fleet, Team, Clients, **Settings**. Moved **Availability → Settings / Time off**, **Activity → Settings / Activity**. Old `/dashboard/availability` + `/dashboard/activity` redirect. Notifications = manager draft requests + staff assignments (view/link only; accept/deny → **A12**). Portal unchanged.
 
 ---
 

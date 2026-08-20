@@ -143,7 +143,8 @@ export async function submitAvailabilityRequest(formData: FormData) {
     }),
   ]);
 
-  revalidatePath("/dashboard/availability");
+  revalidatePath("/dashboard/settings/time-off");
+  revalidatePath("/dashboard/settings");
 }
 
 function parseReviewStatus(raw: FormDataEntryValue | null): AvailabilityStatus {
@@ -203,5 +204,6 @@ export async function reviewAvailabilityRequest(formData: FormData) {
     }),
   ]);
 
-  revalidatePath("/dashboard/availability");
+  revalidatePath("/dashboard/settings/time-off");
+  revalidatePath("/dashboard/settings");
 }
