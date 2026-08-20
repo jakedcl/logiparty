@@ -14,7 +14,8 @@
 |----|------|-------|-------|
 | **A1** | Jake tests job flow locally | Jake | Automated: `npx tsx scripts/golden-path-walk.ts` → **29 passed, 0 failed** (2026-08-19). Still worth one manual click-through on prod. |
 | **A4** | Unknown subdomain → homepage | Agent | If `{slug}.logiparty.com` has no org in DB, redirect to `https://logiparty.com` (A3 homepage exists — ready to wire) |
-| **A6** | Client inventory UI polish | Agent (when Jake picks it) | **Docs-only queue item — do not start until Jake asks.** Polish Client inventory first; same pattern likely later for **Our inventory** and **Fleet**. (1) **SKU:** keep label "SKU"; auto-uppercase on input/blur; soft format (letters/numbers/`-`) — not a hard regex. (2) **Demote "Add item"** — collapsed or bottom; list is primary (managers mostly adjust qty). (3) **Items list:** dense table/rows, not big card containers per item. |
+| **A7** | Dashboard UI consistency | Agent (when Jake picks it) | Same principle as **A6** across the rest of the app: demote “new / add” create forms (collapsed or bottom); dense lists/tables primary; professional SaaS ops feel. Touch: **Our inventory**, **Fleet**, **Jobs list**, **Team**, etc. Pattern reference: Client inventory after A6. |
+| **A8** | Dev role / persona switcher | Agent (when Jake picks it) | Exclusive Jake/dev tooling to switch roles while testing. **Feasibility: yes**, with hard env gating. **Safest MVP:** panel only when `ALLOW_DEV_ROLE_SWITCH=true` (never on Vercel Production) — quick-login as seed users (`morgan`, `sam`, `dana`, `rep1`) or server action that creates a session for a chosen seed user in the current org. **Alt:** JWT “view as” impersonation — more powerful, higher risk; env-gated + email allowlist (e.g. `jakedcl73@gmail.com`). Do **not** ship to Production customers without kill-switch. Explore seed-user switch vs impersonation when picked. |
 
 ---
 
@@ -43,6 +44,7 @@
 - [x] **A2** Fix Vercel Production env + login redirect loop — Jake confirmed login works on prod (`test.logiparty.com`, 2026-08-20). Env checklist + `secureCookie: true` for `__Secure-authjs.session-token` in middleware.
 - [x] **A5** Neon `dev` branch — local `.env.local` `DATABASE_URL` → pooled `dev` (`ep-lucky-water-aphwec7q-pooler…`); Vercel Production stays on Neon `main`. Fork had schema + `test`/`demo` already; no reset of `main`. Only run `db:reset-seed` against `dev`.
 - [x] **A3** Marketing / leads homepage at apex `logiparty.com` — invite-only “Request access” form → `marketing_leads` (+ optional Resend notify). Tenant `{slug}.logiparty.com` unchanged. Follow-up: **A4** unknown subdomain → homepage.
+- [x] **A6** Client inventory UI polish — dense items table (SKU/Name/Description/Qty/Actions); inline qty + description edit; SKU/name read-only after create; soft SKU normalize (trim, uppercase, `A-Z0-9_-`); “+ Add item” collapsed at bottom. Files: `app/dashboard/client-inventory/page.tsx`, `components/client-inventory/*`, `lib/inventory/sku.ts`, `lib/actions/client-inventory.ts`.
 
 ---
 

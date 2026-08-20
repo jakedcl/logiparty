@@ -13,6 +13,7 @@ import {
   type ClientCompany,
   type ClientInventoryItem,
 } from "@/lib/db/schema";
+import { normalizeSku } from "@/lib/inventory/sku";
 import {
   getSessionClientCompany,
   getSessionStaffTags,
@@ -57,7 +58,7 @@ export async function createClientInventoryItem(formData: FormData) {
   const session = await requireClientInventoryAccess();
 
   const clientCompanyId = formData.get("clientCompanyId") as string;
-  const sku = (formData.get("sku") as string)?.trim();
+  const sku = normalizeSku(String(formData.get("sku") ?? ""));
   const name = (formData.get("name") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() || null;
   const totalQuantity = parseQuantity(formData.get("totalQuantity"));
@@ -101,7 +102,7 @@ export async function updateClientInventoryItem(formData: FormData) {
   const clientCompanyId = formData.get("clientCompanyId") as string;
   if (!id) throw new Error("Missing item id");
 
-  const sku = (formData.get("sku") as string)?.trim();
+  const sku = normalizeSku(String(formData.get("sku") ?? ""));
   const name = (formData.get("name") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() || null;
   const totalQuantity = parseQuantity(formData.get("totalQuantity"));
