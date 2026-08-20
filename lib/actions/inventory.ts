@@ -7,6 +7,7 @@ import { activityLogInsert } from "@/lib/activity/log";
 import { canManageOrgInventory } from "@/lib/auth/permissions";
 import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import { inventoryItems, type InventoryItem } from "@/lib/db/schema";
+import { normalizeSku } from "@/lib/inventory/sku";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
 async function requireInventoryAccess() {
@@ -30,7 +31,7 @@ function parseQuantity(raw: FormDataEntryValue | null): number {
 export async function createOrgInventoryItem(formData: FormData) {
   const session = await requireInventoryAccess();
 
-  const sku = (formData.get("sku") as string)?.trim();
+  const sku = normalizeSku(String(formData.get("sku") ?? ""));
   const name = (formData.get("name") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() || null;
   const totalQuantity = parseQuantity(formData.get("totalQuantity"));
@@ -67,7 +68,7 @@ export async function updateOrgInventoryItem(formData: FormData) {
   const id = formData.get("id") as string;
   if (!id) throw new Error("Missing item id");
 
-  const sku = (formData.get("sku") as string)?.trim();
+  const sku = normalizeSku(String(formData.get("sku") ?? ""));
   const name = (formData.get("name") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() || null;
   const totalQuantity = parseQuantity(formData.get("totalQuantity"));
