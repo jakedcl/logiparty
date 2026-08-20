@@ -18,18 +18,18 @@ export async function switchDevPersona(formData: FormData): Promise<void> {
     throw new Error("Dev role switch is disabled");
   }
 
-  const personaId = String(formData.get("persona") ?? "");
-  const persona = getDevPersona(personaId);
-  if (!persona) {
-    throw new Error("Unknown persona");
-  }
-
   const headersList = await headers();
   const session = await auth();
   const orgSlug =
     session?.user?.orgSlug ?? getOrgSlugFromHeaders(headersList);
   if (!orgSlug) {
     throw new Error("No organization context");
+  }
+
+  const personaId = String(formData.get("persona") ?? "");
+  const persona = getDevPersona(personaId, orgSlug);
+  if (!persona) {
+    throw new Error("Unknown persona");
   }
 
   try {
