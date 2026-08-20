@@ -1,6 +1,12 @@
 /**
  * Golden-path seed — run: npm run db:seed (requires DATABASE_URL)
  * Safe to re-run: uses ON CONFLICT / existence checks.
+ *
+ * Creates TWO fully populated tenants:
+ *   - nydac  → New York Design and Construction (Jake's cast + Red Bull)
+ *   - test   → Acme Event Logistics (playground cast + Monster)
+ *
+ * users.email is globally unique — casts use different emails.
  */
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
@@ -27,41 +33,39 @@ function loadEnvLocal() {
   }
 }
 
-const ORG_SLUG = "nydac";
-const ORG_NAME = "New York Design and Construction";
+type Sql = ReturnType<typeof neon>;
 
-async function seed() {
-  loadEnvLocal();
-  const url = process.env.DATABASE_URL;
-  if (!url) {
-    throw new Error("DATABASE_URL required");
-  }
-  const sql = neon(url);
-  const passwordHash = await bcrypt.hash("password123", 10);
+type SeedPerson = {
+  email: string;
+  first: string;
+  last: string;
+};
 
-  const logoUrl = "/seed/test-tenant-logo.svg";
-  const primaryColor = "#0f172a";
+type SeedOrg = {
+  slug: string;
+  name: string;
+  logoUrl: string;
+  primaryColor: string;
+  people: readonly SeedPerson[];
+  orgAdminEmails: readonly string[];
+  managerEmails: readonly string[];
+  staffEmails: readonly string[];
+  warehouseEmails: readonly string[];
+  driverEmails: readonly string[];
+  clientEmails: readonly string[];
+  clientCompany: string;
+  clientTitles: Record<string, string>;
+  clientInventory: { sku: string; name: string; qty: number };
+  orgInventory: { sku: string; name: string; qty: number };
+  fleet: { name: string; plate: string };
+};
 
-  await sql`
-    INSERT INTO organizations (slug, name, primary_color, email_from_name, logo_url)
-    VALUES
-      (${ORG_SLUG}, ${ORG_NAME}, ${primaryColor}, ${ORG_NAME}, ${logoUrl})
-    ON CONFLICT (slug) DO NOTHING
-  `;
-
-  // Always refresh NYDAC branding so re-seed applies name/logo without full reset.
-  await sql`
-    UPDATE organizations
-    SET
-      name = ${ORG_NAME},
-      email_from_name = ${ORG_NAME},
-      logo_url = ${logoUrl},
-      primary_color = ${primaryColor}
-    WHERE slug = ${ORG_SLUG}
-  `;
-
-  // Display names: first + last joined (empty last → single name like "Ed").
-  const people = [
+const NYDAC: SeedOrg = {
+  slug: "nydac",
+  name: "New York Design and Construction",
+  logoUrl: "/seed/nydac-logo.svg",
+  primaryColor: "#1e3a5f",
+  people: [
     { email: "ed@test.test", first: "Ed", last: "" },
     { email: "mike@test.test", first: "Mike", last: "Oso" },
     { email: "don@test.test", first: "Don", last: "" },
@@ -71,16 +75,65 @@ async function seed() {
     { email: "jerome@test.test", first: "Jerome", last: "" },
     { email: "michaela@redbull.test", first: "Michaela", last: "" },
     { email: "dom@redbull.test", first: "Dom", last: "" },
-  ] as const;
+  ],
+  orgAdminEmails: ["ed@test.test"],
+  managerEmails: ["mike@test.test", "don@test.test"],
+  staffEmails: [
+    "paul@test.test",
+    "tom@test.test",
+    "rob@test.test",
+    "jerome@test.test",
+  ],
+  warehouseEmails: ["tom@test.test", "rob@test.test"],
+  driverEmails: ["paul@test.test", "jerome@test.test"],
+  clientEmails: ["michaela@redbull.test", "dom@redbull.test"],
+  clientCompany: "Red Bull",
+  clientTitles: {
+    "michaela@redbull.test": "POC",
+    "dom@redbull.test": "Rep",
+  },
+  clientInventory: { sku: "RB-BAR-01", name: "Branded Bar", qty: 10 },
+  orgInventory: { sku: "DOLLY-01", name: "Dolly", qty: 20 },
+  fleet: { name: "Box Truck 12", plate: "NYD-012" },
+};
 
-  // Migrate superseded second Red Bull user (Alex → Dom) if still present.
-  await sql`
-    UPDATE users
-    SET email = 'dom@redbull.test', first_name = 'Dom', last_name = ''
-    WHERE email = 'alex@redbull.test'
-      AND NOT EXISTS (SELECT 1 FROM users WHERE email = 'dom@redbull.test')
-  `;
+const TEST: SeedOrg = {
+  slug: "test",
+  name: "Acme Event Logistics",
+  logoUrl: "/seed/test-tenant-logo.svg",
+  primaryColor: "#ea580c",
+  people: [
+    { email: "boss@playground.test", first: "Alex", last: "Boss" },
+    { email: "riley@playground.test", first: "Riley", last: "Lane" },
+    { email: "chris@playground.test", first: "Chris", last: "Ware" },
+    { email: "pat@playground.test", first: "Pat", last: "Stock" },
+    { email: "jamie@playground.test", first: "Jamie", last: "Drive" },
+    { email: "nina@monster.test", first: "Nina", last: "" },
+    { email: "kai@monster.test", first: "Kai", last: "" },
+  ],
+  orgAdminEmails: ["boss@playground.test"],
+  managerEmails: ["riley@playground.test"],
+  staffEmails: [
+    "chris@playground.test",
+    "pat@playground.test",
+    "jamie@playground.test",
+  ],
+  warehouseEmails: ["chris@playground.test", "pat@playground.test"],
+  driverEmails: ["jamie@playground.test"],
+  clientEmails: ["nina@monster.test", "kai@monster.test"],
+  clientCompany: "Monster",
+  clientTitles: {
+    "nina@monster.test": "POC",
+    "kai@monster.test": "Rep",
+  },
+  clientInventory: { sku: "MN-TENT-01", name: "Promo Tent", qty: 6 },
+  orgInventory: { sku: "PALLET-JACK-01", name: "Pallet Jack", qty: 8 },
+  fleet: { name: "Sprinter Van 3", plate: "ACM-003" },
+};
 
+const ORGS: readonly SeedOrg[] = [NYDAC, TEST];
+
+async function upsertPeople(sql: Sql, people: readonly SeedPerson[], passwordHash: string) {
   for (const p of people) {
     await sql`
       INSERT INTO users (email, password_hash, first_name, last_name)
@@ -91,130 +144,182 @@ async function seed() {
         last_name = EXCLUDED.last_name
     `;
   }
+}
 
-  // Ed — OrgAdmin (boss)
+async function seedOrg(sql: Sql, org: SeedOrg, passwordHash: string) {
   await sql`
-    INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
-    SELECT o.id, u.id, true, true, false, false
-    FROM organizations o, users u
-    WHERE o.slug = ${ORG_SLUG} AND u.email = 'ed@test.test'
-    ON CONFLICT (org_id, user_id) DO UPDATE SET
-      is_org_admin = true, is_manager = true, is_staff = false, is_client = false
+    INSERT INTO organizations (slug, name, primary_color, email_from_name, logo_url)
+    VALUES
+      (${org.slug}, ${org.name}, ${org.primaryColor}, ${org.name}, ${org.logoUrl})
+    ON CONFLICT (slug) DO NOTHING
   `;
-  // Mike Oso + Don — Managers
+
+  // Always refresh branding so re-seed applies name/logo without full reset.
   await sql`
-    INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
-    SELECT o.id, u.id, false, true, false, false
-    FROM organizations o, users u
-    WHERE o.slug = ${ORG_SLUG} AND u.email IN ('mike@test.test', 'don@test.test')
-    ON CONFLICT (org_id, user_id) DO UPDATE SET
-      is_org_admin = false, is_manager = true, is_staff = false, is_client = false
+    UPDATE organizations
+    SET
+      name = ${org.name},
+      email_from_name = ${org.name},
+      logo_url = ${org.logoUrl},
+      primary_color = ${org.primaryColor}
+    WHERE slug = ${org.slug}
   `;
-  // Staff: Paul, Tom, Rob, Jerome
-  await sql`
-    INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
-    SELECT o.id, u.id, false, false, true, false
-    FROM organizations o, users u
-    WHERE o.slug = ${ORG_SLUG}
-      AND u.email IN (
-        'paul@test.test',
-        'tom@test.test',
-        'rob@test.test',
-        'jerome@test.test'
-      )
-    ON CONFLICT (org_id, user_id) DO UPDATE SET
-      is_org_admin = false, is_manager = false, is_staff = true, is_client = false
-  `;
-  // Clients: Michaela + Dom (Red Bull)
-  await sql`
-    INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
-    SELECT o.id, u.id, false, false, false, true
-    FROM organizations o, users u
-    WHERE o.slug = ${ORG_SLUG}
-      AND u.email IN ('michaela@redbull.test', 'dom@redbull.test')
-    ON CONFLICT (org_id, user_id) DO UPDATE SET
-      is_org_admin = false, is_manager = false, is_staff = false, is_client = true
-  `;
-  // Warehouse: Tom + Rob
-  await sql`
-    INSERT INTO staff_capability_tags (membership_id, tag)
-    SELECT m.id, 'warehouse'
-    FROM org_memberships m
-    JOIN users u ON u.id = m.user_id
-    JOIN organizations o ON o.id = m.org_id
-    WHERE o.slug = ${ORG_SLUG} AND u.email IN ('tom@test.test', 'rob@test.test')
-    ON CONFLICT DO NOTHING
-  `;
-  // Driver: Paul + Jerome
-  await sql`
-    INSERT INTO staff_capability_tags (membership_id, tag)
-    SELECT m.id, 'driver'
-    FROM org_memberships m
-    JOIN users u ON u.id = m.user_id
-    JOIN organizations o ON o.id = m.org_id
-    WHERE o.slug = ${ORG_SLUG} AND u.email IN ('paul@test.test', 'jerome@test.test')
-    ON CONFLICT DO NOTHING
-  `;
+
+  await upsertPeople(sql, org.people, passwordHash);
+
+  for (const email of org.orgAdminEmails) {
+    await sql`
+      INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
+      SELECT o.id, u.id, true, true, false, false
+      FROM organizations o, users u
+      WHERE o.slug = ${org.slug} AND u.email = ${email}
+      ON CONFLICT (org_id, user_id) DO UPDATE SET
+        is_org_admin = true, is_manager = true, is_staff = false, is_client = false
+    `;
+  }
+
+  if (org.managerEmails.length) {
+    await sql`
+      INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
+      SELECT o.id, u.id, false, true, false, false
+      FROM organizations o, users u
+      WHERE o.slug = ${org.slug} AND u.email = ANY(${org.managerEmails})
+      ON CONFLICT (org_id, user_id) DO UPDATE SET
+        is_org_admin = false, is_manager = true, is_staff = false, is_client = false
+    `;
+  }
+
+  if (org.staffEmails.length) {
+    await sql`
+      INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
+      SELECT o.id, u.id, false, false, true, false
+      FROM organizations o, users u
+      WHERE o.slug = ${org.slug} AND u.email = ANY(${org.staffEmails})
+      ON CONFLICT (org_id, user_id) DO UPDATE SET
+        is_org_admin = false, is_manager = false, is_staff = true, is_client = false
+    `;
+  }
+
+  if (org.clientEmails.length) {
+    await sql`
+      INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
+      SELECT o.id, u.id, false, false, false, true
+      FROM organizations o, users u
+      WHERE o.slug = ${org.slug} AND u.email = ANY(${org.clientEmails})
+      ON CONFLICT (org_id, user_id) DO UPDATE SET
+        is_org_admin = false, is_manager = false, is_staff = false, is_client = true
+    `;
+  }
+
+  if (org.warehouseEmails.length) {
+    await sql`
+      INSERT INTO staff_capability_tags (membership_id, tag)
+      SELECT m.id, 'warehouse'
+      FROM org_memberships m
+      JOIN users u ON u.id = m.user_id
+      JOIN organizations o ON o.id = m.org_id
+      WHERE o.slug = ${org.slug} AND u.email = ANY(${org.warehouseEmails})
+      ON CONFLICT DO NOTHING
+    `;
+  }
+
+  if (org.driverEmails.length) {
+    await sql`
+      INSERT INTO staff_capability_tags (membership_id, tag)
+      SELECT m.id, 'driver'
+      FROM org_memberships m
+      JOIN users u ON u.id = m.user_id
+      JOIN organizations o ON o.id = m.org_id
+      WHERE o.slug = ${org.slug} AND u.email = ANY(${org.driverEmails})
+      ON CONFLICT DO NOTHING
+    `;
+  }
 
   await sql`
     INSERT INTO client_companies (org_id, name)
-    SELECT o.id, 'Red Bull'
+    SELECT o.id, ${org.clientCompany}
     FROM organizations o
-    WHERE o.slug = ${ORG_SLUG}
+    WHERE o.slug = ${org.slug}
       AND NOT EXISTS (
         SELECT 1 FROM client_companies c
-        WHERE c.org_id = o.id AND c.name = 'Red Bull'
+        WHERE c.org_id = o.id AND c.name = ${org.clientCompany}
       )
   `;
 
-  await sql`
-    INSERT INTO client_users (org_id, client_company_id, user_id, title)
-    SELECT o.id, c.id, u.id,
-      CASE u.email
-        WHEN 'michaela@redbull.test' THEN 'POC'
-        ELSE 'Rep'
-      END
-    FROM organizations o
-    JOIN client_companies c ON c.org_id = o.id AND c.name = 'Red Bull'
-    JOIN users u ON u.email IN ('michaela@redbull.test', 'dom@redbull.test')
-    WHERE o.slug = ${ORG_SLUG}
-    ON CONFLICT (client_company_id, user_id) DO NOTHING
-  `;
+  for (const email of org.clientEmails) {
+    const title = org.clientTitles[email] ?? "Rep";
+    await sql`
+      INSERT INTO client_users (org_id, client_company_id, user_id, title)
+      SELECT o.id, c.id, u.id, ${title}
+      FROM organizations o
+      JOIN client_companies c ON c.org_id = o.id AND c.name = ${org.clientCompany}
+      JOIN users u ON u.email = ${email}
+      WHERE o.slug = ${org.slug}
+      ON CONFLICT (client_company_id, user_id) DO NOTHING
+    `;
+  }
 
+  const ci = org.clientInventory;
   await sql`
     INSERT INTO client_inventory_items (org_id, client_company_id, sku, name, total_quantity)
-    SELECT o.id, c.id, 'RB-BAR-01', 'Branded Bar', 10
+    SELECT o.id, c.id, ${ci.sku}, ${ci.name}, ${ci.qty}
     FROM organizations o
-    JOIN client_companies c ON c.org_id = o.id AND c.name = 'Red Bull'
-    WHERE o.slug = ${ORG_SLUG}
+    JOIN client_companies c ON c.org_id = o.id AND c.name = ${org.clientCompany}
+    WHERE o.slug = ${org.slug}
       AND NOT EXISTS (
         SELECT 1 FROM client_inventory_items i
-        WHERE i.org_id = o.id AND i.sku = 'RB-BAR-01'
+        WHERE i.org_id = o.id AND i.sku = ${ci.sku}
       )
   `;
+
+  const oi = org.orgInventory;
   await sql`
     INSERT INTO inventory_items (org_id, sku, name, total_quantity)
-    SELECT o.id, 'DOLLY-01', 'Dolly', 20
+    SELECT o.id, ${oi.sku}, ${oi.name}, ${oi.qty}
     FROM organizations o
-    WHERE o.slug = ${ORG_SLUG}
+    WHERE o.slug = ${org.slug}
       AND NOT EXISTS (
-        SELECT 1 FROM inventory_items i WHERE i.org_id = o.id AND i.sku = 'DOLLY-01'
+        SELECT 1 FROM inventory_items i WHERE i.org_id = o.id AND i.sku = ${oi.sku}
       )
   `;
+
+  const fl = org.fleet;
   await sql`
     INSERT INTO fleet_vehicles (org_id, name, plate)
-    SELECT o.id, 'Box Truck 12', 'TST-012'
+    SELECT o.id, ${fl.name}, ${fl.plate}
     FROM organizations o
-    WHERE o.slug = ${ORG_SLUG}
+    WHERE o.slug = ${org.slug}
       AND NOT EXISTS (
-        SELECT 1 FROM fleet_vehicles f WHERE f.org_id = o.id AND f.name = 'Box Truck 12'
+        SELECT 1 FROM fleet_vehicles f WHERE f.org_id = o.id AND f.name = ${fl.name}
       )
   `;
+}
+
+async function seed() {
+  loadEnvLocal();
+  const url = process.env.DATABASE_URL;
+  if (!url) {
+    throw new Error("DATABASE_URL required");
+  }
+  const sql = neon(url);
+  const passwordHash = await bcrypt.hash("password123", 10);
+
+  // Migrate superseded second Red Bull user (Alex → Dom) if still present.
+  await sql`
+    UPDATE users
+    SET email = 'dom@redbull.test', first_name = 'Dom', last_name = ''
+    WHERE email = 'alex@redbull.test'
+      AND NOT EXISTS (SELECT 1 FROM users WHERE email = 'dom@redbull.test')
+  `;
+
+  for (const org of ORGS) {
+    await seedOrg(sql, org, passwordHash);
+  }
 
   console.log(`
 Seed complete. Password for all accounts: password123
 
-  nydac (http://nydac.localhost:3000)
+  nydac — New York Design and Construction (http://nydac.localhost:3000)
     ed@test.test              OrgAdmin (Ed)
     mike@test.test            Manager (Mike Oso)
     don@test.test             Manager (Don)
@@ -224,6 +329,17 @@ Seed complete. Password for all accounts: password123
     jerome@test.test          Staff / driver
     michaela@redbull.test     Client / POC (Red Bull)
     dom@redbull.test          Client (Red Bull)
+    logo: /seed/nydac-logo.svg
+
+  test — Acme Event Logistics (http://test.localhost:3000)
+    boss@playground.test      OrgAdmin (Alex Boss)
+    riley@playground.test     Manager (Riley Lane)
+    chris@playground.test     Staff / warehouse
+    pat@playground.test       Staff / warehouse
+    jamie@playground.test     Staff / driver
+    nina@monster.test         Client / POC (Monster)
+    kai@monster.test          Client (Monster)
+    logo: /seed/test-tenant-logo.svg (orange TEST badge)
 `);
 }
 

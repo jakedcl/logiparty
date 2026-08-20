@@ -1,12 +1,21 @@
 import { switchDevPersona } from "@/lib/actions/dev-role-switch";
 import {
-  DEV_PERSONAS,
+  getDevPersonaHint,
+  getDevPersonasForOrg,
   isDevRoleSwitchAllowed,
 } from "@/lib/dev/role-switch";
 
+type Props = {
+  /** Current host org slug — personas are org-scoped. */
+  orgSlug?: string | null;
+};
+
 /** Floating Dev panel — only renders when ALLOW_DEV_ROLE_SWITCH is on (never Production). */
-export function DevRoleSwitchPanel() {
+export function DevRoleSwitchPanel({ orgSlug }: Props) {
   if (!isDevRoleSwitchAllowed()) return null;
+
+  const personas = getDevPersonasForOrg(orgSlug);
+  if (personas.length === 0) return null;
 
   return (
     <div className="fixed bottom-4 right-4 z-50 no-print">
@@ -22,9 +31,9 @@ export function DevRoleSwitchPanel() {
         </summary>
         <div className="border-t border-neutral-100 px-2 py-2 space-y-1">
           <p className="px-1 pb-1 text-[10px] leading-snug text-neutral-400">
-            Seed quick-login · Client = Michaela (Red Bull)
+            {getDevPersonaHint(orgSlug)}
           </p>
-          {DEV_PERSONAS.map((p) => (
+          {personas.map((p) => (
             <form key={p.id} action={switchDevPersona}>
               <input type="hidden" name="persona" value={p.id} />
               <button

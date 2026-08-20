@@ -1,6 +1,9 @@
 /**
  * A8 — Dev role / persona switcher helpers.
  * Hard-deny on Vercel Production even if ALLOW_DEV_ROLE_SWITCH is set.
+ *
+ * Personas are keyed by org slug (host). On nydac → Jake's cast;
+ * on test → Acme playground cast.
  */
 
 export function isDevRoleSwitchAllowed(): boolean {
@@ -26,8 +29,7 @@ export type DevPersonaMeta = {
   redirectPath: "/dashboard" | "/portal";
 };
 
-/** Public persona list (emails are not secrets; passwords stay server-side). */
-export const DEV_PERSONAS: readonly DevPersonaMeta[] = [
+const NYDAC_PERSONAS: readonly DevPersonaMeta[] = [
   {
     id: "orgAdmin",
     buttonLabel: "Ed — OrgAdmin",
@@ -72,8 +74,80 @@ export const DEV_PERSONAS: readonly DevPersonaMeta[] = [
   },
 ] as const;
 
-export function getDevPersona(id: string): DevPersonaMeta | undefined {
-  return DEV_PERSONAS.find((p) => p.id === id);
+const TEST_PERSONAS: readonly DevPersonaMeta[] = [
+  {
+    id: "orgAdmin",
+    buttonLabel: "Alex Boss — OrgAdmin",
+    roleLabel: "OrgAdmin",
+    email: "boss@playground.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "manager",
+    buttonLabel: "Riley — Manager",
+    roleLabel: "Manager",
+    email: "riley@playground.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "warehouse",
+    buttonLabel: "Chris — Warehouse",
+    roleLabel: "Staff (Warehouse)",
+    email: "chris@playground.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "driver",
+    buttonLabel: "Jamie — Driver",
+    roleLabel: "Staff (Driver)",
+    email: "jamie@playground.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "client",
+    buttonLabel: "Nina — Client",
+    roleLabel: "Client (Monster)",
+    email: "nina@monster.test",
+    redirectPath: "/portal",
+  },
+] as const;
+
+/** Persona map keyed by organization slug (current host). */
+export const DEV_PERSONAS_BY_ORG: Readonly<
+  Record<string, readonly DevPersonaMeta[]>
+> = {
+  nydac: NYDAC_PERSONAS,
+  test: TEST_PERSONAS,
+};
+
+/** @deprecated Prefer getDevPersonasForOrg — defaults to nydac for older imports. */
+export const DEV_PERSONAS: readonly DevPersonaMeta[] = NYDAC_PERSONAS;
+
+export function getDevPersonasForOrg(
+  orgSlug: string | null | undefined
+): readonly DevPersonaMeta[] {
+  if (!orgSlug) return [];
+  return DEV_PERSONAS_BY_ORG[orgSlug] ?? [];
+}
+
+export function getDevPersona(
+  id: string,
+  orgSlug?: string | null
+): DevPersonaMeta | undefined {
+  const list = orgSlug
+    ? getDevPersonasForOrg(orgSlug)
+    : DEV_PERSONAS;
+  return list.find((p) => p.id === id);
+}
+
+export function getDevPersonaHint(orgSlug: string | null | undefined): string {
+  if (orgSlug === "test") {
+    return "Seed quick-login · Client = Nina (Monster)";
+  }
+  if (orgSlug === "nydac") {
+    return "Seed quick-login · Client = Michaela (Red Bull)";
+  }
+  return "No seed personas for this org";
 }
 
 type RoleFlags = {
