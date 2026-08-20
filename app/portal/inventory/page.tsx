@@ -1,3 +1,4 @@
+import { ChevronDown } from "lucide-react";
 import {
   listClientInventoryItems,
 } from "@/lib/actions/client-inventory";
@@ -49,15 +50,24 @@ export default async function PortalInventoryPage() {
             <PortalRequestNewItemLink />
           </section>
 
-          <section className="space-y-3">
-            <h2 className="text-sm font-medium text-neutral-800">
-              Your requests
-              <span className="ml-1.5 text-neutral-400 font-normal">
-                ({requests.length})
+          <details className="group">
+            <summary className="cursor-pointer list-none text-sm text-neutral-600 hover:text-neutral-900 select-none [&::-webkit-details-marker]:hidden">
+              <span className="inline-flex items-center gap-1.5 font-medium text-neutral-800">
+                <ChevronDown
+                  className="h-3.5 w-3.5 shrink-0 text-neutral-400 transition-transform group-open:rotate-180"
+                  strokeWidth={1.75}
+                  aria-hidden
+                />
+                Your requests
+                <span className="text-neutral-400 font-normal">
+                  ({requests.length})
+                </span>
               </span>
-            </h2>
-            <PortalInventoryRequestsList requests={requests} />
-          </section>
+            </summary>
+            <div className="mt-3">
+              <PortalInventoryRequestsList requests={requests} />
+            </div>
+          </details>
         </>
       )}
     </div>
