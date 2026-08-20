@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (nav shell)*
+*Last updated: 2026-08-20 (nydac rich seed)*
 
 ---
 
@@ -59,6 +59,7 @@ _None queued._
 - [x] **A11b** Job detail tabs + density — `?tab=` switches **one** panel (was hash-link dump of all sections). Dense tables/rows for locations/inventory/fleet/crew/docs; Remove behind ⋯; status chip in header; soft panel fade. Files: `app/dashboard/jobs/[id]/page.tsx`, `components/jobs/*`, `components/ui/view-edit.tsx`.
 - [x] **B4 partial** Stripe billing scaffold (optional, no keys required) — Checkout + portal + webhook + Settings Billing; soft `billing_status`; keys TBD.
 - [x] **Nav shell** Staff dashboard — left sidebar + mobile drawer (`DashboardShell`); portal unchanged; run-sheet location bullets → `ul`.
+- [x] **NYDAC rich seed** — `seedNydacRich()` in `lib/db/seed.ts`: Monster Energy + Gotham Glow clients, fat catalogs, 5 fleet, 6 jobs across draft/upcoming/ready/completed with locations/crew/fleet/qty_loaded + activity. Neon **dev** only.
 
 ---
 
@@ -88,9 +89,20 @@ _None queued._
 
 | Org | Local host | OrgAdmin | Manager | Client POC |
 |-----|------------|----------|---------|------------|
-| **nydac** · NYDAC | http://nydac.localhost:3000 | `ed@test.test` | `mike@test.test` | `michaela@redbull.test` (Red Bull) |
+| **nydac** · NYDAC | http://nydac.localhost:3000 | `ed@test.test` | `mike@test.test` | `michaela@redbull.test` (Red Bull) · also Monster / Gotham Glow |
 | **test** · Acme | http://test.localhost:3000 | `boss@playground.test` | `riley@playground.test` | `nina@monster.test` (Monster) |
 | **axis** · Axis Global Staging | http://axis.localhost:3000 | `jordan@axis.test` | `avery@axis.test` | `taylor@volt.test` (Volt Energy) |
+
+**NYDAC rich seed (Neon `dev`)** — busy warehouse for poking around:
+
+| Status | Sample job |
+|--------|------------|
+| draft | Red Bull Holiday Window Concept |
+| upcoming (partial) | Red Bull Summer Pop-Up · Monster Times Square Takeover |
+| ready | Red Bull Brooklyn Mirage · Gotham Glow Fashion Week |
+| completed | Red Bull Pier 17 Wrap |
+
+Extra portal logins (still `password123`): `sara@monster.nydac.test`, `maya@gothamglow.test`. Dev panel client button stays Michaela (Red Bull).
 
 ---
 

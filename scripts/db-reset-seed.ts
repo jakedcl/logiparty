@@ -35,6 +35,11 @@ const SEED_USER_EMAILS = [
   "jerome@test.test",
   "michaela@redbull.test",
   "dom@redbull.test",
+  // NYDAC extra client portal users (Monster + Gotham Glow)
+  "sara@monster.nydac.test",
+  "lee@monster.nydac.test",
+  "maya@gothamglow.test",
+  "nick@gothamglow.test",
   // Test / Acme playground cast
   "boss@playground.test",
   "riley@playground.test",
