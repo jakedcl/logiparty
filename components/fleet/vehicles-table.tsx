@@ -6,13 +6,18 @@ import type { FleetVehicle } from "@/lib/db/schema";
 
 export function FleetVehiclesTable({
   vehicles,
+  canEdit = false,
 }: {
   vehicles: FleetVehicle[];
+  /** Managers / OrgAdmin — inline Save/Delete. Viewers see read-only rows. */
+  canEdit?: boolean;
 }) {
   if (vehicles.length === 0) {
     return (
       <p className="text-sm text-neutral-500 py-4">
-        No fleet vehicles yet. Use + Add vehicle above when you need one.
+        {canEdit
+          ? "No fleet vehicles yet. Use + Add vehicle above when you need one."
+          : "No fleet vehicles yet."}
       </p>
     );
   }
@@ -26,13 +31,34 @@ export function FleetVehiclesTable({
             <th className="py-2 px-3 font-medium w-[7rem]">Plate</th>
             <th className="py-2 px-3 font-medium">Description</th>
             <th className="py-2 px-3 font-medium w-[4.5rem]">Active</th>
-            <th className="py-2 px-3 font-medium w-[7.5rem] text-right">
-              Actions
-            </th>
+            {canEdit ? (
+              <th className="py-2 px-3 font-medium w-[7.5rem] text-right">
+                Actions
+              </th>
+            ) : null}
           </tr>
         </thead>
         <tbody>
           {vehicles.map((vehicle) => {
+            if (!canEdit) {
+              return (
+                <tr key={vehicle.id} className="align-middle">
+                  <td className="py-2 px-3 text-neutral-900 font-medium">
+                    {vehicle.name}
+                  </td>
+                  <td className="py-2 px-3 font-mono text-sm text-neutral-700">
+                    {vehicle.plate?.trim() ? vehicle.plate : "—"}
+                  </td>
+                  <td className="py-2 px-3 text-neutral-600">
+                    {vehicle.description?.trim() ? vehicle.description : "—"}
+                  </td>
+                  <td className="py-2 px-3 text-sm text-neutral-700">
+                    {vehicle.isActive ? "Yes" : "No"}
+                  </td>
+                </tr>
+              );
+            }
+
             const formId = `fleet-${vehicle.id}`;
             return (
               <tr key={vehicle.id} className="align-middle">

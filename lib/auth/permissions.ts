@@ -68,7 +68,15 @@ export function canManageClientInventory(
   return canManageOrgInventory(m, staffTags);
 }
 
-/** Managers only — warehouse staff cannot CRUD fleet (APP_CONTEXT matrix) */
+/**
+ * All internal staff can view the Fleet tab (Jake: see fleet, not only managers).
+ * Clients stay portal-only — they never hit the staff dashboard.
+ */
+export function canViewFleet(m: SessionMembership): boolean {
+  return canAccessInternalDashboard(m);
+}
+
+/** Managers / OrgAdmin only — Add / Edit / Delete fleet vehicles */
 export function canManageFleet(m: SessionMembership): boolean {
   return m.isOrgAdmin || m.isManager;
 }

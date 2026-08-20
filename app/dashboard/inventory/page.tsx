@@ -21,6 +21,7 @@ import {
   canManageClientInventory,
   canManageFleet,
   canManageOrgInventory,
+  canViewFleet,
 } from "@/lib/auth/permissions";
 import {
   inventoryHref,
@@ -44,7 +45,8 @@ export default async function InventoryHubPage({
   const tags = await getSessionStaffTags(session);
   const showClient = canManageClientInventory(session.user, tags);
   const showEquipment = canManageOrgInventory(session.user, tags);
-  const showFleet = canManageFleet(session.user);
+  const showFleet = canViewFleet(session.user);
+  const canEditFleet = canManageFleet(session.user);
 
   const allowed: InventoryTab[] = [];
   if (showClient) allowed.push("client");
@@ -149,8 +151,11 @@ export default async function InventoryHubPage({
 
       {tab === "fleet" ? (
         <div className="space-y-3">
-          <AddFleetVehiclePanel caption="Box trucks, vans, and other vehicles assigned to jobs." />
-          <FleetVehiclesTable vehicles={vehicles} />
+          <AddFleetVehiclePanel
+            caption="Box trucks, vans, and other vehicles assigned to jobs."
+            canAdd={canEditFleet}
+          />
+          <FleetVehiclesTable vehicles={vehicles} canEdit={canEditFleet} />
         </div>
       ) : null}
     </div>
