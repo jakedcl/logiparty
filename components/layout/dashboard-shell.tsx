@@ -65,7 +65,7 @@ function Brand({
           className="h-9 w-auto max-w-[140px] shrink-0"
         />
       ) : null}
-      <span className="truncate text-base font-semibold leading-snug tracking-tight text-neutral-900">
+      <span className="whitespace-normal break-words text-balance text-base font-semibold leading-snug tracking-tight text-neutral-900">
         {orgName}
       </span>
     </div>
