@@ -10,7 +10,7 @@ One page to go from zero → local dev → production. Read this first.
 cd /Users/jakedcl/Dev/logiparty
 npm install
 npm run db:migrate:sql   # first time only
-npm run db:seed          # nydac + test orgs + golden-path users
+npm run db:seed          # nydac + test + axis orgs + golden-path users
 npm run dev              # http://nydac.localhost:3000
 ```
 
@@ -19,6 +19,7 @@ Add to `/etc/hosts` if you haven't:
 ```
 127.0.0.1 nydac.localhost
 127.0.0.1 test.localhost
+127.0.0.1 axis.localhost
 ```
 
 Copy `.env.example` → `.env.local` and fill `DATABASE_URL`, `AUTH_SECRET`, etc.
@@ -48,7 +49,18 @@ Set `NEXT_PUBLIC_DEV_ORG_SLUG=nydac` as the primary local tenant (or leave unset
 | `nina@monster.test` | Client portal (POC · Monster) |
 | `kai@monster.test` | Client portal |
 
-Emails are **globally unique** — do not reuse NYDAC emails on the test org.
+**axis** — Axis Global Staging (`http://axis.localhost:3000`)
+
+| Email | Role |
+|-------|------|
+| `jordan@axis.test` | Org admin (Jordan Hale) |
+| `avery@axis.test` | Manager (Avery Quinn) |
+| `casey@axis.test` | Staff (warehouse) |
+| `blake@axis.test` | Staff (driver) |
+| `taylor@volt.test` | Client portal (POC · Volt Energy) |
+| `reese@volt.test` | Client portal |
+
+Emails are **globally unique** — do not reuse cast emails across orgs.
 
 **Your personal account:** `jakedcl73@gmail.com` is linked as NYDAC org admin on the current database. Use your existing password (not `password123`). Re-run anytime:
 
@@ -67,7 +79,7 @@ npm run db:relink-admin
 | https://test.logiparty.com | **Prod tenant** (Neon `main` still older seed until intentional re-seed) |
 | https://nydac.logiparty.com | Use after prod has a `nydac` org row |
 
-After wildcard DNS is live, log in at the tenant that exists on **prod** (today: **https://test.logiparty.com**) with seed accounts or your personal admin. Local Neon **dev** has both `nydac` and `test`.
+After wildcard DNS is live, log in at the tenant that exists on **prod** (today: **https://test.logiparty.com**) with seed accounts or your personal admin. Local Neon **dev** has `nydac`, `test`, and `axis`.
 
 Latest Vercel deployment: **success** on commit `2653b5f` (main).
 
@@ -79,11 +91,11 @@ If you ran `npm run db:reset-seed -- --confirm` earlier:
 
 | Removed | Kept |
 |---------|------|
-| `nydac` + `test` orgs (and legacy `demo`/acme if present) and all their jobs, catalogs, fleet | Other orgs (if any) |
-| Seed test accounts (nydac cast + playground cast; also legacy `admin@demo.test`) | Personal accounts like `jakedcl73@gmail.com` |
+| `nydac` + `test` + `axis` orgs (and legacy `demo`/acme if present) and all their jobs, catalogs, fleet | Other orgs (if any) |
+| Seed test accounts (nydac + playground + axis casts; also legacy `admin@demo.test`) | Personal accounts like `jakedcl73@gmail.com` |
 | Client companies under seed orgs | — |
 
-**Current state (after `npm run db:seed` on Neon `dev`):** **`nydac`** + **`test`** exist, catalogs re-seeded, both casts present. Personal admin re-linked to nydac.
+**Current state (after `npm run db:seed` on Neon `dev`):** **`nydac`** + **`test`** + **`axis`** exist, catalogs re-seeded, all three casts present. Personal admin re-linked to nydac.
 
 `db:reset-seed` only touches seed orgs/users — it does **not** drop the whole database. But if Production shares the same `DATABASE_URL`, production sees the same wipe. Script refuses Neon `main` hostnames.
 
@@ -148,8 +160,8 @@ Log in at the **prod** tenant URL (today **`https://test.logiparty.com/login`**)
 
 ```bash
 npm run dev                    # local app
-npm run db:seed                # idempotent — safe to re-run (nydac + test)
-npm run db:reset-seed -- --confirm   # wipe seed filler; re-seed both orgs
+npm run db:seed                # idempotent — safe to re-run (nydac + test + axis)
+npm run db:reset-seed -- --confirm   # wipe seed filler; re-seed all three orgs
 npm run db:relink-admin        # re-link personal email as nydac admin
 npm run test:integration       # RLS / RBAC smoke tests
 ```

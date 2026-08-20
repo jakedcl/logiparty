@@ -1,9 +1,9 @@
 /**
- * A8 — Dev role / persona switcher helpers.
+ * A8 / F1 — Dev role / persona switcher helpers.
  * Hard-deny on Vercel Production even if ALLOW_DEV_ROLE_SWITCH is set.
  *
- * Personas are keyed by org slug (host). On nydac → Jake's cast;
- * on test → Acme playground cast.
+ * Personas are keyed by org slug (current host).
+ *   nydac → Jake's cast · test → Acme · axis → Axis Global Staging
  */
 
 export function isDevRoleSwitchAllowed(): boolean {
@@ -112,12 +112,51 @@ const TEST_PERSONAS: readonly DevPersonaMeta[] = [
   },
 ] as const;
 
+const AXIS_PERSONAS: readonly DevPersonaMeta[] = [
+  {
+    id: "orgAdmin",
+    buttonLabel: "Jordan Hale — OrgAdmin",
+    roleLabel: "OrgAdmin",
+    email: "jordan@axis.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "manager",
+    buttonLabel: "Avery Quinn — Manager",
+    roleLabel: "Manager",
+    email: "avery@axis.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "warehouse",
+    buttonLabel: "Casey Reed — Warehouse",
+    roleLabel: "Staff (Warehouse)",
+    email: "casey@axis.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "driver",
+    buttonLabel: "Blake Ortiz — Driver",
+    roleLabel: "Staff (Driver)",
+    email: "blake@axis.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "client",
+    buttonLabel: "Taylor Kim — Client",
+    roleLabel: "Client (Volt Energy)",
+    email: "taylor@volt.test",
+    redirectPath: "/portal",
+  },
+] as const;
+
 /** Persona map keyed by organization slug (current host). */
 export const DEV_PERSONAS_BY_ORG: Readonly<
   Record<string, readonly DevPersonaMeta[]>
 > = {
   nydac: NYDAC_PERSONAS,
   test: TEST_PERSONAS,
+  axis: AXIS_PERSONAS,
 };
 
 /** @deprecated Prefer getDevPersonasForOrg — defaults to nydac for older imports. */
@@ -146,6 +185,9 @@ export function getDevPersonaHint(orgSlug: string | null | undefined): string {
   }
   if (orgSlug === "nydac") {
     return "Seed quick-login · Client = Michaela (Red Bull)";
+  }
+  if (orgSlug === "axis") {
+    return "Seed quick-login · Client = Taylor (Volt)";
   }
   return "No seed personas for this org";
 }
