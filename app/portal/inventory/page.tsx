@@ -14,7 +14,8 @@ export default async function PortalInventoryPage() {
       <div>
         <h1 className="text-2xl font-semibold">Inventory</h1>
         <p className="text-sm text-neutral-500 mt-1">
-          Items stored with us for {company?.name ?? "your company"}.
+          Items stored with {session.user.orgName} for{" "}
+          {company?.name ?? "your company"}.
         </p>
       </div>
 
