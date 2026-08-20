@@ -156,7 +156,7 @@ export async function addJobInventoryLine(formData: FormData) {
   const jobId = formData.get("jobId") as string;
   if (!jobId) throw new Error("Missing job id");
 
-  const job = await getJobOrThrow(session.user.orgId, jobId);
+  await getJobOrThrow(session.user.orgId, jobId);
   const itemType = parseItemType(formData.get("itemType"));
   const itemId = formData.get("itemId") as string;
   const quantityAssigned = parseQty(formData.get("quantityAssigned"));
