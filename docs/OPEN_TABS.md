@@ -29,7 +29,7 @@ _None queued._
 | B1 | Prod smoke test + logo on login | Login works (A2 done). Remaining: full smoke + logo on login |
 | B2 | First real paying customer | Jake tested app + A3 homepage live |
 | B3 | Resend invite emails | Resend account + domain verify |
-| B4 | M6 (Stripe, self-serve signup, custom domains) | Post-pilot — do not start unless Jake asks |
+| B4 | M6 (Stripe, self-serve signup, custom domains) | **Stripe scaffold done** (keys TBD). Remaining: Jake adds Stripe keys + webhook + prod migrate `0019`; self-serve signup + custom domains still later |
 
 ---
 
@@ -57,6 +57,7 @@ _None queued._
 - [x] **F1** Third seed tenant — **`axis`** · Axis Global Staging · logo `/seed/axis-logo.svg` (teal) · client Volt Energy · cast `@axis.test` / `@volt.test`. Dev persona switcher host-scoped for all three. Neon **dev** reset-seeded; prod **main** untouched.
 - [x] **A11** View-then-edit detail UIs — default read-only labels/values; **Edit** → form + Save/Cancel. Shared `components/ui/view-edit.tsx`. Applied: job **Summary**, **Locations**, **Inventory** qty; org **settings**; **Team** roles/tags. Fleet/Crew stay list+Remove; assigns/uploads behind collapsed **+ Add**. Portal job detail already read-only. Create/new stays form-like.
 - [x] **A11b** Job detail tabs + density — `?tab=` switches **one** panel (was hash-link dump of all sections). Dense tables/rows for locations/inventory/fleet/crew/docs; Remove behind ⋯; status chip in header; soft panel fade. Files: `app/dashboard/jobs/[id]/page.tsx`, `components/jobs/*`, `components/ui/view-edit.tsx`.
+- [x] **B4 partial** Stripe billing scaffold (optional, no keys required) — Checkout + portal + webhook + Settings Billing; soft `billing_status`; keys TBD.
 
 ---
 

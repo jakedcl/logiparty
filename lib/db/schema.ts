@@ -49,6 +49,12 @@ export const organizations = pgTable("organizations", {
   logoUrl: text("logo_url"),
   primaryColor: text("primary_color").default("#2563eb"),
   emailFromName: text("email_from_name"),
+  /** Stripe customer for this org (optional billing). */
+  stripeCustomerId: text("stripe_customer_id"),
+  /** Active/latest Stripe subscription id. */
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  /** Soft status: none | active | past_due | canceled — no hard lockout in pilot. */
+  billingStatus: text("billing_status"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),

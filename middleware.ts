@@ -68,7 +68,9 @@ export async function middleware(request: NextRequest) {
   const isAuthPage = pathname === "/login";
   const isInvitePage = pathname.startsWith("/invite/");
   const isPublicApi =
-    pathname.startsWith("/api/auth") || pathname === "/api/health";
+    pathname.startsWith("/api/auth") ||
+    pathname === "/api/health" ||
+    pathname === "/api/stripe/webhook";
   // Apex marketing homepage (A3) — public when host has no org slug.
   const isApexMarketing = !orgSlug && pathname === "/";
 

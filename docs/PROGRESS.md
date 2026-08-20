@@ -147,3 +147,12 @@
 - [ ] Create the first real org in production DB (or build the sign-up flow in M6)
 - [ ] Set their subdomain slug, run seed or manual insert
 - [ ] **Use separate Neon branches:** local `.env.local` → dev branch; Vercel Production → `main` (never run `db:reset-seed` against prod URL)
+
+### M6 — Stripe billing scaffold (optional plug-and-play)
+- [x] Env stubs in `.env.example` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`, optional publishable)
+- [x] `lib/stripe.ts` — `isStripeConfigured()` / `getStripe()` (null when missing)
+- [x] Org columns: `stripe_customer_id`, `stripe_subscription_id`, `billing_status` + migration `0019`
+- [x] Checkout Session + Customer Portal server actions; webhook at `/api/stripe/webhook`
+- [x] Settings → Billing UI (calm “not configured” without keys; soft status only)
+- [ ] Jake: create Stripe product/price, add keys to Vercel + `.env.local`, register webhook URL
+- [ ] Jake: apply `0019_m6_org_billing.sql` on Neon **prod `main`** (dev can be migrated anytime)

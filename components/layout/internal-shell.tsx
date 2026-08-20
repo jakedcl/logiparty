@@ -10,6 +10,7 @@ import {
   canManageFleet,
   canManageJobs,
   canManageOrgInventory,
+  canManageBilling,
   canManageOrgSettings,
   canInviteUsers,
   canReviewAvailability,
@@ -33,7 +34,8 @@ export function InternalShell({
   children,
 }: Props) {
   const orgName = session.user.orgName;
-  const showSettings = canManageOrgSettings(session.user);
+  const showSettings =
+    canManageOrgSettings(session.user) || canManageBilling(session.user);
   const showTeam = canInviteUsers(session.user);
   const showInventory = canManageOrgInventory(session.user, staffTags);
   const showClientInventory = canManageClientInventory(session.user, staffTags);

@@ -145,8 +145,23 @@ Without this, tenant subdomains will not resolve (SSL/connect errors).
 | `NEXT_PUBLIC_DEV_ORG_SLUG` | **Local only** — do not set in Production |
 | `R2_*` | If using document uploads (M4+) |
 | `RESEND_*` | If using email invites |
+| `STRIPE_SECRET_KEY` | Optional — leave empty until ready |
+| `STRIPE_WEBHOOK_SECRET` | Optional — from Stripe Dashboard webhook endpoint |
+| `STRIPE_PRICE_ID` | Optional — recurring Price id (`price_…`) |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Optional — only if you add embedded Checkout later |
 
 Never commit `.env.local`.
+
+### Stripe (when you have keys)
+
+1. Create a Product + recurring Price in Stripe Dashboard → copy `price_…` into `STRIPE_PRICE_ID`.
+2. Add `STRIPE_SECRET_KEY` (test `sk_test_…` first) on Vercel **and** local `.env.local`.
+3. Webhook endpoint (apex, not tenant): **`https://logiparty.com/api/stripe/webhook`**
+   - Events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
+   - Paste signing secret into `STRIPE_WEBHOOK_SECRET`
+4. Enable Customer Portal in Stripe Dashboard (payment method update / cancel).
+5. Run migration `0019_m6_org_billing.sql` on Neon **prod `main`** when ready (`npm run db:migrate:sql` against prod URL — or run that file only). Dev branch can be migrated locally anytime.
+6. Settings → Billing (OrgAdmin / Manager): Subscribe / Manage billing. App does **not** lock out unpaid orgs during pilot.
 
 **Neon ↔ Vercel integration gotcha:** Neon may inject `DATABASE_URL_UNPOOLED` into Production. This app reads **`DATABASE_URL` only** (`lib/db/index.ts`). You must add **`DATABASE_URL`** (pooled, `…-pooler…`) scoped to **Production** — Development-only is not enough. Then redeploy.
 
@@ -170,4 +185,4 @@ npm run test:integration       # RLS / RBAC smoke tests
 
 ## Next build work
 
-M5 is in progress. Do **not** start M6 until ready. Track tickets in [docs/PROGRESS.md](PROGRESS.md) and [HOW_TO_BUILD.md](../HOW_TO_BUILD.md).
+MVP + optional Stripe scaffold are in. Remaining M6 (self-serve signup, custom domains) waits until Jake asks. Track in [docs/PROGRESS.md](PROGRESS.md) and [HOW_TO_BUILD.md](../HOW_TO_BUILD.md).

@@ -25,6 +25,11 @@ export function canManageOrgSettings(m: SessionMembership): boolean {
   return m.isOrgAdmin;
 }
 
+/** OrgAdmin or Manager — open Billing in settings (soft Stripe scaffold). */
+export function canManageBilling(m: SessionMembership): boolean {
+  return m.isOrgAdmin || m.isManager;
+}
+
 export function canManageJobs(m: SessionMembership): boolean {
   return m.isOrgAdmin || m.isManager;
 }
