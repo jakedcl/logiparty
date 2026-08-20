@@ -148,10 +148,10 @@ async function main() {
 
   const sql = neon(url);
   const [testOrg] = (await sql`
-    SELECT id, slug FROM organizations WHERE slug = 'test' LIMIT 1
+    SELECT id, slug FROM organizations WHERE slug = 'nydac' LIMIT 1
   `) as { id: string; slug: string }[];
   if (!testOrg) {
-    throw new Error("Need test org — run npm run db:seed");
+    throw new Error("Need nydac org — run npm run db:seed");
   }
 
   const probeSlug = `rls-probe-${Date.now()}`;

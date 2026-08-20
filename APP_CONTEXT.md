@@ -45,7 +45,7 @@
 - Organization display name
 - Logo (object storage)
 - Primary brand color
-- Email "from" name (e.g. "TestTenant" via Resend)
+- Email "from" name (e.g. "New York Design and Construction" via Resend)
 - Client portal uses org branding only
 
 ### Branding rule

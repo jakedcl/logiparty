@@ -1,7 +1,7 @@
 /**
  * Smoke-check catalog RLS: org A data is invisible under org B context.
  * Run: npx tsx scripts/verify-catalog-rls.ts (requires DATABASE_URL)
- * Creates an ephemeral second org — seed only provides `test`.
+ * Creates an ephemeral second org — seed only provides `nydac`.
  */
 import { neon } from "@neondatabase/serverless";
 
@@ -10,9 +10,9 @@ async function main() {
   if (!url) throw new Error("DATABASE_URL required");
   const sql = neon(url);
 
-  const [a] = await sql`SELECT id, slug FROM organizations WHERE slug = 'test' LIMIT 1`;
+  const [a] = await sql`SELECT id, slug FROM organizations WHERE slug = 'nydac' LIMIT 1`;
   if (!a) {
-    throw new Error("Need test org — run npm run db:seed");
+    throw new Error("Need nydac org — run npm run db:seed");
   }
 
   const probeSlug = `rls-probe-${Date.now()}`;

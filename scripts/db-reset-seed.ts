@@ -1,5 +1,5 @@
 /**
- * Wipe seeded orgs (test + legacy demo/acme/…) and re-run golden-path seed.
+ * Wipe seeded orgs (nydac + legacy test/demo/acme/…) and re-run golden-path seed.
  *
  * Run: npm run db:reset-seed -- --confirm
  *
@@ -7,15 +7,15 @@
  * (CASCADE org-scoped rows / memberships — users are NOT auto-deleted), then
  * seed-only users by email. Non-seed users are kept.
  *
- * After re-seed, only `test` exists (demo is legacy cleanup only).
+ * After re-seed, only `nydac` exists (test/demo/… are legacy cleanup only).
  */
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { neon } from "@neondatabase/serverless";
 import { execSync } from "child_process";
 
-/** Orgs wiped on reset. Seed recreates `test` only; others are legacy cleanup. */
-const SEED_ORG_SLUGS = ["test", "demo", "acme", "testtenant3pl"] as const;
+/** Orgs wiped on reset. Seed recreates `nydac` only; others are legacy cleanup. */
+const SEED_ORG_SLUGS = ["nydac", "test", "demo", "acme", "testtenant3pl"] as const;
 
 const SEED_USER_EMAILS = [
   // Current cast
@@ -193,24 +193,24 @@ async function resetAndSeed() {
     SELECT o.slug, i.sku, i.name
     FROM inventory_items i
     JOIN organizations o ON o.id = i.org_id
-    WHERE o.slug = 'test'
+    WHERE o.slug = 'nydac'
     ORDER BY i.sku
   `;
   const fleetAfter = await sql`
     SELECT o.slug, f.name, f.plate
     FROM fleet_vehicles f
     JOIN organizations o ON o.id = f.org_id
-    WHERE o.slug = 'test'
+    WHERE o.slug = 'nydac'
     ORDER BY f.name
   `;
 
   console.log("\n--- After seed ---");
   console.log("Orgs:", orgsAfter);
   console.log("Client companies:", clientsAfter);
-  console.log("TestTenant3PL inventory:", inventoryAfter);
-  console.log("TestTenant3PL fleet:", fleetAfter);
+  console.log("NYDAC inventory:", inventoryAfter);
+  console.log("NYDAC fleet:", fleetAfter);
   console.log(
-    "\nNon-seed users preserved (e.g. personal accounts) — re-invite to test if needed."
+    "\nNon-seed users preserved (e.g. personal accounts) — re-invite to nydac if needed."
   );
 }
 

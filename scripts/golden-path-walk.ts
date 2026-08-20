@@ -79,7 +79,7 @@ async function login(email: string) {
       csrfToken,
       email,
       password: PASSWORD,
-      orgSlug: "test",
+      orgSlug: "nydac",
       redirect: "false",
       callbackUrl: `${BASE}/dashboard`,
     }),
@@ -116,21 +116,21 @@ async function main() {
   const { assertAssignmentFits } = await import("../lib/jobs/inventory-locks");
   const { maybePromoteJobToReady } = await import("../lib/jobs/auto-ready");
 
-  const [tenant] = await sql`SELECT id FROM organizations WHERE slug = 'test'`;
+  const [tenant] = await sql`SELECT id FROM organizations WHERE slug = 'nydac'`;
   const [rb] =
     await sql`SELECT id FROM client_companies WHERE org_id = ${tenant.id} AND name = 'Red Bull'`;
 
   // --- Setup / catalogs via UI ---
   const ed = await login("ed@test.test");
   const edDash = await getHtml(ed, "/dashboard");
-  assertIncludes(edDash.html, "TestTenant3PL");
+  assertIncludes(edDash.html, "New York Design and Construction");
   assertNotIncludes(edDash.html, "Logiparty");
-  mark("1", edDash.status === 200, "Ed dashboard branded TestTenant3PL, no Logiparty");
+  mark("1", edDash.status === 200, "Ed dashboard branded NYDAC, no Logiparty");
 
   const settings = await getHtml(ed, "/dashboard/settings");
   mark(
     "2",
-    settings.status === 200 && settings.html.includes("TestTenant3PL"),
+    settings.status === 200 && settings.html.includes("New York Design and Construction"),
     "Ed can open white-label settings"
   );
 
@@ -140,7 +140,7 @@ async function main() {
 
   const michaela = await login("michaela@redbull.test");
   const portalHome = await getHtml(michaela, "/portal");
-  assertIncludes(portalHome.html, "TestTenant3PL");
+  assertIncludes(portalHome.html, "New York Design and Construction");
   assertNotIncludes(portalHome.html, "Logiparty");
   const dom = await login("dom@redbull.test");
   const portal2 = await getHtml(dom, "/portal");
