@@ -284,6 +284,22 @@ Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`,
 
 ---
 
+## Platform marketing (A3)
+
+### `marketing_leads`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | uuid PK | |
+| name | text | |
+| email | text | |
+| company | text | Nullable |
+| message | text | Nullable |
+| created_at | timestamptz | |
+
+*Not org-scoped — no RLS. Apex `logiparty.com` waitlist / access requests. Optional Resend notify via `LEADS_NOTIFY_EMAIL`.*
+
+---
+
 ## Lock model (application logic)
 
 | Resource | Locked when | Released when |

@@ -41,23 +41,25 @@ export async function middleware(request: NextRequest) {
   const isInvitePage = pathname.startsWith("/invite/");
   const isPublicApi =
     pathname.startsWith("/api/auth") || pathname === "/api/health";
+  // Apex marketing homepage (A3) — public when host has no org slug.
+  const isApexMarketing = !orgSlug && pathname === "/";
 
-  if (!token && !isAuthPage && !isInvitePage && !isPublicApi) {
+  if (
+    !token &&
+    !isAuthPage &&
+    !isInvitePage &&
+    !isPublicApi &&
+    !isApexMarketing
+  ) {
     return redirectPath(request, "/login");
   }
 
   if (token && isAuthPage) {
     const isClient = token.isClient === true;
-    return redirectPath(request, isClient ? "/portal" : "/dashboard");
-  }
-
-  // Unauthenticated app routes on apex / unknown host need a tenant subdomain.
-  // Signed-in users carry org context in the JWT — do not bounce them back to /login.
-  if (!token && !orgSlug && !isAuthPage && !isInvitePage && !isPublicApi) {
-    const isLocalBare =
-      host.split(":")[0] === "localhost" || host.split(":")[0] === "127.0.0.1";
-    if (!isLocalBare && !process.env.NEXT_PUBLIC_DEV_ORG_SLUG) {
-      return redirectPath(request, "/login");
+    // On apex, leave /login alone for the "use your subdomain" message unless
+    // they somehow have a session cookie here — then send them to the tenant.
+    if (orgSlug) {
+      return redirectPath(request, isClient ? "/portal" : "/dashboard");
     }
   }
 

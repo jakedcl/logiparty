@@ -97,6 +97,13 @@
 
 ---
 
+## Go-live queue (OPEN_TABS)
+
+- [x] **A3** Apex marketing homepage at `logiparty.com` (leads → `marketing_leads`; invite-only CTA)
+- [ ] **A4** Unknown subdomain → redirect to apex homepage
+
+---
+
 ## Go Live checklist
 
 ### Local testing (do this first)
