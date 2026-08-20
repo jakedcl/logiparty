@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (A14 client → tenant notes).*
+*Last updated: 2026-08-20 (A15 staff dashboard home).*
 
 ---
 
@@ -71,6 +71,7 @@
 - [x] **A13b** Portal inventory request UX — row **⋯** menu (Change quantity / Remove from storage) → dedicated `/portal/inventory/requests/new?type=…&itemId=…` form page; + Request new item → same page `type=add`. No inline stacked forms. Your requests list kept.
 - [x] **Portal jobs date sort** — `/portal/jobs` ordered by `job_start` desc (then `created_at`); was `created_at` only so Date column looked jumbled. Inventory requests already newest-first by `created_at`.
 - [x] **A14** Client → tenant general notes v1 — portal `/portal/notes` (list newest-first + collapsed compose); table `client_notes` + migration `0022`; managers see unread in Notifications + Mark read; one-way (D18). Seed: Red Bull Michaela unread sample. Neon **dev** migrated + seedable.
+- [x] **A15** Staff `/dashboard` home — role-aware welcome (first name + org); Needs attention (top 5 from `listNotifications`, incl. notes/inventory/drafts/assignments); Upcoming work dense table (soonest `job_start` first, cap 8); manager **+ New job** / staff My Jobs + Time off; A6/A7 list density. Time-off tip → Settings.
 ---
 
 ## Current environments

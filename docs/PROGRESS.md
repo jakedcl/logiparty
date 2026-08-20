@@ -115,6 +115,7 @@
 - [x] **A13b** Portal inventory request UX — ⋯ menu → dedicated `/portal/inventory/requests/new` form (no inline stacked forms)
 - [x] Portal jobs list sort by `job_start` desc (newest job date first)
 - [x] **A14** Client → tenant general notes — `client_notes`; portal Notes page; staff Notifications unread + Mark read; Neon **dev** `0022`
+- [x] **A15** Staff dashboard home — replace M0 stub with role-aware ops console (Needs attention + Upcoming work + primary CTAs)
 
 ---
 
