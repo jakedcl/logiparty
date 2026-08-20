@@ -185,7 +185,7 @@ export async function listNotifications(
         kind: "inventory_request",
         title: `Inventory · ${inventoryTypeLabel(row.type)}`,
         detail: `${label} · ${row.clientName ?? "Client"}`,
-        href: `/dashboard/client-inventory`,
+        href: `/dashboard/inventory?tab=client`,
         createdAt: row.createdAt,
         inventoryRequestId: row.id,
       });
@@ -352,7 +352,7 @@ export async function listRejectedItems(
         kind: "inventory_request",
         title: `Denied · ${inventoryTypeLabel(row.type)}`,
         detail: `${label} · ${row.clientName ?? "Client"}`,
-        href: `/dashboard/client-inventory`,
+        href: `/dashboard/inventory?tab=client`,
         createdAt: row.reviewedAt ?? row.createdAt,
         inventoryRequestId: row.id,
       });

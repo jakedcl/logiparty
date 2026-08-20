@@ -2,14 +2,19 @@ import {
   deleteClientInventoryItem,
   updateClientInventoryItem,
 } from "@/lib/actions/client-inventory";
-import type { ClientInventoryItem } from "@/lib/db/schema";
+import { WarehouseSelect } from "@/components/inventory/warehouse-select";
+import type { ClientInventoryItem, Warehouse } from "@/lib/db/schema";
 
 export function ClientInventoryItemsTable({
   items,
   clientCompanyId,
+  warehouses,
+  returnLocation,
 }: {
   items: ClientInventoryItem[];
   clientCompanyId: string;
+  warehouses: Warehouse[];
+  returnLocation?: string;
 }) {
   if (items.length === 0) {
     return (
@@ -22,13 +27,14 @@ export function ClientInventoryItemsTable({
 
   return (
     <div className="lp-table-wrap">
-      <table className="lp-table min-w-[640px]">
+      <table className="lp-table min-w-[720px]">
         <thead>
           <tr>
             <th className="py-2 px-3 font-medium w-[7.5rem]">SKU</th>
             <th className="py-2 px-3 font-medium w-[10rem]">Name</th>
             <th className="py-2 px-3 font-medium">Description</th>
             <th className="py-2 px-3 font-medium w-[5.5rem]">Qty</th>
+            <th className="py-2 px-3 font-medium w-[8rem]">Location</th>
             <th className="py-2 px-3 font-medium w-[7.5rem] text-right">
               Actions
             </th>
@@ -38,10 +44,7 @@ export function ClientInventoryItemsTable({
           {items.map((item) => {
             const formId = `client-inv-${item.id}`;
             return (
-              <tr
-                key={item.id}
-                className="align-middle"
-              >
+              <tr key={item.id} className="align-middle">
                 <td className="py-1.5 px-3 font-mono text-xs text-neutral-700 whitespace-nowrap">
                   {item.sku}
                   <input type="hidden" form={formId} name="sku" value={item.sku} />
@@ -75,6 +78,13 @@ export function ClientInventoryItemsTable({
                     className="w-full max-w-[5rem] border border-neutral-200 rounded px-1.5 py-1 text-sm tabular-nums"
                   />
                 </td>
+                <td className="py-1.5 px-3">
+                  <WarehouseSelect
+                    formId={formId}
+                    warehouses={warehouses}
+                    defaultValue={item.warehouseId}
+                  />
+                </td>
                 <td className="py-1.5 px-3 text-right whitespace-nowrap">
                   <form
                     id={formId}
@@ -87,6 +97,13 @@ export function ClientInventoryItemsTable({
                       name="clientCompanyId"
                       value={clientCompanyId}
                     />
+                    {returnLocation ? (
+                      <input
+                        type="hidden"
+                        name="returnLocation"
+                        value={returnLocation}
+                      />
+                    ) : null}
                     <button
                       type="submit"
                       className="text-sm text-neutral-700 hover:text-neutral-900 font-medium mr-3"
@@ -101,6 +118,13 @@ export function ClientInventoryItemsTable({
                       name="clientCompanyId"
                       value={clientCompanyId}
                     />
+                    {returnLocation ? (
+                      <input
+                        type="hidden"
+                        name="returnLocation"
+                        value={returnLocation}
+                      />
+                    ) : null}
                     <button
                       type="submit"
                       className="text-sm text-red-600 hover:text-red-800"

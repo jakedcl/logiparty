@@ -43,9 +43,10 @@ export function InternalShell({
 }: Props) {
   const orgName = session.user.orgName ?? "Organization";
   const showTeam = canInviteUsers(session.user);
-  const showInventory = canManageOrgInventory(session.user, staffTags);
-  const showClientInventory = canManageClientInventory(session.user, staffTags);
-  const showFleet = canManageFleet(session.user);
+  const showInventory =
+    canManageOrgInventory(session.user, staffTags) ||
+    canManageClientInventory(session.user, staffTags) ||
+    canManageFleet(session.user);
   const showJobs = canManageJobs(session.user);
   const showMyJobs = canViewMyJobs(session.user);
   const showNotifications = showJobs || showMyJobs;
@@ -59,15 +60,8 @@ export function InternalShell({
     navItems.push({ href: "/dashboard/notifications", label: "Notifications" });
   }
   if (showInventory) {
-    navItems.push({ href: "/dashboard/inventory", label: "Our inventory" });
+    navItems.push({ href: "/dashboard/inventory", label: "Inventory" });
   }
-  if (showClientInventory) {
-    navItems.push({
-      href: "/dashboard/client-inventory",
-      label: "Client inventory",
-    });
-  }
-  if (showFleet) navItems.push({ href: "/dashboard/fleet", label: "Fleet" });
   if (showTeam) {
     navItems.push({ href: "/dashboard/team", label: "Team" });
     navItems.push({ href: "/dashboard/clients", label: "Clients" });

@@ -182,10 +182,27 @@ export const clientInventoryItems = pgTable("client_inventory_items", {
   clientCompanyId: uuid("client_company_id")
     .notNull()
     .references(() => clientCompanies.id, { onDelete: "cascade" }),
+  warehouseId: uuid("warehouse_id").references(() => warehouses.id, {
+    onDelete: "set null",
+  }),
   sku: text("sku").notNull(),
   name: text("name").notNull(),
   description: text("description"),
   totalQuantity: integer("total_quantity").notNull().default(0),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/** Org storage sites (warehouses). Distinct from job_locations (event venues). */
+export const warehouses = pgTable("warehouses", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  address: text("address"),
+  isActive: boolean("is_active").notNull().default(true),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -256,6 +273,9 @@ export const inventoryItems = pgTable("inventory_items", {
   orgId: uuid("org_id")
     .notNull()
     .references(() => organizations.id, { onDelete: "cascade" }),
+  warehouseId: uuid("warehouse_id").references(() => warehouses.id, {
+    onDelete: "set null",
+  }),
   sku: text("sku").notNull(),
   name: text("name").notNull(),
   description: text("description"),
@@ -270,6 +290,9 @@ export const fleetVehicles = pgTable("fleet_vehicles", {
   orgId: uuid("org_id")
     .notNull()
     .references(() => organizations.id, { onDelete: "cascade" }),
+  warehouseId: uuid("warehouse_id").references(() => warehouses.id, {
+    onDelete: "set null",
+  }),
   name: text("name").notNull(),
   plate: text("plate"),
   description: text("description"),
@@ -482,6 +505,7 @@ export type ClientInventoryItem = typeof clientInventoryItems.$inferSelect;
 export type ClientInventoryRequest =
   typeof clientInventoryRequests.$inferSelect;
 export type ClientNote = typeof clientNotes.$inferSelect;
+export type Warehouse = typeof warehouses.$inferSelect;
 export type FleetVehicle = typeof fleetVehicles.$inferSelect;
 export type Tool = typeof tools.$inferSelect;
 export type ActivityLog = typeof activityLogs.$inferSelect;

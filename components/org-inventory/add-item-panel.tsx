@@ -1,7 +1,17 @@
 import { SkuInput } from "@/components/client-inventory/sku-input";
+import { WarehouseSelect } from "@/components/inventory/warehouse-select";
 import { createOrgInventoryItem } from "@/lib/actions/inventory";
+import type { Warehouse } from "@/lib/db/schema";
 
-export function AddOrgInventoryItemPanel() {
+export function AddOrgInventoryItemPanel({
+  warehouses,
+  returnLocation,
+  defaultWarehouseId,
+}: {
+  warehouses: Warehouse[];
+  returnLocation?: string;
+  defaultWarehouseId?: string | null;
+}) {
   return (
     <details className="group border-t border-neutral-200 pt-4">
       <summary className="cursor-pointer list-none text-sm text-neutral-600 hover:text-neutral-900 select-none [&::-webkit-details-marker]:hidden">
@@ -17,8 +27,11 @@ export function AddOrgInventoryItemPanel() {
       </summary>
       <form
         action={createOrgInventoryItem}
-        className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-6 lg:items-end"
+        className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-7 lg:items-end"
       >
+        {returnLocation ? (
+          <input type="hidden" name="returnLocation" value={returnLocation} />
+        ) : null}
         <label className="text-xs text-neutral-500 lg:col-span-1">
           SKU
           <SkuInput
@@ -53,6 +66,16 @@ export function AddOrgInventoryItemPanel() {
             defaultValue={0}
             className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
           />
+        </label>
+        <label className="text-xs text-neutral-500 lg:col-span-1">
+          Location
+          <div className="mt-1">
+            <WarehouseSelect
+              warehouses={warehouses}
+              defaultValue={defaultWarehouseId}
+              className="w-full border border-neutral-200 rounded px-2 py-1.5 text-sm bg-white"
+            />
+          </div>
         </label>
         <button
           type="submit"
