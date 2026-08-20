@@ -101,24 +101,11 @@ Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`,
 
 ## Catalogs
 
-### `warehouses` (org storage sites)
-| Column | Type | Notes |
-|--------|------|-------|
-| id | uuid PK | |
-| org_id | uuid FK | RLS |
-| name | text | e.g. "Bushwick Warehouse" |
-| address | text | Nullable street address |
-| is_active | boolean | default true |
-| created_at | timestamptz | |
-
-Org-defined storage sites. UI label: **Location**. Distinct from `job_locations` (event venue addresses on a job). Optional `warehouse_id` on catalog rows filters Inventory hub.
-
 ### `inventory_items` (our inventory / Equipment tab)
 | Column | Type | Notes |
 |--------|------|-------|
 | id | uuid PK | |
 | org_id | uuid FK | RLS |
-| warehouse_id | uuid FK → warehouses | Nullable; ON DELETE SET NULL |
 | sku | text | |
 | name | text | |
 | description | text | |
@@ -133,7 +120,6 @@ Org-defined storage sites. UI label: **Location**. Distinct from `job_locations`
 | id | uuid PK | |
 | org_id | uuid FK | RLS |
 | client_company_id | uuid FK | |
-| warehouse_id | uuid FK → warehouses | Nullable; ON DELETE SET NULL |
 | sku | text | |
 | name | text | |
 | description | text | |
@@ -185,7 +171,6 @@ Clients do **not** edit this catalog directly. They submit rows in `client_inven
 |--------|------|-------|
 | id | uuid PK | |
 | org_id | uuid FK | RLS |
-| warehouse_id | uuid FK → warehouses | Nullable; ON DELETE SET NULL |
 | name | text | e.g. "Box Truck 12" |
 | plate | text | Nullable |
 | description | text | |
@@ -406,11 +391,7 @@ erDiagram
   client_companies ||--o{ client_users : has
   users ||--o{ client_users : links
   organizations ||--o{ jobs : has
-  organizations ||--o{ warehouses : has
   client_companies ||--o{ jobs : owns
-  warehouses ||--o{ inventory_items : stores
-  warehouses ||--o{ client_inventory_items : stores
-  warehouses ||--o{ fleet_vehicles : bases
   jobs ||--o{ job_locations : has
   jobs ||--o{ job_inventory_lines : has
   jobs ||--o{ job_fleet_assignments : has

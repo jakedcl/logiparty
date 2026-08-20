@@ -1,4 +1,4 @@
-/** Staff inventory hub query helpers — one page, three tabs, shared location. */
+/** Staff inventory hub — one page, three tabs. */
 
 export type InventoryTab = "client" | "equipment" | "fleet";
 
@@ -10,9 +10,6 @@ export const INVENTORY_TABS: readonly {
   { id: "equipment", label: "Equipment" },
   { id: "fleet", label: "Fleet" },
 ] as const;
-
-/** Empty / missing = all locations; `unassigned` = no warehouse. */
-export type LocationFilter = string | "unassigned" | "";
 
 export function parseInventoryTab(
   raw: string | undefined,
@@ -26,21 +23,10 @@ export function parseInventoryTab(
 
 export function inventoryHref(opts: {
   tab: InventoryTab;
-  location?: string;
   companyId?: string;
 }): string {
   const q = new URLSearchParams();
   q.set("tab", opts.tab);
-  if (opts.location) q.set("location", opts.location);
   if (opts.companyId) q.set("companyId", opts.companyId);
   return `/dashboard/inventory?${q.toString()}`;
-}
-
-/** Parse optional warehouse_id from form — empty string → null. */
-export function parseWarehouseId(
-  raw: FormDataEntryValue | null
-): string | null {
-  const v = String(raw ?? "").trim();
-  if (!v) return null;
-  return v;
 }
