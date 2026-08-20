@@ -116,6 +116,8 @@
 - [x] Portal jobs list sort by `job_start` desc (newest job date first)
 - [x] **A14** Client → tenant general notes — `client_notes`; portal Notes page; staff Notifications unread + Mark read; Neon **dev** `0022`
 - [x] **A15** Staff dashboard home — replace M0 stub with role-aware ops console (Needs attention + Upcoming work + primary CTAs)
+- [x] **A16** Visual system — tokens, tenant primary, open layouts (2026-08-20)
+- [x] **A17** Rejected out of feeds — denied jobs/inventory leave Inbox/Jobs/portal primary lists; collapsed Rejected folders; DB rows kept
 
 ---
 
@@ -166,3 +168,4 @@
 
 ### Go-live ops (OPEN_TABS)
 - [x] **A16** Visual system — tokens, tenant primary, open layouts (2026-08-20)
+- [x] **A17** Rejected out of primary feeds (2026-08-20)
