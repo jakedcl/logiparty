@@ -26,7 +26,7 @@ export default async function PortalHomePage() {
         >
           <p className="font-medium">Jobs</p>
           <p className="text-sm text-neutral-500 mt-1">
-            View jobs and submit requests
+            Track status and submit requests
           </p>
         </Link>
         <Link

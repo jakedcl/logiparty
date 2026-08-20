@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (manager deny portal draft → denied).*
+*Last updated: 2026-08-20 (portal jobs list-first / create-last).*
 
 ---
 
@@ -66,6 +66,7 @@
 - [x] **Account menu** — Click name+role in dashboard/portal top bar → **My Profile** + **Sign out** only. Settings hub lists **My Profile** above Time off. Profile: edit first/last name; email read-only; change password if `password_hash` set. Paths: `/dashboard/settings/profile`, `/portal/profile` (`/dashboard/profile` redirects to settings). Sidebar/drawer brand: logo stacked above org name.
 - [x] **Manager deny portal draft** — New job status `denied` (migration `0020`). Managers Accept / Deny on job detail + Notifications; client portal shows denied (not stuck pending). D5b; distinct from **A12** staff assignment accept/deny. Neon **dev** migrated; seed example Monster Rooftop Soft Ask.
 - [x] **Clients tab contacts** — `/dashboard/clients` lists each company with a dense Name/Email/Title table of `client_users` (seed Michaela POC + Dom Rep under Red Bull on nydac). Invite contact + Add company stays collapsed create-last; invite flow unchanged.
+- [x] **Portal jobs list-first** — `/portal/jobs` matches A6/A7: dense Your jobs table (name/date/status chips/View) first; **+ New request** collapsed at bottom; subtitle tracks status first. Draft accept/deny copy unchanged. Auth/company scope untouched.
 
 ---
 
