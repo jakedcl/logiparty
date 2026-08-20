@@ -1,30 +1,34 @@
 import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
 import { canInviteUsers } from "@/lib/auth/permissions";
-import { createClientCompany } from "@/lib/actions/clients";
+import {
+  createClientCompany,
+  listClientCompaniesWithContacts,
+} from "@/lib/actions/clients";
 import { createClientInvite } from "@/lib/actions/invites";
 import { requireSession } from "@/lib/org/context";
-import { db } from "@/lib/db";
-import { clientCompanies } from "@/lib/db/schema";
+
+function contactDisplayName(
+  firstName: string | null,
+  lastName: string | null,
+  email: string
+) {
+  const name = [firstName, lastName].filter(Boolean).join(" ").trim();
+  return name || email;
+}
 
 export default async function ClientsPage() {
   const session = await requireSession();
   if (!canInviteUsers(session.user)) redirect("/dashboard");
 
-  const companies =
-    db ?
-      await db
-        .select()
-        .from(clientCompanies)
-        .where(eq(clientCompanies.orgId, session.user.orgId))
-    : [];
+  const rows = await listClientCompaniesWithContacts(session.user.orgId);
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-semibold mb-1">Client companies</h1>
         <p className="text-sm text-neutral-500">
-          Your customers (e.g. Red Bull). Invite contacts to the client portal.
+          Your customers (e.g. Red Bull). Contacts appear under each company —
+          invite more to the client portal.
         </p>
       </div>
 
@@ -33,22 +37,73 @@ export default async function ClientsPage() {
           <h2 className="text-sm font-medium text-neutral-800">
             Companies
             <span className="ml-1.5 text-neutral-400 font-normal">
-              ({companies.length})
+              ({rows.length})
             </span>
           </h2>
         </div>
 
-        {companies.length === 0 ? (
+        {rows.length === 0 ? (
           <p className="text-sm text-neutral-500 py-4">
             No client companies yet. Use + Add company below.
           </p>
         ) : (
           <ul className="border border-neutral-200 rounded-md bg-white divide-y divide-neutral-100 -mx-4 sm:mx-0">
-            {companies.map((company) => (
-              <li key={company.id} className="px-3 py-3">
-                <p className="text-sm font-medium text-neutral-900 mb-2">
-                  {company.name}
-                </p>
+            {rows.map(({ company, contacts }) => (
+              <li key={company.id} className="px-3 py-3 space-y-2">
+                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+                  <p className="text-sm font-medium text-neutral-900">
+                    {company.name}
+                  </p>
+                  <p className="text-xs text-neutral-500">
+                    {contacts.length} contact
+                    {contacts.length === 1 ? "" : "s"}
+                  </p>
+                </div>
+
+                {contacts.length === 0 ? (
+                  <p className="text-sm text-neutral-500 py-1">
+                    No contacts yet. Invite someone below.
+                  </p>
+                ) : (
+                  <div className="overflow-x-auto -mx-3 sm:mx-0">
+                    <table className="w-full min-w-[28rem] text-sm text-left">
+                      <thead>
+                        <tr className="border-y border-neutral-100 text-neutral-500 bg-neutral-50/80">
+                          <th className="py-1.5 px-3 font-medium w-[10rem]">
+                            Name
+                          </th>
+                          <th className="py-1.5 px-3 font-medium">Email</th>
+                          <th className="py-1.5 px-3 font-medium w-[8rem]">
+                            Title
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {contacts.map((c) => (
+                          <tr
+                            key={c.clientUserId}
+                            className="border-b border-neutral-100 last:border-0 align-middle"
+                          >
+                            <td className="py-1.5 px-3 text-neutral-900 whitespace-nowrap">
+                              {contactDisplayName(
+                                c.firstName,
+                                c.lastName,
+                                c.email
+                              )}
+                            </td>
+                            <td className="py-1.5 px-3 text-neutral-600">
+                              {c.email}
+                            </td>
+                            <td className="py-1.5 px-3 text-neutral-600">
+                              {c.title?.trim() || "—"}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+
                 <details className="group">
                   <summary className="cursor-pointer list-none text-sm text-neutral-600 hover:text-neutral-900 select-none [&::-webkit-details-marker]:hidden">
                     <span className="inline-flex items-center gap-1.5 font-medium">

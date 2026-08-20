@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (sidebar logo stacked above org name)*
+*Last updated: 2026-08-20 (Clients tab lists contacts under each company)*
 
 ---
 
@@ -64,6 +64,7 @@
 - [x] **NYDAC rich seed** — `seedNydacRich()` in `lib/db/seed.ts`: Monster Energy + Gotham Glow clients, fat catalogs, 5 fleet, 6 jobs across draft/upcoming/ready/completed with locations/crew/fleet/qty_loaded + activity. Crew spread: Tom/Rob/Paul/Jerome each on 5 jobs; Mike/Don lead multiple; ready jobs full LI+LO. Neon **dev** only.
 - [x] **Staff nav UX** — Primary: Dashboard, Jobs / My Jobs, **Notifications**, inventory, Fleet, Team, Clients, **Settings**. Moved **Availability → Settings / Time off**, **Activity → Settings / Activity**. Old `/dashboard/availability` + `/dashboard/activity` redirect. Notifications = manager draft requests + staff assignments (view/link only; accept/deny → **A12**). Portal unchanged.
 - [x] **Account menu** — Click name+role in dashboard/portal top bar → **My Profile** + **Sign out** only. Settings hub lists **My Profile** above Time off. Profile: edit first/last name; email read-only; change password if `password_hash` set. Paths: `/dashboard/settings/profile`, `/portal/profile` (`/dashboard/profile` redirects to settings). Sidebar/drawer brand: logo stacked above org name.
+- [x] **Clients tab contacts** — `/dashboard/clients` lists each company with a dense Name/Email/Title table of `client_users` (seed Michaela POC + Dom Rep under Red Bull on nydac). Invite contact + Add company stays collapsed create-last; invite flow unchanged.
 
 ---
 
