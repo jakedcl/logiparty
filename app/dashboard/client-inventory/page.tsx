@@ -2,11 +2,13 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AddItemPanel } from "@/components/client-inventory/add-item-panel";
 import { ClientInventoryItemsTable } from "@/components/client-inventory/items-table";
+import { PendingInventoryRequestsPanel } from "@/components/client-inventory/pending-requests";
 import { canManageClientInventory } from "@/lib/auth/permissions";
 import {
   listClientCompaniesForOrg,
   listClientInventoryItems,
 } from "@/lib/actions/client-inventory";
+import { listPendingInventoryRequests } from "@/lib/actions/inventory-requests";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
 export default async function ClientInventoryPage({
@@ -25,6 +27,7 @@ export default async function ClientInventoryPage({
   const items = selectedId
     ? await listClientInventoryItems(session.user.orgId, selectedId)
     : [];
+  const pending = await listPendingInventoryRequests(session.user.orgId);
 
   return (
     <div className="space-y-6">
@@ -32,9 +35,22 @@ export default async function ClientInventoryPage({
         <h1 className="text-2xl font-semibold mb-1">Client inventory</h1>
         <p className="text-sm text-neutral-500">
           Assets owned by a client company and stored in your warehouse. Filter
-          by company — clients only see their own catalog in the portal.
+          by company — clients request changes in the portal; you approve or
+          deny here and in Notifications.
         </p>
       </div>
+
+      {pending.length > 0 ? (
+        <section className="space-y-3">
+          <h2 className="text-sm font-medium text-neutral-800">
+            Pending requests
+            <span className="ml-1.5 text-neutral-400 font-normal">
+              ({pending.length})
+            </span>
+          </h2>
+          <PendingInventoryRequestsPanel requests={pending} />
+        </section>
+      ) : null}
 
       {companies.length === 0 ? (
         <p className="text-sm text-neutral-500">

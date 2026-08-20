@@ -16,6 +16,8 @@ assignment_role: 'Driver' | 'Laborer' | 'Lead'
 job_inventory_item_type: 'client' | 'org'
 availability_status: 'Pending' | 'Approved' | 'Denied'
 uploader_role: 'manager' | 'client'
+inventory_request_type: 'add' | 'qty_change' | 'remove'
+inventory_request_status: 'pending' | 'approved' | 'denied'
 ```
 
 Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`, `rigger`, `staging`
@@ -121,6 +123,31 @@ Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`,
 | description | text | |
 | total_quantity | int | |
 | created_at | timestamptz | |
+
+Clients do **not** edit this catalog directly. They submit rows in `client_inventory_requests`; managers approve (apply) or deny.
+
+### `client_inventory_requests`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | uuid PK | |
+| org_id | uuid FK | RLS |
+| client_company_id | uuid FK | |
+| requested_by_user_id | uuid FK → users | Client who submitted |
+| type | inventory_request_type | `add` \| `qty_change` \| `remove` |
+| client_inventory_item_id | uuid FK → client_inventory_items | Nullable; required for qty/remove |
+| proposed_sku | text | Nullable; used for `add` |
+| proposed_name | text | Nullable; used for `add` |
+| proposed_description | text | Nullable; used for `add` |
+| proposed_quantity | int | Nullable; used for `add` / `qty_change` |
+| reason | text | Required — why the change |
+| status | inventory_request_status | `pending` \| `approved` \| `denied` |
+| reviewer_user_id | uuid FK → users | Nullable until reviewed |
+| reviewed_at | timestamptz | Nullable |
+| review_note | text | Optional manager note (esp. deny) |
+| created_at | timestamptz | |
+| updated_at | timestamptz | |
+
+*Approve applies to `client_inventory_items`: `add` inserts a row; `qty_change` updates `total_quantity`; `remove` deletes the catalog row (same as staff delete). Deny only updates status + review fields.*
 
 ### `fleet_vehicles`
 | Column | Type | Notes |

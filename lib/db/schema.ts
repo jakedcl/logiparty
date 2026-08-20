@@ -43,6 +43,18 @@ export const availabilityStatusEnum = pgEnum("availability_status", [
 
 export const uploaderRoleEnum = pgEnum("uploader_role", ["manager", "client"]);
 
+export const inventoryRequestTypeEnum = pgEnum("inventory_request_type", [
+  "add",
+  "qty_change",
+  "remove",
+]);
+
+export const inventoryRequestStatusEnum = pgEnum("inventory_request_status", [
+  "pending",
+  "approved",
+  "denied",
+]);
+
 export const organizations = pgTable("organizations", {
   id: uuid("id").primaryKey().defaultRandom(),
   slug: text("slug").notNull().unique(),
@@ -175,6 +187,42 @@ export const clientInventoryItems = pgTable("client_inventory_items", {
   description: text("description"),
   totalQuantity: integer("total_quantity").notNull().default(0),
   createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+/** Client portal change requests — managers approve/deny before catalog mutates */
+export const clientInventoryRequests = pgTable("client_inventory_requests", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  clientCompanyId: uuid("client_company_id")
+    .notNull()
+    .references(() => clientCompanies.id, { onDelete: "cascade" }),
+  requestedByUserId: uuid("requested_by_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  type: inventoryRequestTypeEnum("type").notNull(),
+  clientInventoryItemId: uuid("client_inventory_item_id").references(
+    () => clientInventoryItems.id,
+    { onDelete: "set null" }
+  ),
+  proposedSku: text("proposed_sku"),
+  proposedName: text("proposed_name"),
+  proposedDescription: text("proposed_description"),
+  proposedQuantity: integer("proposed_quantity"),
+  reason: text("reason").notNull(),
+  status: inventoryRequestStatusEnum("status").notNull().default("pending"),
+  reviewerUserId: uuid("reviewer_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+  reviewNote: text("review_note"),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
 });
@@ -408,6 +456,8 @@ export type ClientCompany = typeof clientCompanies.$inferSelect;
 export type Invite = typeof invites.$inferSelect;
 export type InventoryItem = typeof inventoryItems.$inferSelect;
 export type ClientInventoryItem = typeof clientInventoryItems.$inferSelect;
+export type ClientInventoryRequest =
+  typeof clientInventoryRequests.$inferSelect;
 export type FleetVehicle = typeof fleetVehicles.$inferSelect;
 export type Tool = typeof tools.$inferSelect;
 export type ActivityLog = typeof activityLogs.$inferSelect;
@@ -427,6 +477,10 @@ export type AssignmentRole = (typeof assignmentRoleEnum.enumValues)[number];
 export type AvailabilityStatus =
   (typeof availabilityStatusEnum.enumValues)[number];
 export type UploaderRole = (typeof uploaderRoleEnum.enumValues)[number];
+export type InventoryRequestType =
+  (typeof inventoryRequestTypeEnum.enumValues)[number];
+export type InventoryRequestStatus =
+  (typeof inventoryRequestStatusEnum.enumValues)[number];
 
 export const JOB_STATUSES = jobStatusEnum.enumValues;
 export const JOB_INVENTORY_ITEM_TYPES = jobInventoryItemTypeEnum.enumValues;
