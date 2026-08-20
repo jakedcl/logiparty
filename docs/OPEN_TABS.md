@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (A13 portal inventory requests).*
+*Last updated: 2026-08-20 (A13b portal inventory request UX).*
 
 ---
 
@@ -68,6 +68,7 @@
 - [x] **Clients tab contacts** — `/dashboard/clients` lists each company with a dense Name/Email/Title table of `client_users` (seed Michaela POC + Dom Rep under Red Bull on nydac). Invite contact + Add company stays collapsed create-last; invite flow unchanged.
 - [x] **Portal jobs list-first** — `/portal/jobs` matches A6/A7: dense Your jobs table (name/date/status chips/View) first; **+ New request** collapsed at bottom; subtitle tracks status first. Draft accept/deny copy unchanged. Auth/company scope untouched.
 - [x] **A13** Portal inventory **requests** v1 — clients request add / qty change / remove with reason; managers Approve (apply to `client_inventory_items`) or Deny (+ optional note). Table `client_inventory_requests` + migration `0021`. Portal `/portal/inventory` list-first + collapsed + Request new item + Your requests. Staff: Notifications + Client inventory pending panel. Seed: 2 Red Bull pending samples (cooler qty + umbrella add). Neon **dev** migrated + seeded.
+- [x] **A13b** Portal inventory request UX — row **⋯** menu (Change quantity / Remove from storage) → dedicated `/portal/inventory/requests/new?type=…&itemId=…` form page; + Request new item → same page `type=add`. No inline stacked forms. Your requests list kept.
 ---
 
 ## Current environments
