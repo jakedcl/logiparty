@@ -736,6 +736,16 @@ async function ensureJobFleet(sql: Sql, jobName: string, fleetNames: string[]) {
 }
 
 async function ensureJobCrew(sql: Sql, jobName: string, crew: RichCrew[]) {
+  // Replace crew so re-seed can reshuffle assignments (ON CONFLICT alone can't remove).
+  await sql`
+    DELETE FROM job_assignments ja
+    USING jobs j, organizations o
+    WHERE ja.job_id = j.id
+      AND j.org_id = o.id
+      AND o.slug = 'nydac'
+      AND j.name = ${jobName}
+  `;
+
   for (const c of crew) {
     await sql`
       INSERT INTO job_assignments (job_id, org_id, user_id, phase, assigned_role)
@@ -1085,7 +1095,8 @@ async function seedNydacRich(sql: Sql, passwordHash: string) {
       pocName: "Michaela",
       pocPhone: "212-555-0101",
       leadEmail: "mike@test.test",
-      notes: "Partial assign — still waiting on LoadOut labor + cooler count.",
+      notes:
+        "Partial assign — LoadIn crew set; LoadOut driver only (no LO labor) + cooler count pending.",
       timing: {
         jobStartDays: 7,
         jobEndDays: 8,
@@ -1119,11 +1130,13 @@ async function seedNydacRich(sql: Sql, passwordHash: string) {
         },
       ],
       fleetNames: ["Cargo Van 4"],
+      // LoadIn full; LoadOut driver only → stays upcoming (auto-ready incomplete)
       crew: [
         { email: "mike@test.test", phase: "LoadIn", role: "Lead" },
         { email: "paul@test.test", phase: "LoadIn", role: "Driver" },
         { email: "tom@test.test", phase: "LoadIn", role: "Laborer" },
-        // Missing LoadOut → stays upcoming (auto-ready incomplete)
+        { email: "rob@test.test", phase: "LoadIn", role: "Laborer" },
+        { email: "jerome@test.test", phase: "LoadOut", role: "Driver" },
       ],
     },
     {
@@ -1133,7 +1146,8 @@ async function seedNydacRich(sql: Sql, passwordHash: string) {
       pocName: "Sara Chen",
       pocPhone: "646-555-0199",
       leadEmail: "don@test.test",
-      notes: "Inventory assigned; fleet TBD. Sara wants claw tents front-and-center.",
+      notes:
+        "Inventory assigned; fleet TBD. LoadIn crew set; LoadOut driver only. Sara wants claw tents front-and-center.",
       timing: {
         jobStartDays: 12,
         jobEndDays: 13,
@@ -1176,9 +1190,13 @@ async function seedNydacRich(sql: Sql, passwordHash: string) {
         },
       ],
       fleetNames: [],
+      // LoadIn full; LoadOut driver only → stays upcoming
       crew: [
         { email: "don@test.test", phase: "LoadIn", role: "Lead" },
+        { email: "jerome@test.test", phase: "LoadIn", role: "Driver" },
+        { email: "tom@test.test", phase: "LoadIn", role: "Laborer" },
         { email: "rob@test.test", phase: "LoadIn", role: "Laborer" },
+        { email: "paul@test.test", phase: "LoadOut", role: "Driver" },
       ],
     },
     {
@@ -1249,12 +1267,13 @@ async function seedNydacRich(sql: Sql, passwordHash: string) {
         },
       ],
       fleetNames: ["Box Truck 12", "Sprinter 7"],
+      // Mike leads LoadIn; Don leads LoadOut — full warehouse + both drivers
       crew: [
         { email: "mike@test.test", phase: "LoadIn", role: "Lead" },
         { email: "paul@test.test", phase: "LoadIn", role: "Driver" },
         { email: "tom@test.test", phase: "LoadIn", role: "Laborer" },
         { email: "rob@test.test", phase: "LoadIn", role: "Laborer" },
-        { email: "mike@test.test", phase: "LoadOut", role: "Lead" },
+        { email: "don@test.test", phase: "LoadOut", role: "Lead" },
         { email: "jerome@test.test", phase: "LoadOut", role: "Driver" },
         { email: "tom@test.test", phase: "LoadOut", role: "Laborer" },
         { email: "rob@test.test", phase: "LoadOut", role: "Laborer" },
@@ -1328,6 +1347,7 @@ async function seedNydacRich(sql: Sql, passwordHash: string) {
         },
       ],
       fleetNames: ["Box Truck 18"],
+      // Don both phases; Jerome drives LI, Paul drives LO; Tom+Rob both phases
       crew: [
         { email: "don@test.test", phase: "LoadIn", role: "Lead" },
         { email: "jerome@test.test", phase: "LoadIn", role: "Driver" },
@@ -1336,6 +1356,7 @@ async function seedNydacRich(sql: Sql, passwordHash: string) {
         { email: "don@test.test", phase: "LoadOut", role: "Lead" },
         { email: "paul@test.test", phase: "LoadOut", role: "Driver" },
         { email: "tom@test.test", phase: "LoadOut", role: "Laborer" },
+        { email: "rob@test.test", phase: "LoadOut", role: "Laborer" },
       ],
     },
     {
@@ -1385,12 +1406,15 @@ async function seedNydacRich(sql: Sql, passwordHash: string) {
         },
       ],
       fleetNames: ["Box Truck 12"],
+      // Mike LI lead; Don LO lead; both drivers + both warehouse on both phases
       crew: [
         { email: "mike@test.test", phase: "LoadIn", role: "Lead" },
         { email: "paul@test.test", phase: "LoadIn", role: "Driver" },
         { email: "tom@test.test", phase: "LoadIn", role: "Laborer" },
-        { email: "mike@test.test", phase: "LoadOut", role: "Lead" },
+        { email: "rob@test.test", phase: "LoadIn", role: "Laborer" },
+        { email: "don@test.test", phase: "LoadOut", role: "Lead" },
         { email: "jerome@test.test", phase: "LoadOut", role: "Driver" },
+        { email: "tom@test.test", phase: "LoadOut", role: "Laborer" },
         { email: "rob@test.test", phase: "LoadOut", role: "Laborer" },
       ],
     },

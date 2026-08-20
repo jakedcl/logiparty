@@ -59,7 +59,7 @@ _None queued._
 - [x] **A11b** Job detail tabs + density — `?tab=` switches **one** panel (was hash-link dump of all sections). Dense tables/rows for locations/inventory/fleet/crew/docs; Remove behind ⋯; status chip in header; soft panel fade. Files: `app/dashboard/jobs/[id]/page.tsx`, `components/jobs/*`, `components/ui/view-edit.tsx`.
 - [x] **B4 partial** Stripe billing scaffold (optional, no keys required) — Checkout + portal + webhook + Settings Billing; soft `billing_status`; keys TBD.
 - [x] **Nav shell** Staff dashboard — left sidebar + mobile drawer (`DashboardShell`); portal unchanged; run-sheet location bullets → `ul`.
-- [x] **NYDAC rich seed** — `seedNydacRich()` in `lib/db/seed.ts`: Monster Energy + Gotham Glow clients, fat catalogs, 5 fleet, 6 jobs across draft/upcoming/ready/completed with locations/crew/fleet/qty_loaded + activity. Neon **dev** only.
+- [x] **NYDAC rich seed** — `seedNydacRich()` in `lib/db/seed.ts`: Monster Energy + Gotham Glow clients, fat catalogs, 5 fleet, 6 jobs across draft/upcoming/ready/completed with locations/crew/fleet/qty_loaded + activity. Crew spread: Tom/Rob/Paul/Jerome each on 5 jobs; Mike/Don lead multiple; ready jobs full LI+LO. Neon **dev** only.
 
 ---
 
