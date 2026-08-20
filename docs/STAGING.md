@@ -17,12 +17,12 @@ npm run db:seed
 npm run test:integration
 ```
 
-To wipe seeded filler (test/demo orgs, test users, catalogs) and re-seed fresh:
+To wipe seeded filler (`test` org + legacy seed orgs/users, catalogs) and re-seed fresh:
 
 ```bash
 npm run db:reset-seed -- --confirm
 ```
 
-Uses `DATABASE_URL` from `.env.local`. Only deletes orgs `test` and `demo` plus the seven seed test accounts — other users are kept. **Does not delete the whole database** — but if Production shares this URL, Production sees the same change.
+Uses `DATABASE_URL` from `.env.local`. Only deletes seed orgs (`test`, and legacy `demo`/`acme`/…) plus seed test accounts — other users are kept. After re-seed, only **`test`** exists. **Does not delete the whole database** — but if Production shares this URL, Production sees the same change.
 
 Do not commit connection strings. `.env.local` stays untracked.

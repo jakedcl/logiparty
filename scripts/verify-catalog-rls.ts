@@ -1,6 +1,7 @@
 /**
  * Smoke-check catalog RLS: org A data is invisible under org B context.
  * Run: npx tsx scripts/verify-catalog-rls.ts (requires DATABASE_URL)
+ * Creates an ephemeral second org — seed only provides `test`.
  */
 import { neon } from "@neondatabase/serverless";
 
@@ -9,11 +10,17 @@ async function main() {
   if (!url) throw new Error("DATABASE_URL required");
   const sql = neon(url);
 
-  const orgs = await sql`SELECT id, slug FROM organizations ORDER BY slug LIMIT 2`;
-  if (orgs.length < 2) {
-    throw new Error("Need two orgs (seed test + demo) to verify isolation");
+  const [a] = await sql`SELECT id, slug FROM organizations WHERE slug = 'test' LIMIT 1`;
+  if (!a) {
+    throw new Error("Need test org — run npm run db:seed");
   }
-  const [a, b] = orgs;
+
+  const probeSlug = `rls-probe-${Date.now()}`;
+  const [b] = await sql`
+    INSERT INTO organizations (slug, name, primary_color, email_from_name)
+    VALUES (${probeSlug}, 'RLS Probe', '#000000', 'RLS Probe')
+    RETURNING id, slug
+  `;
 
   const marker = `rls-check-${Date.now()}`;
   await sql`
@@ -50,6 +57,7 @@ async function main() {
     );
   } finally {
     await sql`DELETE FROM inventory_items WHERE sku = ${marker}`;
+    await sql`DELETE FROM organizations WHERE id = ${b.id}`;
   }
 }
 

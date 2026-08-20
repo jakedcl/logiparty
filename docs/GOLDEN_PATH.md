@@ -71,7 +71,7 @@ End-to-end flow the first paying 3PL must complete. QA and agents use this to ve
 |---|------|----------|
 | F1 | Paul tries URL of unassigned job | 403 or not listed |
 | F2 | Red Bull user tries another client's job | 403 |
-| F3 | User from `demo` org guesses `test` job UUID | 403 / empty (RLS) |
+| F3 | Other org context guesses `test` job UUID | 403 / empty (RLS) |
 | F4 | Assign same 10 bars to two overlapping upcoming jobs | Blocked or partial qty only |
 
 ---

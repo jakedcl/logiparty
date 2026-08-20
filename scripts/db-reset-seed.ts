@@ -1,16 +1,20 @@
 /**
- * Wipe seeded orgs (test, demo) and re-run golden-path seed.
+ * Wipe seeded orgs (test + legacy demo/acme/…) and re-run golden-path seed.
  *
  * Run: npm run db:reset-seed -- --confirm
  *
  * Deletes jobs first (FK: jobs.client_company_id RESTRICT), then organizations
- * (CASCADE org-scoped rows), then seed-only users. Non-seed users are kept.
+ * (CASCADE org-scoped rows / memberships — users are NOT auto-deleted), then
+ * seed-only users by email. Non-seed users are kept.
+ *
+ * After re-seed, only `test` exists (demo is legacy cleanup only).
  */
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { neon } from "@neondatabase/serverless";
 import { execSync } from "child_process";
 
+/** Orgs wiped on reset. Seed recreates `test` only; others are legacy cleanup. */
 const SEED_ORG_SLUGS = ["test", "demo", "acme", "testtenant3pl"] as const;
 
 const SEED_USER_EMAILS = [
@@ -24,8 +28,8 @@ const SEED_USER_EMAILS = [
   "jerome@test.test",
   "michaela@redbull.test",
   "dom@redbull.test",
+  // Legacy cast (cleanup on reset — includes former demo OrgAdmin Devon)
   "admin@demo.test",
-  // Legacy cast (cleanup on reset)
   "admin@test.test",
   "morgan@test.test",
   "sam@test.test",
