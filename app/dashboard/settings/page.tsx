@@ -25,10 +25,6 @@ export default async function SettingsPage({
     canReviewAvailability(session.user);
   const canActivity = canManageJobs(session.user);
 
-  if (!canSettings && !canBilling && !canTimeOff && !canActivity) {
-    redirect("/dashboard");
-  }
-
   const org =
     canSettings || canBilling ? await getOrgForSession(session) : null;
   if ((canSettings || canBilling) && !org) redirect("/dashboard");
@@ -41,52 +37,57 @@ export default async function SettingsPage({
         ? "Checkout canceled."
         : null;
 
-  const showHubLinks = canTimeOff || canActivity;
-
   return (
     <div className="space-y-6 max-w-md">
       <div>
         <h1 className="text-2xl font-semibold mb-1">Settings</h1>
         <p className="text-sm text-neutral-500">
           {canSettings
-            ? "Organization branding, billing, time off, and activity."
+            ? "Your profile, organization branding, billing, time off, and activity."
             : canBilling && !canTimeOff && !canActivity
-              ? "Subscription status for this organization."
-              : "Account and org preferences for your role."}
+              ? "Your profile and subscription status."
+              : "Your profile and account preferences."}
         </p>
       </div>
 
-      {showHubLinks ? (
-        <nav
-          className="flex flex-col gap-1 border border-neutral-200 rounded-md bg-white divide-y divide-neutral-100"
-          aria-label="Settings sections"
+      <nav
+        className="flex flex-col gap-1 border border-neutral-200 rounded-md bg-white divide-y divide-neutral-100"
+        aria-label="Settings sections"
+      >
+        <Link
+          href="/dashboard/settings/profile"
+          className="px-3 py-2.5 text-sm hover:bg-neutral-50"
         >
-          {canTimeOff ? (
-            <Link
-              href="/dashboard/settings/time-off"
-              className="px-3 py-2.5 text-sm hover:bg-neutral-50"
-            >
-              <span className="font-medium text-neutral-900">Time off</span>
-              <span className="block text-xs text-neutral-500 mt-0.5">
-                {canReviewAvailability(session.user)
-                  ? "Request PTO and approve or deny pending requests"
-                  : "Request time off"}
-              </span>
-            </Link>
-          ) : null}
-          {canActivity ? (
-            <Link
-              href="/dashboard/settings/activity"
-              className="px-3 py-2.5 text-sm hover:bg-neutral-50"
-            >
-              <span className="font-medium text-neutral-900">Activity log</span>
-              <span className="block text-xs text-neutral-500 mt-0.5">
-                Recent org actions
-              </span>
-            </Link>
-          ) : null}
-        </nav>
-      ) : null}
+          <span className="font-medium text-neutral-900">My Profile</span>
+          <span className="block text-xs text-neutral-500 mt-0.5">
+            Name and password
+          </span>
+        </Link>
+        {canTimeOff ? (
+          <Link
+            href="/dashboard/settings/time-off"
+            className="px-3 py-2.5 text-sm hover:bg-neutral-50"
+          >
+            <span className="font-medium text-neutral-900">Time off</span>
+            <span className="block text-xs text-neutral-500 mt-0.5">
+              {canReviewAvailability(session.user)
+                ? "Request PTO and approve or deny pending requests"
+                : "Request time off"}
+            </span>
+          </Link>
+        ) : null}
+        {canActivity ? (
+          <Link
+            href="/dashboard/settings/activity"
+            className="px-3 py-2.5 text-sm hover:bg-neutral-50"
+          >
+            <span className="font-medium text-neutral-900">Activity log</span>
+            <span className="block text-xs text-neutral-500 mt-0.5">
+              Recent org actions
+            </span>
+          </Link>
+        ) : null}
+      </nav>
 
       {billingFlash && (
         <p className="text-sm rounded border border-neutral-200 bg-neutral-50 px-3 py-2 text-neutral-700">

@@ -93,7 +93,7 @@ export const authConfig = {
   session: { strategy: "jwt", maxAge: 60 * 60 * 24 * 7 },
   callbacks: {
     redirect: authRedirectCallback,
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
       if (user) {
         token.orgId = user.orgId;
         token.orgSlug = user.orgSlug;
@@ -102,6 +102,9 @@ export const authConfig = {
         token.isManager = user.isManager;
         token.isStaff = user.isStaff;
         token.isClient = user.isClient;
+      }
+      if (trigger === "update" && session?.user?.name != null) {
+        token.name = session.user.name;
       }
       return token;
     },
