@@ -17,8 +17,10 @@ export type DevPersonaId =
 
 export type DevPersonaMeta = {
   id: DevPersonaId;
-  /** Button label in the Dev panel */
+  /** Button label in the Dev panel — "Name — Role" */
   buttonLabel: string;
+  /** Short role for legend / secondary line */
+  roleLabel: string;
   email: string;
   redirectPath: "/dashboard" | "/portal";
 };
@@ -27,31 +29,36 @@ export type DevPersonaMeta = {
 export const DEV_PERSONAS: readonly DevPersonaMeta[] = [
   {
     id: "orgAdmin",
-    buttonLabel: "OrgAdmin",
+    buttonLabel: "Alex — OrgAdmin",
+    roleLabel: "OrgAdmin",
     email: "admin@test.test",
     redirectPath: "/dashboard",
   },
   {
     id: "manager",
-    buttonLabel: "Morgan",
+    buttonLabel: "Morgan — Manager",
+    roleLabel: "Manager",
     email: "morgan@test.test",
     redirectPath: "/dashboard",
   },
   {
     id: "warehouse",
-    buttonLabel: "Sam",
+    buttonLabel: "Sam — Warehouse",
+    roleLabel: "Staff (Warehouse)",
     email: "sam@test.test",
     redirectPath: "/dashboard",
   },
   {
     id: "driver",
-    buttonLabel: "Dana",
+    buttonLabel: "Dana — Driver",
+    roleLabel: "Staff (Driver)",
     email: "dana@test.test",
     redirectPath: "/dashboard",
   },
   {
     id: "client",
-    buttonLabel: "Client",
+    buttonLabel: "Riley — Client",
+    roleLabel: "Client (Red Bull)",
     email: "rep1@redbull.test",
     redirectPath: "/portal",
   },

@@ -21,8 +21,8 @@ export function DevRoleSwitchPanel() {
           </span>
         </summary>
         <div className="border-t border-neutral-100 px-2 py-2 space-y-1">
-          <p className="px-1 pb-1 text-[10px] text-neutral-400">
-            Quick-login seed personas
+          <p className="px-1 pb-1 text-[10px] leading-snug text-neutral-400">
+            Seed quick-login · Client = Riley (Red Bull portal)
           </p>
           {DEV_PERSONAS.map((p) => (
             <form key={p.id} action={switchDevPersona}>
@@ -30,6 +30,7 @@ export function DevRoleSwitchPanel() {
               <button
                 type="submit"
                 className="w-full rounded px-2 py-1.5 text-left text-sm text-neutral-700 hover:bg-neutral-100"
+                title={`${p.email} → ${p.redirectPath}`}
               >
                 {p.buttonLabel}
               </button>
