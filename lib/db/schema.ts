@@ -191,6 +191,29 @@ export const clientInventoryItems = pgTable("client_inventory_items", {
     .defaultNow(),
 });
 
+/** Client → 3PL general notes (one-way; not job/SKU scoped) */
+export const clientNotes = pgTable("client_notes", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  clientCompanyId: uuid("client_company_id")
+    .notNull()
+    .references(() => clientCompanies.id, { onDelete: "cascade" }),
+  sentByUserId: uuid("sent_by_user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  subject: text("subject"),
+  body: text("body").notNull(),
+  readAt: timestamp("read_at", { withTimezone: true }),
+  readByUserId: uuid("read_by_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 /** Client portal change requests — managers approve/deny before catalog mutates */
 export const clientInventoryRequests = pgTable("client_inventory_requests", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -458,6 +481,7 @@ export type InventoryItem = typeof inventoryItems.$inferSelect;
 export type ClientInventoryItem = typeof clientInventoryItems.$inferSelect;
 export type ClientInventoryRequest =
   typeof clientInventoryRequests.$inferSelect;
+export type ClientNote = typeof clientNotes.$inferSelect;
 export type FleetVehicle = typeof fleetVehicles.$inferSelect;
 export type Tool = typeof tools.$inferSelect;
 export type ActivityLog = typeof activityLogs.$inferSelect;

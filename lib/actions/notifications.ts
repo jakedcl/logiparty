@@ -1,6 +1,6 @@
 "use server";
 
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull } from "drizzle-orm";
 import {
   canManageClientInventory,
   canManageJobs,
@@ -10,6 +10,7 @@ import { db, withOrgQuery } from "@/lib/db";
 import {
   clientCompanies,
   clientInventoryRequests,
+  clientNotes,
   jobAssignments,
   jobs,
 } from "@/lib/db/schema";
@@ -17,13 +18,17 @@ import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
 export type NotificationItem = {
   id: string;
-  kind: "draft_request" | "inventory_request" | "assignment";
+  kind: "draft_request" | "inventory_request" | "client_note" | "assignment";
   title: string;
   detail: string;
   href: string;
   createdAt: Date;
   /** Set for inventory_request so the inbox can Approve/Deny inline */
   inventoryRequestId?: string;
+  /** Set for client_note so the inbox can Mark read inline */
+  clientNoteId?: string;
+  /** Full body preview for client notes */
+  bodyPreview?: string;
 };
 
 const LIMIT = 40;
@@ -90,6 +95,49 @@ export async function listNotifications(
         detail: `${row.name} · ${row.clientName ?? "Client"}`,
         href: `/dashboard/jobs/${row.id}`,
         createdAt: row.createdAt,
+      });
+    }
+
+    const notes = await withOrgQuery<
+      {
+        id: string;
+        subject: string | null;
+        body: string;
+        createdAt: Date;
+        clientName: string | null;
+      }[]
+    >(orgId, (database) =>
+      database
+        .select({
+          id: clientNotes.id,
+          subject: clientNotes.subject,
+          body: clientNotes.body,
+          createdAt: clientNotes.createdAt,
+          clientName: clientCompanies.name,
+        })
+        .from(clientNotes)
+        .leftJoin(
+          clientCompanies,
+          eq(clientNotes.clientCompanyId, clientCompanies.id)
+        )
+        .where(and(eq(clientNotes.orgId, orgId), isNull(clientNotes.readAt)))
+        .orderBy(desc(clientNotes.createdAt))
+        .limit(LIMIT)
+    );
+
+    for (const row of notes) {
+      const preview = row.body.replace(/\s+/g, " ").trim();
+      const short =
+        preview.length > 100 ? `${preview.slice(0, 99)}…` : preview;
+      items.push({
+        id: `note:${row.id}`,
+        kind: "client_note",
+        title: row.subject?.trim() || "Client note",
+        detail: `${row.clientName ?? "Client"} · ${short}`,
+        href: `/dashboard/notifications`,
+        createdAt: row.createdAt,
+        clientNoteId: row.id,
+        bodyPreview: preview,
       });
     }
   }

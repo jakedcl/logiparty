@@ -30,6 +30,7 @@ npm run db:migrate:sql
 | `0019_m6_org_billing.sql` | org Stripe billing columns (soft status) |
 | `0020_job_status_denied.sql` | job_status enum + `denied` (reject portal draft) |
 | `0021_client_inventory_requests.sql` | portal inventory change requests (add/qty/remove) |
+| `0022_client_notes.sql` | client → tenant general notes (one-way, unread via `read_at`) |
 
 Then seed (optional):
 

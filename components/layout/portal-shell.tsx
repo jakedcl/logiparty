@@ -18,6 +18,7 @@ const NAV = [
   { href: "/portal", label: "Home" },
   { href: "/portal/jobs", label: "Jobs" },
   { href: "/portal/inventory", label: "Inventory" },
+  { href: "/portal/notes", label: "Notes" },
 ] as const;
 
 async function signOutAction() {

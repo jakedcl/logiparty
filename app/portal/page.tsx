@@ -39,6 +39,15 @@ export default async function PortalHomePage() {
             {company?.name ?? "your company"}
           </p>
         </Link>
+        <Link
+          href="/portal/notes"
+          className="border rounded-lg bg-white p-4 hover:border-neutral-400 transition-colors sm:col-span-2"
+        >
+          <p className="font-medium">Notes</p>
+          <p className="text-sm text-neutral-500 mt-1">
+            Send a general message to {session.user.orgName}
+          </p>
+        </Link>
       </div>
     </div>
   );
