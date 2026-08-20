@@ -35,7 +35,8 @@ export default async function PortalHomePage() {
         >
           <p className="font-medium">Inventory</p>
           <p className="text-sm text-neutral-500 mt-1">
-            Items stored with us for your company
+            Items stored with {session.user.orgName} for{" "}
+            {company?.name ?? "your company"}
           </p>
         </Link>
       </div>
