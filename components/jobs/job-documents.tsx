@@ -1,4 +1,5 @@
 import { CollapsibleAdd } from "@/components/jobs/collapsible-add";
+import { QuietRemove } from "@/components/jobs/quiet-remove";
 import {
   deleteJobDocument,
   uploadJobDocument,
@@ -31,55 +32,58 @@ export function JobDocuments({
       {docs.length === 0 ? (
         <p className="text-sm text-neutral-500">No documents yet.</p>
       ) : (
-        <ul className="space-y-2">
-          {docs.map((doc) => {
-            const canDelete =
-              canDeleteAny || doc.uploadedBy === currentUserId;
-            return (
-              <li
-                key={doc.id}
-                className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between border rounded-lg px-3 py-3 text-sm bg-white"
-              >
-                <div className="min-w-0">
-                  <p className="truncate font-medium text-base">{doc.fileName}</p>
-                  <p className="text-xs text-neutral-500">
-                    {doc.uploaderRole} · {formatSize(doc.fileSizeBytes)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 shrink-0">
-                  {doc.downloadUrl ? (
-                    <a
-                      href={doc.downloadUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center justify-center min-h-[44px] px-3 rounded-lg border text-sm font-medium"
-                    >
-                      Open
-                    </a>
-                  ) : (
-                    <span className="text-xs text-neutral-400">Unavailable</span>
-                  )}
-                  {canDelete ? (
-                    <form action={deleteJobDocument}>
-                      <input type="hidden" name="jobId" value={jobId} />
-                      <input type="hidden" name="id" value={doc.id} />
-                      <button
-                        type="submit"
-                        className="min-h-[44px] px-3 text-sm text-red-600 hover:text-red-800"
+        <div className="border border-neutral-200 rounded-md bg-white overflow-hidden">
+          <ul className="divide-y divide-neutral-100">
+            {docs.map((doc) => {
+              const canDelete =
+                canDeleteAny || doc.uploadedBy === currentUserId;
+              return (
+                <li
+                  key={doc.id}
+                  className="flex items-center gap-3 px-3 py-2.5 text-sm"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-medium text-neutral-900">
+                      {doc.fileName}
+                    </p>
+                    <p className="text-xs text-neutral-500 mt-0.5">
+                      {doc.uploaderRole} · {formatSize(doc.fileSizeBytes)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    {doc.downloadUrl ? (
+                      <a
+                        href={doc.downloadUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-sm font-medium text-neutral-600 hover:text-neutral-900 px-2 py-1"
                       >
-                        Delete
-                      </button>
-                    </form>
-                  ) : null}
-                </div>
-              </li>
-            );
-          })}
-        </ul>
+                        Open
+                      </a>
+                    ) : (
+                      <span className="text-xs text-neutral-400 px-2">
+                        Unavailable
+                      </span>
+                    )}
+                    {canDelete ? (
+                      <QuietRemove label="Delete">
+                        <form action={deleteJobDocument}>
+                          <input type="hidden" name="jobId" value={jobId} />
+                          <input type="hidden" name="id" value={doc.id} />
+                          <button type="submit">Delete</button>
+                        </form>
+                      </QuietRemove>
+                    ) : null}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       )}
 
       {canUpload && !storageConfigured ? (
-        <p className="text-sm text-neutral-500 border rounded-lg bg-neutral-50 px-3 py-3">
+        <p className="text-sm text-neutral-500 border border-dashed border-neutral-200 rounded-md px-3 py-3">
           File uploads will work once Cloudflare R2 is connected. Everything else
           on this job still works without it.
         </p>
@@ -87,12 +91,9 @@ export function JobDocuments({
 
       {canUpload && storageConfigured ? (
         <CollapsibleAdd label="Upload document">
-          <form
-            action={uploadJobDocument}
-            className="space-y-3 sticky bottom-20 sm:static sm:bottom-auto bg-neutral-50 sm:bg-transparent -mx-4 px-4 sm:mx-0 sm:px-0 pb-2 sm:pb-0"
-          >
+          <form action={uploadJobDocument} className="space-y-3">
             <input type="hidden" name="jobId" value={jobId} />
-            <label className="block text-sm font-medium text-neutral-700">
+            <label className="block text-sm text-neutral-600">
               PDF or photo
               <input
                 type="file"
@@ -100,12 +101,12 @@ export function JobDocuments({
                 required
                 accept="application/pdf,image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif"
                 capture="environment"
-                className="mt-2 block w-full text-base file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-900 file:px-4 file:py-3 file:text-white file:font-medium file:min-h-[48px]"
+                className="mt-2 block w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-neutral-900 file:px-3 file:py-2 file:text-white file:text-sm file:font-medium"
               />
             </label>
             <button
               type="submit"
-              className="w-full rounded-lg px-4 py-3 text-base font-medium bg-neutral-900 text-white min-h-[48px]"
+              className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
             >
               Upload document
             </button>

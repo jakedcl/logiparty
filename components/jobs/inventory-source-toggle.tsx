@@ -11,27 +11,32 @@ type Props = {
 export function InventorySourceToggle({ jobId, source }: Props) {
   const router = useRouter();
 
+  function go(next: "client" | "org") {
+    const q = new URLSearchParams({ tab: "inventory", inv: next });
+    router.push(`/dashboard/jobs/${jobId}?${q.toString()}`);
+  }
+
   return (
-    <div className="flex gap-2 text-sm">
+    <div className="inline-flex rounded-md border border-neutral-200 p-0.5 text-sm bg-neutral-50">
       <button
         type="button"
-        className={`rounded-full border px-3 py-1 ${
+        className={`rounded px-3 py-1 transition-colors ${
           source === "client"
-            ? "bg-neutral-900 text-white border-neutral-900"
-            : "text-neutral-600"
+            ? "bg-white text-neutral-900 shadow-sm"
+            : "text-neutral-500 hover:text-neutral-800"
         }`}
-        onClick={() => router.push(`/dashboard/jobs/${jobId}?inv=client#inventory`)}
+        onClick={() => go("client")}
       >
         Client items
       </button>
       <button
         type="button"
-        className={`rounded-full border px-3 py-1 ${
+        className={`rounded px-3 py-1 transition-colors ${
           source === "org"
-            ? "bg-neutral-900 text-white border-neutral-900"
-            : "text-neutral-600"
+            ? "bg-white text-neutral-900 shadow-sm"
+            : "text-neutral-500 hover:text-neutral-800"
         }`}
-        onClick={() => router.push(`/dashboard/jobs/${jobId}?inv=org#inventory`)}
+        onClick={() => go("org")}
       >
         Our items
       </button>

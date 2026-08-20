@@ -9,7 +9,7 @@ export function CollapsibleAdd({
   children: ReactNode;
 }) {
   return (
-    <details className="group border-t border-neutral-200 pt-3">
+    <details className="group border-t border-neutral-100 pt-3">
       <summary className="cursor-pointer list-none text-sm text-neutral-600 hover:text-neutral-900 select-none [&::-webkit-details-marker]:hidden">
         <span className="inline-flex items-center gap-1.5 font-medium">
           <span className="text-neutral-400 group-open:hidden" aria-hidden>
@@ -21,7 +21,7 @@ export function CollapsibleAdd({
           {label}
         </span>
       </summary>
-      <div className="mt-3">{children}</div>
+      <div className="mt-3 max-w-lg">{children}</div>
     </details>
   );
 }

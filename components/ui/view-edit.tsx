@@ -10,6 +10,11 @@ type ViewEditProps = {
   editLabel?: string;
   /** Optional class on the outer wrapper */
   className?: string;
+  /**
+   * `block` — Edit button above content (summary panels).
+   * `inline` — Edit as a quiet text control beside content (dense list rows).
+   */
+  variant?: "block" | "inline";
 };
 
 /**
@@ -21,6 +26,7 @@ export function ViewEdit({
   edit,
   editLabel = "Edit",
   className,
+  variant = "block",
 }: ViewEditProps) {
   const [editing, setEditing] = useState(false);
 
@@ -28,6 +34,23 @@ export function ViewEdit({
     return (
       <div className={className}>
         {edit({ onCancel: () => setEditing(false) })}
+      </div>
+    );
+  }
+
+  if (variant === "inline") {
+    return (
+      <div className={className}>
+        <div className="flex items-start gap-3">
+          <div className="min-w-0 flex-1">{view}</div>
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            className="shrink-0 text-xs font-medium text-neutral-500 hover:text-neutral-900 pt-0.5"
+          >
+            {editLabel}
+          </button>
+        </div>
       </div>
     );
   }
