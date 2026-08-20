@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { auth, signIn } from "@/lib/auth";
@@ -40,9 +41,9 @@ export default async function LoginPage({
             ).
           </p>
           <p className="mt-4 text-sm text-neutral-600">
-            <a href="/" className="text-neutral-900 underline underline-offset-2">
+            <Link href="/" className="text-neutral-900 underline underline-offset-2">
               ← Back to Logiparty
-            </a>
+            </Link>
           </p>
         </div>
       </div>
