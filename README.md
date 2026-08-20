@@ -45,8 +45,9 @@ Production uses `{slug}.logiparty.com`. For local dev:
 1. Add to `/etc/hosts`:
    ```
    127.0.0.1 nydac.localhost
+   127.0.0.1 test.localhost
    ```
-2. Run `npm run dev` and open `http://nydac.localhost:3000`
+2. Run `npm run dev` and open `http://nydac.localhost:3000` (or `http://test.localhost:3000`)
 
 Alternatively set `NEXT_PUBLIC_DEV_ORG_SLUG=nydac` if using a dev fallback (see middleware).
 
@@ -55,13 +56,15 @@ Alternatively set `NEXT_PUBLIC_DEV_ORG_SLUG=nydac` if using a dev fallback (see 
 ```bash
 npm install
 npm run db:migrate:sql   # apply SQL in lib/db/migrations/
-npm run db:seed          # golden-path users (password123)
-npm run db:reset-seed -- --confirm  # wipe seed filler + re-seed `nydac`
+npm run db:seed          # golden-path users (password123) — nydac + test
+npm run db:reset-seed -- --confirm  # wipe seed filler + re-seed both orgs
 npm run test:integration
 npm run dev              # http://nydac.localhost:3000
 ```
 
 Seed accounts (all password `password123`):
+
+**nydac** — New York Design and Construction
 
 | Email | Role |
 |-------|------|
@@ -72,6 +75,17 @@ Seed accounts (all password `password123`):
 | `paul@test.test` / `jerome@test.test` | Staff / driver |
 | `michaela@redbull.test` | Client POC (Red Bull) |
 | `dom@redbull.test` | Client (Red Bull) |
+
+**test** — Acme Event Logistics (playground)
+
+| Email | Role |
+|-------|------|
+| `boss@playground.test` | OrgAdmin |
+| `riley@playground.test` | Manager |
+| `chris@playground.test` / `pat@playground.test` | Staff / warehouse |
+| `jamie@playground.test` | Staff / driver |
+| `nina@monster.test` | Client POC (Monster) |
+| `kai@monster.test` | Client (Monster) |
 
 A second Neon **branch** (staging) is optional — see [docs/STAGING.md](docs/STAGING.md). You can keep using one DATABASE_URL until you are ready to connect more services.
 

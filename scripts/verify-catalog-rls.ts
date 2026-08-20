@@ -1,7 +1,7 @@
 /**
  * Smoke-check catalog RLS: org A data is invisible under org B context.
  * Run: npx tsx scripts/verify-catalog-rls.ts (requires DATABASE_URL)
- * Creates an ephemeral second org — seed only provides `nydac`.
+ * Creates an ephemeral second org for isolation check (seed already has nydac + test).
  */
 import { neon } from "@neondatabase/serverless";
 
