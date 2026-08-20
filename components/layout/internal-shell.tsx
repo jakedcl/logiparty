@@ -3,6 +3,8 @@ import { headers } from "next/headers";
 import { signOut } from "@/lib/auth";
 import { absoluteRedirectUrl } from "@/lib/auth/redirect";
 import type { Session } from "next-auth";
+import { DevRoleSwitchPanel } from "@/components/dev/dev-role-switch-panel";
+import { SessionIdentity } from "@/components/layout/session-identity";
 import {
   canManageClientInventory,
   canManageFleet,
@@ -135,26 +137,38 @@ export function InternalShell({
             )}
           </nav>
         </div>
-        <form
-          action={async () => {
-            "use server";
-            const headersList = await headers();
-            await signOut({
-              redirectTo: absoluteRedirectUrl(headersList, "/login"),
-            });
-          }}
-        >
-          <button
-            type="submit"
-            className="text-sm text-neutral-500 hover:text-neutral-800"
+        <div className="flex items-center gap-3 shrink-0">
+          <SessionIdentity
+            name={session.user.name}
+            email={session.user.email}
+            isOrgAdmin={session.user.isOrgAdmin}
+            isManager={session.user.isManager}
+            isStaff={session.user.isStaff}
+            isClient={session.user.isClient}
+            staffTags={staffTags}
+          />
+          <form
+            action={async () => {
+              "use server";
+              const headersList = await headers();
+              await signOut({
+                redirectTo: absoluteRedirectUrl(headersList, "/login"),
+              });
+            }}
           >
-            Sign out
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="text-sm text-neutral-500 hover:text-neutral-800"
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
       </header>
       <main className="flex-1 p-4 md:p-6 max-w-6xl mx-auto w-full">
         {children}
       </main>
+      <DevRoleSwitchPanel />
     </div>
   );
 }
