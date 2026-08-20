@@ -84,13 +84,13 @@ export function JobRunSheetView({ sheet, backHref, backLabel }: Props) {
           {sheet.locations.length === 0 ? (
             <p className="text-neutral-500">None</p>
           ) : (
-            <ol className="list-decimal pl-5 space-y-1">
+            <ul className="list-disc pl-5 space-y-1">
               {sheet.locations.map((loc) => (
                 <li key={loc.id}>
                   <span className="font-medium">{loc.label}</span> — {loc.address}
                 </li>
               ))}
-            </ol>
+            </ul>
           )}
         </section>
 

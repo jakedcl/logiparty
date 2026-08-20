@@ -26,7 +26,10 @@ export function BillingPanel({
 
   if (!configured) {
     return (
-      <section className="space-y-2 border-t border-neutral-200 pt-6">
+      <section
+        id="billing"
+        className="space-y-2 border-t border-neutral-200 pt-6"
+      >
         <h2 className="text-lg font-medium">Billing</h2>
         <p className="text-sm text-neutral-500">
           Billing isn’t configured yet. When Stripe keys are added to the
@@ -39,7 +42,10 @@ export function BillingPanel({
   const isActive = status === "active";
 
   return (
-    <section className="space-y-3 border-t border-neutral-200 pt-6">
+    <section
+      id="billing"
+      className="space-y-3 border-t border-neutral-200 pt-6"
+    >
       <div>
         <h2 className="text-lg font-medium">Billing</h2>
         <p className="text-sm text-neutral-500 mt-1">
