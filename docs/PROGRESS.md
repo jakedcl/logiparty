@@ -118,6 +118,8 @@
 - [x] **A15** Staff dashboard home — replace M0 stub with role-aware ops console (Needs attention + Upcoming work + primary CTAs)
 - [x] **A16** Visual system — tokens, tenant primary, open layouts (2026-08-20)
 - [x] **A17** Rejected out of feeds — denied jobs/inventory leave Inbox/Jobs/portal primary lists; collapsed Rejected folders; DB rows kept
+- [x] **A18a** Inventory IA — one nav Inventory; tabs Client \| Equipment \| Fleet (`?tab=`)
+- [x] **A18b** Warehouses — `warehouses` + `warehouse_id` on catalogs; location filter; Neon **dev** `0023` + nydac 2 sites
 
 ---
 
@@ -169,3 +171,4 @@
 ### Go-live ops (OPEN_TABS)
 - [x] **A16** Visual system — tokens, tenant primary, open layouts (2026-08-20)
 - [x] **A17** Rejected out of primary feeds (2026-08-20)
+- [x] **A18a/A18b** Inventory hub + warehouses (2026-08-20)

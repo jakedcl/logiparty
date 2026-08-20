@@ -401,6 +401,18 @@ const NYDAC_EXTRA_PEOPLE: readonly SeedPerson[] = [
 ];
 
 const NYDAC_WAREHOUSE = "88 Bushwick Ave, Brooklyn, NY 11211";
+const NYDAC_YARD = "44 Review Ave, Long Island City, NY 11101";
+
+const NYDAC_SITES = [
+  {
+    name: "Bushwick Warehouse",
+    address: NYDAC_WAREHOUSE,
+  },
+  {
+    name: "Queens Yard",
+    address: NYDAC_YARD,
+  },
+] as const;
 
 type RichInvItem = {
   sku: string;
@@ -462,6 +474,95 @@ async function ensureClientCompany(sql: Sql, companyName: string) {
         SELECT 1 FROM client_companies c
         WHERE c.org_id = o.id AND c.name = ${companyName}
       )
+  `;
+}
+
+/** Two NYDAC storage sites for Inventory location filter smoke. */
+async function ensureNydacWarehouses(sql: Sql) {
+  for (const site of NYDAC_SITES) {
+    await sql`
+      INSERT INTO warehouses (org_id, name, address, is_active)
+      SELECT o.id, ${site.name}, ${site.address}, true
+      FROM organizations o
+      WHERE o.slug = 'nydac'
+        AND NOT EXISTS (
+          SELECT 1 FROM warehouses w
+          WHERE w.org_id = o.id AND w.name = ${site.name}
+        )
+    `;
+    await sql`
+      UPDATE warehouses w
+      SET address = ${site.address}, is_active = true
+      FROM organizations o
+      WHERE o.slug = 'nydac'
+        AND w.org_id = o.id
+        AND w.name = ${site.name}
+    `;
+  }
+
+  // Split existing catalog rows across the two sites (idempotent-ish).
+  await sql`
+    UPDATE client_inventory_items i
+    SET warehouse_id = w.id
+    FROM organizations o, warehouses w
+    WHERE o.slug = 'nydac'
+      AND i.org_id = o.id
+      AND w.org_id = o.id
+      AND w.name = 'Bushwick Warehouse'
+      AND i.warehouse_id IS NULL
+      AND mod(abs(hashtext(i.sku)), 2) = 0
+  `;
+  await sql`
+    UPDATE client_inventory_items i
+    SET warehouse_id = w.id
+    FROM organizations o, warehouses w
+    WHERE o.slug = 'nydac'
+      AND i.org_id = o.id
+      AND w.org_id = o.id
+      AND w.name = 'Queens Yard'
+      AND i.warehouse_id IS NULL
+  `;
+  await sql`
+    UPDATE inventory_items i
+    SET warehouse_id = w.id
+    FROM organizations o, warehouses w
+    WHERE o.slug = 'nydac'
+      AND i.org_id = o.id
+      AND w.org_id = o.id
+      AND w.name = 'Bushwick Warehouse'
+      AND i.warehouse_id IS NULL
+      AND mod(abs(hashtext(i.sku)), 2) = 0
+  `;
+  await sql`
+    UPDATE inventory_items i
+    SET warehouse_id = w.id
+    FROM organizations o, warehouses w
+    WHERE o.slug = 'nydac'
+      AND i.org_id = o.id
+      AND w.org_id = o.id
+      AND w.name = 'Queens Yard'
+      AND i.warehouse_id IS NULL
+  `;
+  await sql`
+    UPDATE fleet_vehicles f
+    SET warehouse_id = w.id
+    FROM organizations o, warehouses w
+    WHERE o.slug = 'nydac'
+      AND f.org_id = o.id
+      AND w.org_id = o.id
+      AND w.name = 'Bushwick Warehouse'
+      AND f.warehouse_id IS NULL
+      AND mod(abs(hashtext(f.name)), 2) = 0
+  `;
+  await sql`
+    UPDATE fleet_vehicles f
+    SET warehouse_id = w.id
+    FROM organizations o, warehouses w
+    WHERE o.slug = 'nydac'
+      AND f.org_id = o.id
+      AND w.org_id = o.id
+      AND w.name = 'Queens Yard'
+      AND f.warehouse_id IS NULL
   `;
 }
 
@@ -1054,6 +1155,8 @@ async function seedNydacRich(sql: Sql, passwordHash: string) {
       isActive: false,
     },
   ]);
+
+  await ensureNydacWarehouses(sql);
 
   // —— Jobs across statuses ——
   const jobs: RichJob[] = [
