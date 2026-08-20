@@ -6,7 +6,10 @@ import {
   approveInventoryRequest,
   denyInventoryRequest,
 } from "@/lib/actions/inventory-requests";
-import { listNotifications } from "@/lib/actions/notifications";
+import {
+  listNotifications,
+  listRejectedItems,
+} from "@/lib/actions/notifications";
 import {
   canManageClientInventory,
   canManageJobs,
@@ -44,6 +47,10 @@ export default async function NotificationsPage() {
   if (!canManager && !canStaff && !canInventory) redirect("/dashboard");
 
   const items = await listNotifications(session.user.orgId);
+  const rejected =
+    canManager || canInventory
+      ? await listRejectedItems(session.user.orgId).catch(() => [])
+      : [];
   const showActions = canManager || canInventory;
 
   return (
@@ -101,10 +108,7 @@ export default async function NotificationsPage() {
                   const noteId =
                     item.kind === "client_note" ? item.clientNoteId : null;
                   return (
-                    <tr
-                      key={item.id}
-                      className=""
-                    >
+                    <tr key={item.id}>
                       <td className="py-2 px-3 text-neutral-500 whitespace-nowrap">
                         {kindLabel(item.kind)}
                       </td>
@@ -215,6 +219,68 @@ export default async function NotificationsPage() {
           </div>
         )}
       </section>
+
+      {rejected.length > 0 ? (
+        <details className="group border-t border-[var(--border)] pt-6">
+          <summary className="cursor-pointer list-none select-none [&::-webkit-details-marker]:hidden">
+            <span className="lp-section-title inline-flex items-center gap-1.5">
+              <span className="text-[var(--faint)] group-open:hidden" aria-hidden>
+                +
+              </span>
+              <span
+                className="hidden text-[var(--faint)] group-open:inline"
+                aria-hidden
+              >
+                −
+              </span>
+              Rejected
+              <span className="lp-section-meta">({rejected.length})</span>
+            </span>
+          </summary>
+          <div className="mt-3 lp-table-wrap">
+            <table className="lp-table min-w-[480px]">
+              <thead>
+                <tr>
+                  <th className="py-2 px-3 font-medium w-[6.5rem]">Type</th>
+                  <th className="py-2 px-3 font-medium">Item</th>
+                  <th className="py-2 px-3 font-medium w-[9rem] text-right">
+                    When
+                  </th>
+                  <th className="py-2 px-3 font-medium w-[4rem] text-right">
+                    {" "}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rejected.map((item) => (
+                  <tr key={item.id}>
+                    <td className="py-2 px-3 text-neutral-500 whitespace-nowrap">
+                      {kindLabel(item.kind)}
+                    </td>
+                    <td className="py-2 px-3">
+                      <p className="font-medium text-neutral-700">{item.title}</p>
+                      <p className="text-neutral-500 text-xs mt-0.5">
+                        {item.detail}
+                      </p>
+                    </td>
+                    <td className="py-2 px-3 text-right text-xs text-neutral-400 whitespace-nowrap">
+                      <time>{fmt(item.createdAt)}</time>
+                    </td>
+                    <td className="py-2 px-3 text-right">
+                      <Link
+                        href={item.href}
+                        className="text-xs text-neutral-400 hover:text-neutral-700"
+                      >
+                        View →
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </details>
+      ) : null}
     </div>
   );
 }
