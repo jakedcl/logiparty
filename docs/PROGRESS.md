@@ -107,6 +107,7 @@
 - [x] **A8** Dev role / persona switcher (`ALLOW_DEV_ROLE_SWITCH`; never Vercel Production; seed quick-login + header identity; personas keyed by org slug)
 - [x] **A10** Dual-tenant seed: `nydac` (NYDAC logo) + `test` (Acme / orange TEST badge); Neon **dev** only
 - [x] **F1** Third seed tenant: `axis` (Axis Global Staging / teal logo + Volt Energy); Dev panel host-scoped; Neon **dev** only
+- [x] **A11** View-then-edit detail UIs (job Summary/Locations/Inventory; settings; team) + collapsed job assigns
 
 ---
 

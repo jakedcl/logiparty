@@ -1,3 +1,4 @@
+import { CollapsibleAdd } from "@/components/jobs/collapsible-add";
 import {
   deleteJobDocument,
   uploadJobDocument,
@@ -85,29 +86,31 @@ export function JobDocuments({
       ) : null}
 
       {canUpload && storageConfigured ? (
-        <form
-          action={uploadJobDocument}
-          className="space-y-3 border-t pt-4 sticky bottom-20 sm:static sm:bottom-auto bg-neutral-50 sm:bg-transparent -mx-4 px-4 sm:mx-0 sm:px-0 pb-2 sm:pb-0"
-        >
-          <input type="hidden" name="jobId" value={jobId} />
-          <label className="block text-sm font-medium text-neutral-700">
-            Upload PDF or photo
-            <input
-              type="file"
-              name="file"
-              required
-              accept="application/pdf,image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif"
-              capture="environment"
-              className="mt-2 block w-full text-base file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-900 file:px-4 file:py-3 file:text-white file:font-medium file:min-h-[48px]"
-            />
-          </label>
-          <button
-            type="submit"
-            className="w-full rounded-lg px-4 py-3 text-base font-medium bg-neutral-900 text-white min-h-[48px]"
+        <CollapsibleAdd label="Upload document">
+          <form
+            action={uploadJobDocument}
+            className="space-y-3 sticky bottom-20 sm:static sm:bottom-auto bg-neutral-50 sm:bg-transparent -mx-4 px-4 sm:mx-0 sm:px-0 pb-2 sm:pb-0"
           >
-            Upload document
-          </button>
-        </form>
+            <input type="hidden" name="jobId" value={jobId} />
+            <label className="block text-sm font-medium text-neutral-700">
+              PDF or photo
+              <input
+                type="file"
+                name="file"
+                required
+                accept="application/pdf,image/jpeg,image/png,image/gif,image/webp,image/heic,image/heif"
+                capture="environment"
+                className="mt-2 block w-full text-base file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-900 file:px-4 file:py-3 file:text-white file:font-medium file:min-h-[48px]"
+              />
+            </label>
+            <button
+              type="submit"
+              className="w-full rounded-lg px-4 py-3 text-base font-medium bg-neutral-900 text-white min-h-[48px]"
+            >
+              Upload document
+            </button>
+          </form>
+        </CollapsibleAdd>
       ) : null}
     </div>
   );

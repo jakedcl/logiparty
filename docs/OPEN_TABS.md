@@ -20,7 +20,7 @@
 
 | ID | Task | Notes |
 |----|------|-------|
-| — | *(empty for now)* | Third seed tenant was **F1** — done. |
+| **A11b** | Remaining view-first polish (optional) | Job detail inventory/fleet/crew/docs already view-first + collapsed add. Revisit only if Jake wants tighter density or My Jobs loaded-qty to match. |
 
 ---
 
@@ -57,6 +57,7 @@
 - [x] **A9** Seed cast → Jake’s old company (Ed/Mike/Don/Paul/Tom/Rob/Jerome + Michaela/Dom @ Red Bull) on **nydac**; playground cast on **test**. Local Neon **dev** re-seeded; prod Neon **main** still old cast until intentional re-seed.
 - [x] **A10** Dual-tenant seed + NYDAC logo — `nydac` uses `/seed/nydac-logo.svg` (navy); `test` keeps orange TEST badge. Emails globally unique across orgs.
 - [x] **F1** Third seed tenant — **`axis`** · Axis Global Staging · logo `/seed/axis-logo.svg` (teal) · client Volt Energy · cast `@axis.test` / `@volt.test`. Dev persona switcher host-scoped for all three. Neon **dev** reset-seeded; prod **main** untouched.
+- [x] **A11** View-then-edit detail UIs — default read-only labels/values; **Edit** → form + Save/Cancel. Shared `components/ui/view-edit.tsx`. Applied: job **Summary**, **Locations**, **Inventory** qty; org **settings**; **Team** roles/tags. Fleet/Crew stay list+Remove; assigns/uploads behind collapsed **+ Add**. Portal job detail already read-only. Create/new stays form-like. Optional follow-up: **A11b**.
 
 ---
 

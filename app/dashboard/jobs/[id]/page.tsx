@@ -1,19 +1,18 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { InventorySourceToggle } from "@/components/jobs/inventory-source-toggle";
+import { CollapsibleAdd } from "@/components/jobs/collapsible-add";
 import { JobDocuments } from "@/components/jobs/job-documents";
-import {
-  JobPanel,
-} from "@/components/jobs/job-panel";
+import { JobInventoryLineRow } from "@/components/jobs/job-inventory-line-row";
+import { JobLocationRow } from "@/components/jobs/job-location-row";
+import { JobPanel } from "@/components/jobs/job-panel";
+import { JobSummaryEditor } from "@/components/jobs/job-summary-editor";
 import { canManageJobs, canUploadDocuments } from "@/lib/auth/permissions";
 import {
   addJobInventoryLine,
-  deleteJobInventoryLine,
   listAssignableClientInventory,
   listAssignableOrgInventory,
   listJobInventoryLines,
-  updateJobInventoryLine,
-  updateQuantityLoaded,
 } from "@/lib/actions/job-inventory";
 import {
   assignFleetToJob,
@@ -34,15 +33,12 @@ import {
   getJob,
   listJobClientCompanies,
   listJobLeadCandidates,
-  updateJob,
 } from "@/lib/actions/jobs";
 import {
   addJobLocation,
-  deleteJobLocation,
   listJobLocations,
-  updateJobLocation,
 } from "@/lib/actions/job-locations";
-import { ASSIGNMENT_PHASES, ASSIGNMENT_ROLES, JOB_STATUSES } from "@/lib/db/schema";
+import { ASSIGNMENT_PHASES, ASSIGNMENT_ROLES } from "@/lib/db/schema";
 import { evaluateAutoReady } from "@/lib/jobs/auto-ready";
 import { requireSession } from "@/lib/org/context";
 import { isStorageConfigured } from "@/lib/storage/r2";
@@ -51,6 +47,19 @@ function toLocalInputValue(d: Date | null | undefined): string {
   if (!d) return "";
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function fmtWindow(d: Date | null | undefined): string {
+  if (!d) return "—";
+  return d.toLocaleString();
+}
+
+function fmtRange(
+  start: Date | null | undefined,
+  end: Date | null | undefined
+): string {
+  if (!start && !end) return "—";
+  return `${fmtWindow(start)} → ${fmtWindow(end)}`;
 }
 
 const PANEL_LINKS = [
@@ -92,21 +101,18 @@ export default async function JobDetailPage({
     leadCandidates,
     jobDocuments,
   ] = await Promise.all([
-      listJobClientCompanies(session.user.orgId),
-      listJobLocations(session.user.orgId, id),
-      listJobInventoryLines(session.user.orgId, id),
-      listAssignableClientInventory(
-        session.user.orgId,
-        job.clientCompanyId
-      ),
-      listAssignableOrgInventory(session.user.orgId),
-      listJobFleetAssignments(session.user.orgId, id),
-      listAssignableFleetVehicles(session.user.orgId, id),
-      listJobAssignments(session.user.orgId, id),
-      listCrewCandidates(session.user.orgId, id),
-      listJobLeadCandidates(session.user.orgId),
-      listJobDocuments(session.user.orgId, id),
-    ]);
+    listJobClientCompanies(session.user.orgId),
+    listJobLocations(session.user.orgId, id),
+    listJobInventoryLines(session.user.orgId, id),
+    listAssignableClientInventory(session.user.orgId, job.clientCompanyId),
+    listAssignableOrgInventory(session.user.orgId),
+    listJobFleetAssignments(session.user.orgId, id),
+    listAssignableFleetVehicles(session.user.orgId, id),
+    listJobAssignments(session.user.orgId, id),
+    listCrewCandidates(session.user.orgId, id),
+    listJobLeadCandidates(session.user.orgId),
+    listJobDocuments(session.user.orgId, id),
+  ]);
 
   const jobLeadLabel =
     leadCandidates.find((c) => c.userId === job.jobLeadUserId)?.label ?? null;
@@ -219,146 +225,33 @@ export default async function JobDetailPage({
             ) : null}
           </div>
         ) : null}
-        <form action={updateJob} className="space-y-3">
-          <input type="hidden" name="id" value={job.id} />
-          <input
-            name="name"
-            required
-            defaultValue={job.name}
-            className="w-full border rounded px-3 py-2 text-sm"
-          />
-          <div className="grid gap-2 sm:grid-cols-2">
-            <label className="text-sm text-neutral-600">
-              Client company
-              <select
-                name="clientCompanyId"
-                required
-                defaultValue={job.clientCompanyId}
-                className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
-              >
-                {companies.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="text-sm text-neutral-600">
-              Status
-              <select
-                name="status"
-                defaultValue={job.status}
-                className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
-              >
-                {JOB_STATUSES.map((s) => (
-                  <option key={s} value={s}>
-                    {s}
-                  </option>
-                ))}
-              </select>
-            </label>
-          </div>
-
-          <div className="grid gap-2 sm:grid-cols-2">
-            <label className="text-sm text-neutral-600">
-              Job start
-              <input
-                type="datetime-local"
-                name="jobStart"
-                defaultValue={toLocalInputValue(job.jobStart)}
-                className="mt-1 w-full border rounded px-3 py-2 text-sm"
-              />
-            </label>
-            <label className="text-sm text-neutral-600">
-              Job end
-              <input
-                type="datetime-local"
-                name="jobEnd"
-                defaultValue={toLocalInputValue(job.jobEnd)}
-                className="mt-1 w-full border rounded px-3 py-2 text-sm"
-              />
-            </label>
-            <label className="text-sm text-neutral-600">
-              Load-in start
-              <input
-                type="datetime-local"
-                name="loadInStart"
-                defaultValue={toLocalInputValue(job.loadInStart)}
-                className="mt-1 w-full border rounded px-3 py-2 text-sm"
-              />
-            </label>
-            <label className="text-sm text-neutral-600">
-              Load-in end
-              <input
-                type="datetime-local"
-                name="loadInEnd"
-                defaultValue={toLocalInputValue(job.loadInEnd)}
-                className="mt-1 w-full border rounded px-3 py-2 text-sm"
-              />
-            </label>
-            <label className="text-sm text-neutral-600">
-              Load-out start
-              <input
-                type="datetime-local"
-                name="loadOutStart"
-                defaultValue={toLocalInputValue(job.loadOutStart)}
-                className="mt-1 w-full border rounded px-3 py-2 text-sm"
-              />
-            </label>
-            <label className="text-sm text-neutral-600">
-              Load-out end
-              <input
-                type="datetime-local"
-                name="loadOutEnd"
-                defaultValue={toLocalInputValue(job.loadOutEnd)}
-                className="mt-1 w-full border rounded px-3 py-2 text-sm"
-              />
-            </label>
-          </div>
-
-          <div className="grid gap-2 sm:grid-cols-2">
-            <input
-              name="clientPocName"
-              placeholder="Client POC name"
-              defaultValue={job.clientPocName ?? ""}
-              className="border rounded px-3 py-2 text-sm"
-            />
-            <input
-              name="clientPocPhone"
-              placeholder="Client POC phone"
-              defaultValue={job.clientPocPhone ?? ""}
-              className="border rounded px-3 py-2 text-sm"
-            />
-          </div>
-          <label className="block text-sm text-neutral-600">
-            Job lead (who to ask)
-            <select
-              name="jobLeadUserId"
-              defaultValue={job.jobLeadUserId ?? ""}
-              className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
-            >
-              <option value="">None</option>
-              {leadCandidates.map((c) => (
-                <option key={c.userId} value={c.userId}>
-                  {c.label}
-                </option>
-              ))}
-            </select>
-          </label>
-          <textarea
-            name="notes"
-            rows={3}
-            placeholder="Internal notes"
-            defaultValue={job.notes ?? ""}
-            className="w-full border rounded px-3 py-2 text-sm"
-          />
-          <button
-            type="submit"
-            className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-          >
-            Save summary
-          </button>
-        </form>
+        <JobSummaryEditor
+          job={{
+            id: job.id,
+            name: job.name,
+            clientCompanyId: job.clientCompanyId,
+            status: job.status,
+            clientPocName: job.clientPocName,
+            clientPocPhone: job.clientPocPhone,
+            jobLeadUserId: job.jobLeadUserId,
+            notes: job.notes,
+          }}
+          companies={companies}
+          leadCandidates={leadCandidates}
+          windows={{
+            jobStart: toLocalInputValue(job.jobStart),
+            jobEnd: toLocalInputValue(job.jobEnd),
+            loadInStart: toLocalInputValue(job.loadInStart),
+            loadInEnd: toLocalInputValue(job.loadInEnd),
+            loadOutStart: toLocalInputValue(job.loadOutStart),
+            loadOutEnd: toLocalInputValue(job.loadOutEnd),
+          }}
+          windowLabels={{
+            job: fmtRange(job.jobStart, job.jobEnd),
+            loadIn: fmtRange(job.loadInStart, job.loadInEnd),
+            loadOut: fmtRange(job.loadOutStart, job.loadOutEnd),
+          }}
+        />
       </JobPanel>
 
       <JobPanel
@@ -366,67 +259,40 @@ export default async function JobDetailPage({
         title={`Locations (${locations.length}/5)`}
         description="Up to 5 labels + addresses (e.g. Warehouse, Venue)."
       >
-        {locations.map((loc) => (
-          <div key={loc.id} className="border rounded p-3 space-y-2">
-            <form action={updateJobLocation} className="space-y-2">
-              <input type="hidden" name="id" value={loc.id} />
+        {locations.length === 0 ? (
+          <p className="text-sm text-neutral-500">No locations yet.</p>
+        ) : (
+          <div className="space-y-3">
+            {locations.map((loc) => (
+              <JobLocationRow key={loc.id} jobId={job.id} location={loc} />
+            ))}
+          </div>
+        )}
+
+        {locations.length < 5 ? (
+          <CollapsibleAdd label="Add location">
+            <form action={addJobLocation} className="space-y-2">
               <input type="hidden" name="jobId" value={job.id} />
               <input
                 name="label"
                 required
-                defaultValue={loc.label}
-                placeholder="Label"
+                placeholder="Label (e.g. Warehouse)"
                 className="w-full border rounded px-3 py-2 text-sm"
               />
               <input
                 name="address"
                 required
-                defaultValue={loc.address}
                 placeholder="Address"
                 className="w-full border rounded px-3 py-2 text-sm"
               />
               <button
                 type="submit"
-                className="rounded px-3 py-1.5 text-sm border border-neutral-300"
+                className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
               >
-                Save
+                Add location
               </button>
             </form>
-            <form action={deleteJobLocation}>
-              <input type="hidden" name="id" value={loc.id} />
-              <input type="hidden" name="jobId" value={job.id} />
-              <button
-                type="submit"
-                className="text-sm text-red-600 hover:text-red-800"
-              >
-                Remove
-              </button>
-            </form>
-          </div>
-        ))}
-
-        {locations.length < 5 ? (
-          <form action={addJobLocation} className="space-y-2 border-t pt-3">
-            <input type="hidden" name="jobId" value={job.id} />
-            <input
-              name="label"
-              required
-              placeholder="Label (e.g. Warehouse)"
-              className="w-full border rounded px-3 py-2 text-sm"
-            />
-            <input
-              name="address"
-              required
-              placeholder="Address"
-              className="w-full border rounded px-3 py-2 text-sm"
-            />
-            <button
-              type="submit"
-              className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-            >
-              Add location
-            </button>
-          </form>
+          </CollapsibleAdd>
         ) : (
           <p className="text-sm text-neutral-500">Maximum of 5 locations.</p>
         )}
@@ -444,125 +310,58 @@ export default async function JobDetailPage({
         ) : (
           <ul className="space-y-3">
             {inventoryLines.map((line) => (
-              <li key={line.id} className="border rounded p-3 space-y-2">
-                <p className="text-sm font-medium">
-                  {line.itemSku ? `${line.itemSku} — ` : ""}
-                  {line.itemName}{" "}
-                  <span className="text-neutral-500 font-normal">
-                    ({line.itemType})
-                  </span>
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <form
-                    action={updateJobInventoryLine}
-                    className="flex gap-2 items-end"
-                  >
-                    <input type="hidden" name="id" value={line.id} />
-                    <input type="hidden" name="jobId" value={job.id} />
-                    <label className="text-sm text-neutral-600">
-                      Assigned qty
-                      <input
-                        name="quantityAssigned"
-                        type="number"
-                        min={1}
-                        required
-                        defaultValue={line.quantityAssigned}
-                        className="mt-1 w-28 border rounded px-3 py-2 text-sm"
-                      />
-                    </label>
-                    <button
-                      type="submit"
-                      className="rounded px-3 py-2 text-sm border border-neutral-300 h-[42px]"
-                    >
-                      Save
-                    </button>
-                  </form>
-                  <form
-                    action={updateQuantityLoaded}
-                    className="flex gap-2 items-end"
-                  >
-                    <input type="hidden" name="id" value={line.id} />
-                    <input type="hidden" name="jobId" value={job.id} />
-                    <label className="text-sm text-neutral-600">
-                      Loaded qty
-                      <input
-                        name="quantityLoaded"
-                        type="number"
-                        min={0}
-                        max={line.quantityAssigned}
-                        required
-                        defaultValue={line.quantityLoaded}
-                        className="mt-1 w-28 border rounded px-3 py-2 text-sm"
-                      />
-                    </label>
-                    <button
-                      type="submit"
-                      className="rounded px-3 py-2 text-sm border border-neutral-300 h-[42px]"
-                    >
-                      Save
-                    </button>
-                  </form>
-                </div>
-                <form action={deleteJobInventoryLine}>
-                  <input type="hidden" name="id" value={line.id} />
-                  <input type="hidden" name="jobId" value={job.id} />
-                  <button
-                    type="submit"
-                    className="text-sm text-red-600 hover:text-red-800"
-                  >
-                    Remove
-                  </button>
-                </form>
-              </li>
+              <JobInventoryLineRow key={line.id} jobId={job.id} line={line} />
             ))}
           </ul>
         )}
 
-        <form action={addJobInventoryLine} className="space-y-2 border-t pt-3">
-          <input type="hidden" name="jobId" value={job.id} />
-          <input type="hidden" name="itemType" value={inventorySource} />
-          {pickerItems.length === 0 ? (
-            <p className="text-sm text-neutral-500">
-              No {inventorySource} inventory items available. Add them in the
-              catalog first.
-            </p>
-          ) : (
-            <>
-              <label className="block text-sm text-neutral-600">
-                Item
-                <select
-                  name="itemId"
-                  required
-                  className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+        <CollapsibleAdd label="Assign inventory">
+          <form action={addJobInventoryLine} className="space-y-2">
+            <input type="hidden" name="jobId" value={job.id} />
+            <input type="hidden" name="itemType" value={inventorySource} />
+            {pickerItems.length === 0 ? (
+              <p className="text-sm text-neutral-500">
+                No {inventorySource} inventory items available. Add them in the
+                catalog first.
+              </p>
+            ) : (
+              <>
+                <label className="block text-sm text-neutral-600">
+                  Item
+                  <select
+                    name="itemId"
+                    required
+                    className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                  >
+                    <option value="">Select…</option>
+                    {pickerItems.map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label className="block text-sm text-neutral-600">
+                  Qty assigned
+                  <input
+                    name="quantityAssigned"
+                    type="number"
+                    min={1}
+                    required
+                    defaultValue={1}
+                    className="mt-1 w-full border rounded px-3 py-2 text-sm"
+                  />
+                </label>
+                <button
+                  type="submit"
+                  className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
                 >
-                  <option value="">Select…</option>
-                  {pickerItems.map((item) => (
-                    <option key={item.id} value={item.id}>
-                      {item.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="block text-sm text-neutral-600">
-                Qty assigned
-                <input
-                  name="quantityAssigned"
-                  type="number"
-                  min={1}
-                  required
-                  defaultValue={1}
-                  className="mt-1 w-full border rounded px-3 py-2 text-sm"
-                />
-              </label>
-              <button
-                type="submit"
-                className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-              >
-                Assign to job
-              </button>
-            </>
-          )}
-        </form>
+                  Assign to job
+                </button>
+              </>
+            )}
+          </form>
+        </CollapsibleAdd>
       </JobPanel>
 
       <JobPanel
@@ -604,40 +403,42 @@ export default async function JobDetailPage({
           </ul>
         )}
 
-        <form action={assignFleetToJob} className="space-y-2 border-t pt-3">
-          <input type="hidden" name="jobId" value={job.id} />
-          {assignableFleet.length === 0 ? (
-            <p className="text-sm text-neutral-500">
-              No more active vehicles to assign. Add them under Fleet, or remove
-              an assignment first.
-            </p>
-          ) : (
-            <>
-              <label className="block text-sm text-neutral-600">
-                Vehicle
-                <select
-                  name="fleetVehicleId"
-                  required
-                  className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+        <CollapsibleAdd label="Assign vehicle">
+          <form action={assignFleetToJob} className="space-y-2">
+            <input type="hidden" name="jobId" value={job.id} />
+            {assignableFleet.length === 0 ? (
+              <p className="text-sm text-neutral-500">
+                No more active vehicles to assign. Add them under Fleet, or
+                remove an assignment first.
+              </p>
+            ) : (
+              <>
+                <label className="block text-sm text-neutral-600">
+                  Vehicle
+                  <select
+                    name="fleetVehicleId"
+                    required
+                    className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                  >
+                    <option value="">Select…</option>
+                    {assignableFleet.map((v) => (
+                      <option key={v.id} value={v.id}>
+                        {v.name}
+                        {v.plate ? ` (${v.plate})` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <button
+                  type="submit"
+                  className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
                 >
-                  <option value="">Select…</option>
-                  {assignableFleet.map((v) => (
-                    <option key={v.id} value={v.id}>
-                      {v.name}
-                      {v.plate ? ` (${v.plate})` : ""}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="submit"
-                className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-              >
-                Assign vehicle
-              </button>
-            </>
-          )}
-        </form>
+                  Assign vehicle
+                </button>
+              </>
+            )}
+          </form>
+        </CollapsibleAdd>
       </JobPanel>
 
       <JobPanel
@@ -676,71 +477,73 @@ export default async function JobDetailPage({
           </ul>
         )}
 
-        <form action={addJobAssignment} className="space-y-2 border-t pt-3">
-          <input type="hidden" name="jobId" value={job.id} />
-          {crewCandidates.length === 0 ? (
-            <p className="text-sm text-neutral-500">
-              No staff members available. Invite or mark users as Staff on the
-              Team page.
-            </p>
-          ) : (
-            <>
-              <label className="block text-sm text-neutral-600">
-                Person
-                <select
-                  name="userId"
-                  required
-                  className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+        <CollapsibleAdd label="Assign crew">
+          <form action={addJobAssignment} className="space-y-2">
+            <input type="hidden" name="jobId" value={job.id} />
+            {crewCandidates.length === 0 ? (
+              <p className="text-sm text-neutral-500">
+                No staff members available. Invite or mark users as Staff on the
+                Team page.
+              </p>
+            ) : (
+              <>
+                <label className="block text-sm text-neutral-600">
+                  Person
+                  <select
+                    name="userId"
+                    required
+                    className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                  >
+                    <option value="">Select…</option>
+                    {crewCandidates.map((c) => (
+                      <option key={c.userId} value={c.userId}>
+                        {c.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <label className="block text-sm text-neutral-600">
+                    Phase
+                    <select
+                      name="phase"
+                      required
+                      className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                      defaultValue="LoadIn"
+                    >
+                      {ASSIGNMENT_PHASES.map((p) => (
+                        <option key={p} value={p}>
+                          {p}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="block text-sm text-neutral-600">
+                    Role
+                    <select
+                      name="assignedRole"
+                      required
+                      className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
+                      defaultValue="Laborer"
+                    >
+                      {ASSIGNMENT_ROLES.map((r) => (
+                        <option key={r} value={r}>
+                          {r}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                </div>
+                <button
+                  type="submit"
+                  className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
                 >
-                  <option value="">Select…</option>
-                  {crewCandidates.map((c) => (
-                    <option key={c.userId} value={c.userId}>
-                      {c.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                <label className="block text-sm text-neutral-600">
-                  Phase
-                  <select
-                    name="phase"
-                    required
-                    className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
-                    defaultValue="LoadIn"
-                  >
-                    {ASSIGNMENT_PHASES.map((p) => (
-                      <option key={p} value={p}>
-                        {p}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="block text-sm text-neutral-600">
-                  Role
-                  <select
-                    name="assignedRole"
-                    required
-                    className="mt-1 w-full border rounded px-3 py-2 text-sm bg-white"
-                    defaultValue="Laborer"
-                  >
-                    {ASSIGNMENT_ROLES.map((r) => (
-                      <option key={r} value={r}>
-                        {r}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              </div>
-              <button
-                type="submit"
-                className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-              >
-                Assign crew
-              </button>
-            </>
-          )}
-        </form>
+                  Assign crew
+                </button>
+              </>
+            )}
+          </form>
+        </CollapsibleAdd>
       </JobPanel>
 
       <JobPanel
