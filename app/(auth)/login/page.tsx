@@ -12,10 +12,14 @@ export default async function LoginPage({
 }: {
   searchParams: Promise<{ error?: string; missingOrg?: string }>;
 }) {
+  const headersList = await headers();
   const session = await auth();
-  if (session?.user) redirect(postAuthPath(session.user));
+  if (session?.user) {
+    // Absolute URL keeps redirect on tenant host (AUTH_URL is apex).
+    redirect(absoluteRedirectUrl(headersList, postAuthPath(session.user)));
+  }
 
-  const orgSlug = getOrgSlugFromHeaders(await headers());
+  const orgSlug = getOrgSlugFromHeaders(headersList);
 
   const params = await searchParams;
 
@@ -84,13 +88,13 @@ export default async function LoginPage({
             const email = formData.get("email") as string;
             const password = formData.get("password") as string;
             try {
-              const headersList = await headers();
+              const reqHeaders = await headers();
               // Absolute URL keeps post-login on tenant subdomain (AUTH_URL is apex).
               await signIn("credentials", {
                 email,
                 password,
                 orgSlug,
-                redirectTo: absoluteRedirectUrl(headersList, "/"),
+                redirectTo: absoluteRedirectUrl(reqHeaders, "/"),
               });
             } catch (error) {
               // Auth.js throws a redirect on success — rethrow so it isn't treated as failure.

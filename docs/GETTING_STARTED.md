@@ -107,15 +107,18 @@ Without this, `test.logiparty.com` will not resolve (SSL/connect errors).
 |----------|-------|
 | `DATABASE_URL` | Neon **main** branch pooled URL — must differ from local dev after you split branches |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
-| `AUTH_URL` | `https://test.logiparty.com` (or your primary tenant URL) |
-| `AUTH_TRUST_HOST` | `true` |
+| `AUTH_URL` | `https://logiparty.com` (apex — **not** a tenant subdomain; see OPEN_TABS A2) |
+| `AUTH_TRUST_HOST` | `true` (required so login works on `*.logiparty.com`) |
 | `NEXT_PUBLIC_ROOT_DOMAIN` | `logiparty.com` |
+| `NEXT_PUBLIC_DEV_ORG_SLUG` | **Local only** — do not set in Production |
 | `R2_*` | If using document uploads (M4+) |
 | `RESEND_*` | If using email invites |
 
 Never commit `.env.local`.
 
-### 3. Redeploy
+**Neon ↔ Vercel integration gotcha:** Neon may inject `DATABASE_URL_UNPOOLED` into Production. This app reads **`DATABASE_URL` only** (`lib/db/index.ts`). You must add **`DATABASE_URL`** (pooled, `…-pooler…`) scoped to **Production** — Development-only is not enough. Then redeploy.
+
+Log in at **`https://test.logiparty.com/login`**, not apex `logiparty.com`.
 
 **Deployments** → latest **Production** → **Redeploy** (after domain + env changes).
 

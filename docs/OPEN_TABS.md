@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-19*
+*Last updated: 2026-08-20*
 
 ---
 
@@ -13,7 +13,7 @@
 | ID | Task | Owner | Notes |
 |----|------|-------|-------|
 | **A1** | Jake tests job flow locally | Jake | Automated: `npx tsx scripts/golden-path-walk.ts` → **29 passed, 0 failed** (2026-08-19). Still worth one manual click-through on prod. |
-| **A2** | Fix Vercel `AUTH_URL` | Jake | Set to `https://logiparty.com` (apex, **not** a tenant subdomain). Keep `AUTH_TRUST_HOST=true`. Redeploy. |
+| **A2** | Fix Vercel Production env | Jake | Env checklist: `DATABASE_URL` (Neon pooled), `AUTH_SECRET`, `AUTH_URL=https://logiparty.com`, `AUTH_TRUST_HOST=true`, `NEXT_PUBLIC_ROOT_DOMAIN=logiparty.com`; remove `NEXT_PUBLIC_DEV_ORG_SLUG` from Production. **Redirect loop fix (2026-08-20):** middleware `getToken` must use `secureCookie: true` in prod (`__Secure-authjs.session-token`). After deploy: **clear cookies for `*.logiparty.com`**, then retest `https://test.logiparty.com/login`. |
 | **A3** | Homepage at `logiparty.com` | Agent | Marketing / leads landing page (does not exist yet) |
 | **A4** | Unknown subdomain → homepage | Agent | If `{slug}.logiparty.com` has no org in DB, redirect to `https://logiparty.com` (depends on A3 or stub page) |
 | **A5** | Neon dev branch | Jake/Agent | Split local `.env.local` from prod `DATABASE_URL` so `db:reset-seed` can't wipe prod |
@@ -24,7 +24,7 @@
 
 | ID | Task | Blocked by |
 |----|------|------------|
-| B1 | Prod smoke test (`test.logiparty.com`) | A2 AUTH_URL + Jake login test |
+| B1 | Prod smoke test + logo on login | A2 Vercel env + Jake login test |
 | B2 | First real paying customer | Jake tested app + A3 homepage optional |
 | B3 | Resend invite emails | Resend account + domain verify |
 | B4 | M6 (Stripe, self-serve signup, custom domains) | Post-pilot — do not start unless Jake asks |

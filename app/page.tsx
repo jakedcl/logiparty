@@ -1,11 +1,13 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { postAuthPath } from "@/lib/auth/redirect";
+import { absoluteRedirectUrl, postAuthPath } from "@/lib/auth/redirect";
 
 export default async function HomePage() {
   const session = await auth();
+  const headersList = await headers();
   if (session?.user) {
-    redirect(postAuthPath(session.user));
+    redirect(absoluteRedirectUrl(headersList, postAuthPath(session.user)));
   }
-  redirect("/login");
+  redirect(absoluteRedirectUrl(headersList, "/login"));
 }
