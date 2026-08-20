@@ -59,6 +59,7 @@ Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`,
 | created_at | timestamptz | |
 
 *Note: A user can be `is_manager` and `is_staff` together. Crew picker includes only `is_staff = true`.*
+*FK: `org_id` → organizations **ON DELETE CASCADE** (deleting an org removes memberships). `user_id` → users **ON DELETE CASCADE**. Deleting an org does **not** delete `users` rows — orphaned users must be deleted explicitly (see `db:reset-seed`).*
 
 ### `staff_capability_tags`
 | Column | Type | Notes |

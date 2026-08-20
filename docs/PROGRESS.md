@@ -94,6 +94,7 @@
 ## Post-MVP cleanup
 
 - [x] **Tools → Our inventory (Option A):** Deprecated separate `tools` catalog; dollies/hand tools live in `inventory_items`. Removed `/dashboard/tools` nav and page. UI label "Org inventory" → **Our inventory**. See DECISIONS D17 / O2.
+- [x] **Removed `demo` org** from seed (and Devon / `admin@demo.test`). Seed is `test` only. Neon **dev** cleaned; prod `main` untouched.
 
 ---
 

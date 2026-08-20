@@ -10,7 +10,7 @@ One page to go from zero → local dev → production. Read this first.
 cd /Users/jakedcl/Dev/logiparty
 npm install
 npm run db:migrate:sql   # first time only
-npm run db:seed          # test + demo orgs, test users
+npm run db:seed          # test org + golden-path users
 npm run dev              # http://test.localhost:3000
 ```
 
@@ -18,7 +18,6 @@ Add to `/etc/hosts` if you haven't:
 
 ```
 127.0.0.1 test.localhost
-127.0.0.1 demo.localhost
 ```
 
 Copy `.env.example` → `.env.local` and fill `DATABASE_URL`, `AUTH_SECRET`, etc.
@@ -32,7 +31,7 @@ Copy `.env.example` → `.env.local` and fill `DATABASE_URL`, `AUTH_SECRET`, etc
 | http://test.localhost:3000 | `tom@test.test` | Staff (warehouse) |
 | http://test.localhost:3000 | `paul@test.test` | Staff (driver) |
 | http://test.localhost:3000 | `michaela@redbull.test` | Client portal (POC) |
-| http://demo.localhost:3000 | `admin@demo.test` | Demo org (RLS checks) |
+| http://test.localhost:3000 | `dom@redbull.test` | Client portal |
 
 **Your personal account:** `jakedcl73@gmail.com` is linked as TestTenant3PL org admin on the current database. Use your existing password (not `password123`). Re-run anytime:
 
@@ -62,11 +61,11 @@ If you ran `npm run db:reset-seed -- --confirm` earlier:
 
 | Removed | Kept |
 |---------|------|
-| `test` and `demo` orgs and all their jobs, catalogs, fleet | Other orgs (if any) |
-| Seed test accounts (`ed@test.test`, etc.) | Personal accounts like `jakedcl73@gmail.com` |
-| Client companies under test/demo | — |
+| `test` org (and legacy `demo`/acme if present) and all their jobs, catalogs, fleet | Other orgs (if any) |
+| Seed test accounts (`ed@test.test`, etc.; also legacy `admin@demo.test`) | Personal accounts like `jakedcl73@gmail.com` |
+| Client companies under seed orgs | — |
 
-**Current state (after `npm run db:seed`):** test + demo exist, **0 jobs**, catalogs re-seeded, test users back. Personal admin re-linked to test.
+**Current state (after `npm run db:seed`):** only **`test`** exists, **0 jobs**, catalogs re-seeded, test users back. Personal admin re-linked to test.
 
 `db:reset-seed` only touches seed orgs/users — it does **not** drop the whole database. But if Production shares the same `DATABASE_URL`, production sees the same wipe.
 
@@ -132,7 +131,7 @@ Log in at **`https://test.logiparty.com/login`**, not apex `logiparty.com`.
 ```bash
 npm run dev                    # local app
 npm run db:seed                # idempotent — safe to re-run
-npm run db:reset-seed -- --confirm   # wipe test/demo filler only
+npm run db:reset-seed -- --confirm   # wipe seed filler; re-seed `test` only
 npm run db:relink-admin        # re-link personal email as test admin
 npm run test:integration       # RLS / RBAC smoke tests
 ```

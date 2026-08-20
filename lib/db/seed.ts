@@ -217,9 +217,6 @@ Seed complete. Password for all accounts: password123
     jerome@test.test          Staff / driver
     michaela@redbull.test     Client / POC (Red Bull)
     dom@redbull.test          Client (Red Bull)
-
-  demo (http://demo.localhost:3000)
-    admin@demo.test           OrgAdmin (for RLS checks)
 `);
 }
 

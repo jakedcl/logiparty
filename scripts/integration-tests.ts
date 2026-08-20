@@ -1,6 +1,6 @@
 /**
  * Cross-org RLS + RBAC smoke tests.
- * Run: npm run test:integration (requires DATABASE_URL, test + demo orgs seeded)
+ * Run: npm run test:integration (requires DATABASE_URL; creates ephemeral 2nd org)
  */
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
@@ -74,7 +74,7 @@ async function verifyJobsRls(
     SELECT id FROM client_companies WHERE org_id = ${orgA.id} LIMIT 1
   `;
   if (companies.length === 0) {
-    console.log("SKIP: jobs RLS (no client company on test — run db:seed:demo)");
+    console.log("SKIP: jobs RLS (no client company on test — run db:seed)");
     return;
   }
 
@@ -147,17 +147,27 @@ async function main() {
   }
 
   const sql = neon(url);
-  const orgs = (await sql`SELECT id, slug FROM organizations ORDER BY slug LIMIT 2`) as {
-    id: string;
-    slug: string;
-  }[];
-  if (orgs.length < 2) {
-    throw new Error("Need test + demo orgs — run npm run db:seed");
+  const [testOrg] = (await sql`
+    SELECT id, slug FROM organizations WHERE slug = 'test' LIMIT 1
+  `) as { id: string; slug: string }[];
+  if (!testOrg) {
+    throw new Error("Need test org — run npm run db:seed");
   }
 
-  await verifyCatalogRls(sql, orgs[0], orgs[1]);
-  await verifyJobsRls(sql, orgs[0], orgs[1]);
-  console.log("All integration checks passed.");
+  const probeSlug = `rls-probe-${Date.now()}`;
+  const [probeOrg] = (await sql`
+    INSERT INTO organizations (slug, name, primary_color, email_from_name)
+    VALUES (${probeSlug}, 'RLS Probe', '#000000', 'RLS Probe')
+    RETURNING id, slug
+  `) as { id: string; slug: string }[];
+
+  try {
+    await verifyCatalogRls(sql, testOrg, probeOrg);
+    await verifyJobsRls(sql, testOrg, probeOrg);
+    console.log("All integration checks passed.");
+  } finally {
+    await sql`DELETE FROM organizations WHERE id = ${probeOrg.id}`;
+  }
 }
 
 main().catch((e) => {

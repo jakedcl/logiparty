@@ -45,7 +45,6 @@ Production uses `{slug}.logiparty.com`. For local dev:
 1. Add to `/etc/hosts`:
    ```
    127.0.0.1 test.localhost
-   127.0.0.1 demo.localhost
    ```
 2. Run `npm run dev` and open `http://test.localhost:3000`
 
@@ -57,7 +56,7 @@ Alternatively set `NEXT_PUBLIC_DEV_ORG_SLUG=test` if using a dev fallback (see m
 npm install
 npm run db:migrate:sql   # apply SQL in lib/db/migrations/
 npm run db:seed          # golden-path users (password123)
-npm run db:reset-seed -- --confirm  # wipe test/demo filler + re-seed
+npm run db:reset-seed -- --confirm  # wipe seed filler + re-seed `test`
 npm run test:integration
 npm run dev              # http://test.localhost:3000
 ```
@@ -73,7 +72,6 @@ Seed accounts (all password `password123`):
 | `paul@test.test` / `jerome@test.test` | Staff / driver |
 | `michaela@redbull.test` | Client POC (Red Bull) |
 | `dom@redbull.test` | Client (Red Bull) |
-| `admin@demo.test` | Demo org (RLS isolation) |
 
 A second Neon **branch** (staging) is optional — see [docs/STAGING.md](docs/STAGING.md). You can keep using one DATABASE_URL until you are ready to connect more services.
 

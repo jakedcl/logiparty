@@ -416,15 +416,24 @@ async function main() {
 
   mark("F2", true, "SKIP: only one client company in seed (Red Bull)");
 
-  const [demo] = await sql`SELECT id FROM organizations WHERE slug = 'demo'`;
-  if (!demo) throw new Error("demo org missing — run npm run db:seed");
-  const underDemo = await sql.transaction([
-    sql`SET LOCAL ROLE logiparty_app`,
-    sql`SELECT set_config('app.current_org_id', ${demo.id}, true)`,
-    sql`SELECT name FROM jobs WHERE id = ${jobId}`,
-  ]);
-  const leaked = (underDemo[2] as { name: string }[]).length;
-  mark("F3", leaked === 0, `Demo org seeing test job rows: ${leaked}`);
+  // Ephemeral second org for cross-tenant RLS (seed no longer creates `demo`)
+  const probeSlug = `rls-probe-${Date.now()}`;
+  const [probeOrg] = await sql`
+    INSERT INTO organizations (slug, name, primary_color, email_from_name)
+    VALUES (${probeSlug}, 'RLS Probe', '#000000', 'RLS Probe')
+    RETURNING id
+  `;
+  try {
+    const underProbe = await sql.transaction([
+      sql`SET LOCAL ROLE logiparty_app`,
+      sql`SELECT set_config('app.current_org_id', ${probeOrg.id}, true)`,
+      sql`SELECT name FROM jobs WHERE id = ${jobId}`,
+    ]);
+    const leaked = (underProbe[2] as { name: string }[]).length;
+    mark("F3", leaked === 0, `Other org seeing test job rows: ${leaked}`);
+  } finally {
+    await sql`DELETE FROM organizations WHERE id = ${probeOrg.id}`;
+  }
 
   const jobA = randomUUID();
   const jobB = randomUUID();
