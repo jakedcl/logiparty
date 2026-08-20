@@ -1,23 +1,34 @@
 import { SkuInput } from "@/components/client-inventory/sku-input";
 import { createOrgInventoryItem } from "@/lib/actions/inventory";
 
-export function AddOrgInventoryItemPanel() {
+/** Caption left + Add right, form expands above the table (never under it). */
+export function AddOrgInventoryItemPanel({ caption }: { caption?: string }) {
   return (
-    <details className="group border-t border-neutral-200 pt-4">
-      <summary className="cursor-pointer list-none text-sm text-neutral-600 hover:text-neutral-900 select-none [&::-webkit-details-marker]:hidden">
-        <span className="inline-flex items-center gap-1.5 font-medium">
-          <span className="text-neutral-400 group-open:hidden" aria-hidden>
-            +
+    <details className="group/add">
+      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+        {caption ? (
+          <p className="text-sm text-[var(--muted)] max-w-2xl pt-0.5">{caption}</p>
+        ) : (
+          <span />
+        )}
+        <summary className="cursor-pointer list-none select-none shrink-0 text-sm font-medium text-[var(--foreground)] hover:underline underline-offset-2 [&::-webkit-details-marker]:hidden">
+          <span className="inline-flex items-center gap-1.5">
+            <span className="text-[var(--subtle)] group-open/add:hidden" aria-hidden>
+              +
+            </span>
+            <span
+              className="hidden text-[var(--subtle)] group-open/add:inline"
+              aria-hidden
+            >
+              −
+            </span>
+            Add item
           </span>
-          <span className="hidden text-neutral-400 group-open:inline" aria-hidden>
-            −
-          </span>
-          Add item
-        </span>
-      </summary>
+        </summary>
+      </div>
       <form
         action={createOrgInventoryItem}
-        className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-6 lg:items-end"
+        className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-6 lg:items-end border-t border-[var(--border-subtle)] pt-3"
       >
         <label className="text-xs text-neutral-500 lg:col-span-1">
           SKU

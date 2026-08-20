@@ -30,3 +30,13 @@ export function inventoryHref(opts: {
   if (opts.companyId) q.set("companyId", opts.companyId);
   return `/dashboard/inventory?${q.toString()}`;
 }
+
+/** Prefer `companyId`; accept legacy `clientId` / `client` query aliases. */
+export function resolveCompanyIdParam(params: {
+  companyId?: string;
+  clientId?: string;
+  client?: string;
+}): string | undefined {
+  const raw = params.companyId || params.clientId || params.client;
+  return raw?.trim() || undefined;
+}
