@@ -3,6 +3,8 @@ import { headers } from "next/headers";
 import { signOut } from "@/lib/auth";
 import { absoluteRedirectUrl } from "@/lib/auth/redirect";
 import type { Session } from "next-auth";
+import { DevRoleSwitchPanel } from "@/components/dev/dev-role-switch-panel";
+import { SessionIdentity } from "@/components/layout/session-identity";
 
 type Props = {
   session: Session;
@@ -47,23 +49,33 @@ export function PortalShell({
             ) : null}
           </div>
         </div>
-        <form
-          action={async () => {
-            "use server";
-            const headersList = await headers();
-            await signOut({
-              redirectTo: absoluteRedirectUrl(headersList, "/login"),
-            });
-          }}
-          className="hidden sm:block"
-        >
-          <button
-            type="submit"
-            className="text-sm text-neutral-500 hover:text-neutral-800 min-h-[44px] px-2"
+        <div className="flex items-center gap-3 shrink-0">
+          <SessionIdentity
+            name={session.user.name}
+            email={session.user.email}
+            isOrgAdmin={session.user.isOrgAdmin}
+            isManager={session.user.isManager}
+            isStaff={session.user.isStaff}
+            isClient={session.user.isClient}
+          />
+          <form
+            action={async () => {
+              "use server";
+              const headersList = await headers();
+              await signOut({
+                redirectTo: absoluteRedirectUrl(headersList, "/login"),
+              });
+            }}
+            className="hidden sm:block"
           >
-            Sign out
-          </button>
-        </form>
+            <button
+              type="submit"
+              className="text-sm text-neutral-500 hover:text-neutral-800 min-h-[44px] px-2"
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
       </header>
 
       <nav className="hidden sm:flex gap-4 text-sm text-neutral-600 px-4 md:px-6 py-2 border-b bg-white max-w-3xl mx-auto w-full">
@@ -95,6 +107,7 @@ export function PortalShell({
           ))}
         </div>
       </nav>
+      <DevRoleSwitchPanel />
     </div>
   );
 }
