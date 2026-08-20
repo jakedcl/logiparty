@@ -119,6 +119,7 @@
 - [x] **A16** Visual system — tokens, tenant primary, open layouts (2026-08-20)
 - [x] **A17** Rejected out of feeds — denied jobs/inventory leave Inbox/Jobs/portal primary lists; collapsed Rejected folders; DB rows kept
 - [x] **A18a** Inventory IA — one nav Inventory; tabs Client \| Equipment \| Fleet (`?tab=`); warehouses (**A18b**) deferred
+- [x] **A18 Client tab UX** — selected client as hero title dropdown; items table below; URL `companyId` (aliases `clientId` / `client`)
 
 ---
 
@@ -170,4 +171,4 @@
 ### Go-live ops (OPEN_TABS)
 - [x] **A16** Visual system — tokens, tenant primary, open layouts (2026-08-20)
 - [x] **A17** Rejected out of primary feeds (2026-08-20)
-- [x] **A18a** Inventory hub tabs (2026-08-20); **A18b** warehouses deferred
+- [x] **A18a** Inventory hub tabs (2026-08-20); **A18b** warehouses deferred; Client tab title dropdown
