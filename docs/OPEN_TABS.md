@@ -16,6 +16,14 @@
 
 ---
 
+## Future / backlog (do not start unless Jake asks)
+
+| ID | Task | Notes |
+|----|------|-------|
+| **F1** | **Third seed tenant** | Jake’s goal: **3 companies** total. Done now: **`nydac`** + **`test`/Acme**. Third org slug/cast TBD — not started; do not add until asked. Dual-seed (A10) is done on Neon **dev** only; do not re-seed prod. |
+
+---
+
 ## Blocked / waiting
 
 | ID | Task | Blocked by |
@@ -47,7 +55,7 @@
 - [x] **A7** Dashboard UI consistency — same A6 list-first / create-last pattern on: **Our inventory**, **Fleet**, **Jobs**, **Team**, **Clients**, **Availability**, **Activity**. Soft SKU normalize on Our inventory. Job detail / portal / marketing unchanged.
 - [x] **A8** Dev role / persona switcher — Option A quick-login via `signIn("credentials")`; gate `ALLOW_DEV_ROLE_SWITCH=true` + hard deny when `VERCEL_ENV=production`; floating Dev panel; always show name+role in dashboard/portal headers. Personas **keyed by org slug** (nydac cast vs test/Acme cast). Do **not** enable on Vercel Production.
 - [x] **A9** Seed cast → Jake’s old company (Ed/Mike/Don/Paul/Tom/Rob/Jerome + Michaela/Dom @ Red Bull) on **nydac**; playground cast on **test**. Local Neon **dev** re-seeded; prod Neon **main** still old cast until intentional re-seed.
-- [x] **A10** Dual-tenant seed + NYDAC logo — `nydac` uses `/seed/nydac-logo.svg` (navy); `test` keeps orange TEST badge. Emails globally unique across orgs.
+- [x] **A10** Dual-tenant seed + NYDAC logo — `nydac` uses `/seed/nydac-logo.svg` (navy); `test` keeps orange TEST badge. Emails globally unique across orgs. (**2 of 3** companies Jake wants; third tenant = **F1**, still open.)
 
 ---
 
