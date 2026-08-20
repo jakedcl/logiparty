@@ -34,7 +34,9 @@ function loadEnvLocal() {
   }
 }
 
-type Sql = ReturnType<typeof neon>;
+// Tagged-template neon client. Avoid ReturnType<typeof neon> — package generics disagree with neon(url).
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Sql = any;
 
 type SeedPerson = {
   email: string;

@@ -1,13 +1,9 @@
 import { redirect } from "next/navigation";
+import { TeamMemberRow } from "@/components/team/team-member-row";
 import { canInviteUsers } from "@/lib/auth/permissions";
 import { createStaffInvite } from "@/lib/actions/invites";
-import {
-  updateMembershipRoles,
-  updateStaffTags,
-  listTeamMembers,
-} from "@/lib/actions/team";
+import { listTeamMembers } from "@/lib/actions/team";
 import { requireSession } from "@/lib/org/context";
-import { STAFF_TAGS } from "@/lib/db/schema";
 
 export default async function TeamPage() {
   const session = await requireSession();
@@ -42,85 +38,12 @@ export default async function TeamPage() {
         ) : (
           <ul className="border border-neutral-200 rounded-md bg-white divide-y divide-neutral-100 -mx-4 sm:mx-0">
             {internalMembers.map(({ membership, user, tags }) => (
-              <li key={membership.id} className="px-3 py-3 space-y-2">
-                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-                  <p className="text-sm font-medium text-neutral-900">
-                    {user.firstName} {user.lastName}
-                  </p>
-                  <p className="text-xs text-neutral-500">{user.email}</p>
-                </div>
-                <form
-                  action={updateMembershipRoles}
-                  className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm"
-                >
-                  <input
-                    type="hidden"
-                    name="membershipId"
-                    value={membership.id}
-                  />
-                  <label className="flex items-center gap-1.5 text-neutral-700">
-                    <input
-                      type="checkbox"
-                      name="isOrgAdmin"
-                      defaultChecked={membership.isOrgAdmin}
-                    />
-                    Admin
-                  </label>
-                  <label className="flex items-center gap-1.5 text-neutral-700">
-                    <input
-                      type="checkbox"
-                      name="isManager"
-                      defaultChecked={membership.isManager}
-                    />
-                    Manager
-                  </label>
-                  <label className="flex items-center gap-1.5 text-neutral-700">
-                    <input
-                      type="checkbox"
-                      name="isStaff"
-                      defaultChecked={membership.isStaff}
-                    />
-                    Staff
-                  </label>
-                  <button
-                    type="submit"
-                    className="text-sm text-neutral-700 hover:text-neutral-900 font-medium"
-                  >
-                    Save roles
-                  </button>
-                </form>
-                {membership.isStaff ? (
-                  <form action={updateStaffTags} className="space-y-1.5">
-                    <input
-                      type="hidden"
-                      name="membershipId"
-                      value={membership.id}
-                    />
-                    <p className="text-xs text-neutral-500">Capability tags</p>
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
-                      {STAFF_TAGS.map((tag) => (
-                        <label
-                          key={tag}
-                          className="flex items-center gap-1.5 text-neutral-700"
-                        >
-                          <input
-                            type="checkbox"
-                            name={`tag-${tag}`}
-                            defaultChecked={tags.includes(tag)}
-                          />
-                          {tag}
-                        </label>
-                      ))}
-                      <button
-                        type="submit"
-                        className="text-sm text-neutral-700 hover:text-neutral-900 font-medium"
-                      >
-                        Save tags
-                      </button>
-                    </div>
-                  </form>
-                ) : null}
-              </li>
+              <TeamMemberRow
+                key={membership.id}
+                membership={membership}
+                user={user}
+                tags={tags}
+              />
             ))}
           </ul>
         )}
