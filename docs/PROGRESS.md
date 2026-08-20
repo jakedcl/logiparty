@@ -102,7 +102,7 @@
 - [x] **A3** Apex marketing homepage at `logiparty.com` (leads → `marketing_leads`; invite-only CTA)
 - [x] **A4** Unknown subdomain → redirect to apex homepage (middleware + Neon slug check)
 - [x] **A6** Client inventory UI polish (dense table; demoted add; soft SKU)
-- [ ] **A7** Dashboard UI consistency (same A6 pattern across Our inventory / Fleet / Jobs / Team)
+- [x] **A7** Dashboard UI consistency — list-first tables + collapsed add on Our inventory, Fleet, Jobs, Team, Clients, Availability, Activity; SKU soft-normalize on Our inventory
 - [ ] **A8** Dev role / persona switcher (env-gated; local + never prod customers)
 
 ---

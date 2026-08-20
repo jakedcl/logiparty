@@ -13,7 +13,6 @@
 | ID | Task | Owner | Notes |
 |----|------|-------|-------|
 | **A1** | Jake tests job flow locally | Jake | Automated: `npx tsx scripts/golden-path-walk.ts` → **29 passed, 0 failed** (2026-08-19). Still worth one manual click-through on prod. |
-| **A7** | Dashboard UI consistency | Agent (when Jake picks it) | Same principle as **A6** across the rest of the app: demote “new / add” create forms (collapsed or bottom); dense lists/tables primary; professional SaaS ops feel. Touch: **Our inventory**, **Fleet**, **Jobs list**, **Team**, etc. Pattern reference: Client inventory after A6. |
 | **A8** | Dev role / persona switcher | Agent (when Jake picks it) | Exclusive Jake/dev tooling to switch roles while testing. **Feasibility: yes**, with hard env gating. **Safest MVP:** panel only when `ALLOW_DEV_ROLE_SWITCH=true` (never on Vercel Production) — quick-login as seed users (`morgan`, `sam`, `dana`, `rep1`) or server action that creates a session for a chosen seed user in the current org. **Alt:** JWT “view as” impersonation — more powerful, higher risk; env-gated + email allowlist (e.g. `jakedcl73@gmail.com`). Do **not** ship to Production customers without kill-switch. Explore seed-user switch vs impersonation when picked. |
 
 ---
@@ -45,6 +44,7 @@
 - [x] **A3** Marketing / leads homepage at apex `logiparty.com` — invite-only “Request access” form → `marketing_leads` (+ optional Resend notify). Tenant `{slug}.logiparty.com` unchanged. Follow-up: **A4** unknown subdomain → homepage.
 - [x] **A4** Unknown subdomain → apex homepage — middleware checks `organizations.slug` via Neon HTTP; missing org → redirect to `https://logiparty.com` / `http://localhost:3000`. Known tenants + apex/www unchanged.
 - [x] **A6** Client inventory UI polish — dense items table (SKU/Name/Description/Qty/Actions); inline qty + description edit; SKU/name read-only after create; soft SKU normalize (trim, uppercase, `A-Z0-9_-`); “+ Add item” collapsed at bottom. Files: `app/dashboard/client-inventory/page.tsx`, `components/client-inventory/*`, `lib/inventory/sku.ts`, `lib/actions/client-inventory.ts`.
+- [x] **A7** Dashboard UI consistency — same A6 list-first / create-last pattern on: **Our inventory**, **Fleet**, **Jobs**, **Team**, **Clients**, **Availability**, **Activity**. Soft SKU normalize on Our inventory. Job detail / portal / marketing unchanged.
 
 ---
 
