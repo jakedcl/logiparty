@@ -5,8 +5,8 @@ import type { InventoryRequestView } from "@/lib/actions/inventory-requests";
 import { PendingInventoryRequestsPanel } from "@/components/client-inventory/pending-requests";
 
 /**
- * Title row chrome: left slot (client switcher) + quiet pending control on the right.
- * When open, pending list expands full-width under the title — not competing with Add.
+ * Title row: client hero left, quiet “N pending” right.
+ * Click opens a panel under the title — closed by default, no details/accordion.
  */
 export function ClientInventoryTitleRow({
   title,
@@ -22,33 +22,19 @@ export function ClientInventoryTitleRow({
     <div className="space-y-3">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">{title}</div>
-        {count === 0 ? (
-          <p className="shrink-0 pt-2 text-sm text-[var(--faint)]">
-            No pending requests
-          </p>
-        ) : (
+        {count > 0 ? (
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
             aria-expanded={open}
-            className="shrink-0 inline-flex items-center gap-1.5 pt-2 text-sm font-medium text-[var(--foreground)] hover:underline underline-offset-2"
+            className="shrink-0 pt-2 text-sm font-medium tabular-nums text-neutral-600 hover:text-neutral-900 hover:underline underline-offset-2"
           >
-            <span className="tabular-nums">
-              {count} pending request{count === 1 ? "" : "s"}
-            </span>
-            <span
-              aria-hidden
-              className={`text-xs text-[var(--subtle)] transition-transform duration-150 ${
-                open ? "rotate-180" : ""
-              }`}
-            >
-              ▾
-            </span>
+            {open ? "Hide pending" : `${count} pending`}
           </button>
-        )}
+        ) : null}
       </div>
       {open && count > 0 ? (
-        <div className="border-t border-[var(--border-subtle)] pt-3">
+        <div className="border-t border-neutral-200 pt-3">
           <PendingInventoryRequestsPanel requests={requests} />
         </div>
       ) : null}
