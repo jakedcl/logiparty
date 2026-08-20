@@ -248,3 +248,117 @@ export async function listNotifications(
   items.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   return items.slice(0, LIMIT);
 }
+
+/**
+ * Denied/rejected history for managers — not actionable inbox items.
+ * Newest first; separate from listNotifications (pending only).
+ */
+export async function listRejectedItems(
+  orgId: string
+): Promise<NotificationItem[]> {
+  const session = await requireSession();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
+  if (!db) throw new Error("Database not configured");
+
+  const tags = await getSessionStaffTags(session);
+  const isManager = canManageJobs(session.user);
+  const canInventory = canManageClientInventory(session.user, tags);
+  if (!isManager && !canInventory) throw new Error("Forbidden");
+
+  const items: NotificationItem[] = [];
+
+  if (isManager) {
+    const deniedJobs = await withOrgQuery<
+      {
+        id: string;
+        name: string;
+        createdAt: Date;
+        updatedAt: Date;
+        clientName: string | null;
+      }[]
+    >(orgId, (database) =>
+      database
+        .select({
+          id: jobs.id,
+          name: jobs.name,
+          createdAt: jobs.createdAt,
+          updatedAt: jobs.updatedAt,
+          clientName: clientCompanies.name,
+        })
+        .from(jobs)
+        .leftJoin(
+          clientCompanies,
+          eq(jobs.clientCompanyId, clientCompanies.id)
+        )
+        .where(and(eq(jobs.orgId, orgId), eq(jobs.status, "denied")))
+        .orderBy(desc(jobs.updatedAt))
+        .limit(LIMIT)
+    );
+
+    for (const row of deniedJobs) {
+      items.push({
+        id: `denied-draft:${row.id}`,
+        kind: "draft_request",
+        title: "Denied job request",
+        detail: `${row.name} · ${row.clientName ?? "Client"}`,
+        href: `/dashboard/jobs/${row.id}`,
+        createdAt: row.updatedAt ?? row.createdAt,
+      });
+    }
+  }
+
+  if (canInventory) {
+    const deniedInv = await withOrgQuery<
+      {
+        id: string;
+        type: string;
+        createdAt: Date;
+        reviewedAt: Date | null;
+        proposedName: string | null;
+        proposedSku: string | null;
+        clientName: string | null;
+      }[]
+    >(orgId, (database) =>
+      database
+        .select({
+          id: clientInventoryRequests.id,
+          type: clientInventoryRequests.type,
+          createdAt: clientInventoryRequests.createdAt,
+          reviewedAt: clientInventoryRequests.reviewedAt,
+          proposedName: clientInventoryRequests.proposedName,
+          proposedSku: clientInventoryRequests.proposedSku,
+          clientName: clientCompanies.name,
+        })
+        .from(clientInventoryRequests)
+        .leftJoin(
+          clientCompanies,
+          eq(clientInventoryRequests.clientCompanyId, clientCompanies.id)
+        )
+        .where(
+          and(
+            eq(clientInventoryRequests.orgId, orgId),
+            eq(clientInventoryRequests.status, "denied")
+          )
+        )
+        .orderBy(desc(clientInventoryRequests.reviewedAt))
+        .limit(LIMIT)
+    );
+
+    for (const row of deniedInv) {
+      const label =
+        row.proposedName ?? row.proposedSku ?? inventoryTypeLabel(row.type);
+      items.push({
+        id: `denied-inv:${row.id}`,
+        kind: "inventory_request",
+        title: `Denied · ${inventoryTypeLabel(row.type)}`,
+        detail: `${label} · ${row.clientName ?? "Client"}`,
+        href: `/dashboard/client-inventory`,
+        createdAt: row.reviewedAt ?? row.createdAt,
+        inventoryRequestId: row.id,
+      });
+    }
+  }
+
+  items.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  return items.slice(0, LIMIT);
+}

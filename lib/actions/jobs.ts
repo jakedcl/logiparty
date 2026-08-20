@@ -250,6 +250,7 @@ export async function acceptDraftJob(formData: FormData) {
     actorUserId: session.user.id,
   });
 
+  revalidatePath("/dashboard");
   revalidatePath("/dashboard/jobs");
   revalidatePath(`/dashboard/jobs/${id}`);
   revalidatePath("/dashboard/notifications");
@@ -286,6 +287,7 @@ export async function denyDraftJob(formData: FormData) {
     }),
   ]);
 
+  revalidatePath("/dashboard");
   revalidatePath("/dashboard/jobs");
   revalidatePath(`/dashboard/jobs/${id}`);
   revalidatePath("/dashboard/notifications");

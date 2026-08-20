@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (A16 visual system).*
+*Last updated: 2026-08-20 (A17 rejected out of feeds).*
 
 ---
 
@@ -73,6 +73,7 @@
 - [x] **A14** Client → tenant general notes v1 — portal `/portal/notes` (list newest-first + collapsed compose); table `client_notes` + migration `0022`; managers see unread in Notifications + Mark read; one-way (D18). Seed: Red Bull Michaela unread sample. Neon **dev** migrated + seedable.
 - [x] **A15** Staff `/dashboard` home — role-aware welcome (first name + org); Needs attention (top 5 from `listNotifications`, incl. notes/inventory/drafts/assignments); Upcoming work dense table (soonest `job_start` first, cap 8); manager **+ New job** / staff My Jobs + Time off; A6/A7 list density. Time-off tip → Settings.
 - [x] **A16** Product visual system — high-contrast tokens (`globals.css`); tenant `--primary` via `OrgTheme` + `lib/theme/primary-color` (fallback navy `#1e3a5f`); ink staff sidebar; open tables (no decorative card chrome); portal + login white-label; `PageHeader` / `StatusBadge`. Smoke: nydac Mike + Michaela.
+- [x] **A17** Rejected out of primary feeds — denied jobs leave staff Jobs + portal Your jobs (collapsed **Rejected**); Notifications Inbox stays pending-only + collapsed **Rejected** history (`listRejectedItems`); Needs attention unchanged (already pending-only). Rows kept (`denied` status).
 ---
 
 ## Current environments
