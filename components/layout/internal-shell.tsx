@@ -16,6 +16,7 @@ import {
   canViewFleet,
   canViewMyJobs,
 } from "@/lib/auth/permissions";
+import { inventoryHref } from "@/lib/inventory/hub";
 import { FALLBACK_PRIMARY_COLOR } from "@/lib/theme/primary-color";
 
 type Props = {
@@ -43,10 +44,13 @@ export function InternalShell({
 }: Props) {
   const orgName = session.user.orgName ?? "Organization";
   const showTeam = canInviteUsers(session.user);
-  const showInventory =
-    canManageOrgInventory(session.user, staffTags) ||
-    canManageClientInventory(session.user, staffTags) ||
-    canViewFleet(session.user);
+  const showClientInventory = canManageClientInventory(
+    session.user,
+    staffTags
+  );
+  const showEquipment = canManageOrgInventory(session.user, staffTags);
+  const showFleet = canViewFleet(session.user);
+  const showInventory = showClientInventory || showEquipment || showFleet;
   const showJobs = canManageJobs(session.user);
   const showMyJobs = canViewMyJobs(session.user);
   const showNotifications = showJobs || showMyJobs;
@@ -60,7 +64,33 @@ export function InternalShell({
     navItems.push({ href: "/dashboard/notifications", label: "Notifications" });
   }
   if (showInventory) {
-    navItems.push({ href: "/dashboard/inventory", label: "Inventory" });
+    const inventoryChildren: NonNullable<DashboardNavItem["children"]> = [];
+    if (showClientInventory) {
+      inventoryChildren.push({
+        href: inventoryHref({ tab: "client" }),
+        label: "Client",
+        tab: "client",
+      });
+    }
+    if (showEquipment) {
+      inventoryChildren.push({
+        href: inventoryHref({ tab: "equipment" }),
+        label: "Equipment",
+        tab: "equipment",
+      });
+    }
+    if (showFleet) {
+      inventoryChildren.push({
+        href: inventoryHref({ tab: "fleet" }),
+        label: "Fleet",
+        tab: "fleet",
+      });
+    }
+    navItems.push({
+      href: "/dashboard/inventory",
+      label: "Inventory",
+      children: inventoryChildren,
+    });
   }
   if (showTeam) {
     navItems.push({ href: "/dashboard/team", label: "Team" });

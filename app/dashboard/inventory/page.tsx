@@ -6,7 +6,6 @@ import { ClientInventoryItemsTable } from "@/components/client-inventory/items-t
 import { ClientInventoryTitleRow } from "@/components/client-inventory/pending-requests-chrome";
 import { AddFleetVehiclePanel } from "@/components/fleet/add-vehicle-panel";
 import { FleetVehiclesTable } from "@/components/fleet/vehicles-table";
-import { InventoryTabs } from "@/components/inventory/inventory-tabs";
 import { AddOrgInventoryItemPanel } from "@/components/org-inventory/add-item-panel";
 import { OrgInventoryItemsTable } from "@/components/org-inventory/items-table";
 import { PageHeader } from "@/components/ui/page-header";
@@ -92,20 +91,30 @@ export default async function InventoryHubPage({
     vehicles = await listFleetVehicles(session.user.orgId);
   }
 
+  const header =
+    tab === "client"
+      ? {
+          title: "Client",
+          description: "Client-owned assets stored at your sites.",
+        }
+      : tab === "equipment"
+        ? {
+            title: "Equipment",
+            description:
+              "Gear your company owns (dollies, machines, general stock).",
+          }
+        : {
+            title: "Fleet",
+            description:
+              "Box trucks, vans, and other vehicles assigned to jobs.",
+          };
+
   return (
     <div className="space-y-5">
-      <PageHeader
-        title="Inventory"
-        description="Client assets, your equipment, and fleet — one place."
-      />
-
-      <InventoryTabs
-        tab={tab}
-        companyId={selectedId || undefined}
-        allowed={allowed}
-      />
+      <PageHeader title={header.title} description={header.description} />
 
       {tab === "client" ? (
+
         <div className="space-y-5">
           {companies.length === 0 ? (
             <p className="text-sm text-[var(--muted)]">

@@ -1,16 +1,24 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { usePathname, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { OrgTheme } from "@/components/layout/org-theme";
 import { cn } from "@/lib/utils";
 import { FALLBACK_PRIMARY_COLOR } from "@/lib/theme/primary-color";
 
+export type DashboardNavChild = {
+  href: string;
+  label: string;
+  /** Query match for active child (e.g. tab=client on inventory hub). */
+  tab?: string;
+};
+
 export type DashboardNavItem = {
   href: string;
   label: string;
+  children?: DashboardNavChild[];
 };
 
 type Props = {
@@ -23,10 +31,32 @@ type Props = {
   children: React.ReactNode;
 };
 
+function pathOnly(href: string): string {
+  return href.split("?")[0]?.split("#")[0] ?? href;
+}
+
 function navItemActive(pathname: string, href: string): boolean {
-  const path = href.split("#")[0] ?? href;
+  const path = pathOnly(href);
   if (path === "/dashboard") return pathname === "/dashboard";
   return pathname === path || pathname.startsWith(`${path}/`);
+}
+
+function childActive(
+  pathname: string,
+  searchParams: URLSearchParams,
+  child: DashboardNavChild,
+  siblings: readonly DashboardNavChild[]
+): boolean {
+  if (!navItemActive(pathname, child.href)) return false;
+  if (!child.tab) return true;
+  const current = searchParams.get("tab");
+  if (current === child.tab) return true;
+  // Default tab when ?tab= missing: first sibling with a tab
+  if (!current) {
+    const first = siblings.find((s) => s.tab)?.tab;
+    return first === child.tab;
+  }
+  return false;
 }
 
 function Brand({
@@ -92,7 +122,117 @@ function Brand({
   );
 }
 
-function NavLinks({
+function linkClass(active: boolean, nested = false) {
+  return cn(
+    "relative rounded-md text-sm transition-colors",
+    nested ? "px-3 py-1.5" : "px-3 py-2",
+    active
+      ? "bg-[var(--sidebar-active)] font-medium text-[var(--sidebar-fg)]"
+      : "text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-fg)]"
+  );
+}
+
+function ActiveBar({ show }: { show: boolean }) {
+  if (!show) return null;
+  return (
+    <span
+      className="absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-[var(--primary)]"
+      aria-hidden
+    />
+  );
+}
+
+function NavGroup({
+  item,
+  pathname,
+  searchParams,
+  onNavigate,
+}: {
+  item: DashboardNavItem;
+  pathname: string;
+  searchParams: URLSearchParams;
+  onNavigate?: () => void;
+}) {
+  const children = item.children ?? [];
+  const sectionActive = navItemActive(pathname, item.href);
+  const anyChildActive = children.some((c) =>
+    childActive(pathname, searchParams, c, children)
+  );
+  const [open, setOpen] = useState(sectionActive);
+
+  useEffect(() => {
+    if (sectionActive) setOpen(true);
+  }, [sectionActive, pathname]);
+
+  if (children.length === 0) {
+    const active = sectionActive;
+    return (
+      <Link
+        href={item.href}
+        onClick={onNavigate}
+        className={linkClass(active)}
+      >
+        <ActiveBar show={active} />
+        {item.label}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-0.5">
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className={cn(
+          linkClass(sectionActive && !anyChildActive),
+          "flex w-full items-center justify-between gap-2 text-left"
+        )}
+      >
+        <ActiveBar show={sectionActive && !anyChildActive} />
+        <span>{item.label}</span>
+        <ChevronDown
+          className={cn(
+            "h-3.5 w-3.5 shrink-0 opacity-70 transition-transform",
+            open ? "rotate-0" : "-rotate-90"
+          )}
+          strokeWidth={2}
+          aria-hidden
+        />
+      </button>
+      {open ? (
+        <div
+          className="ml-2 flex flex-col gap-0.5 border-l border-white/10 pl-1.5"
+          role="group"
+          aria-label={item.label}
+        >
+          {children.map((child) => {
+            const active = childActive(
+              pathname,
+              searchParams,
+              child,
+              children
+            );
+            return (
+              <Link
+                key={`${child.href}:${child.label}`}
+                href={child.href}
+                onClick={onNavigate}
+                className={linkClass(active, true)}
+                aria-current={active ? "page" : undefined}
+              >
+                <ActiveBar show={active} />
+                {child.label}
+              </Link>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function NavLinksInner({
   items,
   pathname,
   onNavigate,
@@ -101,33 +241,46 @@ function NavLinks({
   pathname: string;
   onNavigate?: () => void;
 }) {
+  const searchParams = useSearchParams();
   return (
     <nav className="flex flex-col gap-0.5 px-2" aria-label="Dashboard">
-      {items.map((item) => {
-        const active = navItemActive(pathname, item.href);
-        return (
-          <Link
-            key={`${item.href}:${item.label}`}
-            href={item.href}
-            onClick={onNavigate}
-            className={cn(
-              "relative rounded-md px-3 py-2 text-sm transition-colors",
-              active
-                ? "bg-[var(--sidebar-active)] font-medium text-[var(--sidebar-fg)]"
-                : "text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-fg)]"
-            )}
-          >
-            {active ? (
-              <span
-                className="absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-[var(--primary)]"
-                aria-hidden
-              />
-            ) : null}
-            {item.label}
-          </Link>
-        );
-      })}
+      {items.map((item) => (
+        <NavGroup
+          key={`${item.href}:${item.label}`}
+          item={item}
+          pathname={pathname}
+          searchParams={searchParams}
+          onNavigate={onNavigate}
+        />
+      ))}
     </nav>
+  );
+}
+
+function NavLinks(props: {
+  items: DashboardNavItem[];
+  pathname: string;
+  onNavigate?: () => void;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <nav className="flex flex-col gap-0.5 px-2" aria-label="Dashboard">
+          {props.items.map((item) => (
+            <Link
+              key={`${item.href}:${item.label}`}
+              href={item.href}
+              onClick={props.onNavigate}
+              className={linkClass(navItemActive(props.pathname, item.href))}
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+      }
+    >
+      <NavLinksInner {...props} />
+    </Suspense>
   );
 }
 
