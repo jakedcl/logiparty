@@ -67,7 +67,7 @@ async function login(email: string) {
       csrfToken,
       email,
       password: PASSWORD,
-      orgSlug: "test",
+      orgSlug: "nydac",
       redirect: "false",
       callbackUrl: `${BASE}/dashboard`,
     }),
@@ -101,7 +101,7 @@ async function main() {
   if (!url) throw new Error("DATABASE_URL required");
   const sql = neon(url);
 
-  const [tenant] = await sql`SELECT id FROM organizations WHERE slug = 'test'`;
+  const [tenant] = await sql`SELECT id FROM organizations WHERE slug = 'nydac'`;
   const [job] = await sql`
     SELECT j.id FROM jobs j
     JOIN client_companies c ON c.id = j.client_company_id

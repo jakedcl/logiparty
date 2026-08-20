@@ -10,14 +10,14 @@ One page to go from zero → local dev → production. Read this first.
 cd /Users/jakedcl/Dev/logiparty
 npm install
 npm run db:migrate:sql   # first time only
-npm run db:seed          # test org + golden-path users
-npm run dev              # http://test.localhost:3000
+npm run db:seed          # nydac org + golden-path users
+npm run dev              # http://nydac.localhost:3000
 ```
 
 Add to `/etc/hosts` if you haven't:
 
 ```
-127.0.0.1 test.localhost
+127.0.0.1 nydac.localhost
 ```
 
 Copy `.env.example` → `.env.local` and fill `DATABASE_URL`, `AUTH_SECRET`, etc.
@@ -26,14 +26,14 @@ Copy `.env.example` → `.env.local` and fill `DATABASE_URL`, `AUTH_SECRET`, etc
 
 | URL | Email | Role |
 |-----|-------|------|
-| http://test.localhost:3000 | `ed@test.test` | Org admin (Ed) |
-| http://test.localhost:3000 | `mike@test.test` | Manager (Mike Oso) |
-| http://test.localhost:3000 | `tom@test.test` | Staff (warehouse) |
-| http://test.localhost:3000 | `paul@test.test` | Staff (driver) |
-| http://test.localhost:3000 | `michaela@redbull.test` | Client portal (POC) |
-| http://test.localhost:3000 | `dom@redbull.test` | Client portal |
+| http://nydac.localhost:3000 | `ed@test.test` | Org admin (Ed) |
+| http://nydac.localhost:3000 | `mike@test.test` | Manager (Mike Oso) |
+| http://nydac.localhost:3000 | `tom@test.test` | Staff (warehouse) |
+| http://nydac.localhost:3000 | `paul@test.test` | Staff (driver) |
+| http://nydac.localhost:3000 | `michaela@redbull.test` | Client portal (POC) |
+| http://nydac.localhost:3000 | `dom@redbull.test` | Client portal |
 
-**Your personal account:** `jakedcl73@gmail.com` is linked as TestTenant3PL org admin on the current database. Use your existing password (not `password123`). Re-run anytime:
+**Your personal account:** `jakedcl73@gmail.com` is linked as NYDAC org admin on the current database. Use your existing password (not `password123`). Re-run anytime:
 
 ```bash
 npm run db:relink-admin
@@ -47,9 +47,9 @@ npm run db:relink-admin
 |-----|------------------------------|
 | https://logiparty.com/api/health | **200** — `{"status":"ok"}` |
 | https://logiparty.com/login | **200** (redirects to `www.logiparty.com/login`) |
-| https://test.logiparty.com/api/health | **Fails** — wildcard subdomain not configured yet |
+| https://nydac.logiparty.com/api/health | Use after prod org rename (`test` → `nydac`); until then prod tenant is still `test.logiparty.com` |
 
-After wildcard DNS is live, log in at **https://test.logiparty.com** with the same seed accounts (or your personal admin account).
+After wildcard DNS is live, log in at **https://nydac.logiparty.com** once prod is renamed (until then: **https://test.logiparty.com**) with the same seed accounts (or your personal admin account).
 
 Latest Vercel deployment: **success** on commit `2653b5f` (main).
 
@@ -61,11 +61,11 @@ If you ran `npm run db:reset-seed -- --confirm` earlier:
 
 | Removed | Kept |
 |---------|------|
-| `test` org (and legacy `demo`/acme if present) and all their jobs, catalogs, fleet | Other orgs (if any) |
+| `nydac` org (and legacy `test`/`demo`/acme if present) and all their jobs, catalogs, fleet | Other orgs (if any) |
 | Seed test accounts (`ed@test.test`, etc.; also legacy `admin@demo.test`) | Personal accounts like `jakedcl73@gmail.com` |
 | Client companies under seed orgs | — |
 
-**Current state (after `npm run db:seed`):** only **`test`** exists, **0 jobs**, catalogs re-seeded, test users back. Personal admin re-linked to test.
+**Current state (after `npm run db:seed`):** only **`nydac`** exists, **0 jobs**, catalogs re-seeded, test users back. Personal admin re-linked to nydac.
 
 `db:reset-seed` only touches seed orgs/users — it does **not** drop the whole database. But if Production shares the same `DATABASE_URL`, production sees the same wipe.
 
@@ -99,7 +99,7 @@ Open [vercel.com](https://vercel.com) → **logiparty** project:
 
 **Settings → Domains** → Add `*.logiparty.com` (and ensure `logiparty.com` / `www.logiparty.com` are verified).
 
-Without this, `test.logiparty.com` will not resolve (SSL/connect errors).
+Without this, `nydac.logiparty.com` will not resolve (SSL/connect errors).
 
 ### 2. Environment variables checklist
 
@@ -120,7 +120,7 @@ Never commit `.env.local`.
 
 **Neon ↔ Vercel integration gotcha:** Neon may inject `DATABASE_URL_UNPOOLED` into Production. This app reads **`DATABASE_URL` only** (`lib/db/index.ts`). You must add **`DATABASE_URL`** (pooled, `…-pooler…`) scoped to **Production** — Development-only is not enough. Then redeploy.
 
-Log in at **`https://test.logiparty.com/login`**, not apex `logiparty.com`.
+Log in at **`https://nydac.logiparty.com/login`** after prod rename (until then **`https://test.logiparty.com/login`**), not apex `logiparty.com`.
 
 **Deployments** → latest **Production** → **Redeploy** (after domain + env changes).
 
@@ -131,7 +131,7 @@ Log in at **`https://test.logiparty.com/login`**, not apex `logiparty.com`.
 ```bash
 npm run dev                    # local app
 npm run db:seed                # idempotent — safe to re-run
-npm run db:reset-seed -- --confirm   # wipe seed filler; re-seed `test` only
+npm run db:reset-seed -- --confirm   # wipe seed filler; re-seed `nydac` only
 npm run db:relink-admin        # re-link personal email as test admin
 npm run test:integration       # RLS / RBAC smoke tests
 ```

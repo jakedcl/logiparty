@@ -59,7 +59,7 @@ export default async function InviteAcceptPage({
             await signIn("credentials", {
               email: result.email,
               password: formData.get("password") as string,
-              orgSlug: orgRow?.slug ?? "test",
+              orgSlug: orgRow?.slug ?? "nydac",
               redirectTo: absoluteRedirectUrl(headersList, dest),
             });
           }}

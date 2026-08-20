@@ -17,7 +17,7 @@ npm run db:seed
 npm run test:integration
 ```
 
-To wipe seeded filler (`test` org + legacy seed orgs/users, catalogs) and re-seed fresh:
+To wipe seeded filler (`nydac` org + legacy `test`/demo seed orgs/users, catalogs) and re-seed fresh:
 
 ```bash
 npm run db:reset-seed -- --confirm

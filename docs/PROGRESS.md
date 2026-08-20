@@ -132,7 +132,7 @@
 - [ ] Add `CRON_SECRET` for `/api/cron/auto-ready`
 - [ ] Add domain `logiparty.com` and wildcard `*.logiparty.com` in Vercel project settings
 - [ ] Point DNS to Vercel (they'll give you the records)
-- [ ] Smoke test production: log in at `test.logiparty.com`
+- [ ] Smoke test production: log in at `nydac.logiparty.com` (prod DB still `test` until renamed)
 
 ### Resend (email — invites)
 - [ ] Create account at resend.com, verify your sending domain

@@ -27,6 +27,9 @@ function loadEnvLocal() {
   }
 }
 
+const ORG_SLUG = "nydac";
+const ORG_NAME = "New York Design and Construction";
+
 async function seed() {
   loadEnvLocal();
   const url = process.env.DATABASE_URL;
@@ -36,21 +39,25 @@ async function seed() {
   const sql = neon(url);
   const passwordHash = await bcrypt.hash("password123", 10);
 
-  const testLogoUrl = "/seed/test-tenant-logo.svg";
-  const testPrimaryColor = "#ea580c";
+  const logoUrl = "/seed/test-tenant-logo.svg";
+  const primaryColor = "#0f172a";
 
   await sql`
     INSERT INTO organizations (slug, name, primary_color, email_from_name, logo_url)
     VALUES
-      ('test', 'TestTenant3PL', ${testPrimaryColor}, 'TestTenant3PL', ${testLogoUrl})
+      (${ORG_SLUG}, ${ORG_NAME}, ${primaryColor}, ${ORG_NAME}, ${logoUrl})
     ON CONFLICT (slug) DO NOTHING
   `;
 
-  // Always refresh test-tenant branding so re-seed applies logo without full reset.
+  // Always refresh NYDAC branding so re-seed applies name/logo without full reset.
   await sql`
     UPDATE organizations
-    SET logo_url = ${testLogoUrl}, primary_color = ${testPrimaryColor}
-    WHERE slug = 'test'
+    SET
+      name = ${ORG_NAME},
+      email_from_name = ${ORG_NAME},
+      logo_url = ${logoUrl},
+      primary_color = ${primaryColor}
+    WHERE slug = ${ORG_SLUG}
   `;
 
   // Display names: first + last joined (empty last → single name like "Ed").
@@ -90,7 +97,7 @@ async function seed() {
     INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
     SELECT o.id, u.id, true, true, false, false
     FROM organizations o, users u
-    WHERE o.slug = 'test' AND u.email = 'ed@test.test'
+    WHERE o.slug = ${ORG_SLUG} AND u.email = 'ed@test.test'
     ON CONFLICT (org_id, user_id) DO UPDATE SET
       is_org_admin = true, is_manager = true, is_staff = false, is_client = false
   `;
@@ -99,7 +106,7 @@ async function seed() {
     INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
     SELECT o.id, u.id, false, true, false, false
     FROM organizations o, users u
-    WHERE o.slug = 'test' AND u.email IN ('mike@test.test', 'don@test.test')
+    WHERE o.slug = ${ORG_SLUG} AND u.email IN ('mike@test.test', 'don@test.test')
     ON CONFLICT (org_id, user_id) DO UPDATE SET
       is_org_admin = false, is_manager = true, is_staff = false, is_client = false
   `;
@@ -108,7 +115,7 @@ async function seed() {
     INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
     SELECT o.id, u.id, false, false, true, false
     FROM organizations o, users u
-    WHERE o.slug = 'test'
+    WHERE o.slug = ${ORG_SLUG}
       AND u.email IN (
         'paul@test.test',
         'tom@test.test',
@@ -123,7 +130,7 @@ async function seed() {
     INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
     SELECT o.id, u.id, false, false, false, true
     FROM organizations o, users u
-    WHERE o.slug = 'test'
+    WHERE o.slug = ${ORG_SLUG}
       AND u.email IN ('michaela@redbull.test', 'dom@redbull.test')
     ON CONFLICT (org_id, user_id) DO UPDATE SET
       is_org_admin = false, is_manager = false, is_staff = false, is_client = true
@@ -135,7 +142,7 @@ async function seed() {
     FROM org_memberships m
     JOIN users u ON u.id = m.user_id
     JOIN organizations o ON o.id = m.org_id
-    WHERE o.slug = 'test' AND u.email IN ('tom@test.test', 'rob@test.test')
+    WHERE o.slug = ${ORG_SLUG} AND u.email IN ('tom@test.test', 'rob@test.test')
     ON CONFLICT DO NOTHING
   `;
   // Driver: Paul + Jerome
@@ -145,7 +152,7 @@ async function seed() {
     FROM org_memberships m
     JOIN users u ON u.id = m.user_id
     JOIN organizations o ON o.id = m.org_id
-    WHERE o.slug = 'test' AND u.email IN ('paul@test.test', 'jerome@test.test')
+    WHERE o.slug = ${ORG_SLUG} AND u.email IN ('paul@test.test', 'jerome@test.test')
     ON CONFLICT DO NOTHING
   `;
 
@@ -153,7 +160,7 @@ async function seed() {
     INSERT INTO client_companies (org_id, name)
     SELECT o.id, 'Red Bull'
     FROM organizations o
-    WHERE o.slug = 'test'
+    WHERE o.slug = ${ORG_SLUG}
       AND NOT EXISTS (
         SELECT 1 FROM client_companies c
         WHERE c.org_id = o.id AND c.name = 'Red Bull'
@@ -170,7 +177,7 @@ async function seed() {
     FROM organizations o
     JOIN client_companies c ON c.org_id = o.id AND c.name = 'Red Bull'
     JOIN users u ON u.email IN ('michaela@redbull.test', 'dom@redbull.test')
-    WHERE o.slug = 'test'
+    WHERE o.slug = ${ORG_SLUG}
     ON CONFLICT (client_company_id, user_id) DO NOTHING
   `;
 
@@ -179,7 +186,7 @@ async function seed() {
     SELECT o.id, c.id, 'RB-BAR-01', 'Branded Bar', 10
     FROM organizations o
     JOIN client_companies c ON c.org_id = o.id AND c.name = 'Red Bull'
-    WHERE o.slug = 'test'
+    WHERE o.slug = ${ORG_SLUG}
       AND NOT EXISTS (
         SELECT 1 FROM client_inventory_items i
         WHERE i.org_id = o.id AND i.sku = 'RB-BAR-01'
@@ -189,7 +196,7 @@ async function seed() {
     INSERT INTO inventory_items (org_id, sku, name, total_quantity)
     SELECT o.id, 'DOLLY-01', 'Dolly', 20
     FROM organizations o
-    WHERE o.slug = 'test'
+    WHERE o.slug = ${ORG_SLUG}
       AND NOT EXISTS (
         SELECT 1 FROM inventory_items i WHERE i.org_id = o.id AND i.sku = 'DOLLY-01'
       )
@@ -198,7 +205,7 @@ async function seed() {
     INSERT INTO fleet_vehicles (org_id, name, plate)
     SELECT o.id, 'Box Truck 12', 'TST-012'
     FROM organizations o
-    WHERE o.slug = 'test'
+    WHERE o.slug = ${ORG_SLUG}
       AND NOT EXISTS (
         SELECT 1 FROM fleet_vehicles f WHERE f.org_id = o.id AND f.name = 'Box Truck 12'
       )
@@ -207,7 +214,7 @@ async function seed() {
   console.log(`
 Seed complete. Password for all accounts: password123
 
-  test (http://test.localhost:3000)
+  nydac (http://nydac.localhost:3000)
     ed@test.test              OrgAdmin (Ed)
     mike@test.test            Manager (Mike Oso)
     don@test.test             Manager (Don)

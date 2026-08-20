@@ -23,8 +23,8 @@ End-to-end flow the first paying 3PL must complete. QA and agents use this to ve
 
 ### Setup (M1)
 
-1. **[ ]** Ed logs in at `test.logiparty.com` (no "Logiparty" in header).
-2. **[ ]** Ed sets white-label: org name "TestTenant3PL", logo, primary color.
+1. **[ ]** Ed logs in at `nydac.logiparty.com` (no "Logiparty" in header).
+2. **[ ]** Ed sets white-label: org name "New York Design and Construction", logo, primary color.
 3. **[ ]** Ed invites Mike Oso as Manager (Don also seeded as Manager).
 4. **[ ]** Mike invites Tom/Rob (`warehouse`) and Paul/Jerome (`driver`).
 5. **[ ]** Mike creates client company **Red Bull** and invites two client users with titles (Michaela POC, Dom Rep).

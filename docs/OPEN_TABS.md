@@ -34,13 +34,13 @@
 - [x] Domain `logiparty.com` on Vercel
 - [x] Wildcard `*.logiparty.com`
 - [x] Login subdomain fix (middleware `x-org-slug`)
-- [x] Seed tenant slug: **`test`**, display name **TestTenant3PL**
+- [x] Seed tenant slug: **`nydac`**, display name **New York Design and Construction** (Neon **dev** renamed; prod **main** still `test` until Jake asks)
 - [x] Scripts: `db:reset-seed`, `db:relink-admin`, `golden-path-walk`, `r2-morgan-smoke`
 - [x] Tools catalog deprecated → **Our inventory** (Option A)
 - [x] Cloudflare MCP connected
 - [x] **A2** Fix Vercel Production env + login redirect loop — Jake confirmed login works on prod (`test.logiparty.com`, 2026-08-20). Env checklist + `secureCookie: true` for `__Secure-authjs.session-token` in middleware.
 - [x] **A5** Neon `dev` branch — local `.env.local` `DATABASE_URL` → pooled `dev` (`ep-lucky-water-aphwec7q-pooler…`); Vercel Production stays on Neon `main`. Fork had schema + seed data; no reset of `main`. Only run `db:reset-seed` against `dev`.
-- [x] Removed **`demo`** org from seed (and Devon / `admin@demo.test`). Seed is **`test` only**. Reset still cleans legacy `demo` + orphaned Devon user.
+- [x] Removed **`demo`** org from seed (and Devon / `admin@demo.test`). Seed is **`nydac` only**. Reset still cleans legacy `demo` + `test` + orphaned Devon user.
 - [x] **A3** Marketing / leads homepage at apex `logiparty.com` — invite-only “Request access” form → `marketing_leads` (+ optional Resend notify). Tenant `{slug}.logiparty.com` unchanged. Follow-up: **A4** unknown subdomain → homepage.
 - [x] **A4** Unknown subdomain → apex homepage — middleware checks `organizations.slug` via Neon HTTP; missing org → redirect to `https://logiparty.com` / `http://localhost:3000`. Known tenants + apex/www unchanged.
 - [x] **A6** Client inventory UI polish — dense items table (SKU/Name/Description/Qty/Actions); inline qty + description edit; SKU/name read-only after create; soft SKU normalize (trim, uppercase, `A-Z0-9_-`); “+ Add item” collapsed at bottom. Files: `app/dashboard/client-inventory/page.tsx`, `components/client-inventory/*`, `lib/inventory/sku.ts`, `lib/actions/client-inventory.ts`.
@@ -54,10 +54,11 @@
 
 | What | URL / value |
 |------|-------------|
-| **Prod tenant login** | https://test.logiparty.com/login |
+| **Prod tenant login** | https://test.logiparty.com/login (**still `test` on Neon main** — rename to `nydac` only when Jake asks) |
 | **Prod marketing** | https://logiparty.com |
 | **Local marketing** | http://localhost:3000 (unset `NEXT_PUBLIC_DEV_ORG_SLUG`) |
-| **Local tenant** | http://test.localhost:3000 (`.env.local` → Neon **`dev`**) |
+| **Local tenant** | http://nydac.localhost:3000 (`.env.local` → Neon **`dev`**) |
+| **Seed org** | slug `nydac` · name **New York Design and Construction** |
 | **Seed manager** | `mike@test.test` / `password123` |
 | **Seed OrgAdmin** | `ed@test.test` / `password123` |
 | **Jake admin** | `jakedcl73@gmail.com` (your password) |
