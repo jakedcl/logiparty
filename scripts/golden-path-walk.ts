@@ -394,7 +394,7 @@ async function main() {
     mark("23", false, String(e));
   }
 
-  const activity = await getHtml(mike, "/dashboard/activity");
+  const activity = await getHtml(mike, "/dashboard/settings/activity");
   mark(
     "24",
     activity.html.includes("Accepted job request") &&
