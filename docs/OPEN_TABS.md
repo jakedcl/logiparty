@@ -20,7 +20,7 @@
 
 | ID | Task | Notes |
 |----|------|-------|
-| **F1** | **Third seed tenant** | Jake’s goal: **3 companies** total. Done now: **`nydac`** + **`test`/Acme**. Third org slug/cast TBD — not started; do not add until asked. Dual-seed (A10) is done on Neon **dev** only; do not re-seed prod. |
+| — | *(empty for now)* | Third seed tenant was **F1** — done. |
 
 ---
 
@@ -42,20 +42,21 @@
 - [x] Domain `logiparty.com` on Vercel
 - [x] Wildcard `*.logiparty.com`
 - [x] Login subdomain fix (middleware `x-org-slug`)
-- [x] Seed tenants: **`nydac`** (New York Design and Construction) + **`test`** (Acme Event Logistics playground). Neon **dev** dual-seeded; prod **main** still old until Jake asks
+- [x] Seed tenants: **`nydac`** · **`test`** (Acme) · **`axis`** (Axis Global Staging). Neon **dev** triple-seeded; prod **main** still old until Jake asks
 - [x] Scripts: `db:reset-seed`, `db:relink-admin`, `golden-path-walk`, `r2-morgan-smoke`
 - [x] Tools catalog deprecated → **Our inventory** (Option A)
 - [x] Cloudflare MCP connected
 - [x] **A2** Fix Vercel Production env + login redirect loop — Jake confirmed login works on prod (`test.logiparty.com`, 2026-08-20). Env checklist + `secureCookie: true` for `__Secure-authjs.session-token` in middleware.
 - [x] **A5** Neon `dev` branch — local `.env.local` `DATABASE_URL` → pooled `dev` (`ep-lucky-water-aphwec7q-pooler…`); Vercel Production stays on Neon `main`. Fork had schema + seed data; no reset of `main`. Only run `db:reset-seed` against `dev`.
-- [x] Removed **`demo`** org from seed (and Devon / `admin@demo.test`). Seed creates **`nydac` + `test`**. Reset still cleans legacy `demo` / acme + orphaned users.
+- [x] Removed **`demo`** org from seed (and Devon / `admin@demo.test`). Seed creates **`nydac` + `test` + `axis`**. Reset still cleans legacy `demo` / acme + orphaned users.
 - [x] **A3** Marketing / leads homepage at apex `logiparty.com` — invite-only “Request access” form → `marketing_leads` (+ optional Resend notify). Tenant `{slug}.logiparty.com` unchanged. Follow-up: **A4** unknown subdomain → homepage.
 - [x] **A4** Unknown subdomain → apex homepage — middleware checks `organizations.slug` via Neon HTTP; missing org → redirect to `https://logiparty.com` / `http://localhost:3000`. Known tenants + apex/www unchanged.
 - [x] **A6** Client inventory UI polish — dense items table (SKU/Name/Description/Qty/Actions); inline qty + description edit; SKU/name read-only after create; soft SKU normalize (trim, uppercase, `A-Z0-9_-`); “+ Add item” collapsed at bottom. Files: `app/dashboard/client-inventory/page.tsx`, `components/client-inventory/*`, `lib/inventory/sku.ts`, `lib/actions/client-inventory.ts`.
 - [x] **A7** Dashboard UI consistency — same A6 list-first / create-last pattern on: **Our inventory**, **Fleet**, **Jobs**, **Team**, **Clients**, **Availability**, **Activity**. Soft SKU normalize on Our inventory. Job detail / portal / marketing unchanged.
-- [x] **A8** Dev role / persona switcher — Option A quick-login via `signIn("credentials")`; gate `ALLOW_DEV_ROLE_SWITCH=true` + hard deny when `VERCEL_ENV=production`; floating Dev panel; always show name+role in dashboard/portal headers. Personas **keyed by org slug** (nydac cast vs test/Acme cast). Do **not** enable on Vercel Production.
+- [x] **A8** Dev role / persona switcher — Option A quick-login via `signIn("credentials")`; gate `ALLOW_DEV_ROLE_SWITCH=true` + hard deny when `VERCEL_ENV=production`; floating Dev panel; always show name+role in dashboard/portal headers. Personas **keyed by host org slug** (nydac / test / axis casts). Do **not** enable on Vercel Production.
 - [x] **A9** Seed cast → Jake’s old company (Ed/Mike/Don/Paul/Tom/Rob/Jerome + Michaela/Dom @ Red Bull) on **nydac**; playground cast on **test**. Local Neon **dev** re-seeded; prod Neon **main** still old cast until intentional re-seed.
-- [x] **A10** Dual-tenant seed + NYDAC logo — `nydac` uses `/seed/nydac-logo.svg` (navy); `test` keeps orange TEST badge. Emails globally unique across orgs. (**2 of 3** companies Jake wants; third tenant = **F1**, still open.)
+- [x] **A10** Dual-tenant seed + NYDAC logo — `nydac` uses `/seed/nydac-logo.svg` (navy); `test` keeps orange TEST badge. Emails globally unique across orgs.
+- [x] **F1** Third seed tenant — **`axis`** · Axis Global Staging · logo `/seed/axis-logo.svg` (teal) · client Volt Energy · cast `@axis.test` / `@volt.test`. Dev persona switcher host-scoped for all three. Neon **dev** reset-seeded; prod **main** untouched.
 
 ---
 
@@ -63,21 +64,31 @@
 
 | What | URL / value |
 |------|-------------|
-| **Prod tenant login** | https://test.logiparty.com/login (**still `test` on Neon main** — dual-seed / rename only when Jake asks) |
+| **Prod tenant login** | https://test.logiparty.com/login (**still `test` on Neon main** — triple-seed / rename only when Jake asks) |
 | **Prod marketing** | https://logiparty.com |
 | **Local marketing** | http://localhost:3000 (unset `NEXT_PUBLIC_DEV_ORG_SLUG`) |
 | **Local NYDAC** | http://nydac.localhost:3000 (`.env.local` → Neon **`dev`**) |
 | **Local playground** | http://test.localhost:3000 |
-| **Seed orgs** | `nydac` · **New York Design and Construction** · logo `/seed/nydac-logo.svg`; `test` · **Acme Event Logistics** · logo `/seed/test-tenant-logo.svg` |
+| **Local Axis** | http://axis.localhost:3000 |
+| **Seed orgs** | `nydac` · New York Design and Construction · `/seed/nydac-logo.svg`; `test` · Acme Event Logistics · `/seed/test-tenant-logo.svg`; `axis` · Axis Global Staging · `/seed/axis-logo.svg` |
 | **NYDAC OrgAdmin** | `ed@test.test` / `password123` |
 | **NYDAC manager** | `mike@test.test` / `password123` |
 | **Test OrgAdmin** | `boss@playground.test` / `password123` |
+| **Axis OrgAdmin** | `jordan@axis.test` / `password123` |
 | **Jake admin** | `jakedcl73@gmail.com` (your password) — linked to **nydac** |
 | **AUTH_URL (correct)** | `https://logiparty.com` |
 | **NEXT_PUBLIC_ROOT_DOMAIN** | `logiparty.com` |
 | **NEXT_PUBLIC_DEV_ORG_SLUG** | Local primary: `nydac` (do not set in Production) |
 | **Do NOT set in prod** | `NEXT_PUBLIC_DEV_ORG_SLUG`, `ALLOW_DEV_ROLE_SWITCH` |
 | **Neon branches** | Production = **`main`**; local = **`dev`** (never reset-seed on main) |
+
+### Seed cheat sheet (Neon `dev` — password `password123`)
+
+| Org | Local host | OrgAdmin | Manager | Client POC |
+|-----|------------|----------|---------|------------|
+| **nydac** · NYDAC | http://nydac.localhost:3000 | `ed@test.test` | `mike@test.test` | `michaela@redbull.test` (Red Bull) |
+| **test** · Acme | http://test.localhost:3000 | `boss@playground.test` | `riley@playground.test` | `nina@monster.test` (Monster) |
+| **axis** · Axis Global Staging | http://axis.localhost:3000 | `jordan@axis.test` | `avery@axis.test` | `taylor@volt.test` (Volt Energy) |
 
 ---
 

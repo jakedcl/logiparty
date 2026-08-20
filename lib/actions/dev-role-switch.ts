@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
-import { auth, signIn } from "@/lib/auth";
+import { signIn } from "@/lib/auth";
 import { absoluteRedirectUrl } from "@/lib/auth/redirect";
 import {
   getDevPersona,
@@ -19,9 +19,9 @@ export async function switchDevPersona(formData: FormData): Promise<void> {
   }
 
   const headersList = await headers();
-  const session = await auth();
-  const orgSlug =
-    session?.user?.orgSlug ?? getOrgSlugFromHeaders(headersList);
+  // Prefer host / middleware slug so personas match the tenant you're on
+  // (not a stale session org from another subdomain cookie).
+  const orgSlug = getOrgSlugFromHeaders(headersList);
   if (!orgSlug) {
     throw new Error("No organization context");
   }
