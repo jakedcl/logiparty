@@ -111,7 +111,7 @@
 
 ### Local testing (do this first)
 - [x] Golden-path walk passes: `npx tsx scripts/golden-path-walk.ts` (29 passed, 2026-08-19)
-- [ ] Manual click-through: Morgan + Red Bull rep on localhost (optional — script covers flow)
+- [ ] Manual click-through: Mike + Michaela on localhost (optional — script covers flow)
 
 ### Cloudflare R2 (file uploads)
 - [x] Cloudflare MCP authenticated (account: **logiparty**, ID `6b261c181f1d1d1d46b7b88ef9522fb1`)
@@ -120,7 +120,7 @@
 - [x] Create R2 API token (Object Read & Write, scoped to `logiparty-docs`)
 - [x] Paste `R2_ACCESS_KEY_ID` + `R2_SECRET_ACCESS_KEY` into `.env.local` (account ID + bucket name already set)
 - [x] Test: upload a PDF from the client portal job detail page (automated smoke: portal upload UI enabled + `putJobObject` write/delete OK)
-- [x] Test: Morgan sees the document on the internal job detail (`scripts/r2-morgan-smoke.ts`)
+- [x] Test: Mike sees the document on the internal job detail (`scripts/r2-morgan-smoke.ts`)
 
 ### Vercel deployment
 - [ ] Install Vercel CLI: `npm i -g vercel`

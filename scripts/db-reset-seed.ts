@@ -14,10 +14,24 @@ import { execSync } from "child_process";
 const SEED_ORG_SLUGS = ["test", "demo", "acme", "testtenant3pl"] as const;
 
 const SEED_USER_EMAILS = [
+  // Current cast
+  "ed@test.test",
+  "mike@test.test",
+  "don@test.test",
+  "paul@test.test",
+  "tom@test.test",
+  "rob@test.test",
+  "jerome@test.test",
+  "michaela@redbull.test",
+  "alex@redbull.test",
+  "admin@demo.test",
+  // Legacy cast (cleanup on reset)
   "admin@test.test",
   "morgan@test.test",
   "sam@test.test",
   "dana@test.test",
+  "rep1@redbull.test",
+  "rep2@redbull.test",
   "admin@testtenant3pl.test",
   "morgan@testtenant3pl.test",
   "sam@testtenant3pl.test",
@@ -26,9 +40,6 @@ const SEED_USER_EMAILS = [
   "morgan@acme.test",
   "sam@acme.test",
   "dana@acme.test",
-  "rep1@redbull.test",
-  "rep2@redbull.test",
-  "admin@demo.test",
 ] as const;
 
 function loadEnvLocal() {

@@ -121,51 +121,51 @@ async function main() {
     await sql`SELECT id FROM client_companies WHERE org_id = ${tenant.id} AND name = 'Red Bull'`;
 
   // --- Setup / catalogs via UI ---
-  const alex = await login("admin@test.test");
-  const alexDash = await getHtml(alex, "/dashboard");
-  assertIncludes(alexDash.html, "TestTenant3PL");
-  assertNotIncludes(alexDash.html, "Logiparty");
-  mark("1", alexDash.status === 200, "Alex dashboard branded TestTenant3PL, no Logiparty");
+  const ed = await login("ed@test.test");
+  const edDash = await getHtml(ed, "/dashboard");
+  assertIncludes(edDash.html, "TestTenant3PL");
+  assertNotIncludes(edDash.html, "Logiparty");
+  mark("1", edDash.status === 200, "Ed dashboard branded TestTenant3PL, no Logiparty");
 
-  const settings = await getHtml(alex, "/dashboard/settings");
+  const settings = await getHtml(ed, "/dashboard/settings");
   mark(
     "2",
     settings.status === 200 && settings.html.includes("TestTenant3PL"),
-    "Alex can open white-label settings"
+    "Ed can open white-label settings"
   );
 
-  mark("3", true, "Morgan exists via seed (invite flow not re-run)");
-  mark("4", true, "Sam + Dana exist via seed with warehouse/driver tags");
-  mark("5", true, "Red Bull + two client users exist via seed");
+  mark("3", true, "Mike Oso exists via seed (invite flow not re-run)");
+  mark("4", true, "Tom/Rob warehouse + Paul/Jerome driver exist via seed");
+  mark("5", true, "Red Bull + Michaela/Alex exist via seed");
 
-  const rep1 = await login("rep1@redbull.test");
-  const portalHome = await getHtml(rep1, "/portal");
+  const michaela = await login("michaela@redbull.test");
+  const portalHome = await getHtml(michaela, "/portal");
   assertIncludes(portalHome.html, "TestTenant3PL");
   assertNotIncludes(portalHome.html, "Logiparty");
-  const rep2 = await login("rep2@redbull.test");
-  const portal2 = await getHtml(rep2, "/portal");
+  const alex = await login("alex@redbull.test");
+  const portal2 = await getHtml(alex, "/portal");
   mark(
     "6",
     portalHome.status === 200 && portal2.status === 200,
     "Both client users land on branded portal"
   );
 
-  const morgan = await login("morgan@test.test");
+  const mike = await login("mike@test.test");
   const clientInv = await getHtml(
-    morgan,
+    mike,
     `/dashboard/client-inventory?companyId=${rb.id}`
   );
   mark(
     "7",
     clientInv.html.includes("RB-BAR-01") && clientInv.html.includes("Branded Bar"),
-    "Morgan sees seeded client inventory RB-BAR-01"
+    "Mike sees seeded client inventory RB-BAR-01"
   );
-  const orgInv = await getHtml(morgan, "/dashboard/inventory");
-  mark("8", orgInv.html.includes("Dolly"), "Morgan sees our inventory Dolly");
-  const fleet = await getHtml(morgan, "/dashboard/fleet");
-  mark("9", fleet.html.includes("Box Truck 12"), "Morgan sees Box Truck 12");
+  const orgInv = await getHtml(mike, "/dashboard/inventory");
+  mark("8", orgInv.html.includes("Dolly"), "Mike sees our inventory Dolly");
+  const fleet = await getHtml(mike, "/dashboard/fleet");
+  mark("9", fleet.html.includes("Box Truck 12"), "Mike sees Box Truck 12");
 
-  const portalInv = await getHtml(rep1, "/portal/inventory");
+  const portalInv = await getHtml(michaela, "/portal/inventory");
   mark(
     "10",
     portalInv.html.includes("Branded Bar") &&
@@ -191,12 +191,12 @@ async function main() {
     await sql`SELECT id FROM inventory_items WHERE org_id = ${tenant.id} AND sku = 'DOLLY-01'`;
   const [truck] =
     await sql`SELECT id FROM fleet_vehicles WHERE org_id = ${tenant.id} AND name = 'Box Truck 12'`;
-  const [sam] = await sql`SELECT id FROM users WHERE email = 'sam@test.test'`;
-  const [dana] = await sql`SELECT id FROM users WHERE email = 'dana@test.test'`;
-  const [morganUser] =
-    await sql`SELECT id FROM users WHERE email = 'morgan@test.test'`;
-  const [rep1User] =
-    await sql`SELECT id FROM users WHERE email = 'rep1@redbull.test'`;
+  const [tom] = await sql`SELECT id FROM users WHERE email = 'tom@test.test'`;
+  const [paul] = await sql`SELECT id FROM users WHERE email = 'paul@test.test'`;
+  const [mikeUser] =
+    await sql`SELECT id FROM users WHERE email = 'mike@test.test'`;
+  const [michaelaUser] =
+    await sql`SELECT id FROM users WHERE email = 'michaela@redbull.test'`;
 
   const now = new Date();
   const jobStart = new Date(now.getTime() + 24 * 3600 * 1000);
@@ -215,28 +215,28 @@ async function main() {
       ${jobId}, ${tenant.id}, ${rb.id}, ${jobName}, 'draft',
       ${jobStart.toISOString()}, ${jobEnd.toISOString()},
       ${loadInStart.toISOString()}, ${loadOutEnd.toISOString()},
-      ${rep1User.id}
+      ${michaelaUser.id}
     )
   `;
   mark("11", true, `Created draft job "${jobName}"`);
 
-  const morganJobs = await getHtml(morgan, "/dashboard/jobs");
+  const mikeJobs = await getHtml(mike, "/dashboard/jobs");
   mark(
     "12a",
-    morganJobs.html.includes(jobName) && morganJobs.html.includes("draft"),
-    "Morgan sees draft on Jobs list"
+    mikeJobs.html.includes(jobName) && mikeJobs.html.includes("draft"),
+    "Mike sees draft on Jobs list"
   );
 
   await sql`UPDATE jobs SET status = 'upcoming', updated_at = NOW() WHERE id = ${jobId}`;
   await sql`
     INSERT INTO activity_logs (org_id, user_id, job_id, action, entity_type, entity_id, is_client_visible)
-    VALUES (${tenant.id}, ${morganUser.id}, ${jobId}, 'Accepted job request', 'job', ${jobId}, true)
+    VALUES (${tenant.id}, ${mikeUser.id}, ${jobId}, 'Accepted job request', 'job', ${jobId}, true)
   `;
-  const afterAccept = await getHtml(morgan, `/dashboard/jobs/${jobId}`);
+  const afterAccept = await getHtml(mike, `/dashboard/jobs/${jobId}`);
   mark(
     "12",
     afterAccept.html.includes("upcoming") || afterAccept.status === 200,
-    "Morgan accepted draft → upcoming (job detail loads)"
+    "Mike accepted draft → upcoming (job detail loads)"
   );
 
   await sql`
@@ -245,7 +245,7 @@ async function main() {
       (${jobId}, ${tenant.id}, 'Warehouse', '100 Dock St', 0),
       (${jobId}, ${tenant.id}, 'Venue', '200 Festival Ave', 1)
   `;
-  const locPage = await getHtml(morgan, `/dashboard/jobs/${jobId}`);
+  const locPage = await getHtml(mike, `/dashboard/jobs/${jobId}`);
   mark(
     "13",
     locPage.html.includes("Warehouse") && locPage.html.includes("Venue"),
@@ -281,9 +281,9 @@ async function main() {
   await sql`UPDATE job_inventory_lines SET quantity_loaded = quantity_assigned WHERE job_id = ${jobId}`;
   await sql`
     INSERT INTO activity_logs (org_id, user_id, job_id, action, entity_type, entity_id)
-    VALUES (${tenant.id}, ${sam.id}, ${jobId}, 'Updated quantity loaded', 'job_inventory_line', ${barLine})
+    VALUES (${tenant.id}, ${tom.id}, ${jobId}, 'Updated quantity loaded', 'job_inventory_line', ${barLine})
   `;
-  mark("15", true, "Sam loaded all assigned qty");
+  mark("15", true, "Tom loaded all assigned qty");
 
   await sql`
     INSERT INTO job_fleet_assignments (job_id, fleet_vehicle_id, org_id)
@@ -294,33 +294,33 @@ async function main() {
   await sql`
     INSERT INTO job_assignments (job_id, org_id, user_id, phase, assigned_role)
     VALUES
-      (${jobId}, ${tenant.id}, ${sam.id}, 'LoadIn', 'Laborer'),
-      (${jobId}, ${tenant.id}, ${dana.id}, 'LoadOut', 'Driver')
+      (${jobId}, ${tenant.id}, ${tom.id}, 'LoadIn', 'Laborer'),
+      (${jobId}, ${tenant.id}, ${paul.id}, 'LoadOut', 'Driver')
   `;
-  await sql`UPDATE jobs SET job_lead_user_id = ${sam.id} WHERE id = ${jobId}`;
+  await sql`UPDATE jobs SET job_lead_user_id = ${tom.id} WHERE id = ${jobId}`;
   await sql`
     INSERT INTO activity_logs (org_id, user_id, job_id, action, entity_type, entity_id)
-    VALUES (${tenant.id}, ${morganUser.id}, ${jobId}, 'Assigned crew', 'job_assignment', ${jobId})
+    VALUES (${tenant.id}, ${mikeUser.id}, ${jobId}, 'Assigned crew', 'job_assignment', ${jobId})
   `;
-  mark("17", true, "Crew: Sam LoadIn Laborer, Dana LoadOut Driver, lead=Sam");
+  mark("17", true, "Crew: Tom LoadIn Laborer, Paul LoadOut Driver, lead=Tom");
 
   const promoted = await maybePromoteJobToReady({
     orgId: tenant.id,
     jobId,
-    actorUserId: morganUser.id,
+    actorUserId: mikeUser.id,
   });
   const [readyJob] = await sql`SELECT status FROM jobs WHERE id = ${jobId}`;
   mark("18", promoted && readyJob.status === "ready", `Auto-ready → ${readyJob.status}`);
 
-  const danaJar = await login("dana@test.test");
-  const myJobs = await getHtml(danaJar, "/dashboard/my-jobs");
-  const myJob = await getHtml(danaJar, `/dashboard/my-jobs/${jobId}`);
+  const paulJar = await login("paul@test.test");
+  const myJobs = await getHtml(paulJar, "/dashboard/my-jobs");
+  const myJob = await getHtml(paulJar, `/dashboard/my-jobs/${jobId}`);
   mark(
     "19",
     myJobs.html.includes(jobName) &&
       myJob.status === 200 &&
       myJob.html.includes("Loaded"),
-    "Dana My Jobs shows this job and loaded status"
+    "Paul My Jobs shows this job and loaded status"
   );
 
   const { isStorageConfigured, putJobObject, deleteJobObject } = await import(
@@ -346,12 +346,12 @@ async function main() {
         file_name, storage_key, file_size_bytes, mime_type
       )
       VALUES (
-        ${docId}, ${tenant.id}, ${jobId}, ${rep1User.id}, 'client',
+        ${docId}, ${tenant.id}, ${jobId}, ${michaelaUser.id}, 'client',
         ${fileName}, ${stored.storageKey}, ${stored.size}, ${stored.mimeType}
       )
     `;
-    const portalJob = await getHtml(rep1, `/portal/jobs/${jobId}`);
-    const morganJobDoc = await getHtml(morgan, `/dashboard/jobs/${jobId}`);
+    const portalJob = await getHtml(michaela, `/portal/jobs/${jobId}`);
+    const mikeJobDoc = await getHtml(mike, `/dashboard/jobs/${jobId}`);
     mark(
       "20",
       portalJob.html.includes(fileName) &&
@@ -360,8 +360,8 @@ async function main() {
     );
     mark(
       "21",
-      morganJobDoc.html.includes(fileName) && morganJobDoc.html.includes("Open"),
-      "Morgan sees document on internal job detail"
+      mikeJobDoc.html.includes(fileName) && mikeJobDoc.html.includes("Open"),
+      "Mike sees document on internal job detail"
     );
     await sql`DELETE FROM documents WHERE id = ${docId}`;
     await deleteJobObject(stored.storageKey);
@@ -374,12 +374,12 @@ async function main() {
     UPDATE jobs SET status = 'completed', updated_at = NOW() WHERE id = ${jobId}
   `;
   const [done] = await sql`SELECT status FROM jobs WHERE id = ${jobId}`;
-  mark("22", done.status === "completed", "Morgan marked job completed");
+  mark("22", done.status === "completed", "Mike marked job completed");
 
   const otherJob = randomUUID();
   await sql`
     INSERT INTO jobs (id, org_id, client_company_id, name, status, created_by)
-    VALUES (${otherJob}, ${tenant.id}, ${rb.id}, 'Lock release check', 'upcoming', ${morganUser.id})
+    VALUES (${otherJob}, ${tenant.id}, ${rb.id}, 'Lock release check', 'upcoming', ${mikeUser.id})
   `;
   try {
     await assertAssignmentFits({
@@ -394,7 +394,7 @@ async function main() {
     mark("23", false, String(e));
   }
 
-  const activity = await getHtml(morgan, "/dashboard/activity");
+  const activity = await getHtml(mike, "/dashboard/activity");
   mark(
     "24",
     activity.html.includes("Accepted job request") &&
@@ -402,16 +402,16 @@ async function main() {
     "Activity log shows accept + crew actions"
   );
 
-  const otherJobPage = await getHtml(danaJar, `/dashboard/jobs/${otherJob}`);
-  const danaUnassigned = await getHtml(danaJar, `/dashboard/my-jobs/${otherJob}`);
+  const otherJobPage = await getHtml(paulJar, `/dashboard/jobs/${otherJob}`);
+  const paulUnassigned = await getHtml(paulJar, `/dashboard/my-jobs/${otherJob}`);
   mark(
     "F1",
-    danaUnassigned.status === 404 ||
-      danaUnassigned.status === 307 ||
-      danaUnassigned.html.includes("not found") ||
-      !danaUnassigned.html.includes("Lock release check") ||
+    paulUnassigned.status === 404 ||
+      paulUnassigned.status === 307 ||
+      paulUnassigned.html.includes("not found") ||
+      !paulUnassigned.html.includes("Lock release check") ||
       otherJobPage.status === 307,
-    `Dana unassigned job: my-jobs status ${danaUnassigned.status}, jobs status ${otherJobPage.status}`
+    `Paul unassigned job: my-jobs status ${paulUnassigned.status}, jobs status ${otherJobPage.status}`
   );
 
   mark("F2", true, "SKIP: only one client company in seed (Red Bull)");

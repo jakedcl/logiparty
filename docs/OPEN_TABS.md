@@ -44,7 +44,8 @@
 - [x] **A4** Unknown subdomain → apex homepage — middleware checks `organizations.slug` via Neon HTTP; missing org → redirect to `https://logiparty.com` / `http://localhost:3000`. Known tenants + apex/www unchanged.
 - [x] **A6** Client inventory UI polish — dense items table (SKU/Name/Description/Qty/Actions); inline qty + description edit; SKU/name read-only after create; soft SKU normalize (trim, uppercase, `A-Z0-9_-`); “+ Add item” collapsed at bottom. Files: `app/dashboard/client-inventory/page.tsx`, `components/client-inventory/*`, `lib/inventory/sku.ts`, `lib/actions/client-inventory.ts`.
 - [x] **A7** Dashboard UI consistency — same A6 list-first / create-last pattern on: **Our inventory**, **Fleet**, **Jobs**, **Team**, **Clients**, **Availability**, **Activity**. Soft SKU normalize on Our inventory. Job detail / portal / marketing unchanged.
-- [x] **A8** Dev role / persona switcher — Option A quick-login via `signIn("credentials")`; gate `ALLOW_DEV_ROLE_SWITCH=true` + hard deny when `VERCEL_ENV=production`; floating Dev panel; always show name+role in dashboard/portal headers. Personas: OrgAdmin, Morgan, Sam, Dana, Client (rep1). Do **not** enable on Vercel Production.
+- [x] **A8** Dev role / persona switcher — Option A quick-login via `signIn("credentials")`; gate `ALLOW_DEV_ROLE_SWITCH=true` + hard deny when `VERCEL_ENV=production`; floating Dev panel; always show name+role in dashboard/portal headers. Personas: Ed, Mike Oso, Don, Tom, Paul, Michaela. Do **not** enable on Vercel Production.
+- [x] **A9** Seed cast → Jake’s old company (Ed/Mike/Don/Paul/Tom/Rob/Jerome + Michaela/Alex @ Red Bull). Local Neon **dev** re-seeded; prod Neon **main** still old cast until intentional re-seed.
 
 ---
 
@@ -56,7 +57,8 @@
 | **Prod marketing** | https://logiparty.com |
 | **Local marketing** | http://localhost:3000 (unset `NEXT_PUBLIC_DEV_ORG_SLUG`) |
 | **Local tenant** | http://test.localhost:3000 (`.env.local` → Neon **`dev`**) |
-| **Seed manager** | `morgan@test.test` / `password123` |
+| **Seed manager** | `mike@test.test` / `password123` |
+| **Seed OrgAdmin** | `ed@test.test` / `password123` |
 | **Jake admin** | `jakedcl73@gmail.com` (your password) |
 | **AUTH_URL (correct)** | `https://logiparty.com` |
 | **NEXT_PUBLIC_ROOT_DOMAIN** | `logiparty.com` |
