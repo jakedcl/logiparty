@@ -103,7 +103,7 @@
 - [x] **A4** Unknown subdomain → redirect to apex homepage (middleware + Neon slug check)
 - [x] **A6** Client inventory UI polish (dense table; demoted add; soft SKU)
 - [x] **A7** Dashboard UI consistency — list-first tables + collapsed add on Our inventory, Fleet, Jobs, Team, Clients, Availability, Activity; SKU soft-normalize on Our inventory
-- [ ] **A8** Dev role / persona switcher (env-gated; local + never prod customers)
+- [x] **A8** Dev role / persona switcher (`ALLOW_DEV_ROLE_SWITCH`; never Vercel Production; seed quick-login + header identity)
 
 ---
 
