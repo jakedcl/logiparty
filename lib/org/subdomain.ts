@@ -48,6 +48,21 @@ export function buildTenantOrigin(orgSlug: string, port = "3000"): string {
   return `https://${orgSlug}.${root}`;
 }
 
+/** Apex marketing origin (no tenant slug). Local keeps request port when given. */
+export function buildApexOrigin(port = "3000"): string {
+  const root = getRootDomain();
+  if (process.env.NODE_ENV === "development") {
+    return `http://localhost:${port}`;
+  }
+  return `https://${root}`;
+}
+
+/** Port from Host header (`fake.localhost:3000` → `3000`), else default. */
+export function portFromHost(host: string, fallback = "3000"): string {
+  const parts = host.split(":");
+  return parts.length > 1 && parts[1] ? parts[1] : fallback;
+}
+
 /** Prefer slug injected by middleware; fall back to Host / x-forwarded-host. */
 export function getOrgSlugFromHeaders(headersList: Headers): string | null {
   const fromMiddleware = headersList.get("x-org-slug")?.trim();

@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
-import { getOrgSlugFromHost } from "@/lib/org/subdomain";
+import { orgExistsBySlug } from "@/lib/org/exists";
+import {
+  buildApexOrigin,
+  getOrgSlugFromHost,
+  portFromHost,
+} from "@/lib/org/subdomain";
 
 /** Same-host redirect — never bounce to AUTH_URL apex. */
 function redirectPath(request: NextRequest, path: string) {
@@ -12,10 +17,33 @@ function redirectPath(request: NextRequest, path: string) {
   return NextResponse.redirect(url);
 }
 
+/** Unknown tenant subdomain → marketing apex (A4). */
+function redirectToApex(request: NextRequest) {
+  const host = request.headers.get("host") ?? "";
+  const apex = buildApexOrigin(portFromHost(host));
+  return NextResponse.redirect(new URL("/", apex));
+}
+
 export async function middleware(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
   const orgSlug = getOrgSlugFromHost(host);
   const { pathname } = request.nextUrl;
+
+  // A4: host resolved to a slug but no organizations row → apex homepage.
+  // Fail open on DB errors / missing DATABASE_URL so real tenants keep working.
+  // Skip redirect when apex would still resolve to the same slug (e.g. bad
+  // NEXT_PUBLIC_DEV_ORG_SLUG on bare localhost) to avoid a loop.
+  if (orgSlug) {
+    const exists = await orgExistsBySlug(orgSlug);
+    if (exists === false) {
+      const apexHost = new URL(
+        buildApexOrigin(portFromHost(host))
+      ).host;
+      if (getOrgSlugFromHost(apexHost) !== orgSlug) {
+        return redirectToApex(request);
+      }
+    }
+  }
 
   // Auth.js sets `__Secure-authjs.session-token` when useSecureCookies is on.
   // getToken defaults secureCookie=false and looks for the wrong cookie → null
