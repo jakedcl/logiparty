@@ -42,8 +42,7 @@ async function seed() {
   await sql`
     INSERT INTO organizations (slug, name, primary_color, email_from_name, logo_url)
     VALUES
-      ('test', 'TestTenant3PL', ${testPrimaryColor}, 'TestTenant3PL', ${testLogoUrl}),
-      ('demo', 'Demo Warehouse Co', '#059669', 'Demo Warehouse', NULL)
+      ('test', 'TestTenant3PL', ${testPrimaryColor}, 'TestTenant3PL', ${testLogoUrl})
     ON CONFLICT (slug) DO NOTHING
   `;
 
@@ -64,9 +63,16 @@ async function seed() {
     { email: "rob@test.test", first: "Rob", last: "" },
     { email: "jerome@test.test", first: "Jerome", last: "" },
     { email: "michaela@redbull.test", first: "Michaela", last: "" },
-    { email: "alex@redbull.test", first: "Alex", last: "" },
-    { email: "admin@demo.test", first: "Devon", last: "Demo" },
+    { email: "dom@redbull.test", first: "Dom", last: "" },
   ] as const;
+
+  // Migrate superseded second Red Bull user (Alex → Dom) if still present.
+  await sql`
+    UPDATE users
+    SET email = 'dom@redbull.test', first_name = 'Dom', last_name = ''
+    WHERE email = 'alex@redbull.test'
+      AND NOT EXISTS (SELECT 1 FROM users WHERE email = 'dom@redbull.test')
+  `;
 
   for (const p of people) {
     await sql`
@@ -112,24 +118,16 @@ async function seed() {
     ON CONFLICT (org_id, user_id) DO UPDATE SET
       is_org_admin = false, is_manager = false, is_staff = true, is_client = false
   `;
-  // Clients: Michaela + Alex (Red Bull)
+  // Clients: Michaela + Dom (Red Bull)
   await sql`
     INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
     SELECT o.id, u.id, false, false, false, true
     FROM organizations o, users u
     WHERE o.slug = 'test'
-      AND u.email IN ('michaela@redbull.test', 'alex@redbull.test')
+      AND u.email IN ('michaela@redbull.test', 'dom@redbull.test')
     ON CONFLICT (org_id, user_id) DO UPDATE SET
       is_org_admin = false, is_manager = false, is_staff = false, is_client = true
   `;
-  await sql`
-    INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
-    SELECT o.id, u.id, true, true, false, false
-    FROM organizations o, users u
-    WHERE o.slug = 'demo' AND u.email = 'admin@demo.test'
-    ON CONFLICT (org_id, user_id) DO NOTHING
-  `;
-
   // Warehouse: Tom + Rob
   await sql`
     INSERT INTO staff_capability_tags (membership_id, tag)
@@ -171,7 +169,7 @@ async function seed() {
       END
     FROM organizations o
     JOIN client_companies c ON c.org_id = o.id AND c.name = 'Red Bull'
-    JOIN users u ON u.email IN ('michaela@redbull.test', 'alex@redbull.test')
+    JOIN users u ON u.email IN ('michaela@redbull.test', 'dom@redbull.test')
     WHERE o.slug = 'test'
     ON CONFLICT (client_company_id, user_id) DO NOTHING
   `;
@@ -218,7 +216,7 @@ Seed complete. Password for all accounts: password123
     rob@test.test             Staff / warehouse
     jerome@test.test          Staff / driver
     michaela@redbull.test     Client / POC (Red Bull)
-    alex@redbull.test         Client (Red Bull)
+    dom@redbull.test          Client (Red Bull)
 
   demo (http://demo.localhost:3000)
     admin@demo.test           OrgAdmin (for RLS checks)

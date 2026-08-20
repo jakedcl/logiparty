@@ -15,7 +15,7 @@ End-to-end flow the first paying 3PL must complete. QA and agents use this to ve
 | Don | Manager |
 | Tom / Rob | Staff, `warehouse` tag |
 | Paul / Jerome | Staff, `driver` tag |
-| Michaela & Alex | Client users, same `client_company` (Red Bull); Michaela = POC |
+| Michaela & Dom | Client users, same `client_company` (Red Bull); Michaela = POC |
 
 ---
 
@@ -27,7 +27,7 @@ End-to-end flow the first paying 3PL must complete. QA and agents use this to ve
 2. **[ ]** Ed sets white-label: org name "TestTenant3PL", logo, primary color.
 3. **[ ]** Ed invites Mike Oso as Manager (Don also seeded as Manager).
 4. **[ ]** Mike invites Tom/Rob (`warehouse`) and Paul/Jerome (`driver`).
-5. **[ ]** Mike creates client company **Red Bull** and invites two client users with titles (Michaela POC, Alex Rep).
+5. **[ ]** Mike creates client company **Red Bull** and invites two client users with titles (Michaela POC, Dom Rep).
 6. **[ ]** Both client users complete invite and log into portal (org branding only).
 
 ### Catalogs (M2)
@@ -54,7 +54,7 @@ End-to-end flow the first paying 3PL must complete. QA and agents use this to ve
 ### Staff & client (M3 + M4)
 
 19. **[ ]** Paul opens **My Jobs** on phone — sees only this job, can see loaded status.
-20. **[ ]** Alex uploads a PDF permit to the job from mobile.
+20. **[ ]** Dom uploads a PDF permit to the job from mobile.
 21. **[ ]** Mike sees document on internal job detail.
 
 ### Close (M3)

@@ -23,13 +23,14 @@ const SEED_USER_EMAILS = [
   "rob@test.test",
   "jerome@test.test",
   "michaela@redbull.test",
-  "alex@redbull.test",
+  "dom@redbull.test",
   "admin@demo.test",
   // Legacy cast (cleanup on reset)
   "admin@test.test",
   "morgan@test.test",
   "sam@test.test",
   "dana@test.test",
+  "alex@redbull.test",
   "rep1@redbull.test",
   "rep2@redbull.test",
   "admin@testtenant3pl.test",
@@ -90,7 +91,7 @@ async function resetAndSeed() {
   console.log(`Target database: ${target}`);
   console.warn(
     "\n⚠️  If Vercel Production uses the SAME DATABASE_URL hostname as .env.local,\n" +
-      "    this reset affects production too (test/demo jobs and seed data wiped).\n" +
+      "    this reset affects production too (seed orgs/jobs wiped).\n" +
       "    Compare hostnames in Vercel → Settings → Environment Variables before running.\n" +
       "    Use a separate Neon branch for local dev (see docs/STAGING.md).\n"
   );
