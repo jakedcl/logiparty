@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   requestInventoryAdd,
   requestInventoryQtyChange,
@@ -33,6 +34,35 @@ function typeLabel(type: string): string {
   }
 }
 
+function ItemActionsMenu({ itemId }: { itemId: string }) {
+  return (
+    <details className="relative inline-block text-left">
+      <summary
+        className="list-none cursor-pointer select-none rounded px-1.5 py-0.5 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 [&::-webkit-details-marker]:hidden"
+        aria-label="More actions"
+      >
+        <span aria-hidden className="text-base leading-none tracking-tighter">
+          ⋯
+        </span>
+      </summary>
+      <div className="absolute right-0 top-full z-20 mt-1 min-w-[11rem] rounded-md border border-neutral-200 bg-white py-1 shadow-sm">
+        <Link
+          href={`/portal/inventory/requests/new?type=qty_change&itemId=${itemId}`}
+          className="block px-2.5 py-1.5 text-sm text-neutral-800 hover:bg-neutral-50"
+        >
+          Change quantity
+        </Link>
+        <Link
+          href={`/portal/inventory/requests/new?type=remove&itemId=${itemId}`}
+          className="block px-2.5 py-1.5 text-sm text-red-600 hover:bg-red-50"
+        >
+          Remove from storage
+        </Link>
+      </div>
+    </details>
+  );
+}
+
 export function PortalInventoryItemsTable({
   items,
 }: {
@@ -55,7 +85,7 @@ export function PortalInventoryItemsTable({
             <th className="py-2 px-3 font-medium">SKU</th>
             <th className="py-2 px-3 font-medium">Name</th>
             <th className="py-2 px-3 font-medium w-[4.5rem]">Qty</th>
-            <th className="py-2 px-3 font-medium w-[9rem] text-right">
+            <th className="py-2 px-3 font-medium w-[3.5rem] text-right">
               Actions
             </th>
           </tr>
@@ -64,7 +94,7 @@ export function PortalInventoryItemsTable({
           {items.map((item) => (
             <tr
               key={item.id}
-              className="border-b border-neutral-100 last:border-0 align-top hover:bg-neutral-50/80"
+              className="border-b border-neutral-100 last:border-0 hover:bg-neutral-50/80"
             >
               <td className="py-2 px-3 font-mono text-xs text-neutral-700 whitespace-nowrap">
                 {item.sku}
@@ -81,76 +111,7 @@ export function PortalInventoryItemsTable({
                 {item.totalQuantity}
               </td>
               <td className="py-2 px-3 text-right">
-                <details className="group relative inline-block text-left">
-                  <summary className="cursor-pointer list-none text-xs font-medium text-neutral-600 hover:text-neutral-900 [&::-webkit-details-marker]:hidden">
-                    Request ▾
-                  </summary>
-                  <div className="absolute right-0 z-10 mt-1 w-[16rem] rounded-md border border-neutral-200 bg-white p-3 shadow-sm space-y-3">
-                    <form
-                      action={requestInventoryQtyChange}
-                      className="space-y-2"
-                    >
-                      <input type="hidden" name="itemId" value={item.id} />
-                      <p className="text-xs font-medium text-neutral-800">
-                        Qty change
-                      </p>
-                      <label className="block text-xs text-neutral-500">
-                        New quantity
-                        <input
-                          name="quantity"
-                          type="number"
-                          min={0}
-                          required
-                          defaultValue={item.totalQuantity}
-                          className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
-                        />
-                      </label>
-                      <label className="block text-xs text-neutral-500">
-                        Reason
-                        <textarea
-                          name="reason"
-                          required
-                          rows={2}
-                          placeholder="Why change qty?"
-                          className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
-                        />
-                      </label>
-                      <button
-                        type="submit"
-                        className="text-xs font-medium text-neutral-900 hover:underline"
-                      >
-                        Submit qty request
-                      </button>
-                    </form>
-                    <div className="border-t border-neutral-100 pt-2">
-                      <form
-                        action={requestInventoryRemove}
-                        className="space-y-2"
-                      >
-                        <input type="hidden" name="itemId" value={item.id} />
-                        <p className="text-xs font-medium text-neutral-800">
-                          Remove from storage
-                        </p>
-                        <label className="block text-xs text-neutral-500">
-                          Reason
-                          <textarea
-                            name="reason"
-                            required
-                            rows={2}
-                            placeholder="Why remove?"
-                            className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
-                          />
-                        </label>
-                        <button
-                          type="submit"
-                          className="text-xs font-medium text-red-600 hover:underline"
-                        >
-                          Submit remove request
-                        </button>
-                      </form>
-                    </div>
-                  </div>
-                </details>
+                <ItemActionsMenu itemId={item.id} />
               </td>
             </tr>
           ))}
@@ -160,87 +121,225 @@ export function PortalInventoryItemsTable({
   );
 }
 
-export function PortalRequestNewItem() {
+export function PortalRequestNewItemLink() {
   return (
-    <details className="group border-t border-neutral-200 pt-4">
-      <summary className="cursor-pointer list-none text-sm text-neutral-600 hover:text-neutral-900 select-none [&::-webkit-details-marker]:hidden">
-        <span className="inline-flex items-center gap-1.5 font-medium">
-          <span className="text-neutral-400 group-open:hidden" aria-hidden>
-            +
-          </span>
-          <span
-            className="hidden text-neutral-400 group-open:inline"
-            aria-hidden
-          >
-            −
-          </span>
-          Request new item
+    <div className="border-t border-neutral-200 pt-4">
+      <Link
+        href="/portal/inventory/requests/new?type=add"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-neutral-600 hover:text-neutral-900"
+      >
+        <span className="text-neutral-400" aria-hidden>
+          +
         </span>
-      </summary>
-      <div className="mt-3 max-w-xl space-y-3">
-        <p className="text-xs text-neutral-500">
-          Submits a request for warehouse review. The catalog updates after
-          approval.
-        </p>
-        <form action={requestInventoryAdd} className="space-y-3">
-          <div className="grid gap-2 sm:grid-cols-2">
-            <label className="text-xs text-neutral-500">
-              SKU
-              <input
-                name="sku"
-                required
-                placeholder="RB-NEW-01"
-                className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm font-mono"
-              />
-            </label>
-            <label className="text-xs text-neutral-500">
-              Quantity
-              <input
-                name="quantity"
-                type="number"
-                min={0}
-                required
-                defaultValue={1}
-                className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
-              />
-            </label>
-          </div>
-          <label className="block text-xs text-neutral-500">
-            Name
+        Request new item
+      </Link>
+    </div>
+  );
+}
+
+const fieldClass =
+  "mt-1 w-full border border-neutral-200 rounded-md px-3 py-2 text-sm bg-white";
+const labelClass = "block text-xs font-medium text-neutral-500";
+const readonlyClass =
+  "mt-1 text-sm text-neutral-900 border border-transparent rounded-md px-0 py-1";
+
+export function PortalInventoryRequestForm({
+  type,
+  item,
+}: {
+  type: "add" | "qty_change" | "remove";
+  item?: Pick<
+    ClientInventoryItem,
+    "id" | "sku" | "name" | "totalQuantity" | "description"
+  > | null;
+}) {
+  if (type === "add") {
+    return (
+      <form action={requestInventoryAdd} className="space-y-5 max-w-lg">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <label className={labelClass}>
+            SKU
             <input
-              name="name"
+              name="sku"
               required
-              placeholder="Item name"
-              className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
+              placeholder="RB-NEW-01"
+              className={`${fieldClass} font-mono`}
             />
           </label>
-          <label className="block text-xs text-neutral-500">
-            Description
+          <label className={labelClass}>
+            Quantity
             <input
-              name="description"
-              placeholder="Optional"
-              className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
-            />
-          </label>
-          <label className="block text-xs text-neutral-500">
-            Reason
-            <textarea
-              name="reason"
+              name="quantity"
+              type="number"
+              min={0}
               required
-              rows={2}
-              placeholder="Why add this item?"
-              className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
+              defaultValue={1}
+              className={fieldClass}
             />
           </label>
-          <button
-            type="submit"
-            className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white"
-          >
-            Submit request
-          </button>
-        </form>
+        </div>
+        <label className={labelClass}>
+          Name
+          <input
+            name="name"
+            required
+            placeholder="Item name"
+            className={fieldClass}
+          />
+        </label>
+        <label className={labelClass}>
+          Description
+          <input
+            name="description"
+            placeholder="Optional"
+            className={fieldClass}
+          />
+        </label>
+        <label className={labelClass}>
+          Reason
+          <textarea
+            name="reason"
+            required
+            rows={3}
+            placeholder="Why add this item?"
+            className={fieldClass}
+          />
+        </label>
+        <FormActions />
+      </form>
+    );
+  }
+
+  if (!item) {
+    return (
+      <p className="text-sm text-neutral-500">
+        Item not found.{" "}
+        <Link href="/portal/inventory" className="underline">
+          Back to inventory
+        </Link>
+      </p>
+    );
+  }
+
+  if (type === "qty_change") {
+    return (
+      <form action={requestInventoryQtyChange} className="space-y-5 max-w-lg">
+        <input type="hidden" name="itemId" value={item.id} />
+        <ItemReadonlyFields item={item} />
+        <label className={labelClass}>
+          New quantity
+          <input
+            name="quantity"
+            type="number"
+            min={0}
+            required
+            defaultValue={item.totalQuantity}
+            className={fieldClass}
+          />
+        </label>
+        <label className={labelClass}>
+          Reason
+          <textarea
+            name="reason"
+            required
+            rows={3}
+            placeholder="Why change the quantity?"
+            className={fieldClass}
+          />
+        </label>
+        <FormActions />
+      </form>
+    );
+  }
+
+  return (
+    <form action={requestInventoryRemove} className="space-y-5 max-w-lg">
+      <input type="hidden" name="itemId" value={item.id} />
+      <ItemReadonlyFields item={item} />
+      <p className="text-sm text-neutral-600 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+        This asks the warehouse to remove{" "}
+        <span className="font-medium text-neutral-900">{item.name}</span> from
+        storage. Nothing changes until they approve.
+      </p>
+      <label className={labelClass}>
+        Reason
+        <textarea
+          name="reason"
+          required
+          rows={3}
+          placeholder="Why remove this item?"
+          className={fieldClass}
+        />
+      </label>
+      <FormActions submitLabel="Submit remove request" danger />
+    </form>
+  );
+}
+
+function ItemReadonlyFields({
+  item,
+}: {
+  item: Pick<
+    ClientInventoryItem,
+    "sku" | "name" | "totalQuantity" | "description"
+  >;
+}) {
+  return (
+    <div className="space-y-3 rounded-md border border-neutral-200 bg-neutral-50 px-4 py-3">
+      <div>
+        <p className={labelClass}>Name</p>
+        <p className={readonlyClass}>{item.name}</p>
       </div>
-    </details>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <p className={labelClass}>SKU</p>
+          <p className={`${readonlyClass} font-mono text-xs`}>{item.sku}</p>
+        </div>
+        <div>
+          <p className={labelClass}>Current quantity</p>
+          <p className={`${readonlyClass} tabular-nums`}>
+            {item.totalQuantity}
+          </p>
+        </div>
+      </div>
+      {item.description ? (
+        <div>
+          <p className={labelClass}>Description</p>
+          <p className={`${readonlyClass} text-neutral-600`}>
+            {item.description}
+          </p>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function FormActions({
+  submitLabel = "Submit request",
+  danger = false,
+}: {
+  submitLabel?: string;
+  danger?: boolean;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-3 pt-1">
+      <button
+        type="submit"
+        className={`rounded-md px-4 py-2 text-sm font-medium text-white ${
+          danger
+            ? "bg-red-600 hover:bg-red-700"
+            : "bg-neutral-900 hover:bg-neutral-800"
+        }`}
+      >
+        {submitLabel}
+      </button>
+      <Link
+        href="/portal/inventory"
+        className="text-sm text-neutral-500 hover:text-neutral-800"
+      >
+        Cancel
+      </Link>
+    </div>
   );
 }
 

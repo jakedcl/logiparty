@@ -3,6 +3,7 @@
 import { randomUUID } from "crypto";
 import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
 import { canManageClientInventory } from "@/lib/auth/permissions";
 import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
@@ -181,6 +182,7 @@ async function loadPendingRequest(orgId: string, id: string) {
 
 function revalidateInventoryPaths(clientCompanyId: string) {
   revalidatePath("/portal/inventory");
+  revalidatePath("/portal/inventory/requests/new");
   revalidatePath("/portal");
   revalidatePath("/dashboard/notifications");
   revalidatePath("/dashboard/client-inventory");
@@ -280,6 +282,7 @@ export async function requestInventoryAdd(formData: FormData) {
   ]);
 
   revalidateInventoryPaths(company.id);
+  redirect("/portal/inventory");
 }
 
 export async function requestInventoryQtyChange(formData: FormData) {
@@ -341,6 +344,7 @@ export async function requestInventoryQtyChange(formData: FormData) {
   ]);
 
   revalidateInventoryPaths(company.id);
+  redirect("/portal/inventory");
 }
 
 export async function requestInventoryRemove(formData: FormData) {
@@ -400,6 +404,7 @@ export async function requestInventoryRemove(formData: FormData) {
   ]);
 
   revalidateInventoryPaths(company.id);
+  redirect("/portal/inventory");
 }
 
 export async function approveInventoryRequest(formData: FormData) {

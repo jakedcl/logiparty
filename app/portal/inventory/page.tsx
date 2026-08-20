@@ -5,7 +5,7 @@ import { listPortalInventoryRequests } from "@/lib/actions/inventory-requests";
 import {
   PortalInventoryItemsTable,
   PortalInventoryRequestsList,
-  PortalRequestNewItem,
+  PortalRequestNewItemLink,
 } from "@/components/portal/inventory-requests";
 import { getSessionClientCompany, requireSession } from "@/lib/org/context";
 
@@ -46,7 +46,7 @@ export default async function PortalInventoryPage() {
               </span>
             </h2>
             <PortalInventoryItemsTable items={items} />
-            <PortalRequestNewItem />
+            <PortalRequestNewItemLink />
           </section>
 
           <section className="space-y-3">
