@@ -35,8 +35,12 @@ Set `NEXT_PUBLIC_DEV_ORG_SLUG=nydac` as the primary local tenant (or leave unset
 | `mike@test.test` | Manager (Mike Oso) |
 | `tom@test.test` | Staff (warehouse) |
 | `paul@test.test` | Staff (driver) |
-| `michaela@redbull.test` | Client portal (POC) |
-| `dom@redbull.test` | Client portal |
+| `michaela@redbull.test` | Client portal (POC · Red Bull) |
+| `dom@redbull.test` | Client portal (Red Bull) |
+| `sara@monster.nydac.test` | Client portal (POC · Monster Energy) |
+| `maya@gothamglow.test` | Client portal (POC · Gotham Glow) |
+
+NYDAC also has a **rich warehouse seed** (multi-client inventory, fleet, 6 jobs across draft → completed). Sample jobs: Holiday Window Concept · Summer Pop-Up · Monster Times Square · Brooklyn Mirage · Gotham Fashion Week · Pier 17 Wrap.
 
 **test** — Acme Event Logistics playground (`http://test.localhost:3000`)
 

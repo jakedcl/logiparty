@@ -3,9 +3,12 @@
  * Safe to re-run: uses ON CONFLICT / existence checks.
  *
  * Creates THREE fully populated tenants:
- *   - nydac  → New York Design and Construction (Jake's cast + Red Bull)
+ *   - nydac  → New York Design and Construction (Jake's cast + rich warehouse)
  *   - test   → Acme Event Logistics (playground cast + Monster)
  *   - axis   → Axis Global Staging (generic cast + Volt Energy)
+ *
+ * After base orgs, seedNydacRich() beefs up nydac only (extra clients,
+ * inventory, fleet, multi-status jobs, crew, activity).
  *
  * users.email is globally unique — casts use different emails.
  */
@@ -389,6 +392,1074 @@ async function seedOrg(sql: Sql, org: SeedOrg, passwordHash: string) {
   `;
 }
 
+/** Extra NYDAC client portal users (emails unique vs test/axis casts). */
+const NYDAC_EXTRA_PEOPLE: readonly SeedPerson[] = [
+  { email: "sara@monster.nydac.test", first: "Sara", last: "Chen" },
+  { email: "lee@monster.nydac.test", first: "Lee", last: "Park" },
+  { email: "maya@gothamglow.test", first: "Maya", last: "Ruiz" },
+  { email: "nick@gothamglow.test", first: "Nick", last: "Bell" },
+];
+
+const NYDAC_WAREHOUSE = "88 Bushwick Ave, Brooklyn, NY 11211";
+
+type RichInvItem = {
+  sku: string;
+  name: string;
+  qty: number;
+  description?: string;
+};
+
+type RichFleet = {
+  name: string;
+  plate: string;
+  description?: string;
+  isActive?: boolean;
+};
+
+type RichJobLine = {
+  itemType: "client" | "org";
+  sku: string;
+  quantityAssigned: number;
+  quantityLoaded: number;
+};
+
+type RichCrew = {
+  email: string;
+  phase: "LoadIn" | "LoadOut";
+  role: "Driver" | "Laborer" | "Lead";
+};
+
+type RichJob = {
+  name: string;
+  clientCompany: string;
+  status: "draft" | "upcoming" | "ready" | "completed";
+  pocName: string;
+  pocPhone?: string;
+  leadEmail: string;
+  notes?: string;
+  /** Relative day offsets from NOW for scheduling. */
+  timing: {
+    jobStartDays: number;
+    jobEndDays: number;
+    loadInStartDays?: number;
+    loadInEndDays?: number;
+    loadOutStartDays?: number;
+    loadOutEndDays?: number;
+  };
+  locations: { label: string; address: string }[];
+  inventory: RichJobLine[];
+  fleetNames: string[];
+  crew: RichCrew[];
+};
+
+async function ensureClientCompany(sql: Sql, companyName: string) {
+  await sql`
+    INSERT INTO client_companies (org_id, name)
+    SELECT o.id, ${companyName}
+    FROM organizations o
+    WHERE o.slug = 'nydac'
+      AND NOT EXISTS (
+        SELECT 1 FROM client_companies c
+        WHERE c.org_id = o.id AND c.name = ${companyName}
+      )
+  `;
+}
+
+async function ensureClientItems(
+  sql: Sql,
+  companyName: string,
+  items: readonly RichInvItem[]
+) {
+  for (const item of items) {
+    await sql`
+      INSERT INTO client_inventory_items (
+        org_id, client_company_id, sku, name, description, total_quantity
+      )
+      SELECT o.id, c.id, ${item.sku}, ${item.name}, ${item.description ?? null}, ${item.qty}
+      FROM organizations o
+      JOIN client_companies c ON c.org_id = o.id AND c.name = ${companyName}
+      WHERE o.slug = 'nydac'
+        AND NOT EXISTS (
+          SELECT 1 FROM client_inventory_items i
+          WHERE i.org_id = o.id AND i.sku = ${item.sku}
+        )
+    `;
+    await sql`
+      UPDATE client_inventory_items i
+      SET
+        name = ${item.name},
+        description = ${item.description ?? null},
+        total_quantity = ${item.qty}
+      FROM organizations o
+      WHERE o.slug = 'nydac'
+        AND i.org_id = o.id
+        AND i.sku = ${item.sku}
+    `;
+  }
+}
+
+async function ensureOrgItems(sql: Sql, items: readonly RichInvItem[]) {
+  for (const item of items) {
+    await sql`
+      INSERT INTO inventory_items (org_id, sku, name, description, total_quantity)
+      SELECT o.id, ${item.sku}, ${item.name}, ${item.description ?? null}, ${item.qty}
+      FROM organizations o
+      WHERE o.slug = 'nydac'
+        AND NOT EXISTS (
+          SELECT 1 FROM inventory_items i
+          WHERE i.org_id = o.id AND i.sku = ${item.sku}
+        )
+    `;
+    await sql`
+      UPDATE inventory_items i
+      SET
+        name = ${item.name},
+        description = ${item.description ?? null},
+        total_quantity = ${item.qty}
+      FROM organizations o
+      WHERE o.slug = 'nydac'
+        AND i.org_id = o.id
+        AND i.sku = ${item.sku}
+    `;
+  }
+}
+
+async function ensureFleetVehicles(sql: Sql, vehicles: readonly RichFleet[]) {
+  for (const v of vehicles) {
+    const active = v.isActive !== false;
+    await sql`
+      INSERT INTO fleet_vehicles (org_id, name, plate, description, is_active)
+      SELECT o.id, ${v.name}, ${v.plate}, ${v.description ?? null}, ${active}
+      FROM organizations o
+      WHERE o.slug = 'nydac'
+        AND NOT EXISTS (
+          SELECT 1 FROM fleet_vehicles f
+          WHERE f.org_id = o.id AND f.name = ${v.name}
+        )
+    `;
+    await sql`
+      UPDATE fleet_vehicles f
+      SET
+        plate = ${v.plate},
+        description = ${v.description ?? null},
+        is_active = ${active}
+      FROM organizations o
+      WHERE o.slug = 'nydac'
+        AND f.org_id = o.id
+        AND f.name = ${v.name}
+    `;
+  }
+}
+
+function daysFromNow(days: number): Date {
+  return new Date(Date.now() + days * 24 * 60 * 60 * 1000);
+}
+
+function optionalDays(days: number | undefined): Date | null {
+  return days === undefined ? null : daysFromNow(days);
+}
+
+async function ensureJobShell(sql: Sql, job: RichJob) {
+  const t = job.timing;
+  const jobStart = daysFromNow(t.jobStartDays);
+  const jobEnd = daysFromNow(t.jobEndDays);
+  const loadInStart = optionalDays(t.loadInStartDays);
+  const loadInEnd = optionalDays(t.loadInEndDays);
+  const loadOutStart = optionalDays(t.loadOutStartDays);
+  const loadOutEnd = optionalDays(t.loadOutEndDays);
+
+  await sql`
+    INSERT INTO jobs (
+      org_id, client_company_id, name, status,
+      job_start, job_end,
+      load_in_start, load_in_end, load_out_start, load_out_end,
+      client_poc_name, client_poc_phone, job_lead_user_id, notes, created_by
+    )
+    SELECT
+      o.id,
+      c.id,
+      ${job.name},
+      ${job.status},
+      ${jobStart},
+      ${jobEnd},
+      ${loadInStart},
+      ${loadInEnd},
+      ${loadOutStart},
+      ${loadOutEnd},
+      ${job.pocName},
+      ${job.pocPhone ?? null},
+      lead.id,
+      ${job.notes ?? null},
+      ed.id
+    FROM organizations o
+    JOIN client_companies c ON c.org_id = o.id AND c.name = ${job.clientCompany}
+    JOIN users ed ON ed.email = 'ed@test.test'
+    JOIN users lead ON lead.email = ${job.leadEmail}
+    WHERE o.slug = 'nydac'
+      AND NOT EXISTS (
+        SELECT 1 FROM jobs j WHERE j.org_id = o.id AND j.name = ${job.name}
+      )
+  `;
+
+  // Refresh schedule / status / lead on re-seed so dates stay relative to NOW.
+  await sql`
+    UPDATE jobs j
+    SET
+      status = ${job.status},
+      job_start = ${jobStart},
+      job_end = ${jobEnd},
+      load_in_start = ${loadInStart},
+      load_in_end = ${loadInEnd},
+      load_out_start = ${loadOutStart},
+      load_out_end = ${loadOutEnd},
+      client_poc_name = ${job.pocName},
+      client_poc_phone = ${job.pocPhone ?? null},
+      job_lead_user_id = lead.id,
+      notes = ${job.notes ?? null},
+      updated_at = NOW()
+    FROM organizations o, users lead
+    WHERE o.slug = 'nydac'
+      AND j.org_id = o.id
+      AND j.name = ${job.name}
+      AND lead.email = ${job.leadEmail}
+  `;
+}
+
+async function ensureJobLocations(
+  sql: Sql,
+  jobName: string,
+  locations: { label: string; address: string }[]
+) {
+  // Replace locations so sort_order stays unique vs thin base-seed rows.
+  await sql`
+    DELETE FROM job_locations jl
+    USING jobs j, organizations o
+    WHERE jl.job_id = j.id
+      AND j.org_id = o.id
+      AND o.slug = 'nydac'
+      AND j.name = ${jobName}
+  `;
+
+  let sort = 0;
+  for (const loc of locations) {
+    await sql`
+      INSERT INTO job_locations (job_id, org_id, label, address, sort_order)
+      SELECT j.id, j.org_id, ${loc.label}, ${loc.address}, ${sort}
+      FROM jobs j
+      JOIN organizations o ON o.id = j.org_id
+      WHERE o.slug = 'nydac' AND j.name = ${jobName}
+    `;
+    sort += 1;
+  }
+}
+
+async function ensureJobInventory(sql: Sql, jobName: string, lines: RichJobLine[]) {
+  for (const line of lines) {
+    if (line.itemType === "client") {
+      await sql`
+        INSERT INTO job_inventory_lines (
+          job_id, org_id, item_type, client_item_id, org_item_id,
+          quantity_assigned, quantity_loaded
+        )
+        SELECT
+          j.id, j.org_id, 'client', ci.id, NULL,
+          ${line.quantityAssigned}, ${line.quantityLoaded}
+        FROM jobs j
+        JOIN organizations o ON o.id = j.org_id
+        JOIN client_inventory_items ci ON ci.org_id = o.id AND ci.sku = ${line.sku}
+        WHERE o.slug = 'nydac' AND j.name = ${jobName}
+          AND NOT EXISTS (
+            SELECT 1 FROM job_inventory_lines l
+            WHERE l.job_id = j.id AND l.client_item_id = ci.id
+          )
+      `;
+      await sql`
+        UPDATE job_inventory_lines l
+        SET
+          quantity_assigned = ${line.quantityAssigned},
+          quantity_loaded = ${line.quantityLoaded}
+        FROM jobs j
+        JOIN organizations o ON o.id = j.org_id
+        JOIN client_inventory_items ci ON ci.org_id = o.id AND ci.sku = ${line.sku}
+        WHERE o.slug = 'nydac'
+          AND j.name = ${jobName}
+          AND l.job_id = j.id
+          AND l.client_item_id = ci.id
+      `;
+    } else {
+      await sql`
+        INSERT INTO job_inventory_lines (
+          job_id, org_id, item_type, client_item_id, org_item_id,
+          quantity_assigned, quantity_loaded
+        )
+        SELECT
+          j.id, j.org_id, 'org', NULL, oi.id,
+          ${line.quantityAssigned}, ${line.quantityLoaded}
+        FROM jobs j
+        JOIN organizations o ON o.id = j.org_id
+        JOIN inventory_items oi ON oi.org_id = o.id AND oi.sku = ${line.sku}
+        WHERE o.slug = 'nydac' AND j.name = ${jobName}
+          AND NOT EXISTS (
+            SELECT 1 FROM job_inventory_lines l
+            WHERE l.job_id = j.id AND l.org_item_id = oi.id
+          )
+      `;
+      await sql`
+        UPDATE job_inventory_lines l
+        SET
+          quantity_assigned = ${line.quantityAssigned},
+          quantity_loaded = ${line.quantityLoaded}
+        FROM jobs j
+        JOIN organizations o ON o.id = j.org_id
+        JOIN inventory_items oi ON oi.org_id = o.id AND oi.sku = ${line.sku}
+        WHERE o.slug = 'nydac'
+          AND j.name = ${jobName}
+          AND l.job_id = j.id
+          AND l.org_item_id = oi.id
+      `;
+    }
+  }
+}
+
+async function ensureJobFleet(sql: Sql, jobName: string, fleetNames: string[]) {
+  for (const name of fleetNames) {
+    await sql`
+      INSERT INTO job_fleet_assignments (job_id, fleet_vehicle_id, org_id)
+      SELECT j.id, f.id, j.org_id
+      FROM jobs j
+      JOIN organizations o ON o.id = j.org_id
+      JOIN fleet_vehicles f ON f.org_id = o.id AND f.name = ${name}
+      WHERE o.slug = 'nydac' AND j.name = ${jobName}
+      ON CONFLICT DO NOTHING
+    `;
+  }
+}
+
+async function ensureJobCrew(sql: Sql, jobName: string, crew: RichCrew[]) {
+  for (const c of crew) {
+    await sql`
+      INSERT INTO job_assignments (job_id, org_id, user_id, phase, assigned_role)
+      SELECT j.id, j.org_id, u.id, ${c.phase}, ${c.role}
+      FROM jobs j
+      JOIN organizations o ON o.id = j.org_id
+      JOIN users u ON u.email = ${c.email}
+      WHERE o.slug = 'nydac' AND j.name = ${jobName}
+      ON CONFLICT (job_id, user_id, phase) DO UPDATE SET
+        assigned_role = EXCLUDED.assigned_role
+    `;
+  }
+}
+
+async function ensureActivity(
+  sql: Sql,
+  jobName: string,
+  actorEmail: string,
+  action: string,
+  entityType: string,
+  isClientVisible = false
+) {
+  await sql`
+    INSERT INTO activity_logs (
+      org_id, job_id, user_id, action, entity_type, entity_id,
+      metadata, is_client_visible
+    )
+    SELECT
+      j.org_id, j.id, u.id, ${action}, ${entityType}, j.id,
+      '{}'::jsonb, ${isClientVisible}
+    FROM jobs j
+    JOIN organizations o ON o.id = j.org_id
+    JOIN users u ON u.email = ${actorEmail}
+    WHERE o.slug = 'nydac' AND j.name = ${jobName}
+      AND NOT EXISTS (
+        SELECT 1 FROM activity_logs a
+        WHERE a.job_id = j.id AND a.action = ${action} AND a.user_id = u.id
+      )
+  `;
+}
+
+/**
+ * Beefy NYDAC warehouse — extra clients, catalogs, fleet, multi-status jobs.
+ * Idempotent; safe after base seedOrg('nydac').
+ */
+async function seedNydacRich(sql: Sql, passwordHash: string) {
+  await upsertPeople(sql, NYDAC_EXTRA_PEOPLE, passwordHash);
+
+  // Client memberships for Monster + Gotham Glow
+  const extraClientEmails = NYDAC_EXTRA_PEOPLE.map((p) => p.email);
+  await sql`
+    INSERT INTO org_memberships (org_id, user_id, is_org_admin, is_manager, is_staff, is_client)
+    SELECT o.id, u.id, false, false, false, true
+    FROM organizations o, users u
+    WHERE o.slug = 'nydac' AND u.email = ANY(${extraClientEmails})
+    ON CONFLICT (org_id, user_id) DO UPDATE SET
+      is_org_admin = false, is_manager = false, is_staff = false, is_client = true
+  `;
+
+  await ensureClientCompany(sql, "Monster Energy");
+  await ensureClientCompany(sql, "Gotham Glow");
+
+  for (const email of ["sara@monster.nydac.test", "lee@monster.nydac.test"]) {
+    const title = email.startsWith("sara") ? "POC" : "Rep";
+    await sql`
+      INSERT INTO client_users (org_id, client_company_id, user_id, title)
+      SELECT o.id, c.id, u.id, ${title}
+      FROM organizations o
+      JOIN client_companies c ON c.org_id = o.id AND c.name = 'Monster Energy'
+      JOIN users u ON u.email = ${email}
+      WHERE o.slug = 'nydac'
+      ON CONFLICT (client_company_id, user_id) DO NOTHING
+    `;
+  }
+  for (const email of ["maya@gothamglow.test", "nick@gothamglow.test"]) {
+    const title = email.startsWith("maya") ? "POC" : "Rep";
+    await sql`
+      INSERT INTO client_users (org_id, client_company_id, user_id, title)
+      SELECT o.id, c.id, u.id, ${title}
+      FROM organizations o
+      JOIN client_companies c ON c.org_id = o.id AND c.name = 'Gotham Glow'
+      JOIN users u ON u.email = ${email}
+      WHERE o.slug = 'nydac'
+      ON CONFLICT (client_company_id, user_id) DO NOTHING
+    `;
+  }
+
+  // —— Client inventory (many SKUs) ——
+  await ensureClientItems(sql, "Red Bull", [
+    {
+      sku: "RB-BAR-01",
+      name: "Branded Bar",
+      qty: 14,
+      description: "Red Bull wing-branded portable bar",
+    },
+    {
+      sku: "RB-COOLER-24",
+      name: "Can Cooler 24qt",
+      qty: 48,
+      description: "Rolling cooler for cans",
+    },
+    {
+      sku: "RB-BANNER-10",
+      name: "Backdrop Banner 10ft",
+      qty: 12,
+      description: "Tension fabric backdrop",
+    },
+    {
+      sku: "RB-CASE-SLEEVE",
+      name: "Case Sleeve Display",
+      qty: 60,
+      description: "Floor case wraps",
+    },
+    {
+      sku: "RB-LOUNGE-SOFA",
+      name: "Lounge Sofa Module",
+      qty: 8,
+      description: "Modular lounge seating",
+    },
+    {
+      sku: "RB-HIGHBOY",
+      name: "Highboy Table",
+      qty: 20,
+      description: "Branded cocktail highboy",
+    },
+    {
+      sku: "RB-LED-CUBE",
+      name: "LED Cube Seat",
+      qty: 24,
+      description: "Illuminated cube seating",
+    },
+  ]);
+
+  await ensureClientItems(sql, "Monster Energy", [
+    {
+      sku: "MN-TENT-10",
+      name: "Claw Tent 10x10",
+      qty: 10,
+      description: "Pop-up branded tent",
+    },
+    {
+      sku: "MN-COOLER-ROLL",
+      name: "Rolling Cooler",
+      qty: 30,
+      description: "Monster claw cooler",
+    },
+    {
+      sku: "MN-BANNER-WALL",
+      name: "Media Wall Banner",
+      qty: 6,
+      description: "8ft media wall",
+    },
+    {
+      sku: "MN-BAR-CART",
+      name: "Activation Bar Cart",
+      qty: 4,
+      description: "Mobile pour cart",
+    },
+    {
+      sku: "MN-CASE-PALLET",
+      name: "Case Pallet Wrap Kit",
+      qty: 40,
+      description: "Pallet wrap + headers",
+    },
+    {
+      sku: "MN-STOOL",
+      name: "Branded Stool",
+      qty: 36,
+      description: "Black claw stools",
+    },
+  ]);
+
+  await ensureClientItems(sql, "Gotham Glow", [
+    {
+      sku: "GG-MIRROR-PANEL",
+      name: "Mirror Panel 4x8",
+      qty: 16,
+      description: "Fashion mirror wall panel",
+    },
+    {
+      sku: "GG-RUNWAY-RISER",
+      name: "Runway Riser Section",
+      qty: 12,
+      description: "4ft runway deck section",
+    },
+    {
+      sku: "GG-VANITY-CART",
+      name: "Vanity Cart",
+      qty: 6,
+      description: "Backstage vanity with lights",
+    },
+    {
+      sku: "GG-BANNER-SILK",
+      name: "Silk Drop Banner",
+      qty: 10,
+      description: "Floor-to-ceiling silk",
+    },
+    {
+      sku: "GG-LOUNGE-CHAIR",
+      name: "Velvet Lounge Chair",
+      qty: 18,
+      description: "VIP lounge seating",
+    },
+    {
+      sku: "GG-PED-CASE",
+      name: "Pedestal Display Case",
+      qty: 14,
+      description: "Product pedestal + acrylic",
+    },
+  ]);
+
+  // —— Our inventory ——
+  await ensureOrgItems(sql, [
+    {
+      sku: "DOLLY-01",
+      name: "Dolly",
+      qty: 40,
+      description: "Standard warehouse dolly",
+    },
+    {
+      sku: "RAMP-ALUM-01",
+      name: "Aluminum Load Ramp",
+      qty: 8,
+      description: "Folding aluminum ramp",
+    },
+    {
+      sku: "TABLE-FOLD-6",
+      name: "Folding Table 6ft",
+      qty: 30,
+      description: "Banquet folding table",
+    },
+    {
+      sku: "CABLE-RAMP-3",
+      name: "Cable Ramp 3-Channel",
+      qty: 24,
+      description: "Floor cable protector",
+    },
+    {
+      sku: "HANDTRUCK-01",
+      name: "Hand Truck",
+      qty: 18,
+      description: "Two-wheel hand truck",
+    },
+    {
+      sku: "PALLET-JACK-01",
+      name: "Pallet Jack",
+      qty: 6,
+      description: "Manual pallet jack",
+    },
+    {
+      sku: "STRAP-RATCHET",
+      name: "Ratchet Strap Pack",
+      qty: 50,
+      description: "Pack of 4 straps",
+    },
+    {
+      sku: "CONE-TRAFFIC",
+      name: "Traffic Cone",
+      qty: 40,
+      description: "28in safety cone",
+    },
+    {
+      sku: "BLANKET-MOVE",
+      name: "Moving Blanket",
+      qty: 60,
+      description: "Furniture pad",
+    },
+    {
+      sku: "CART-UTILITY",
+      name: "Utility Cart",
+      qty: 12,
+      description: "3-shelf utility cart",
+    },
+  ]);
+
+  // —— Fleet ——
+  await ensureFleetVehicles(sql, [
+    {
+      name: "Box Truck 12",
+      plate: "NYD-012",
+      description: "26ft box truck",
+      isActive: true,
+    },
+    {
+      name: "Box Truck 18",
+      plate: "NYD-018",
+      description: "26ft box with liftgate",
+      isActive: true,
+    },
+    {
+      name: "Cargo Van 4",
+      plate: "NYD-004",
+      description: "High-roof cargo van",
+      isActive: true,
+    },
+    {
+      name: "Sprinter 7",
+      plate: "NYD-007",
+      description: "Mercedes Sprinter crew van",
+      isActive: true,
+    },
+    {
+      name: "Box Truck 22",
+      plate: "NYD-022",
+      description: "Spare / shop truck",
+      isActive: false,
+    },
+  ]);
+
+  // —— Jobs across statuses ——
+  const jobs: RichJob[] = [
+    {
+      name: "Red Bull Holiday Window Concept",
+      clientCompany: "Red Bull",
+      status: "draft",
+      pocName: "Michaela",
+      pocPhone: "212-555-0101",
+      leadEmail: "mike@test.test",
+      notes: "Client still finalizing window set. Do not book fleet yet.",
+      timing: {
+        jobStartDays: 28,
+        jobEndDays: 30,
+      },
+      locations: [
+        { label: "Warehouse", address: NYDAC_WAREHOUSE },
+        {
+          label: "Venue",
+          address: "5th Ave & 57th St, New York, NY (window concept TBD)",
+        },
+      ],
+      inventory: [
+        {
+          itemType: "client",
+          sku: "RB-BANNER-10",
+          quantityAssigned: 2,
+          quantityLoaded: 0,
+        },
+      ],
+      fleetNames: [],
+      crew: [],
+    },
+    {
+      // Base seed already creates this as upcoming — enrich to partial assign.
+      name: "Red Bull Summer Pop-Up",
+      clientCompany: "Red Bull",
+      status: "upcoming",
+      pocName: "Michaela",
+      pocPhone: "212-555-0101",
+      leadEmail: "mike@test.test",
+      notes: "Partial assign — still waiting on LoadOut labor + cooler count.",
+      timing: {
+        jobStartDays: 7,
+        jobEndDays: 8,
+        loadInStartDays: 6,
+        loadInEndDays: 7,
+        loadOutStartDays: 8,
+        loadOutEndDays: 9,
+      },
+      locations: [
+        { label: "Warehouse", address: NYDAC_WAREHOUSE },
+        { label: "Load-in", address: "200 Pier 17, New York, NY" },
+      ],
+      inventory: [
+        {
+          itemType: "client",
+          sku: "RB-BAR-01",
+          quantityAssigned: 4,
+          quantityLoaded: 2,
+        },
+        {
+          itemType: "client",
+          sku: "RB-COOLER-24",
+          quantityAssigned: 12,
+          quantityLoaded: 0,
+        },
+        {
+          itemType: "org",
+          sku: "DOLLY-01",
+          quantityAssigned: 6,
+          quantityLoaded: 6,
+        },
+      ],
+      fleetNames: ["Cargo Van 4"],
+      crew: [
+        { email: "mike@test.test", phase: "LoadIn", role: "Lead" },
+        { email: "paul@test.test", phase: "LoadIn", role: "Driver" },
+        { email: "tom@test.test", phase: "LoadIn", role: "Laborer" },
+        // Missing LoadOut → stays upcoming (auto-ready incomplete)
+      ],
+    },
+    {
+      name: "Monster Times Square Takeover",
+      clientCompany: "Monster Energy",
+      status: "upcoming",
+      pocName: "Sara Chen",
+      pocPhone: "646-555-0199",
+      leadEmail: "don@test.test",
+      notes: "Inventory assigned; fleet TBD. Sara wants claw tents front-and-center.",
+      timing: {
+        jobStartDays: 12,
+        jobEndDays: 13,
+        loadInStartDays: 11,
+        loadInEndDays: 12,
+        loadOutStartDays: 13,
+        loadOutEndDays: 14,
+      },
+      locations: [
+        { label: "Warehouse", address: NYDAC_WAREHOUSE },
+        {
+          label: "Venue",
+          address: "1500 Broadway, New York, NY 10036",
+        },
+      ],
+      inventory: [
+        {
+          itemType: "client",
+          sku: "MN-TENT-10",
+          quantityAssigned: 4,
+          quantityLoaded: 0,
+        },
+        {
+          itemType: "client",
+          sku: "MN-COOLER-ROLL",
+          quantityAssigned: 10,
+          quantityLoaded: 0,
+        },
+        {
+          itemType: "client",
+          sku: "MN-BANNER-WALL",
+          quantityAssigned: 2,
+          quantityLoaded: 0,
+        },
+        {
+          itemType: "org",
+          sku: "CABLE-RAMP-3",
+          quantityAssigned: 8,
+          quantityLoaded: 0,
+        },
+      ],
+      fleetNames: [],
+      crew: [
+        { email: "don@test.test", phase: "LoadIn", role: "Lead" },
+        { email: "rob@test.test", phase: "LoadIn", role: "Laborer" },
+      ],
+    },
+    {
+      name: "Red Bull Brooklyn Mirage",
+      clientCompany: "Red Bull",
+      status: "ready",
+      pocName: "Dom",
+      pocPhone: "917-555-0144",
+      leadEmail: "mike@test.test",
+      notes: "Fully staged — auto-ready happy. Load-in Saturday AM.",
+      timing: {
+        jobStartDays: 3,
+        jobEndDays: 4,
+        loadInStartDays: 2,
+        loadInEndDays: 3,
+        loadOutStartDays: 4,
+        loadOutEndDays: 5,
+      },
+      locations: [
+        { label: "Warehouse", address: NYDAC_WAREHOUSE },
+        {
+          label: "Venue",
+          address: "140 Stewart Ave, Brooklyn, NY 11237",
+        },
+      ],
+      inventory: [
+        {
+          itemType: "client",
+          sku: "RB-BAR-01",
+          quantityAssigned: 3,
+          quantityLoaded: 3,
+        },
+        {
+          itemType: "client",
+          sku: "RB-HIGHBOY",
+          quantityAssigned: 8,
+          quantityLoaded: 8,
+        },
+        {
+          itemType: "client",
+          sku: "RB-LED-CUBE",
+          quantityAssigned: 12,
+          quantityLoaded: 12,
+        },
+        {
+          itemType: "client",
+          sku: "RB-LOUNGE-SOFA",
+          quantityAssigned: 4,
+          quantityLoaded: 4,
+        },
+        {
+          itemType: "org",
+          sku: "DOLLY-01",
+          quantityAssigned: 10,
+          quantityLoaded: 10,
+        },
+        {
+          itemType: "org",
+          sku: "RAMP-ALUM-01",
+          quantityAssigned: 2,
+          quantityLoaded: 2,
+        },
+        {
+          itemType: "org",
+          sku: "BLANKET-MOVE",
+          quantityAssigned: 16,
+          quantityLoaded: 16,
+        },
+      ],
+      fleetNames: ["Box Truck 12", "Sprinter 7"],
+      crew: [
+        { email: "mike@test.test", phase: "LoadIn", role: "Lead" },
+        { email: "paul@test.test", phase: "LoadIn", role: "Driver" },
+        { email: "tom@test.test", phase: "LoadIn", role: "Laborer" },
+        { email: "rob@test.test", phase: "LoadIn", role: "Laborer" },
+        { email: "mike@test.test", phase: "LoadOut", role: "Lead" },
+        { email: "jerome@test.test", phase: "LoadOut", role: "Driver" },
+        { email: "tom@test.test", phase: "LoadOut", role: "Laborer" },
+        { email: "rob@test.test", phase: "LoadOut", role: "Laborer" },
+      ],
+    },
+    {
+      name: "Gotham Glow Fashion Week",
+      clientCompany: "Gotham Glow",
+      status: "ready",
+      pocName: "Maya Ruiz",
+      pocPhone: "718-555-0177",
+      leadEmail: "don@test.test",
+      notes: "Runway + vanity carts locked. Client visible accept logged.",
+      timing: {
+        jobStartDays: 5,
+        jobEndDays: 6,
+        loadInStartDays: 4,
+        loadInEndDays: 5,
+        loadOutStartDays: 6,
+        loadOutEndDays: 7,
+      },
+      locations: [
+        { label: "Warehouse", address: NYDAC_WAREHOUSE },
+        {
+          label: "Venue",
+          address: "Skylight Clarkson Sq, 550 Washington St, New York, NY",
+        },
+      ],
+      inventory: [
+        {
+          itemType: "client",
+          sku: "GG-RUNWAY-RISER",
+          quantityAssigned: 8,
+          quantityLoaded: 8,
+        },
+        {
+          itemType: "client",
+          sku: "GG-MIRROR-PANEL",
+          quantityAssigned: 6,
+          quantityLoaded: 6,
+        },
+        {
+          itemType: "client",
+          sku: "GG-VANITY-CART",
+          quantityAssigned: 3,
+          quantityLoaded: 3,
+        },
+        {
+          itemType: "client",
+          sku: "GG-LOUNGE-CHAIR",
+          quantityAssigned: 10,
+          quantityLoaded: 10,
+        },
+        {
+          itemType: "org",
+          sku: "TABLE-FOLD-6",
+          quantityAssigned: 6,
+          quantityLoaded: 6,
+        },
+        {
+          itemType: "org",
+          sku: "CABLE-RAMP-3",
+          quantityAssigned: 10,
+          quantityLoaded: 10,
+        },
+        {
+          itemType: "org",
+          sku: "CART-UTILITY",
+          quantityAssigned: 4,
+          quantityLoaded: 4,
+        },
+      ],
+      fleetNames: ["Box Truck 18"],
+      crew: [
+        { email: "don@test.test", phase: "LoadIn", role: "Lead" },
+        { email: "jerome@test.test", phase: "LoadIn", role: "Driver" },
+        { email: "tom@test.test", phase: "LoadIn", role: "Laborer" },
+        { email: "rob@test.test", phase: "LoadIn", role: "Laborer" },
+        { email: "don@test.test", phase: "LoadOut", role: "Lead" },
+        { email: "paul@test.test", phase: "LoadOut", role: "Driver" },
+        { email: "tom@test.test", phase: "LoadOut", role: "Laborer" },
+      ],
+    },
+    {
+      name: "Red Bull Pier 17 Wrap",
+      clientCompany: "Red Bull",
+      status: "completed",
+      pocName: "Michaela",
+      pocPhone: "212-555-0101",
+      leadEmail: "mike@test.test",
+      notes: "Wrapped last week. Locks released (load_out_end in past).",
+      timing: {
+        jobStartDays: -14,
+        jobEndDays: -12,
+        loadInStartDays: -15,
+        loadInEndDays: -14,
+        loadOutStartDays: -12,
+        loadOutEndDays: -11,
+      },
+      locations: [
+        { label: "Warehouse", address: NYDAC_WAREHOUSE },
+        { label: "Venue", address: "89 South St, New York, NY 10038" },
+      ],
+      inventory: [
+        {
+          itemType: "client",
+          sku: "RB-BAR-01",
+          quantityAssigned: 2,
+          quantityLoaded: 2,
+        },
+        {
+          itemType: "client",
+          sku: "RB-CASE-SLEEVE",
+          quantityAssigned: 20,
+          quantityLoaded: 20,
+        },
+        {
+          itemType: "org",
+          sku: "DOLLY-01",
+          quantityAssigned: 4,
+          quantityLoaded: 4,
+        },
+        {
+          itemType: "org",
+          sku: "HANDTRUCK-01",
+          quantityAssigned: 2,
+          quantityLoaded: 2,
+        },
+      ],
+      fleetNames: ["Box Truck 12"],
+      crew: [
+        { email: "mike@test.test", phase: "LoadIn", role: "Lead" },
+        { email: "paul@test.test", phase: "LoadIn", role: "Driver" },
+        { email: "tom@test.test", phase: "LoadIn", role: "Laborer" },
+        { email: "mike@test.test", phase: "LoadOut", role: "Lead" },
+        { email: "jerome@test.test", phase: "LoadOut", role: "Driver" },
+        { email: "rob@test.test", phase: "LoadOut", role: "Laborer" },
+      ],
+    },
+  ];
+
+  for (const job of jobs) {
+    await ensureJobShell(sql, job);
+    await ensureJobLocations(sql, job.name, job.locations);
+    await ensureJobInventory(sql, job.name, job.inventory);
+    await ensureJobFleet(sql, job.name, job.fleetNames);
+    await ensureJobCrew(sql, job.name, job.crew);
+  }
+
+  // Activity logs (accept / crew / ready flavor)
+  await ensureActivity(
+    sql,
+    "Gotham Glow Fashion Week",
+    "ed@test.test",
+    'Accepted job request "Gotham Glow Fashion Week"',
+    "job",
+    true
+  );
+  await ensureActivity(
+    sql,
+    "Gotham Glow Fashion Week",
+    "don@test.test",
+    "Assigned crew (LoadIn / Lead)",
+    "job_assignment"
+  );
+  await ensureActivity(
+    sql,
+    "Gotham Glow Fashion Week",
+    "don@test.test",
+    "Auto-promoted job to ready",
+    "job"
+  );
+  await ensureActivity(
+    sql,
+    "Red Bull Brooklyn Mirage",
+    "mike@test.test",
+    "Assigned crew (LoadIn / Lead)",
+    "job_assignment"
+  );
+  await ensureActivity(
+    sql,
+    "Red Bull Brooklyn Mirage",
+    "mike@test.test",
+    "Auto-promoted job to ready",
+    "job"
+  );
+  await ensureActivity(
+    sql,
+    "Monster Times Square Takeover",
+    "ed@test.test",
+    'Accepted job request "Monster Times Square Takeover"',
+    "job",
+    true
+  );
+  await ensureActivity(
+    sql,
+    "Red Bull Pier 17 Wrap",
+    "mike@test.test",
+    "Marked job completed",
+    "job"
+  );
+
+  console.log("  nydac rich: clients + inventory + fleet + 6 jobs seeded");
+}
+
 async function seed() {
   loadEnvLocal();
   const url = process.env.DATABASE_URL;
@@ -410,6 +1481,8 @@ async function seed() {
     await seedOrg(sql, org, passwordHash);
   }
 
+  await seedNydacRich(sql, passwordHash);
+
   console.log(`
 Seed complete. Password for all accounts: password123
 
@@ -423,7 +1496,13 @@ Seed complete. Password for all accounts: password123
     jerome@test.test          Staff / driver
     michaela@redbull.test     Client / POC (Red Bull)
     dom@redbull.test          Client (Red Bull)
+    sara@monster.nydac.test   Client / POC (Monster Energy)
+    lee@monster.nydac.test    Client (Monster Energy)
+    maya@gothamglow.test      Client / POC (Gotham Glow)
+    nick@gothamglow.test      Client (Gotham Glow)
     logo: /seed/nydac-logo.svg
+    jobs: Holiday Window (draft) · Summer Pop-Up (upcoming) · Monster Times Square (upcoming)
+          · Brooklyn Mirage (ready) · Gotham Fashion Week (ready) · Pier 17 Wrap (completed)
 
   test — Acme Event Logistics (http://test.localhost:3000)
     boss@playground.test      OrgAdmin (Alex Boss)
