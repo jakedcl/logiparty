@@ -1,5 +1,5 @@
 /**
- * End-to-end: client uploads doc → Morgan sees it on internal job page.
+ * End-to-end: client uploads doc → Mike sees it on internal job page.
  * Usage: npx tsx scripts/r2-morgan-smoke.ts
  */
 import { existsSync, readFileSync } from "fs";
@@ -112,7 +112,8 @@ async function main() {
   `;
   if (!job) throw new Error("No Red Bull job found — run golden-path walk or create a job first");
 
-  const [rep1] = await sql`SELECT id FROM users WHERE email = 'rep1@redbull.test'`;
+  const [michaela] =
+    await sql`SELECT id FROM users WHERE email = 'michaela@redbull.test'`;
   const docId = randomUUID();
   const pdf = Buffer.from(
     "%PDF-1.4\n1 0 obj<<>>endobj\ntrailer<<>>\n%%EOF\n",
@@ -133,32 +134,32 @@ async function main() {
       file_name, storage_key, file_size_bytes, mime_type
     )
     VALUES (
-      ${docId}, ${tenant.id}, ${job.id}, ${rep1.id}, 'client',
+      ${docId}, ${tenant.id}, ${job.id}, ${michaela.id}, 'client',
       ${FILE_NAME}, ${stored.storageKey}, ${stored.size}, ${stored.mimeType}
     )
   `;
 
-  const rep1Jar = await login("rep1@redbull.test");
-  const portal = await getHtml(rep1Jar, `/portal/jobs/${job.id}`);
-  const morganJar = await login("morgan@test.test");
-  const internal = await getHtml(morganJar, `/dashboard/jobs/${job.id}`);
+  const michaelaJar = await login("michaela@redbull.test");
+  const portal = await getHtml(michaelaJar, `/portal/jobs/${job.id}`);
+  const mikeJar = await login("mike@test.test");
+  const internal = await getHtml(mikeJar, `/dashboard/jobs/${job.id}`);
 
   const portalOk =
     portal.status === 200 &&
     portal.html.includes(FILE_NAME) &&
     !portal.html.includes("File uploads will work once Cloudflare R2");
-  const morganOk =
+  const mikeOk =
     internal.status === 200 &&
     internal.html.includes(FILE_NAME) &&
     internal.html.includes("Open");
 
   console.log(portalOk ? "PASS" : "FAIL", "Client portal lists uploaded PDF");
-  console.log(morganOk ? "PASS" : "FAIL", "Morgan sees document on internal job detail");
+  console.log(mikeOk ? "PASS" : "FAIL", "Mike sees document on internal job detail");
 
   await sql`DELETE FROM documents WHERE id = ${docId}`;
   await deleteJobObject(stored.storageKey);
 
-  if (!portalOk || !morganOk) process.exit(1);
+  if (!portalOk || !mikeOk) process.exit(1);
 }
 
 main().catch((e) => {

@@ -27,10 +27,11 @@ Copy `.env.example` → `.env.local` and fill `DATABASE_URL`, `AUTH_SECRET`, etc
 
 | URL | Email | Role |
 |-----|-------|------|
-| http://test.localhost:3000 | `admin@test.test` | Org admin |
-| http://test.localhost:3000 | `morgan@test.test` | Manager |
-| http://test.localhost:3000 | `sam@test.test` | Staff (warehouse) |
-| http://test.localhost:3000 | `rep1@redbull.test` | Client portal |
+| http://test.localhost:3000 | `ed@test.test` | Org admin (Ed) |
+| http://test.localhost:3000 | `mike@test.test` | Manager (Mike Oso) |
+| http://test.localhost:3000 | `tom@test.test` | Staff (warehouse) |
+| http://test.localhost:3000 | `paul@test.test` | Staff (driver) |
+| http://test.localhost:3000 | `michaela@redbull.test` | Client portal (POC) |
 | http://demo.localhost:3000 | `admin@demo.test` | Demo org (RLS checks) |
 
 **Your personal account:** `jakedcl73@gmail.com` is linked as TestTenant3PL org admin on the current database. Use your existing password (not `password123`). Re-run anytime:
@@ -62,7 +63,7 @@ If you ran `npm run db:reset-seed -- --confirm` earlier:
 | Removed | Kept |
 |---------|------|
 | `test` and `demo` orgs and all their jobs, catalogs, fleet | Other orgs (if any) |
-| Seven seed test accounts (`admin@test.test`, etc.) | Personal accounts like `jakedcl73@gmail.com` |
+| Seed test accounts (`ed@test.test`, etc.) | Personal accounts like `jakedcl73@gmail.com` |
 | Client companies under test/demo | — |
 
 **Current state (after `npm run db:seed`):** test + demo exist, **0 jobs**, catalogs re-seeded, test users back. Personal admin re-linked to test.

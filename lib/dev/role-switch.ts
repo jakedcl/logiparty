@@ -11,6 +11,7 @@ export function isDevRoleSwitchAllowed(): boolean {
 export type DevPersonaId =
   | "orgAdmin"
   | "manager"
+  | "manager2"
   | "warehouse"
   | "driver"
   | "client";
@@ -29,37 +30,44 @@ export type DevPersonaMeta = {
 export const DEV_PERSONAS: readonly DevPersonaMeta[] = [
   {
     id: "orgAdmin",
-    buttonLabel: "Alex — OrgAdmin",
+    buttonLabel: "Ed — OrgAdmin",
     roleLabel: "OrgAdmin",
-    email: "admin@test.test",
+    email: "ed@test.test",
     redirectPath: "/dashboard",
   },
   {
     id: "manager",
-    buttonLabel: "Morgan — Manager",
+    buttonLabel: "Mike Oso — Manager",
     roleLabel: "Manager",
-    email: "morgan@test.test",
+    email: "mike@test.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "manager2",
+    buttonLabel: "Don — Manager",
+    roleLabel: "Manager",
+    email: "don@test.test",
     redirectPath: "/dashboard",
   },
   {
     id: "warehouse",
-    buttonLabel: "Sam — Warehouse",
+    buttonLabel: "Tom — Warehouse",
     roleLabel: "Staff (Warehouse)",
-    email: "sam@test.test",
+    email: "tom@test.test",
     redirectPath: "/dashboard",
   },
   {
     id: "driver",
-    buttonLabel: "Dana — Driver",
+    buttonLabel: "Paul — Driver",
     roleLabel: "Staff (Driver)",
-    email: "dana@test.test",
+    email: "paul@test.test",
     redirectPath: "/dashboard",
   },
   {
     id: "client",
-    buttonLabel: "Riley — Client",
+    buttonLabel: "Michaela — Client",
     roleLabel: "Client (Red Bull)",
-    email: "rep1@redbull.test",
+    email: "michaela@redbull.test",
     redirectPath: "/portal",
   },
 ] as const;

@@ -22,7 +22,7 @@ export function DevRoleSwitchPanel() {
         </summary>
         <div className="border-t border-neutral-100 px-2 py-2 space-y-1">
           <p className="px-1 pb-1 text-[10px] leading-snug text-neutral-400">
-            Seed quick-login · Client = Riley (Red Bull portal)
+            Seed quick-login · Client = Michaela (Red Bull)
           </p>
           {DEV_PERSONAS.map((p) => (
             <form key={p.id} action={switchDevPersona}>
