@@ -16,8 +16,8 @@ type Props = {
   logoUrl?: string | null;
   primaryColor?: string;
   navItems: DashboardNavItem[];
-  identity: React.ReactNode;
-  signOut: React.ReactNode;
+  /** Name/role control (dropdown with profile + sign out) */
+  accountMenu: React.ReactNode;
   children: React.ReactNode;
 };
 
@@ -30,31 +30,42 @@ function navItemActive(pathname: string, href: string): boolean {
 function Brand({
   orgName,
   logoUrl,
-  compact = false,
+  /** Horizontal beside logo — only for the sticky mobile top bar */
+  inline = false,
 }: {
   orgName: string;
   logoUrl?: string | null;
-  compact?: boolean;
+  inline?: boolean;
 }) {
+  if (inline) {
+    return (
+      <div className="flex min-w-0 items-center gap-1.5">
+        {logoUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={logoUrl}
+            alt=""
+            className="h-7 w-auto max-w-[100px] shrink-0"
+          />
+        ) : null}
+        <span className="truncate text-base font-semibold tracking-tight text-neutral-900">
+          {orgName}
+        </span>
+      </div>
+    );
+  }
+
   return (
-    <div className={cn("flex items-center gap-2 min-w-0", compact && "gap-1.5")}>
+    <div className="flex min-w-0 flex-col items-start gap-2">
       {logoUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           src={logoUrl}
           alt=""
-          className={cn(
-            "w-auto shrink-0",
-            compact ? "h-7 max-w-[100px]" : "h-8 max-w-[140px]"
-          )}
+          className="h-9 w-auto max-w-[140px] shrink-0"
         />
       ) : null}
-      <span
-        className={cn(
-          "font-semibold tracking-tight truncate text-neutral-900",
-          compact ? "text-base" : "text-lg"
-        )}
-      >
+      <span className="truncate text-base font-semibold leading-snug tracking-tight text-neutral-900">
         {orgName}
       </span>
     </div>
@@ -106,8 +117,7 @@ export function DashboardShell({
   logoUrl,
   primaryColor = "#2563eb",
   navItems,
-  identity,
-  signOut,
+  accountMenu,
   children,
 }: Props) {
   const pathname = usePathname();
@@ -166,11 +176,11 @@ export function DashboardShell({
             aria-modal="true"
             aria-label="Navigation"
           >
-            <div className="flex items-center justify-between border-b border-neutral-100 px-4 py-3">
-              <Brand orgName={orgName} logoUrl={logoUrl} compact />
+            <div className="flex items-start justify-between gap-2 border-b border-neutral-100 px-4 py-3">
+              <Brand orgName={orgName} logoUrl={logoUrl} />
               <button
                 type="button"
-                className="rounded-md p-2 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
+                className="shrink-0 rounded-md p-2 text-neutral-500 hover:bg-neutral-100 hover:text-neutral-800"
                 aria-label="Close menu"
                 onClick={() => setDrawerOpen(false)}
               >
@@ -204,12 +214,11 @@ export function DashboardShell({
             >
               <Menu className="h-5 w-5" strokeWidth={1.75} />
             </button>
-            <Brand orgName={orgName} logoUrl={logoUrl} compact />
+            <Brand orgName={orgName} logoUrl={logoUrl} inline />
           </div>
           <div className="hidden lg:block" />
-          <div className="flex shrink-0 items-center gap-3">
-            {identity}
-            {signOut}
+          <div className="flex shrink-0 items-center">
+            {accountMenu}
           </div>
         </header>
 

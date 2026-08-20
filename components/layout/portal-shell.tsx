@@ -20,6 +20,14 @@ const NAV = [
   { href: "/portal/inventory", label: "Inventory" },
 ] as const;
 
+async function signOutAction() {
+  "use server";
+  const headersList = await headers();
+  await signOut({
+    redirectTo: absoluteRedirectUrl(headersList, "/login"),
+  });
+}
+
 export function PortalShell({
   session,
   primaryColor = "#2563eb",
@@ -49,7 +57,7 @@ export function PortalShell({
             ) : null}
           </div>
         </div>
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center shrink-0">
           <SessionIdentity
             name={session.user.name}
             email={session.user.email}
@@ -57,24 +65,9 @@ export function PortalShell({
             isManager={session.user.isManager}
             isStaff={session.user.isStaff}
             isClient={session.user.isClient}
+            profileHref="/portal/profile"
+            signOutAction={signOutAction}
           />
-          <form
-            action={async () => {
-              "use server";
-              const headersList = await headers();
-              await signOut({
-                redirectTo: absoluteRedirectUrl(headersList, "/login"),
-              });
-            }}
-            className="hidden sm:block"
-          >
-            <button
-              type="submit"
-              className="text-sm text-neutral-500 hover:text-neutral-800 min-h-[44px] px-2"
-            >
-              Sign out
-            </button>
-          </form>
         </div>
       </header>
 
