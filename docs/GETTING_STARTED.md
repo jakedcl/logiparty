@@ -73,17 +73,19 @@ If you ran `npm run db:reset-seed -- --confirm` earlier:
 
 ## Neon branch strategy
 
-**Today:** `.env.local` points at Neon host `ep-red-surf-apcicxpa-pooler.c-7.us-east-1.aws.neon.tech` (likely the `main` branch). If Vercel Production uses the same connection string, local scripts affect live data.
+**Concept:** two databases, same schema. Local scripts only touch `dev`; live traffic stays on `main`.
 
-**Recommended going forward:**
+| Env | Neon branch | Where `DATABASE_URL` lives |
+|-----|-------------|----------------------------|
+| **Local** | `dev` (pooled host `ep-lucky-water-aphwec7q-pooler…`) | `.env.local` only — never commit |
+| **Production** | `main` (pooled host `ep-red-surf-apcicxpa-pooler…`) | Vercel **Production** env only |
 
-1. **Production** → Neon `main` branch connection string in Vercel **Production** env only.
-2. **Local dev** → Create a Neon **`dev`** branch from `main` in the [Neon console](https://console.neon.tech) → paste that branch's pooled URL into `.env.local` as `DATABASE_URL`.
-3. Run `npm run db:migrate:sql && npm run db:seed` against the dev branch once.
+Done (A5, 2026-08-20): Neon project **logiparty** has branch `dev` forked from `main`. Local `.env.local` points at `dev`. Vercel Production stays on `main`.
 
-Then you can safely run `db:reset-seed` locally without touching production.
+- Safe locally: `npm run db:reset-seed -- --confirm` (only resets seed orgs on `dev`)
+- Never point local at `main`, and never run reset-seed against Production
 
-> Neon MCP was not authenticated in the automation session — confirm branches manually in the Neon console under project **logiparty**.
+If you recreate `.env.local` from `.env.example`, copy the **`dev`** pooled connection string from the [Neon console](https://console.neon.tech) (project **logiparty** → branch **dev** → pooled).
 
 See also [docs/STAGING.md](STAGING.md).
 

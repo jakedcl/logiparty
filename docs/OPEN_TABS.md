@@ -15,7 +15,6 @@
 | **A1** | Jake tests job flow locally | Jake | Automated: `npx tsx scripts/golden-path-walk.ts` → **29 passed, 0 failed** (2026-08-19). Still worth one manual click-through on prod. |
 | **A3** | Homepage at `logiparty.com` | Agent | Marketing / leads landing page (does not exist yet) |
 | **A4** | Unknown subdomain → homepage | Agent | If `{slug}.logiparty.com` has no org in DB, redirect to `https://logiparty.com` (depends on A3 or stub page) |
-| **A5** | Neon dev branch | Jake/Agent | Split local `.env.local` from prod `DATABASE_URL` so `db:reset-seed` can't wipe prod |
 | **A6** | Client inventory UI polish | Agent (when Jake picks it) | **Docs-only queue item — do not start until Jake asks.** Polish Client inventory first; same pattern likely later for **Our inventory** and **Fleet**. (1) **SKU:** keep label "SKU"; auto-uppercase on input/blur; soft format (letters/numbers/`-`) — not a hard regex. (2) **Demote "Add item"** — collapsed or bottom; list is primary (managers mostly adjust qty). (3) **Items list:** dense table/rows, not big card containers per item. |
 
 ---
@@ -43,6 +42,7 @@
 - [x] Tools catalog deprecated → **Our inventory** (Option A)
 - [x] Cloudflare MCP connected
 - [x] **A2** Fix Vercel Production env + login redirect loop — Jake confirmed login works on prod (`test.logiparty.com`, 2026-08-20). Env checklist + `secureCookie: true` for `__Secure-authjs.session-token` in middleware.
+- [x] **A5** Neon `dev` branch — local `.env.local` `DATABASE_URL` → pooled `dev` (`ep-lucky-water-aphwec7q-pooler…`); Vercel Production stays on Neon `main`. Fork had schema + `test`/`demo` already; no reset of `main`. Only run `db:reset-seed` against `dev`.
 
 ---
 
@@ -51,11 +51,13 @@
 | What | URL / value |
 |------|-------------|
 | **Prod tenant login** | https://test.logiparty.com/login |
+| **Local tenant** | http://test.localhost:3000 (`.env.local` → Neon **`dev`**) |
 | **Seed manager** | `morgan@test.test` / `password123` |
 | **Jake admin** | `jakedcl73@gmail.com` (your password) |
 | **AUTH_URL (correct)** | `https://logiparty.com` |
 | **NEXT_PUBLIC_ROOT_DOMAIN** | `logiparty.com` |
 | **Do NOT set in prod** | `NEXT_PUBLIC_DEV_ORG_SLUG` |
+| **Neon branches** | Production = **`main`**; local = **`dev`** (never reset-seed on main) |
 
 ---
 
