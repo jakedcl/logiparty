@@ -8,7 +8,7 @@ export function OrgInventoryItemsTable({ items }: { items: InventoryItem[] }) {
   if (items.length === 0) {
     return (
       <p className="text-sm text-neutral-500 py-4">
-        No equipment yet. Use + Add item below when you need a new SKU.
+        No equipment yet. Use + Add item above when you need a new SKU.
       </p>
     );
   }

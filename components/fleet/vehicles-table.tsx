@@ -12,7 +12,7 @@ export function FleetVehiclesTable({
   if (vehicles.length === 0) {
     return (
       <p className="text-sm text-neutral-500 py-4">
-        No fleet vehicles yet. Use + Add vehicle below when you need one.
+        No fleet vehicles yet. Use + Add vehicle above when you need one.
       </p>
     );
   }

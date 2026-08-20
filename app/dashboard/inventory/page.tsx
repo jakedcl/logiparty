@@ -128,7 +128,7 @@ export default async function InventoryHubPage({
               <div className="space-y-3">
                 <AddItemPanel
                   clientCompanyId={selectedId}
-                  caption="Client-owned assets stored at your sites. Clients request changes in the portal."
+                  caption={`Client-owned assets stored at your sites · ${clientItems.length} item${clientItems.length === 1 ? "" : "s"}`}
                 />
                 <ClientInventoryItemsTable
                   items={clientItems}
