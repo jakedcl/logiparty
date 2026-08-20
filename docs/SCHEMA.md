@@ -10,7 +10,7 @@ All `id` fields are UUID v4 unless noted. All timestamps are `timestamptz`.
 
 ```ts
 org_role: 'OrgAdmin' | 'Manager' | 'Staff' | 'Client'
-job_status: 'draft' | 'upcoming' | 'ready' | 'completed'
+job_status: 'draft' | 'upcoming' | 'ready' | 'completed' | 'denied'
 assignment_phase: 'LoadIn' | 'LoadOut'
 assignment_role: 'Driver' | 'Laborer' | 'Lead'
 job_inventory_item_type: 'client' | 'org'

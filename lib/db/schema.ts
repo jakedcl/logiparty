@@ -16,6 +16,7 @@ export const jobStatusEnum = pgEnum("job_status", [
   "upcoming",
   "ready",
   "completed",
+  "denied",
 ]);
 
 export const jobInventoryItemTypeEnum = pgEnum("job_inventory_item_type", [

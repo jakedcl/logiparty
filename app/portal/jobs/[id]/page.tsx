@@ -42,6 +42,13 @@ export default async function PortalJobDetailPage({
         </p>
       ) : null}
 
+      {job.status === "denied" ? (
+        <p className="text-sm border rounded-lg bg-red-50 border-red-200 text-red-950 px-4 py-3">
+          This request was denied. Contact the team if you need a different
+          date or scope, then submit a new request.
+        </p>
+      ) : null}
+
       <section className="border rounded-lg bg-white p-4 space-y-2 text-sm">
         <h2 className="font-medium">Windows</h2>
         <p>Job: {fmt(job.jobStart)} → {fmt(job.jobEnd)}</p>

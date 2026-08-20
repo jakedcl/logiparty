@@ -12,6 +12,8 @@ function statusClass(status: string): string {
       return "bg-emerald-100 text-emerald-900";
     case "completed":
       return "bg-neutral-200 text-neutral-700";
+    case "denied":
+      return "bg-red-100 text-red-900";
     default:
       return "bg-neutral-100 text-neutral-700";
   }
@@ -81,8 +83,8 @@ export default async function PortalJobsPage() {
         <section className="border rounded-lg p-4 bg-white order-2 md:order-1">
           <h2 className="font-medium mb-1">New request</h2>
           <p className="text-xs text-neutral-500 mb-4">
-            Submits as a draft for the team to accept. You cannot edit after
-            sending.
+            Submits as a draft for the team to accept or deny. You cannot edit
+            after sending.
           </p>
           <form action={requestJob} className="space-y-3">
             <input

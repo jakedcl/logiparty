@@ -63,7 +63,7 @@ See [HOW_TO_BUILD.md §12](HOW_TO_BUILD.md#12-pr-checklist).
 - Multi-tenant via **subdomain** `{slug}.logiparty.com`
 - **RLS** on all org-scoped tables; `app.current_org_id` per request
 - **No "Logiparty"** in 3PL staff UI
-- Job statuses: `draft`, `upcoming`, `ready`, `completed`
+- Job statuses: `draft`, `upcoming`, `ready`, `completed`, `denied`
 - Use `**quantity_loaded`**, not `quantity_staged`
 - Release inventory/fleet locks after `**load_out_end**`
 - **Invite-only** accounts

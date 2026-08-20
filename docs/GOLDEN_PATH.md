@@ -41,6 +41,7 @@ End-to-end flow the first paying 3PL must complete. QA and agents use this to ve
 
 11. **[ ]** Michaela submits **draft** job request: "Summer Festival Activation".
 12. **[ ]** Mike sees draft in internal app and accepts → status **upcoming**.
+12b. **[ ]** (Optional) Mike denies a different draft → status **denied**; portal shows denied.
 
 ### Job operations (M3)
 

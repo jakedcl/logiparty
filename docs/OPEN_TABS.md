@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (Clients tab lists contacts under each company)*
+*Last updated: 2026-08-20 (manager deny portal draft → denied).*
 
 ---
 
@@ -20,7 +20,7 @@
 
 | ID | Task | Notes |
 |----|------|-------|
-| **A12** | Staff accept/deny job assignments | Not in schema/APP_CONTEXT today (`job_assignments` has no accept status). Notifications v1 is **inbox of links** only. Needs product decision + small schema (status / responded_at) before UI. |
+| **A12** | Staff accept/deny **job assignments** | Separate from manager deny of portal drafts (done). `job_assignments` still has no accept status. Needs product decision + small schema before UI. |
 
 ---
 
@@ -62,8 +62,9 @@
 - [x] **B4 partial** Stripe billing scaffold (optional, no keys required) — Checkout + portal + webhook + Settings Billing; soft `billing_status`; keys TBD.
 - [x] **Nav shell** Staff dashboard — left sidebar + mobile drawer (`DashboardShell`); portal unchanged; run-sheet location bullets → `ul`.
 - [x] **NYDAC rich seed** — `seedNydacRich()` in `lib/db/seed.ts`: Monster Energy + Gotham Glow clients, fat catalogs, 5 fleet, 6 jobs across draft/upcoming/ready/completed with locations/crew/fleet/qty_loaded + activity. Crew spread: Tom/Rob/Paul/Jerome each on 5 jobs; Mike/Don lead multiple; ready jobs full LI+LO. Neon **dev** only.
-- [x] **Staff nav UX** — Primary: Dashboard, Jobs / My Jobs, **Notifications**, inventory, Fleet, Team, Clients, **Settings**. Moved **Availability → Settings / Time off**, **Activity → Settings / Activity**. Old `/dashboard/availability` + `/dashboard/activity` redirect. Notifications = manager draft requests + staff assignments (view/link only; accept/deny → **A12**). Portal unchanged.
+- [x] **Staff nav UX** — Primary: Dashboard, Jobs / My Jobs, **Notifications**, inventory, Fleet, Team, Clients, **Settings**. Moved **Availability → Settings / Time off**, **Activity → Settings / Activity**. Old `/dashboard/availability` + `/dashboard/activity` redirect. Notifications = manager draft requests (Accept/Deny) + staff assignments (view/link; staff accept/deny → **A12**). Portal unchanged.
 - [x] **Account menu** — Click name+role in dashboard/portal top bar → **My Profile** + **Sign out** only. Settings hub lists **My Profile** above Time off. Profile: edit first/last name; email read-only; change password if `password_hash` set. Paths: `/dashboard/settings/profile`, `/portal/profile` (`/dashboard/profile` redirects to settings). Sidebar/drawer brand: logo stacked above org name.
+- [x] **Manager deny portal draft** — New job status `denied` (migration `0020`). Managers Accept / Deny on job detail + Notifications; client portal shows denied (not stuck pending). D5b; distinct from **A12** staff assignment accept/deny. Neon **dev** migrated; seed example Monster Rooftop Soft Ask.
 - [x] **Clients tab contacts** — `/dashboard/clients` lists each company with a dense Name/Email/Title table of `client_users` (seed Michaela POC + Dom Rep under Red Bull on nydac). Invite contact + Add company stays collapsed create-last; invite flow unchanged.
 
 ---
@@ -103,6 +104,7 @@
 | Status | Sample job |
 |--------|------------|
 | draft | Red Bull Holiday Window Concept |
+| denied | Monster Rooftop Soft Ask |
 | upcoming (partial) | Red Bull Summer Pop-Up · Monster Times Square Takeover |
 | ready | Red Bull Brooklyn Mirage · Gotham Glow Fashion Week |
 | completed | Red Bull Pier 17 Wrap |

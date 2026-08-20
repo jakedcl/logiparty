@@ -8,7 +8,8 @@ Ambiguous product choices resolved here. Agents follow these unless the user ove
 | D2 | Min fleet for auto-ready? | **≥1** `job_fleet_assignments` row | User specified trucks in ready rules |
 | D3 | Loaded granularity? | Per-line `quantity_loaded` int | Same as school staged qty |
 | D4 | Client edit draft? | **Defer** — manager accepts/rejects only | Reduce portal scope |
-| D5 | Cancelled job status? | **Defer** — use `completed` + internal notes | Simpler enum |
+| D5 | Cancelled job status (upcoming/ready)? | **Defer** — use `completed` + internal notes | Simpler enum for mid-lifecycle cancel |
+| D5b | Deny portal draft? | **`denied` status** — manager rejects client request; client sees denied (not soft-delete) | D4 “rejects”; distinct from D5 cancelled |
 | D6 | Realtime updates? | **Defer** — page refresh OK | M5+ |
 | D7 | Local subdomain dev | `/etc/hosts` → `nydac.localhost` + port 3000 | See README |
 | D8 | Logiparty visible to staff? | **No** except optional help footer | White-label positioning |
@@ -39,4 +40,4 @@ Ambiguous product choices resolved here. Agents follow these unless the user ove
 | O1 | Assign managers to staff (reporting line)? | TBD — not MVP |
 | O3 | Minimum crew count beyond 1+1 phases? | At least 1 LoadIn + 1 LoadOut assignment |
 
-*Last updated: post-MVP cleanup (tools → our inventory).*
+*Last updated: 2026-08-20 (D5b denied status for portal drafts).*

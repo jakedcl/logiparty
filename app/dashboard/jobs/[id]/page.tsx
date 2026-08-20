@@ -30,6 +30,7 @@ import {
 import { listJobDocuments } from "@/lib/actions/documents";
 import {
   acceptDraftJob,
+  denyDraftJob,
   deleteJob,
   getJob,
   listJobClientCompanies,
@@ -43,6 +44,7 @@ import { ASSIGNMENT_PHASES, ASSIGNMENT_ROLES } from "@/lib/db/schema";
 import { evaluateAutoReady } from "@/lib/jobs/auto-ready";
 import { requireSession } from "@/lib/org/context";
 import { isStorageConfigured } from "@/lib/storage/r2";
+import { ConfirmSubmitButton } from "@/components/ui/confirm-submit-button";
 
 function toLocalInputValue(d: Date | null | undefined): string {
   if (!d) return "";
@@ -89,6 +91,8 @@ function statusTone(status: string): string {
       return "bg-emerald-50 text-emerald-900 ring-emerald-200";
     case "completed":
       return "bg-neutral-100 text-neutral-600 ring-neutral-200";
+    case "denied":
+      return "bg-red-50 text-red-900 ring-red-200";
     default:
       return "bg-neutral-100 text-neutral-700 ring-neutral-200";
   }
@@ -274,17 +278,37 @@ export default async function JobDetailPage({
               <p className="font-medium">Client request — draft</p>
               <p className="text-xs">
                 Accept to move this job to upcoming so you can assign inventory,
-                fleet, and crew.
+                fleet, and crew. Deny if you will not take the request.
               </p>
-              <form action={acceptDraftJob}>
-                <input type="hidden" name="id" value={job.id} />
-                <button
-                  type="submit"
-                  className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white"
-                >
-                  Accept request
-                </button>
-              </form>
+              <div className="flex flex-wrap items-center gap-2">
+                <form action={acceptDraftJob}>
+                  <input type="hidden" name="id" value={job.id} />
+                  <button
+                    type="submit"
+                    className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white"
+                  >
+                    Accept request
+                  </button>
+                </form>
+                <form action={denyDraftJob}>
+                  <input type="hidden" name="id" value={job.id} />
+                  <ConfirmSubmitButton
+                    message="Deny this client job request? They will see it as denied."
+                    className="rounded px-3 py-1.5 text-sm font-medium border border-red-300 bg-white text-red-700 hover:bg-red-50"
+                  >
+                    Deny
+                  </ConfirmSubmitButton>
+                </form>
+              </div>
+            </div>
+          ) : null}
+          {job.status === "denied" ? (
+            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-3 text-sm text-red-950">
+              <p className="font-medium">Request denied</p>
+              <p className="text-xs mt-1">
+                This client portal request was rejected. It will not move to
+                upcoming.
+              </p>
             </div>
           ) : null}
           {autoReady ? (
