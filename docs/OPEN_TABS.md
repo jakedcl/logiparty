@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (A18a Inventory hub tabs).*
+*Last updated: 2026-08-20 (A18 Client tab title dropdown).*
 
 ---
 
@@ -76,6 +76,7 @@
 - [x] **A16** Product visual system — high-contrast tokens (`globals.css`); tenant `--primary` via `OrgTheme` + `lib/theme/primary-color` (fallback navy `#1e3a5f`); ink staff sidebar; open tables (no decorative card chrome); portal + login white-label; `PageHeader` / `StatusBadge`. Smoke: nydac Mike + Michaela.
 - [x] **A17** Rejected out of primary feeds — denied jobs leave staff Jobs + portal Your jobs (collapsed **Rejected**); Notifications Inbox stays pending-only + collapsed **Rejected** history (`listRejectedItems`); Needs attention unchanged (already pending-only). Rows kept (`denied` status).
 - [x] **A18a** Inventory IA — single staff nav **Inventory**; tabs Client \| Equipment \| Fleet; `?tab=` deep-links; legacy `/dashboard/client-inventory` + `/dashboard/fleet` redirect; A16 open tables. (**A18b** warehouses deferred.)
+- [x] **A18 Client tab UX** — selected client company is the hero title (clickable dropdown / combobox); items table below for that client; `?tab=client&companyId=` (also accepts `clientId` / `client`); no decorative card wrap.
 ---
 
 ## Current environments

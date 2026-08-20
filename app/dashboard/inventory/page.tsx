@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AddItemPanel } from "@/components/client-inventory/add-item-panel";
+import { ClientCompanyTitleSelect } from "@/components/client-inventory/client-company-title-select";
 import { ClientInventoryItemsTable } from "@/components/client-inventory/items-table";
 import { PendingInventoryRequestsPanel } from "@/components/client-inventory/pending-requests";
 import { AddFleetVehiclePanel } from "@/components/fleet/add-vehicle-panel";
@@ -27,12 +28,23 @@ import {
 } from "@/lib/inventory/hub";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
+function resolveClientCompanyId(
+  companies: { id: string }[],
+  params: { companyId?: string; clientId?: string; client?: string }
+): string {
+  const raw = params.companyId || params.clientId || params.client || "";
+  if (raw && companies.some((c) => c.id === raw)) return raw;
+  return "";
+}
+
 export default async function InventoryHubPage({
   searchParams,
 }: {
   searchParams: Promise<{
     tab?: string;
     companyId?: string;
+    clientId?: string;
+    client?: string;
   }>;
 }) {
   const session = await requireSession();
@@ -59,10 +71,7 @@ export default async function InventoryHubPage({
 
   if (tab === "client") {
     companies = await listClientCompaniesForOrg(session.user.orgId);
-    selectedId =
-      params.companyId && companies.some((c) => c.id === params.companyId)
-        ? params.companyId
-        : "";
+    selectedId = resolveClientCompanyId(companies, params);
     clientItems = selectedId
       ? await listClientInventoryItems(session.user.orgId, selectedId)
       : [];
@@ -75,7 +84,7 @@ export default async function InventoryHubPage({
 
   const tabCopy =
     tab === "client"
-      ? "Client-owned assets stored at your sites. Clients request changes in the portal."
+      ? null
       : tab === "equipment"
         ? "Gear your company owns (dollies, machines, general stock)."
         : "Box trucks, vans, and other vehicles assigned to jobs.";
@@ -93,7 +102,9 @@ export default async function InventoryHubPage({
         allowed={allowed}
       />
 
-      <p className="text-sm text-neutral-500">{tabCopy}</p>
+      {tabCopy ? (
+        <p className="text-sm text-neutral-500">{tabCopy}</p>
+      ) : null}
 
       {tab === "client" ? (
         <div className="space-y-5">
@@ -110,7 +121,7 @@ export default async function InventoryHubPage({
           ) : null}
 
           {companies.length === 0 ? (
-            <p className="text-sm text-neutral-500">
+            <p className="app-empty">
               Add a{" "}
               <Link href="/dashboard/clients" className="underline">
                 client company
@@ -118,50 +129,42 @@ export default async function InventoryHubPage({
               first.
             </p>
           ) : (
-            <form method="get" className="flex flex-wrap gap-2 items-end max-w-xl">
-              <input type="hidden" name="tab" value="client" />
-              <label className="flex-1 text-sm text-neutral-600 min-w-[200px]">
-                Client company
-                <select
-                  name="companyId"
-                  defaultValue={selectedId}
-                  required
-                  className="mt-1 w-full border border-neutral-200 rounded px-3 py-2 text-sm bg-white"
-                >
-                  <option value="">Select a company</option>
-                  {companies.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <button
-                type="submit"
-                className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white h-[42px]"
-              >
-                Filter
-              </button>
-            </form>
-          )}
-
-          {selectedId ? (
             <section className="space-y-3">
-              <div className="flex items-baseline justify-between gap-2">
-                <h2 className="text-sm font-medium text-neutral-800">
-                  Items
-                  <span className="ml-1.5 text-neutral-400 font-normal">
-                    ({clientItems.length})
-                  </span>
-                </h2>
+              <div className="space-y-1">
+                <ClientCompanyTitleSelect
+                  companies={companies.map((c) => ({
+                    id: c.id,
+                    name: c.name,
+                  }))}
+                  selectedId={selectedId}
+                />
+                <p className="text-sm text-neutral-500">
+                  Client-owned assets stored at your sites.
+                  {selectedId ? (
+                    <span className="text-neutral-400">
+                      {" "}
+                      · {clientItems.length} item
+                      {clientItems.length === 1 ? "" : "s"}
+                    </span>
+                  ) : null}
+                </p>
               </div>
-              <ClientInventoryItemsTable
-                items={clientItems}
-                clientCompanyId={selectedId}
-              />
-              <AddItemPanel clientCompanyId={selectedId} />
+
+              {selectedId ? (
+                <>
+                  <ClientInventoryItemsTable
+                    items={clientItems}
+                    clientCompanyId={selectedId}
+                  />
+                  <AddItemPanel clientCompanyId={selectedId} />
+                </>
+              ) : (
+                <p className="app-empty">
+                  Choose a client above to see their inventory.
+                </p>
+              )}
             </section>
-          ) : null}
+          )}
         </div>
       ) : null}
 
