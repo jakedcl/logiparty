@@ -7,12 +7,10 @@ import {
 
 export function InventoryTabs({
   tab,
-  location,
   companyId,
   allowed,
 }: {
   tab: InventoryTab;
-  location?: string;
   companyId?: string;
   allowed: readonly InventoryTab[];
 }) {
@@ -30,7 +28,6 @@ export function InventoryTabs({
             key={t.id}
             href={inventoryHref({
               tab: t.id,
-              location: location || undefined,
               companyId: t.id === "client" ? companyId : undefined,
             })}
             scroll={false}

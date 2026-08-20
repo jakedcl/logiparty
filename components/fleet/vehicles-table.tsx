@@ -2,17 +2,12 @@ import {
   deleteFleetVehicle,
   updateFleetVehicle,
 } from "@/lib/actions/fleet";
-import { WarehouseSelect } from "@/components/inventory/warehouse-select";
-import type { FleetVehicle, Warehouse } from "@/lib/db/schema";
+import type { FleetVehicle } from "@/lib/db/schema";
 
 export function FleetVehiclesTable({
   vehicles,
-  warehouses,
-  returnLocation,
 }: {
   vehicles: FleetVehicle[];
-  warehouses: Warehouse[];
-  returnLocation?: string;
 }) {
   if (vehicles.length === 0) {
     return (
@@ -24,13 +19,12 @@ export function FleetVehiclesTable({
 
   return (
     <div className="lp-table-wrap">
-      <table className="lp-table min-w-[720px]">
+      <table className="lp-table min-w-[640px]">
         <thead>
           <tr>
             <th className="py-2 px-3 font-medium w-[10rem]">Name</th>
             <th className="py-2 px-3 font-medium w-[7rem]">Plate</th>
             <th className="py-2 px-3 font-medium">Description</th>
-            <th className="py-2 px-3 font-medium w-[8rem]">Location</th>
             <th className="py-2 px-3 font-medium w-[4.5rem]">Active</th>
             <th className="py-2 px-3 font-medium w-[7.5rem] text-right">
               Actions
@@ -69,13 +63,6 @@ export function FleetVehiclesTable({
                     className="w-full min-w-[8rem] border border-transparent hover:border-neutral-200 focus:border-neutral-300 rounded px-1.5 py-1 text-sm bg-transparent focus:bg-white"
                   />
                 </td>
-                <td className="py-1.5 px-3">
-                  <WarehouseSelect
-                    formId={formId}
-                    warehouses={warehouses}
-                    defaultValue={vehicle.warehouseId}
-                  />
-                </td>
                 <td className="py-1.5 px-3 text-center">
                   <input
                     form={formId}
@@ -93,13 +80,6 @@ export function FleetVehiclesTable({
                     className="inline"
                   >
                     <input type="hidden" name="id" value={vehicle.id} />
-                    {returnLocation ? (
-                      <input
-                        type="hidden"
-                        name="returnLocation"
-                        value={returnLocation}
-                      />
-                    ) : null}
                     <button
                       type="submit"
                       className="text-sm text-neutral-700 hover:text-neutral-900 font-medium mr-3"
@@ -109,13 +89,6 @@ export function FleetVehiclesTable({
                   </form>
                   <form action={deleteFleetVehicle} className="inline">
                     <input type="hidden" name="id" value={vehicle.id} />
-                    {returnLocation ? (
-                      <input
-                        type="hidden"
-                        name="returnLocation"
-                        value={returnLocation}
-                      />
-                    ) : null}
                     <button
                       type="submit"
                       className="text-sm text-red-600 hover:text-red-800"

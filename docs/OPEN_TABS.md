@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (A18 Inventory IA + warehouses).*
+*Last updated: 2026-08-20 (A18a Inventory hub tabs).*
 
 ---
 
@@ -21,6 +21,7 @@
 | ID | Task | Notes |
 |----|------|-------|
 | **A12** | Staff accept/deny **job assignments** | Separate from manager deny of portal drafts (done). `job_assignments` still has no accept status. Needs product decision + small schema before UI. |
+| **A18b** | Warehouses / item locations (optional) | Deferred — nice detail, not required. No schema/filter until Jake asks. |
 
 ---
 
@@ -74,8 +75,7 @@
 - [x] **A15** Staff `/dashboard` home — role-aware welcome (first name + org); Needs attention (top 5 from `listNotifications`, incl. notes/inventory/drafts/assignments); Upcoming work dense table (soonest `job_start` first, cap 8); manager **+ New job** / staff My Jobs + Time off; A6/A7 list density. Time-off tip → Settings.
 - [x] **A16** Product visual system — high-contrast tokens (`globals.css`); tenant `--primary` via `OrgTheme` + `lib/theme/primary-color` (fallback navy `#1e3a5f`); ink staff sidebar; open tables (no decorative card chrome); portal + login white-label; `PageHeader` / `StatusBadge`. Smoke: nydac Mike + Michaela.
 - [x] **A17** Rejected out of primary feeds — denied jobs leave staff Jobs + portal Your jobs (collapsed **Rejected**); Notifications Inbox stays pending-only + collapsed **Rejected** history (`listRejectedItems`); Needs attention unchanged (already pending-only). Rows kept (`denied` status).
-- [x] **A18a** Inventory IA — single staff nav **Inventory**; tabs Client \| Equipment \| Fleet; `?tab=` deep-links; legacy `/dashboard/client-inventory` + `/dashboard/fleet` redirect; A16 open tables.
-- [x] **A18b** Warehouses / locations — `warehouses` + nullable `warehouse_id` on client/equipment/fleet (migration `0023`); shared location filter; Manage locations panel; nydac seed Bushwick Warehouse + Queens Yard.
+- [x] **A18a** Inventory IA — single staff nav **Inventory**; tabs Client \| Equipment \| Fleet; `?tab=` deep-links; legacy `/dashboard/client-inventory` + `/dashboard/fleet` redirect; A16 open tables. (**A18b** warehouses deferred.)
 ---
 
 ## Current environments

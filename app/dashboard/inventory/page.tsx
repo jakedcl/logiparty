@@ -5,9 +5,7 @@ import { ClientInventoryItemsTable } from "@/components/client-inventory/items-t
 import { PendingInventoryRequestsPanel } from "@/components/client-inventory/pending-requests";
 import { AddFleetVehiclePanel } from "@/components/fleet/add-vehicle-panel";
 import { FleetVehiclesTable } from "@/components/fleet/vehicles-table";
-import { InventoryLocationFilter } from "@/components/inventory/location-filter";
 import { InventoryTabs } from "@/components/inventory/inventory-tabs";
-import { ManageWarehousesPanel } from "@/components/inventory/manage-warehouses-panel";
 import { AddOrgInventoryItemPanel } from "@/components/org-inventory/add-item-panel";
 import { OrgInventoryItemsTable } from "@/components/org-inventory/items-table";
 import { PageHeader } from "@/components/ui/page-header";
@@ -18,7 +16,6 @@ import {
 import { listFleetVehicles } from "@/lib/actions/fleet";
 import { listOrgInventoryItems } from "@/lib/actions/inventory";
 import { listPendingInventoryRequests } from "@/lib/actions/inventory-requests";
-import { listWarehouses } from "@/lib/actions/warehouses";
 import {
   canManageClientInventory,
   canManageFleet,
@@ -35,7 +32,6 @@ export default async function InventoryHubPage({
 }: {
   searchParams: Promise<{
     tab?: string;
-    location?: string;
     companyId?: string;
   }>;
 }) {
@@ -53,29 +49,6 @@ export default async function InventoryHubPage({
 
   const params = await searchParams;
   const tab = parseInventoryTab(params.tab, allowed);
-  const locationRaw = params.location?.trim() || "";
-  const locationFilter =
-    locationRaw === "unassigned"
-      ? ("unassigned" as const)
-      : locationRaw || undefined;
-  const returnLocation = locationRaw || undefined;
-  const defaultWarehouseId =
-    locationFilter && locationFilter !== "unassigned" ? locationFilter : null;
-
-  const warehouses = await listWarehouses(session.user.orgId);
-  const validLocation =
-    !locationRaw ||
-    locationRaw === "unassigned" ||
-    warehouses.some((w) => w.id === locationRaw);
-  const location = validLocation ? locationRaw : "";
-  const filterOpts = location
-    ? {
-        warehouseId:
-          location === "unassigned"
-            ? ("unassigned" as const)
-            : location,
-      }
-    : undefined;
 
   let companies: Awaited<ReturnType<typeof listClientCompaniesForOrg>> = [];
   let selectedId = "";
@@ -91,20 +64,13 @@ export default async function InventoryHubPage({
         ? params.companyId
         : "";
     clientItems = selectedId
-      ? await listClientInventoryItems(
-          session.user.orgId,
-          selectedId,
-          filterOpts
-        )
+      ? await listClientInventoryItems(session.user.orgId, selectedId)
       : [];
     pending = await listPendingInventoryRequests(session.user.orgId);
   } else if (tab === "equipment") {
-    equipmentItems = await listOrgInventoryItems(
-      session.user.orgId,
-      filterOpts
-    );
+    equipmentItems = await listOrgInventoryItems(session.user.orgId);
   } else {
-    vehicles = await listFleetVehicles(session.user.orgId, filterOpts);
+    vehicles = await listFleetVehicles(session.user.orgId);
   }
 
   const tabCopy =
@@ -118,19 +84,11 @@ export default async function InventoryHubPage({
     <div className="space-y-5">
       <PageHeader
         title="Inventory"
-        description="Client assets, your equipment, and fleet — one place, filtered by site."
-      />
-
-      <InventoryLocationFilter
-        warehouses={warehouses}
-        tab={tab}
-        location={location || undefined}
-        companyId={selectedId || undefined}
+        description="Client assets, your equipment, and fleet — one place."
       />
 
       <InventoryTabs
         tab={tab}
-        location={location || undefined}
         companyId={selectedId || undefined}
         allowed={allowed}
       />
@@ -162,9 +120,6 @@ export default async function InventoryHubPage({
           ) : (
             <form method="get" className="flex flex-wrap gap-2 items-end max-w-xl">
               <input type="hidden" name="tab" value="client" />
-              {location ? (
-                <input type="hidden" name="location" value={location} />
-              ) : null}
               <label className="flex-1 text-sm text-neutral-600 min-w-[200px]">
                 Client company
                 <select
@@ -203,15 +158,8 @@ export default async function InventoryHubPage({
               <ClientInventoryItemsTable
                 items={clientItems}
                 clientCompanyId={selectedId}
-                warehouses={warehouses}
-                returnLocation={returnLocation}
               />
-              <AddItemPanel
-                clientCompanyId={selectedId}
-                warehouses={warehouses}
-                returnLocation={returnLocation}
-                defaultWarehouseId={defaultWarehouseId}
-              />
+              <AddItemPanel clientCompanyId={selectedId} />
             </section>
           ) : null}
         </div>
@@ -227,16 +175,8 @@ export default async function InventoryHubPage({
               </span>
             </h2>
           </div>
-          <OrgInventoryItemsTable
-            items={equipmentItems}
-            warehouses={warehouses}
-            returnLocation={returnLocation}
-          />
-          <AddOrgInventoryItemPanel
-            warehouses={warehouses}
-            returnLocation={returnLocation}
-            defaultWarehouseId={defaultWarehouseId}
-          />
+          <OrgInventoryItemsTable items={equipmentItems} />
+          <AddOrgInventoryItemPanel />
         </section>
       ) : null}
 
@@ -250,20 +190,10 @@ export default async function InventoryHubPage({
               </span>
             </h2>
           </div>
-          <FleetVehiclesTable
-            vehicles={vehicles}
-            warehouses={warehouses}
-            returnLocation={returnLocation}
-          />
-          <AddFleetVehiclePanel
-            warehouses={warehouses}
-            returnLocation={returnLocation}
-            defaultWarehouseId={defaultWarehouseId}
-          />
+          <FleetVehiclesTable vehicles={vehicles} />
+          <AddFleetVehiclePanel />
         </section>
       ) : null}
-
-      <ManageWarehousesPanel warehouses={warehouses} />
     </div>
   );
 }

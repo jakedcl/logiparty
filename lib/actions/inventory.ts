@@ -1,18 +1,14 @@
 "use server";
 
 import { randomUUID } from "crypto";
-import { and, asc, eq, isNull } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
 import { canManageOrgInventory } from "@/lib/auth/permissions";
 import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
-import {
-  inventoryItems,
-  warehouses,
-  type InventoryItem,
-} from "@/lib/db/schema";
-import { inventoryHref, parseWarehouseId } from "@/lib/inventory/hub";
+import { inventoryItems, type InventoryItem } from "@/lib/db/schema";
+import { inventoryHref } from "@/lib/inventory/hub";
 import { normalizeSku } from "@/lib/inventory/sku";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
@@ -34,29 +30,8 @@ function parseQuantity(raw: FormDataEntryValue | null): number {
   return n;
 }
 
-async function assertWarehouseInOrg(
-  orgId: string,
-  warehouseId: string | null
-): Promise<void> {
-  if (!warehouseId) return;
-  const rows = await withOrgQuery<{ id: string }[]>(orgId, (database) =>
-    database
-      .select({ id: warehouses.id })
-      .from(warehouses)
-      .where(and(eq(warehouses.id, warehouseId), eq(warehouses.orgId, orgId)))
-      .limit(1)
-  );
-  if (!rows[0]) throw new Error("Warehouse not found");
-}
-
-function returnToEquipment(formData: FormData) {
-  const location = String(formData.get("returnLocation") ?? "").trim();
-  redirect(
-    inventoryHref({
-      tab: "equipment",
-      location: location || undefined,
-    })
-  );
+function returnToEquipment() {
+  redirect(inventoryHref({ tab: "equipment" }));
 }
 
 export async function createOrgInventoryItem(formData: FormData) {
@@ -66,18 +41,15 @@ export async function createOrgInventoryItem(formData: FormData) {
   const name = (formData.get("name") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() || null;
   const totalQuantity = parseQuantity(formData.get("totalQuantity"));
-  const warehouseId = parseWarehouseId(formData.get("warehouseId"));
 
   if (!sku) throw new Error("SKU is required");
   if (!name) throw new Error("Name is required");
-  await assertWarehouseInOrg(session.user.orgId, warehouseId);
 
   const id = randomUUID();
   await withOrgQueries(session.user.orgId, (database) => [
     database.insert(inventoryItems).values({
       id,
       orgId: session.user.orgId,
-      warehouseId,
       sku,
       name,
       description,
@@ -89,12 +61,12 @@ export async function createOrgInventoryItem(formData: FormData) {
       action: `Created our inventory item "${name}"`,
       entityType: "inventory_item",
       entityId: id,
-      metadata: { sku, name, totalQuantity, warehouseId },
+      metadata: { sku, name, totalQuantity },
     }),
   ]);
 
   revalidatePath("/dashboard/inventory");
-  returnToEquipment(formData);
+  returnToEquipment();
 }
 
 export async function updateOrgInventoryItem(formData: FormData) {
@@ -107,16 +79,14 @@ export async function updateOrgInventoryItem(formData: FormData) {
   const name = (formData.get("name") as string)?.trim();
   const description = (formData.get("description") as string)?.trim() || null;
   const totalQuantity = parseQuantity(formData.get("totalQuantity"));
-  const warehouseId = parseWarehouseId(formData.get("warehouseId"));
 
   if (!sku) throw new Error("SKU is required");
   if (!name) throw new Error("Name is required");
-  await assertWarehouseInOrg(session.user.orgId, warehouseId);
 
   await withOrgQueries(session.user.orgId, (database) => [
     database
       .update(inventoryItems)
-      .set({ sku, name, description, totalQuantity, warehouseId })
+      .set({ sku, name, description, totalQuantity })
       .where(
         and(
           eq(inventoryItems.id, id),
@@ -129,12 +99,12 @@ export async function updateOrgInventoryItem(formData: FormData) {
       action: `Updated our inventory item "${name}"`,
       entityType: "inventory_item",
       entityId: id,
-      metadata: { sku, name, totalQuantity, warehouseId },
+      metadata: { sku, name, totalQuantity },
     }),
   ]);
 
   revalidatePath("/dashboard/inventory");
-  returnToEquipment(formData);
+  returnToEquipment();
 }
 
 export async function deleteOrgInventoryItem(formData: FormData) {
@@ -162,25 +132,18 @@ export async function deleteOrgInventoryItem(formData: FormData) {
   ]);
 
   revalidatePath("/dashboard/inventory");
-  returnToEquipment(formData);
+  returnToEquipment();
 }
 
 export async function listOrgInventoryItems(
-  orgId: string,
-  opts?: { warehouseId?: string | "unassigned" }
+  orgId: string
 ): Promise<InventoryItem[]> {
   if (!db) return [];
-  const filters = [eq(inventoryItems.orgId, orgId)];
-  if (opts?.warehouseId === "unassigned") {
-    filters.push(isNull(inventoryItems.warehouseId));
-  } else if (opts?.warehouseId) {
-    filters.push(eq(inventoryItems.warehouseId, opts.warehouseId));
-  }
   return withOrgQuery<InventoryItem[]>(orgId, (database) =>
     database
       .select()
       .from(inventoryItems)
-      .where(and(...filters))
+      .where(eq(inventoryItems.orgId, orgId))
       .orderBy(asc(inventoryItems.name))
   );
 }
