@@ -432,7 +432,7 @@ type RichCrew = {
 type RichJob = {
   name: string;
   clientCompany: string;
-  status: "draft" | "upcoming" | "ready" | "completed";
+  status: "draft" | "upcoming" | "ready" | "completed" | "denied";
   pocName: string;
   pocPhone?: string;
   leadEmail: string;
@@ -1088,6 +1088,25 @@ async function seedNydacRich(sql: Sql, passwordHash: string) {
       crew: [],
     },
     {
+      name: "Monster Rooftop Soft Ask",
+      clientCompany: "Monster Energy",
+      status: "denied",
+      pocName: "Sara",
+      pocPhone: "212-555-0202",
+      leadEmail: "mike@test.test",
+      notes: "Denied — no capacity that week; client told to re-request for Q4.",
+      timing: {
+        jobStartDays: -14,
+        jobEndDays: -13,
+      },
+      locations: [
+        { label: "Venue", address: "Rooftop TBD, Midtown Manhattan" },
+      ],
+      inventory: [],
+      fleetNames: [],
+      crew: [],
+    },
+    {
       // Base seed already creates this as upcoming — enrich to partial assign.
       name: "Red Bull Summer Pop-Up",
       clientCompany: "Red Bull",
@@ -1525,7 +1544,7 @@ Seed complete. Password for all accounts: password123
     maya@gothamglow.test      Client / POC (Gotham Glow)
     nick@gothamglow.test      Client (Gotham Glow)
     logo: /seed/nydac-logo.svg
-    jobs: Holiday Window (draft) · Summer Pop-Up (upcoming) · Monster Times Square (upcoming)
+    jobs: Holiday Window (draft) · Monster Rooftop Soft Ask (denied) · Summer Pop-Up (upcoming) · Monster Times Square (upcoming)
           · Brooklyn Mirage (ready) · Gotham Fashion Week (ready) · Pier 17 Wrap (completed)
 
   test — Acme Event Logistics (http://test.localhost:3000)

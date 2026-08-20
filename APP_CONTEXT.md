@@ -107,7 +107,7 @@ Central unit of work: inventory lines, fleet, crew, locations, documents, activi
 | `org_id` | UUID | RLS anchor |
 | `name` | string | |
 | `client_company_id` | UUID | FK to client_companies |
-| `status` | enum | `draft`, `upcoming`, `ready`, `completed` |
+| `status` | enum | `draft`, `upcoming`, `ready`, `completed`, `denied` |
 | `job_start` | timestamptz | When work/event starts |
 | `job_end` | timestamptz | |
 | `load_in_start` | timestamptz | |
@@ -130,6 +130,7 @@ Central unit of work: inventory lines, fleet, crew, locations, documents, activi
 ### Job status flow
 ```
 draft → upcoming → ready → completed
+draft → denied   (manager rejects client portal request)
 ```
 
 | Status | Meaning |
@@ -138,8 +139,9 @@ draft → upcoming → ready → completed
 | `upcoming` | Active job (manager created or accepted draft) |
 | `ready` | Auto or manual — trucks loaded, inventory loaded, crew assigned |
 | `completed` | Manager closed job |
+| `denied` | Manager rejected a client portal `draft` request (terminal for that request) |
 
-- **No** `confirmed`, `staged`, `active`, `cancelled` in v1 (see [docs/DECISIONS.md](docs/DECISIONS.md))
+- **No** `confirmed`, `staged`, `active`, or mid-lifecycle `cancelled` in v1 (see [docs/DECISIONS.md](docs/DECISIONS.md) D5)
 - Manager may **manually** set `ready` even if auto-rules incomplete (v1 default)
 
 ### Auto-ready rules
@@ -158,7 +160,7 @@ When status is `upcoming` and not `completed`, system evaluates:
 
 ### Who creates jobs
 - Manager: creates `upcoming` job directly
-- Client: submits `draft` request → manager accepts → `upcoming`
+- Client: submits `draft` request → manager accepts → `upcoming` (or denies → `denied`)
 
 ### Recurring / templates
 Out of scope for v1.
@@ -322,6 +324,7 @@ See [docs/SCHEMA.md](docs/SCHEMA.md) for full table list.
 | Invite users / tags | ✓ | ✓ | — | — | — |
 | Create / edit / delete jobs | — | ✓ | — | — | — |
 | Accept draft → upcoming | — | ✓ | — | — | — |
+| Deny draft → denied | — | ✓ | — | — | — |
 | Request job (draft) | — | — | — | — | ✓ |
 | View jobs | All | All | Assigned | Assigned | Own company |
 | Client inventory catalog | — | ✓ | ✓ | — | Read own |

@@ -64,6 +64,7 @@
 - [x] M4-2 Client auth routes on subdomain
 - [x] M4-3 Job request → `draft`
 - [x] M4-4 Manager accept draft → `upcoming`
+- [x] Manager deny portal draft → `denied` (D5b; migration `0020`)
 - [x] M4-5 R2 document upload + list
 - [x] M4-6 Client delete own docs
 - [x] M4-7 Mobile-responsive job list + upload

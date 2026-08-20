@@ -26,7 +26,7 @@ export default async function JobsPage() {
         <h1 className="text-2xl font-semibold mb-1">Jobs</h1>
         <p className="text-sm text-neutral-500">
           Create and manage jobs. Statuses: draft → upcoming → ready →
-          completed.
+          completed (or draft → denied).
         </p>
       </div>
 
@@ -90,6 +90,9 @@ export default async function JobsPage() {
                       {job.status}
                       {job.status === "draft" ? (
                         <span className="text-neutral-400"> · needs accept</span>
+                      ) : null}
+                      {job.status === "denied" ? (
+                        <span className="text-neutral-400"> · rejected</span>
                       ) : null}
                     </td>
                     <td className="py-2 px-3 text-right">
@@ -156,7 +159,7 @@ export default async function JobsPage() {
                     defaultValue="upcoming"
                     className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm bg-white"
                   >
-                    {JOB_STATUSES.map((s) => (
+                    {JOB_STATUSES.filter((s) => s !== "denied").map((s) => (
                       <option key={s} value={s}>
                         {s}
                       </option>

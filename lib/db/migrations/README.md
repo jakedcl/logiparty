@@ -28,6 +28,7 @@ npm run db:migrate:sql
 | `0017_m5_availability.sql` | availability_requests |
 | `0018_a3_marketing_leads.sql` | apex marketing / waitlist leads |
 | `0019_m6_org_billing.sql` | org Stripe billing columns (soft status) |
+| `0020_job_status_denied.sql` | job_status enum + `denied` (reject portal draft) |
 
 Then seed (optional):
 
