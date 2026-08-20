@@ -38,7 +38,7 @@ export async function listPortalJobs(orgId: string): Promise<Job[]> {
       .where(
         and(eq(jobs.orgId, orgId), eq(jobs.clientCompanyId, company.id))
       )
-      .orderBy(desc(jobs.createdAt))
+      .orderBy(desc(jobs.jobStart), desc(jobs.createdAt))
   );
 }
 
