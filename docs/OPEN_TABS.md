@@ -76,7 +76,7 @@
 - [x] **A16** Product visual system — high-contrast tokens (`globals.css`); tenant `--primary` via `OrgTheme` + `lib/theme/primary-color` (fallback navy `#1e3a5f`); ink staff sidebar; open tables (no decorative card chrome); portal + login white-label; `PageHeader` / `StatusBadge`. Smoke: nydac Mike + Michaela.
 - [x] **A17** Rejected out of primary feeds — denied jobs leave staff Jobs + portal Your jobs (collapsed **Rejected**); Notifications Inbox stays pending-only + collapsed **Rejected** history (`listRejectedItems`); Needs attention unchanged (already pending-only). Rows kept (`denied` status).
 - [x] **A18a** Inventory IA — single staff nav **Inventory**; tabs Client \| Equipment \| Fleet; `?tab=` deep-links; legacy redirects; A16 open tables. (**A18b** warehouses deferred.)
-- [x] **A18a polish** Client hero + Add-above-table — huge clickable client-name dropdown; pending scoped to selected client (quiet top-right reveal); caption left / **Add …** right above tables on Client, Equipment, Fleet (never under the table); `?tab=client&companyId=` (aliases `clientId` / `client`).
+- [x] **A18 Client cleanup** — big client title (no truncate) + switcher; quiet **N pending** toggle (closed by default); caption left / **+ Add …** button right (plain button, form below — no `<details>`); Client items view-first with ⋯ Edit/Delete; Equipment/Fleet only move Add top-right (tables unchanged).
 ---
 
 ## Current environments

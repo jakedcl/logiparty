@@ -50,10 +50,10 @@ export function ClientCompanyTitleSelect({
   }
 
   return (
-    <div ref={rootRef} className="relative inline-block max-w-full">
+    <div ref={rootRef} className="relative max-w-full">
       <button
         type="button"
-        className="group inline-flex max-w-full items-center gap-2 rounded-md text-left -ml-1.5 px-1.5 py-0.5 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+        className="group inline-flex max-w-full items-start gap-2 rounded-md text-left -ml-1.5 px-1.5 py-0.5 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
         aria-expanded={open}
         aria-haspopup="listbox"
         aria-controls={listId}
@@ -65,14 +65,14 @@ export function ClientCompanyTitleSelect({
         onClick={() => setOpen((v) => !v)}
       >
         <span
-          className={`truncate text-[1.75rem] font-semibold tracking-tight leading-tight sm:text-[2rem] ${
+          className={`text-[1.75rem] font-semibold tracking-tight leading-tight sm:text-[2rem] text-balance break-words ${
             selected ? "text-neutral-900" : "text-neutral-400"
           }`}
         >
           {label}
         </span>
         <ChevronDown
-          className={`mt-0.5 h-5 w-5 shrink-0 text-neutral-400 transition-transform group-hover:text-neutral-600 ${
+          className={`mt-2 h-5 w-5 shrink-0 text-neutral-400 transition-transform group-hover:text-neutral-600 ${
             open ? "rotate-180" : ""
           }`}
           strokeWidth={2}
