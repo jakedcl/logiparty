@@ -119,6 +119,7 @@
 - [x] **A16** Visual system — tokens, tenant primary, open layouts (2026-08-20)
 - [x] **A17** Rejected out of feeds — denied jobs/inventory leave Inbox/Jobs/portal primary lists; collapsed Rejected folders; DB rows kept
 - [x] **A18a** Inventory IA — one nav Inventory; tabs Client \| Equipment \| Fleet (`?tab=`); warehouses (**A18b**) deferred
+- [x] **A18 Inventory nested sidebar** — sidebar parent Inventory → Client | Equipment | Fleet; `?tab=` deep-links; page tabs removed (sidebar primary). PR #40.
 - [x] **A18a polish** Client hero dropdown + pending reveal; Add on caption row (all tabs); URL `companyId` (+ `clientId` / `client` aliases)
 
 ---
