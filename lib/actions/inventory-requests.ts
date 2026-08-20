@@ -184,6 +184,7 @@ function revalidateInventoryPaths(clientCompanyId: string) {
   revalidatePath("/portal/inventory");
   revalidatePath("/portal/inventory/requests/new");
   revalidatePath("/portal");
+  revalidatePath("/dashboard");
   revalidatePath("/dashboard/notifications");
   revalidatePath("/dashboard/client-inventory");
   revalidatePath(`/dashboard/client-inventory?companyId=${clientCompanyId}`);

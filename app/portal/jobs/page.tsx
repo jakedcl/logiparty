@@ -16,6 +16,8 @@ export default async function PortalJobsPage() {
   const session = await requireSession();
   const company = await getSessionClientCompany(session);
   const jobList = company ? await listPortalJobs(session.user.orgId) : [];
+  const activeJobs = jobList.filter((j) => j.status !== "denied");
+  const rejectedJobs = jobList.filter((j) => j.status === "denied");
 
   return (
     <div className="space-y-8">
@@ -32,10 +34,10 @@ export default async function PortalJobsPage() {
         <section className="space-y-3">
           <h2 className="lp-section-title">
             Your jobs
-            <span className="lp-section-meta">({jobList.length})</span>
+            <span className="lp-section-meta">({activeJobs.length})</span>
           </h2>
 
-          {jobList.length === 0 ? (
+          {activeJobs.length === 0 ? (
             <p className="app-empty">
               No jobs yet. Use + New request below when you need one.
             </p>
@@ -51,7 +53,7 @@ export default async function PortalJobsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {jobList.map((job) => {
+                  {activeJobs.map((job) => {
                     const when = fmtShort(job.jobStart);
                     return (
                       <tr key={job.id}>
@@ -82,6 +84,72 @@ export default async function PortalJobsPage() {
               </table>
             </div>
           )}
+
+          {rejectedJobs.length > 0 ? (
+            <details className="group border-t border-[var(--border)] pt-4">
+              <summary className="cursor-pointer list-none text-sm text-[var(--muted)] hover:text-[var(--foreground)] select-none [&::-webkit-details-marker]:hidden">
+                <span className="inline-flex items-center gap-1.5 font-medium">
+                  <span
+                    className="text-[var(--faint)] group-open:hidden"
+                    aria-hidden
+                  >
+                    +
+                  </span>
+                  <span
+                    className="hidden text-[var(--faint)] group-open:inline"
+                    aria-hidden
+                  >
+                    −
+                  </span>
+                  Rejected
+                  <span className="font-normal text-[var(--faint)]">
+                    ({rejectedJobs.length})
+                  </span>
+                </span>
+              </summary>
+              <div className="mt-3 lp-table-wrap">
+                <table className="lp-table min-w-[420px]">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th className="w-[6rem]">Date</th>
+                      <th className="w-[7rem]">Status</th>
+                      <th className="w-[4rem] text-right"> </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rejectedJobs.map((job) => {
+                      const when = fmtShort(job.jobStart);
+                      return (
+                        <tr key={job.id}>
+                          <td>
+                            <Link
+                              href={`/portal/jobs/${job.id}`}
+                              className="lp-cell-strong hover:underline"
+                            >
+                              {job.name}
+                            </Link>
+                          </td>
+                          <td>{when ?? "—"}</td>
+                          <td>
+                            <StatusBadge status={job.status} kind="job" />
+                          </td>
+                          <td className="text-right">
+                            <Link
+                              href={`/portal/jobs/${job.id}`}
+                              className="lp-link-quiet"
+                            >
+                              View →
+                            </Link>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </details>
+          ) : null}
 
           <details className="group border-t border-[var(--border)] pt-4">
             <summary className="cursor-pointer list-none text-sm text-[var(--muted)] hover:text-[var(--foreground)] select-none [&::-webkit-details-marker]:hidden">
