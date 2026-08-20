@@ -1,19 +1,26 @@
+import { headers } from "next/headers";
 import { switchDevPersona } from "@/lib/actions/dev-role-switch";
 import {
   getDevPersonaHint,
   getDevPersonasForOrg,
   isDevRoleSwitchAllowed,
 } from "@/lib/dev/role-switch";
+import { getOrgSlugFromHeaders } from "@/lib/org/subdomain";
 
 type Props = {
-  /** Current host org slug — personas are org-scoped. */
+  /**
+   * Optional override. Prefer host slug (current tenant) — panel resolves
+   * from middleware headers when omitted so personas match the subdomain.
+   */
   orgSlug?: string | null;
 };
 
 /** Floating Dev panel — only renders when ALLOW_DEV_ROLE_SWITCH is on (never Production). */
-export function DevRoleSwitchPanel({ orgSlug }: Props) {
+export async function DevRoleSwitchPanel({ orgSlug: orgSlugProp }: Props) {
   if (!isDevRoleSwitchAllowed()) return null;
 
+  const headersList = await headers();
+  const orgSlug = orgSlugProp ?? getOrgSlugFromHeaders(headersList);
   const personas = getDevPersonasForOrg(orgSlug);
   if (personas.length === 0) return null;
 

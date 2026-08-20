@@ -2,9 +2,10 @@
  * Golden-path seed — run: npm run db:seed (requires DATABASE_URL)
  * Safe to re-run: uses ON CONFLICT / existence checks.
  *
- * Creates TWO fully populated tenants:
+ * Creates THREE fully populated tenants:
  *   - nydac  → New York Design and Construction (Jake's cast + Red Bull)
  *   - test   → Acme Event Logistics (playground cast + Monster)
+ *   - axis   → Axis Global Staging (generic cast + Volt Energy)
  *
  * users.email is globally unique — casts use different emails.
  */
@@ -58,6 +59,13 @@ type SeedOrg = {
   clientInventory: { sku: string; name: string; qty: number };
   orgInventory: { sku: string; name: string; qty: number };
   fleet: { name: string; plate: string };
+  /** One upcoming job so Jobs list isn't empty after seed. */
+  sampleJob: {
+    name: string;
+    locationLabel: string;
+    address: string;
+    pocName: string;
+  };
 };
 
 const NYDAC: SeedOrg = {
@@ -95,6 +103,12 @@ const NYDAC: SeedOrg = {
   clientInventory: { sku: "RB-BAR-01", name: "Branded Bar", qty: 10 },
   orgInventory: { sku: "DOLLY-01", name: "Dolly", qty: 20 },
   fleet: { name: "Box Truck 12", plate: "NYD-012" },
+  sampleJob: {
+    name: "Red Bull Summer Pop-Up",
+    locationLabel: "Load-in",
+    address: "200 Pier 17, New York, NY",
+    pocName: "Michaela",
+  },
 };
 
 const TEST: SeedOrg = {
@@ -129,9 +143,51 @@ const TEST: SeedOrg = {
   clientInventory: { sku: "MN-TENT-01", name: "Promo Tent", qty: 6 },
   orgInventory: { sku: "PALLET-JACK-01", name: "Pallet Jack", qty: 8 },
   fleet: { name: "Sprinter Van 3", plate: "ACM-003" },
+  sampleJob: {
+    name: "Monster Campus Activation",
+    locationLabel: "Venue",
+    address: "1 Acme Way, Austin, TX",
+    pocName: "Nina",
+  },
 };
 
-const ORGS: readonly SeedOrg[] = [NYDAC, TEST];
+const AXIS: SeedOrg = {
+  slug: "axis",
+  name: "Axis Global Staging",
+  logoUrl: "/seed/axis-logo.svg",
+  primaryColor: "#0f766e",
+  people: [
+    { email: "jordan@axis.test", first: "Jordan", last: "Hale" },
+    { email: "avery@axis.test", first: "Avery", last: "Quinn" },
+    { email: "casey@axis.test", first: "Casey", last: "Reed" },
+    { email: "drew@axis.test", first: "Drew", last: "Park" },
+    { email: "blake@axis.test", first: "Blake", last: "Ortiz" },
+    { email: "taylor@volt.test", first: "Taylor", last: "Kim" },
+    { email: "reese@volt.test", first: "Reese", last: "Ng" },
+  ],
+  orgAdminEmails: ["jordan@axis.test"],
+  managerEmails: ["avery@axis.test"],
+  staffEmails: ["casey@axis.test", "drew@axis.test", "blake@axis.test"],
+  warehouseEmails: ["casey@axis.test", "drew@axis.test"],
+  driverEmails: ["blake@axis.test"],
+  clientEmails: ["taylor@volt.test", "reese@volt.test"],
+  clientCompany: "Volt Energy",
+  clientTitles: {
+    "taylor@volt.test": "POC",
+    "reese@volt.test": "Rep",
+  },
+  clientInventory: { sku: "VT-KIOSK-01", name: "Brand Kiosk", qty: 8 },
+  orgInventory: { sku: "CART-01", name: "Utility Cart", qty: 12 },
+  fleet: { name: "Box Truck 7", plate: "AXS-007" },
+  sampleJob: {
+    name: "Volt Trade Show Load-In",
+    locationLabel: "Hall B",
+    address: "500 Expo Blvd, Chicago, IL",
+    pocName: "Taylor Kim",
+  },
+};
+
+const ORGS: readonly SeedOrg[] = [NYDAC, TEST, AXIS];
 
 async function upsertPeople(sql: Sql, people: readonly SeedPerson[], passwordHash: string) {
   for (const p of people) {
@@ -293,6 +349,42 @@ async function seedOrg(sql: Sql, org: SeedOrg, passwordHash: string) {
         SELECT 1 FROM fleet_vehicles f WHERE f.org_id = o.id AND f.name = ${fl.name}
       )
   `;
+
+  const job = org.sampleJob;
+  const adminEmail = org.orgAdminEmails[0];
+  await sql`
+    INSERT INTO jobs (
+      org_id, client_company_id, name, status,
+      job_start, job_end, client_poc_name, created_by
+    )
+    SELECT
+      o.id,
+      c.id,
+      ${job.name},
+      'upcoming',
+      NOW() + INTERVAL '7 days',
+      NOW() + INTERVAL '8 days',
+      ${job.pocName},
+      u.id
+    FROM organizations o
+    JOIN client_companies c ON c.org_id = o.id AND c.name = ${org.clientCompany}
+    JOIN users u ON u.email = ${adminEmail}
+    WHERE o.slug = ${org.slug}
+      AND NOT EXISTS (
+        SELECT 1 FROM jobs j WHERE j.org_id = o.id AND j.name = ${job.name}
+      )
+  `;
+
+  await sql`
+    INSERT INTO job_locations (job_id, org_id, label, address, sort_order)
+    SELECT j.id, j.org_id, ${job.locationLabel}, ${job.address}, 0
+    FROM jobs j
+    JOIN organizations o ON o.id = j.org_id
+    WHERE o.slug = ${org.slug} AND j.name = ${job.name}
+      AND NOT EXISTS (
+        SELECT 1 FROM job_locations jl WHERE jl.job_id = j.id
+      )
+  `;
 }
 
 async function seed() {
@@ -340,6 +432,16 @@ Seed complete. Password for all accounts: password123
     nina@monster.test         Client / POC (Monster)
     kai@monster.test          Client (Monster)
     logo: /seed/test-tenant-logo.svg (orange TEST badge)
+
+  axis — Axis Global Staging (http://axis.localhost:3000)
+    jordan@axis.test          OrgAdmin (Jordan Hale)
+    avery@axis.test           Manager (Avery Quinn)
+    casey@axis.test           Staff / warehouse
+    drew@axis.test            Staff / warehouse
+    blake@axis.test           Staff / driver
+    taylor@volt.test          Client / POC (Volt Energy)
+    reese@volt.test           Client (Volt Energy)
+    logo: /seed/axis-logo.svg (teal)
 `);
 }
 

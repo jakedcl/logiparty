@@ -168,7 +168,7 @@ export function InternalShell({
       <main className="flex-1 p-4 md:p-6 max-w-6xl mx-auto w-full">
         {children}
       </main>
-      <DevRoleSwitchPanel orgSlug={session.user.orgSlug} />
+      <DevRoleSwitchPanel />
     </div>
   );
 }

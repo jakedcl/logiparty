@@ -1,5 +1,5 @@
 /**
- * Wipe seeded orgs (nydac + test + legacy demo/acme/…) and re-run golden-path seed.
+ * Wipe seeded orgs (nydac + test + axis + legacy demo/acme/…) and re-run golden-path seed.
  *
  * Run: npm run db:reset-seed -- --confirm
  *
@@ -7,15 +7,22 @@
  * (CASCADE org-scoped rows / memberships — users are NOT auto-deleted), then
  * seed-only users by email. Non-seed users are kept.
  *
- * After re-seed, both `nydac` and `test` exist (fully populated).
+ * After re-seed, `nydac`, `test`, and `axis` exist (fully populated).
  */
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { neon } from "@neondatabase/serverless";
 import { execSync } from "child_process";
 
-/** Orgs wiped on reset. Seed recreates `nydac` + `test`; others are legacy cleanup. */
-const SEED_ORG_SLUGS = ["nydac", "test", "demo", "acme", "testtenant3pl"] as const;
+/** Orgs wiped on reset. Seed recreates nydac + test + axis; others are legacy cleanup. */
+const SEED_ORG_SLUGS = [
+  "nydac",
+  "test",
+  "axis",
+  "demo",
+  "acme",
+  "testtenant3pl",
+] as const;
 
 const SEED_USER_EMAILS = [
   // NYDAC cast
@@ -36,6 +43,14 @@ const SEED_USER_EMAILS = [
   "jamie@playground.test",
   "nina@monster.test",
   "kai@monster.test",
+  // Axis Global Staging cast
+  "jordan@axis.test",
+  "avery@axis.test",
+  "casey@axis.test",
+  "drew@axis.test",
+  "blake@axis.test",
+  "taylor@volt.test",
+  "reese@volt.test",
   // Legacy cast (cleanup on reset — includes former demo OrgAdmin Devon)
   "admin@demo.test",
   "admin@test.test",
@@ -211,15 +226,22 @@ async function resetAndSeed() {
     SELECT o.slug, i.sku, i.name
     FROM inventory_items i
     JOIN organizations o ON o.id = i.org_id
-    WHERE o.slug IN ('nydac', 'test')
+    WHERE o.slug IN ('nydac', 'test', 'axis')
     ORDER BY o.slug, i.sku
   `;
   const fleetAfter = await sql`
     SELECT o.slug, f.name, f.plate
     FROM fleet_vehicles f
     JOIN organizations o ON o.id = f.org_id
-    WHERE o.slug IN ('nydac', 'test')
+    WHERE o.slug IN ('nydac', 'test', 'axis')
     ORDER BY o.slug, f.name
+  `;
+  const jobsAfter = await sql`
+    SELECT o.slug, j.name, j.status
+    FROM jobs j
+    JOIN organizations o ON o.id = j.org_id
+    WHERE o.slug IN ('nydac', 'test', 'axis')
+    ORDER BY o.slug, j.name
   `;
 
   console.log("\n--- After seed ---");
@@ -227,8 +249,9 @@ async function resetAndSeed() {
   console.log("Client companies:", clientsAfter);
   console.log("Inventory:", inventoryAfter);
   console.log("Fleet:", fleetAfter);
+  console.log("Sample jobs:", jobsAfter);
   console.log(
-    "\nNon-seed users preserved (e.g. personal accounts) — re-invite to nydac/test if needed."
+    "\nNon-seed users preserved (e.g. personal accounts) — re-invite to nydac/test/axis if needed."
   );
 }
 
