@@ -118,6 +118,9 @@
 - [x] **A15** Staff dashboard home — replace M0 stub with role-aware ops console (Needs attention + Upcoming work + primary CTAs)
 - [x] **A16** Visual system — tokens, tenant primary, open layouts (2026-08-20)
 - [x] **A17** Rejected out of feeds — denied jobs/inventory leave Inbox/Jobs/portal primary lists; collapsed Rejected folders; DB rows kept
+- [x] **A18a** Inventory IA — one nav Inventory; tabs Client \| Equipment \| Fleet (`?tab=`); warehouses (**A18b**) deferred
+- [x] **A18 Inventory nested sidebar** — sidebar parent Inventory → Client | Equipment | Fleet; `?tab=` deep-links; page tabs removed (sidebar primary). PR #40.
+- [x] **A18a polish** Client hero dropdown + pending reveal; Add on caption row (all tabs); URL `companyId` (+ `clientId` / `client` aliases)
 
 ---
 
@@ -169,3 +172,4 @@
 ### Go-live ops (OPEN_TABS)
 - [x] **A16** Visual system — tokens, tenant primary, open layouts (2026-08-20)
 - [x] **A17** Rejected out of primary feeds (2026-08-20)
+- [x] **A18a** Inventory hub tabs (2026-08-20); **A18b** warehouses deferred; Client hero + Add-above-table polish

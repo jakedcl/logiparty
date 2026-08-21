@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (A17 rejected out of feeds).*
+*Last updated: 2026-08-20 (A18 Inventory nested sidebar).*
 
 ---
 
@@ -21,6 +21,7 @@
 | ID | Task | Notes |
 |----|------|-------|
 | **A12** | Staff accept/deny **job assignments** | Separate from manager deny of portal drafts (done). `job_assignments` still has no accept status. Needs product decision + small schema before UI. |
+| **A18b** | Warehouses / item locations (optional) | Deferred — nice detail, not required. No schema/filter until Jake asks. |
 
 ---
 
@@ -62,7 +63,7 @@
 - [x] **B4 partial** Stripe billing scaffold (optional, no keys required) — Checkout + portal + webhook + Settings Billing; soft `billing_status`; keys TBD.
 - [x] **Nav shell** Staff dashboard — left sidebar + mobile drawer (`DashboardShell`); portal unchanged; run-sheet location bullets → `ul`.
 - [x] **NYDAC rich seed** — `seedNydacRich()` in `lib/db/seed.ts`: Monster Energy + Gotham Glow clients, fat catalogs, 5 fleet, 6 jobs across draft/upcoming/ready/completed with locations/crew/fleet/qty_loaded + activity. Crew spread: Tom/Rob/Paul/Jerome each on 5 jobs; Mike/Don lead multiple; ready jobs full LI+LO. Neon **dev** only.
-- [x] **Staff nav UX** — Primary: Dashboard, Jobs / My Jobs, **Notifications**, inventory, Fleet, Team, Clients, **Settings**. Moved **Availability → Settings / Time off**, **Activity → Settings / Activity**. Old `/dashboard/availability` + `/dashboard/activity` redirect. Notifications = manager draft requests (Accept/Deny) + staff assignments (view/link; staff accept/deny → **A12**). Portal unchanged.
+- [x] **Staff nav UX** — Primary: Dashboard, Jobs / My Jobs, **Notifications**, **Inventory** (Client/Equipment/Fleet tabs), Team, Clients, **Settings**. Moved **Availability → Settings / Time off**, **Activity → Settings / Activity**. Old `/dashboard/availability` + `/dashboard/activity` redirect. Notifications = manager draft requests (Accept/Deny) + staff assignments (view/link; staff accept/deny → **A12**). Portal unchanged.
 - [x] **Account menu** — Click name+role in dashboard/portal top bar → **My Profile** + **Sign out** only. Settings hub lists **My Profile** above Time off. Profile: edit first/last name; email read-only; change password if `password_hash` set. Paths: `/dashboard/settings/profile`, `/portal/profile` (`/dashboard/profile` redirects to settings). Sidebar/drawer brand: logo stacked above org name.
 - [x] **Manager deny portal draft** — New job status `denied` (migration `0020`). Managers Accept / Deny on job detail + Notifications; client portal shows denied (not stuck pending). D5b; distinct from **A12** staff assignment accept/deny. Neon **dev** migrated; seed example Monster Rooftop Soft Ask.
 - [x] **Clients tab contacts** — `/dashboard/clients` lists each company with a dense Name/Email/Title table of `client_users` (seed Michaela POC + Dom Rep under Red Bull on nydac). Invite contact + Add company stays collapsed create-last; invite flow unchanged.
@@ -74,6 +75,10 @@
 - [x] **A15** Staff `/dashboard` home — role-aware welcome (first name + org); Needs attention (top 5 from `listNotifications`, incl. notes/inventory/drafts/assignments); Upcoming work dense table (soonest `job_start` first, cap 8); manager **+ New job** / staff My Jobs + Time off; A6/A7 list density. Time-off tip → Settings.
 - [x] **A16** Product visual system — high-contrast tokens (`globals.css`); tenant `--primary` via `OrgTheme` + `lib/theme/primary-color` (fallback navy `#1e3a5f`); ink staff sidebar; open tables (no decorative card chrome); portal + login white-label; `PageHeader` / `StatusBadge`. Smoke: nydac Mike + Michaela.
 - [x] **A17** Rejected out of primary feeds — denied jobs leave staff Jobs + portal Your jobs (collapsed **Rejected**); Notifications Inbox stays pending-only + collapsed **Rejected** history (`listRejectedItems`); Needs attention unchanged (already pending-only). Rows kept (`denied` status).
+- [x] **A18a** Inventory IA — single staff nav **Inventory**; tabs Client \| Equipment \| Fleet; `?tab=` deep-links; legacy redirects; A16 open tables. (**A18b** warehouses deferred.)
+- [x] **A18 Client cleanup** — big client title (no truncate) + switcher; quiet **N pending** toggle (closed by default); caption left / **+ Add …** button right (plain button, form below — no `<details>`); Client items view-first with ⋯ Edit/Delete; Equipment/Fleet only move Add top-right (tables unchanged).
+- [x] **A18 fleet view + Equipment ⋯** — all staff roles **view** Fleet tab (D21); Manager/OrgAdmin only Add/Edit/Delete; Equipment rows match Client ⋯ Edit/Delete (no Save/Delete on every row). Clients stay portal-only. PR #40.
+- [x] **A18 Inventory nested sidebar** — Inventory expands to Client | Equipment | Fleet in the staff sidebar (primary nav); `?tab=` deep-links kept; page segment tabs removed to avoid double chrome. PR #40.
 ---
 
 ## Current environments

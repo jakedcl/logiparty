@@ -13,6 +13,7 @@ import {
   type ClientCompany,
   type ClientInventoryItem,
 } from "@/lib/db/schema";
+import { inventoryHref } from "@/lib/inventory/hub";
 import { normalizeSku } from "@/lib/inventory/sku";
 import {
   getSessionClientCompany,
@@ -54,6 +55,15 @@ async function assertCompanyInOrg(orgId: string, clientCompanyId: string) {
   if (!companies[0]) throw new Error("Client company not found");
 }
 
+function returnToClient(clientCompanyId?: string) {
+  redirect(
+    inventoryHref({
+      tab: "client",
+      companyId: clientCompanyId || undefined,
+    })
+  );
+}
+
 export async function createClientInventoryItem(formData: FormData) {
   const session = await requireClientInventoryAccess();
 
@@ -90,9 +100,9 @@ export async function createClientInventoryItem(formData: FormData) {
     }),
   ]);
 
-  revalidatePath("/dashboard/client-inventory");
+  revalidatePath("/dashboard/inventory");
   revalidatePath("/portal");
-  redirect(`/dashboard/client-inventory?companyId=${clientCompanyId}`);
+  returnToClient(clientCompanyId);
 }
 
 export async function updateClientInventoryItem(formData: FormData) {
@@ -130,11 +140,9 @@ export async function updateClientInventoryItem(formData: FormData) {
     }),
   ]);
 
-  revalidatePath("/dashboard/client-inventory");
+  revalidatePath("/dashboard/inventory");
   revalidatePath("/portal");
-  if (clientCompanyId) {
-    redirect(`/dashboard/client-inventory?companyId=${clientCompanyId}`);
-  }
+  returnToClient(clientCompanyId || undefined);
 }
 
 export async function deleteClientInventoryItem(formData: FormData) {
@@ -163,11 +171,9 @@ export async function deleteClientInventoryItem(formData: FormData) {
     }),
   ]);
 
-  revalidatePath("/dashboard/client-inventory");
+  revalidatePath("/dashboard/inventory");
   revalidatePath("/portal");
-  if (clientCompanyId) {
-    redirect(`/dashboard/client-inventory?companyId=${clientCompanyId}`);
-  }
+  returnToClient(clientCompanyId || undefined);
 }
 
 export async function listClientCompaniesForOrg(
