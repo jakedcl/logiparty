@@ -7,6 +7,7 @@ import {
   requestInventoryRemove,
 } from "@/lib/actions/inventory-requests";
 import type { ClientInventoryItem } from "@/lib/db/schema";
+import { RowActionsMenu } from "@/components/ui/row-actions-menu";
 
 function statusClass(status: string): string {
   switch (status) {
@@ -36,30 +37,22 @@ function typeLabel(type: string): string {
 
 function ItemActionsMenu({ itemId }: { itemId: string }) {
   return (
-    <details className="relative inline-block text-left">
-      <summary
-        className="list-none cursor-pointer select-none rounded px-1.5 py-0.5 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100 [&::-webkit-details-marker]:hidden"
-        aria-label="More actions"
+    <RowActionsMenu menuClassName="min-w-[11rem] rounded-md border border-neutral-200 bg-white py-1 shadow-md">
+      <Link
+        href={`/portal/inventory/requests/new?type=qty_change&itemId=${itemId}`}
+        role="menuitem"
+        className="block px-2.5 py-1.5 text-sm text-neutral-800 hover:bg-neutral-50"
       >
-        <span aria-hidden className="text-base leading-none tracking-tighter">
-          ⋯
-        </span>
-      </summary>
-      <div className="absolute right-0 top-full z-20 mt-1 min-w-[11rem] rounded-md border border-neutral-200 bg-white py-1 shadow-sm">
-        <Link
-          href={`/portal/inventory/requests/new?type=qty_change&itemId=${itemId}`}
-          className="block px-2.5 py-1.5 text-sm text-neutral-800 hover:bg-neutral-50"
-        >
-          Change quantity
-        </Link>
-        <Link
-          href={`/portal/inventory/requests/new?type=remove&itemId=${itemId}`}
-          className="block px-2.5 py-1.5 text-sm text-red-600 hover:bg-red-50"
-        >
-          Remove from storage
-        </Link>
-      </div>
-    </details>
+        Change quantity
+      </Link>
+      <Link
+        href={`/portal/inventory/requests/new?type=remove&itemId=${itemId}`}
+        role="menuitem"
+        className="block px-2.5 py-1.5 text-sm text-red-600 hover:bg-red-50"
+      >
+        Remove from storage
+      </Link>
+    </RowActionsMenu>
   );
 }
 

@@ -99,7 +99,6 @@ export default async function SettingsPage({
               name: org.name,
               logoUrl: org.logoUrl,
               primaryColor: org.primaryColor,
-              emailFromName: org.emailFromName,
             }}
           />
         </section>

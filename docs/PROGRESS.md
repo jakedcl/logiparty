@@ -168,10 +168,11 @@
 - [x] Checkout Session + Customer Portal server actions; webhook at `/api/stripe/webhook`
 - [x] Settings → Billing UI (calm “not configured” without keys; soft status only)
 - [ ] Jake: create Stripe product/price, add keys to Vercel + `.env.local`, register webhook URL
-- [ ] Jake: apply `0019_m6_org_billing.sql` on Neon **prod `main`** (dev can be migrated anytime)
+- [x] Jake: apply `0019_m6_org_billing.sql` on Neon **prod `main`** (2026-08-20; also `0020`–`0023`)
 
 ### Go-live ops (OPEN_TABS)
 - [x] **A16** Visual system — tokens, tenant primary, open layouts (2026-08-20)
 - [x] **A17** Rejected out of primary feeds (2026-08-20)
 - [x] **A19** Jobs / My Jobs calendar + weekday dates (2026-08-20)
 - [x] **A18a** Inventory hub tabs (2026-08-20); **A18b** warehouses deferred; Client hero + Add-above-table polish
+- [x] **RowActions portal + email from name** — ⋯ menus via body portal; Org Settings drops Email from name; mail uses display name (2026-08-20)

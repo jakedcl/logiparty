@@ -18,17 +18,17 @@ export async function updateOrgSettings(formData: FormData) {
   const name = (formData.get("name") as string)?.trim();
   const logoUrl = (formData.get("logoUrl") as string)?.trim() || null;
   const primaryColor = (formData.get("primaryColor") as string)?.trim();
-  const emailFromName = (formData.get("emailFromName") as string)?.trim() || null;
 
   if (!name) throw new Error("Organization name is required");
 
+  // Outbound email "from" display uses organizations.name (see sendInviteEmail).
+  // email_from_name column is unused by UI; left in place for backwards safety.
   await db
     .update(organizations)
     .set({
       name,
       logoUrl,
       primaryColor: primaryColor || FALLBACK_PRIMARY_COLOR,
-      emailFromName,
     })
     .where(eq(organizations.id, session.user.orgId));
 
