@@ -186,8 +186,10 @@ function revalidateInventoryPaths(clientCompanyId: string) {
   revalidatePath("/portal");
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/notifications");
-  revalidatePath("/dashboard/client-inventory");
-  revalidatePath(`/dashboard/client-inventory?companyId=${clientCompanyId}`);
+  revalidatePath("/dashboard/inventory");
+  revalidatePath(
+    `/dashboard/inventory?tab=client&companyId=${clientCompanyId}`
+  );
 }
 
 export async function listPortalInventoryRequests(
