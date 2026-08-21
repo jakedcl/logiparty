@@ -2,14 +2,23 @@ type InviteEmailParams = {
   to: string;
   orgName: string;
   inviteUrl: string;
-  fromName?: string;
+  /**
+   * Optional legacy `email_from_name`. Display name (`orgName`) wins;
+   * mailer falls back `fromName ?? orgName` only if orgName were empty.
+   */
+  fromName?: string | null;
 };
 
 export async function sendInviteEmail(params: InviteEmailParams) {
   const apiKey = process.env.RESEND_API_KEY;
+  const displayFrom = (
+    params.orgName?.trim() ||
+    params.fromName?.trim() ||
+    "Team"
+  ).trim();
   const from =
     process.env.RESEND_FROM_EMAIL ??
-    `${params.fromName ?? params.orgName} <onboarding@resend.dev>`;
+    `${displayFrom} <onboarding@resend.dev>`;
 
   if (!apiKey) {
     console.log("\n[dev] Invite link (no RESEND_API_KEY):\n", params.inviteUrl, "\n");

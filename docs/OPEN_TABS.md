@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (A18 Inventory nested sidebar + A19 Jobs calendar merged to main).*
+*Last updated: 2026-08-20 (RowActions portal menus + drop Email from name; org mail uses display name).*
 
 ---
 
@@ -29,10 +29,10 @@
 
 | ID | Task | Blocked by |
 |----|------|------------|
-| B1 | Prod smoke test + logo on login | Login works (A2 done). Remaining: full smoke + logo on login |
+| B1 | Prod smoke test + logo on login | Login + logo OK. Dashboard 500 fixed (env was on Neon `vercel-dev`). Remaining: full smoke after login |
 | B2 | First real paying customer | Jake tested app + A3 homepage live |
 | B3 | Resend invite emails | Resend account + domain verify |
-| B4 | M6 (Stripe, self-serve signup, custom domains) | **Stripe scaffold done** (keys TBD). Remaining: Jake adds Stripe keys + webhook + prod migrate `0019`; self-serve signup + custom domains still later |
+| B4 | M6 (Stripe, self-serve signup, custom domains) | **Stripe scaffold done** (keys TBD). Remaining: Jake adds Stripe keys + webhook; self-serve signup + custom domains still later. Neon `main` + `vercel-dev` both have `0019`–`0022`. **2026-08-20:** Production `DATABASE_URL` was wrongly on `vercel-dev` (`ep-orange-cake…`); corrected to `main` pooler (`ep-red-surf…-pooler`) to match `DATABASE_URL_UNPOOLED`. |
 
 ---
 
@@ -80,6 +80,7 @@
 - [x] **A18 Client cleanup** — big client title (no truncate) + switcher; quiet **N pending** toggle (closed by default); caption left / **+ Add …** button right (plain button, form below — no `<details>`); Client items view-first with ⋯ Edit/Delete; Equipment/Fleet only move Add top-right (tables unchanged).
 - [x] **A18 fleet view + Equipment ⋯** — all staff roles **view** Fleet tab (D21); Manager/OrgAdmin only Add/Edit/Delete; Equipment rows match Client ⋯ Edit/Delete (no Save/Delete on every row). Clients stay portal-only. PR #40.
 - [x] **A18 Inventory nested sidebar** — Inventory expands to Client | Equipment | Fleet in the staff sidebar (primary nav); `?tab=` deep-links kept; page segment tabs removed to avoid double chrome. PR #40.
+- [x] **RowActions portal** — shared `RowActionsMenu` portals ⋯ menus to `document.body` (fixed + flip-up) so `.lp-table-wrap` overflow cannot clip; Client/Equipment/portal inventory + QuietRemove. Org Settings: removed Email from name; invites use `organizations.name`.
 ---
 
 ## Current environments
