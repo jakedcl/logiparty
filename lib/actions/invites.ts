@@ -47,12 +47,14 @@ export async function createStaffInvite(formData: FormData) {
   });
 
   const org = await getOrgForSession(session);
+  const orgName = org?.name ?? session.user.orgName;
   const inviteUrl = buildInviteUrl(token, session.user.orgSlug);
   await sendInviteEmail({
     to: email,
-    orgName: org?.name ?? session.user.orgName,
+    orgName,
     inviteUrl,
-    fromName: org?.emailFromName ?? undefined,
+    // Legacy column only; orgName is the from-display source of truth.
+    fromName: org?.emailFromName,
   });
 
   // Store tags on invite metadata — apply on accept via hidden field
@@ -87,12 +89,13 @@ export async function createClientInvite(formData: FormData) {
   });
 
   const org = await getOrgForSession(session);
+  const orgName = org?.name ?? session.user.orgName;
   const inviteUrl = buildInviteUrl(token, session.user.orgSlug);
   await sendInviteEmail({
     to: email,
-    orgName: org?.name ?? session.user.orgName,
+    orgName,
     inviteUrl,
-    fromName: org?.emailFromName ?? undefined,
+    fromName: org?.emailFromName,
   });
 
   revalidatePath("/dashboard/clients");

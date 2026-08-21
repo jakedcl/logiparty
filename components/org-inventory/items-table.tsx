@@ -6,6 +6,10 @@ import {
   updateOrgInventoryItem,
 } from "@/lib/actions/inventory";
 import type { InventoryItem } from "@/lib/db/schema";
+import {
+  RowActionItem,
+  RowActionsMenu,
+} from "@/components/ui/row-actions-menu";
 
 function RowMenu({
   item,
@@ -14,45 +18,16 @@ function RowMenu({
   item: InventoryItem;
   onEdit: () => void;
 }) {
-  const [open, setOpen] = useState(false);
-
   return (
-    <div className="relative inline-block text-left">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        aria-label="More actions"
-        className="rounded px-1.5 py-0.5 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100"
-      >
-        <span aria-hidden className="text-base leading-none tracking-tighter">
-          ⋯
-        </span>
-      </button>
-      {open ? (
-        <div className="absolute right-0 top-full z-20 mt-1 min-w-[7.5rem] rounded-md border border-neutral-200 bg-white py-1 shadow-sm">
-          <button
-            type="button"
-            className="block w-full px-2.5 py-1.5 text-left text-sm text-neutral-800 hover:bg-neutral-50"
-            onClick={() => {
-              setOpen(false);
-              onEdit();
-            }}
-          >
-            Edit
-          </button>
-          <form action={deleteOrgInventoryItem}>
-            <input type="hidden" name="id" value={item.id} />
-            <button
-              type="submit"
-              className="block w-full px-2.5 py-1.5 text-left text-sm text-red-600 hover:bg-red-50"
-            >
-              Delete
-            </button>
-          </form>
-        </div>
-      ) : null}
-    </div>
+    <RowActionsMenu>
+      <RowActionItem onClick={onEdit}>Edit</RowActionItem>
+      <form action={deleteOrgInventoryItem}>
+        <input type="hidden" name="id" value={item.id} />
+        <RowActionItem type="submit" destructive>
+          Delete
+        </RowActionItem>
+      </form>
+    </RowActionsMenu>
   );
 }
 

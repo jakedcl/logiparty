@@ -15,7 +15,6 @@ export function OrgSettingsEditor({
     name: string;
     logoUrl: string | null;
     primaryColor: string | null;
-    emailFromName: string | null;
   };
 }) {
   const primary = org.primaryColor ?? FALLBACK_PRIMARY_COLOR;
@@ -52,10 +51,6 @@ export function OrgSettingsEditor({
                   <span className="font-mono text-xs">{primary}</span>
                 </span>
               ),
-            },
-            {
-              label: "Email from",
-              value: org.emailFromName ?? org.name,
             },
           ]}
         />
@@ -106,20 +101,6 @@ export function OrgSettingsEditor({
               type="color"
               defaultValue={primary}
               className="h-10 w-20 border rounded"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="emailFromName"
-              className="block text-sm font-medium mb-1"
-            >
-              Email from name
-            </label>
-            <input
-              id="emailFromName"
-              name="emailFromName"
-              defaultValue={org.emailFromName ?? org.name}
-              className="lp-input"
             />
           </div>
           <EditFormActions onCancel={onCancel} />
