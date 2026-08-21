@@ -36,6 +36,7 @@ import {
   listJobClientCompanies,
   listJobLeadCandidates,
 } from "@/lib/actions/jobs";
+import { formatJobDateRange } from "@/lib/format/date";
 import {
   addJobLocation,
   listJobLocations,
@@ -52,17 +53,11 @@ function toLocalInputValue(d: Date | null | undefined): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
-function fmtWindow(d: Date | null | undefined): string {
-  if (!d) return "—";
-  return d.toLocaleString();
-}
-
 function fmtRange(
   start: Date | null | undefined,
   end: Date | null | undefined
 ): string {
-  if (!start && !end) return "—";
-  return `${fmtWindow(start)} → ${fmtWindow(end)}`;
+  return formatJobDateRange(start, end);
 }
 
 const JOB_TABS = [

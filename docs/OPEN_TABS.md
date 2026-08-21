@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-20 (A18 Inventory nested sidebar).*
+*Last updated: 2026-08-20 (A18 Inventory nested sidebar + A19 Jobs calendar merged to main).*
 
 ---
 
@@ -75,6 +75,7 @@
 - [x] **A15** Staff `/dashboard` home — role-aware welcome (first name + org); Needs attention (top 5 from `listNotifications`, incl. notes/inventory/drafts/assignments); Upcoming work dense table (soonest `job_start` first, cap 8); manager **+ New job** / staff My Jobs + Time off; A6/A7 list density. Time-off tip → Settings.
 - [x] **A16** Product visual system — high-contrast tokens (`globals.css`); tenant `--primary` via `OrgTheme` + `lib/theme/primary-color` (fallback navy `#1e3a5f`); ink staff sidebar; open tables (no decorative card chrome); portal + login white-label; `PageHeader` / `StatusBadge`. Smoke: nydac Mike + Michaela.
 - [x] **A17** Rejected out of primary feeds — denied jobs leave staff Jobs + portal Your jobs (collapsed **Rejected**); Notifications Inbox stays pending-only + collapsed **Rejected** history (`listRejectedItems`); Needs attention unchanged (already pending-only). Rows kept (`denied` status).
+- [x] **A19** Jobs / My Jobs calendar — List | Calendar toggle (`?view=calendar`); month grid by `job_start`→`job_end`; A16 status colors; weekday dates (`Wed, Aug 20, 2026`) via `lib/format/date.ts`.
 - [x] **A18a** Inventory IA — single staff nav **Inventory**; tabs Client \| Equipment \| Fleet; `?tab=` deep-links; legacy redirects; A16 open tables. (**A18b** warehouses deferred.)
 - [x] **A18 Client cleanup** — big client title (no truncate) + switcher; quiet **N pending** toggle (closed by default); caption left / **+ Add …** button right (plain button, form below — no `<details>`); Client items view-first with ⋯ Edit/Delete; Equipment/Fleet only move Add top-right (tables unchanged).
 - [x] **A18 fleet view + Equipment ⋯** — all staff roles **view** Fleet tab (D21); Manager/OrgAdmin only Add/Edit/Delete; Equipment rows match Client ⋯ Edit/Delete (no Save/Delete on every row). Clients stay portal-only. PR #40.
