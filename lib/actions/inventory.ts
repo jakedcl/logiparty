@@ -3,10 +3,12 @@
 import { randomUUID } from "crypto";
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
 import { canManageOrgInventory } from "@/lib/auth/permissions";
 import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import { inventoryItems, type InventoryItem } from "@/lib/db/schema";
+import { inventoryHref } from "@/lib/inventory/hub";
 import { normalizeSku } from "@/lib/inventory/sku";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
@@ -26,6 +28,10 @@ function parseQuantity(raw: FormDataEntryValue | null): number {
     throw new Error("Quantity must be a non-negative integer");
   }
   return n;
+}
+
+function returnToEquipment() {
+  redirect(inventoryHref({ tab: "equipment" }));
 }
 
 export async function createOrgInventoryItem(formData: FormData) {
@@ -60,6 +66,7 @@ export async function createOrgInventoryItem(formData: FormData) {
   ]);
 
   revalidatePath("/dashboard/inventory");
+  returnToEquipment();
 }
 
 export async function updateOrgInventoryItem(formData: FormData) {
@@ -97,6 +104,7 @@ export async function updateOrgInventoryItem(formData: FormData) {
   ]);
 
   revalidatePath("/dashboard/inventory");
+  returnToEquipment();
 }
 
 export async function deleteOrgInventoryItem(formData: FormData) {
@@ -124,6 +132,7 @@ export async function deleteOrgInventoryItem(formData: FormData) {
   ]);
 
   revalidatePath("/dashboard/inventory");
+  returnToEquipment();
 }
 
 export async function listOrgInventoryItems(

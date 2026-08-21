@@ -329,7 +329,8 @@ See [docs/SCHEMA.md](docs/SCHEMA.md) for full table list.
 | View jobs | All | All | Assigned | Assigned | Own company |
 | Client inventory catalog | — | ✓ | ✓ | — | Read own |
 | Our inventory | — | ✓ | ✓ | — | — |
-| Fleet catalog | — | ✓ | — | — | — |
+| Fleet catalog (view) | ✓ | ✓ | ✓ | ✓ | — |
+| Fleet catalog (edit) | ✓ | ✓ | — | — | — |
 | Assign inventory / fleet / crew | — | ✓ | — | — | — |
 | Update quantity_loaded | — | ✓ | ✓ (assigned job) | — | — |
 | Upload documents | — | ✓ | — | — | ✓ |

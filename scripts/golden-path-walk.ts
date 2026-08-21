@@ -153,16 +153,16 @@ async function main() {
   const mike = await login("mike@test.test");
   const clientInv = await getHtml(
     mike,
-    `/dashboard/client-inventory?companyId=${rb.id}`
+    `/dashboard/inventory?tab=client&companyId=${rb.id}`
   );
   mark(
     "7",
     clientInv.html.includes("RB-BAR-01") && clientInv.html.includes("Branded Bar"),
     "Mike sees seeded client inventory RB-BAR-01"
   );
-  const orgInv = await getHtml(mike, "/dashboard/inventory");
-  mark("8", orgInv.html.includes("Dolly"), "Mike sees our inventory Dolly");
-  const fleet = await getHtml(mike, "/dashboard/fleet");
+  const orgInv = await getHtml(mike, "/dashboard/inventory?tab=equipment");
+  mark("8", orgInv.html.includes("Dolly"), "Mike sees equipment Dolly");
+  const fleet = await getHtml(mike, "/dashboard/inventory?tab=fleet");
   mark("9", fleet.html.includes("Box Truck 12"), "Mike sees Box Truck 12");
 
   const portalInv = await getHtml(michaela, "/portal/inventory");
