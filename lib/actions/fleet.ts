@@ -3,21 +3,34 @@
 import { randomUUID } from "crypto";
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
-import { canManageFleet } from "@/lib/auth/permissions";
+import { canManageFleet, canViewFleet } from "@/lib/auth/permissions";
 import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import { fleetVehicles, type FleetVehicle } from "@/lib/db/schema";
+import { inventoryHref } from "@/lib/inventory/hub";
 import { requireSession } from "@/lib/org/context";
 
-async function requireFleetAccess() {
+async function requireFleetView() {
+  const session = await requireSession();
+  if (!canViewFleet(session.user)) throw new Error("Forbidden");
+  if (!db) throw new Error("Database not configured");
+  return session;
+}
+
+async function requireFleetManage() {
   const session = await requireSession();
   if (!canManageFleet(session.user)) throw new Error("Forbidden");
   if (!db) throw new Error("Database not configured");
   return session;
 }
 
+function returnToFleet() {
+  redirect(inventoryHref({ tab: "fleet" }));
+}
+
 export async function createFleetVehicle(formData: FormData) {
-  const session = await requireFleetAccess();
+  const session = await requireFleetManage();
 
   const name = (formData.get("name") as string)?.trim();
   const plate = (formData.get("plate") as string)?.trim() || null;
@@ -46,11 +59,12 @@ export async function createFleetVehicle(formData: FormData) {
     }),
   ]);
 
-  revalidatePath("/dashboard/fleet");
+  revalidatePath("/dashboard/inventory");
+  returnToFleet();
 }
 
 export async function updateFleetVehicle(formData: FormData) {
-  const session = await requireFleetAccess();
+  const session = await requireFleetManage();
 
   const id = formData.get("id") as string;
   if (!id) throw new Error("Missing vehicle id");
@@ -82,11 +96,12 @@ export async function updateFleetVehicle(formData: FormData) {
     }),
   ]);
 
-  revalidatePath("/dashboard/fleet");
+  revalidatePath("/dashboard/inventory");
+  returnToFleet();
 }
 
 export async function deleteFleetVehicle(formData: FormData) {
-  const session = await requireFleetAccess();
+  const session = await requireFleetManage();
 
   const id = formData.get("id") as string;
   if (!id) throw new Error("Missing vehicle id");
@@ -109,11 +124,12 @@ export async function deleteFleetVehicle(formData: FormData) {
     }),
   ]);
 
-  revalidatePath("/dashboard/fleet");
+  revalidatePath("/dashboard/inventory");
+  returnToFleet();
 }
 
 export async function listFleetVehicles(orgId: string): Promise<FleetVehicle[]> {
-  const session = await requireFleetAccess();
+  const session = await requireFleetView();
   if (session.user.orgId !== orgId) throw new Error("Forbidden");
   return withOrgQuery<FleetVehicle[]>(orgId, (database) =>
     database

@@ -101,7 +101,7 @@ Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`,
 
 ## Catalogs
 
-### `inventory_items` (our inventory)
+### `inventory_items` (our inventory / Equipment tab)
 | Column | Type | Notes |
 |--------|------|-------|
 | id | uuid PK | |
@@ -112,7 +112,7 @@ Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`,
 | total_quantity | int | |
 | created_at | timestamptz | |
 
-3PL-owned gear (dollies, hand tools, general stock). UI label: **Our inventory**. Not fleet; not client-owned assets.
+3PL-owned gear (dollies, hand tools, general stock). UI label: **Equipment** (Inventory hub). Not fleet; not client-owned assets.
 
 ### `client_inventory_items`
 | Column | Type | Notes |
