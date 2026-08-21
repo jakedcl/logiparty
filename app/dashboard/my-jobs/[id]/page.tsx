@@ -15,10 +15,10 @@ import {
   type InventoryItem,
 } from "@/lib/db/schema";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
+import { formatJobDateTime } from "@/lib/format/date";
 
 function fmt(d: Date | null | undefined): string {
-  if (!d) return "—";
-  return d.toLocaleString();
+  return formatJobDateTime(d);
 }
 
 export default async function MyJobDetailPage({

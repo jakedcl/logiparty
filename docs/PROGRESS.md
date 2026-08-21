@@ -118,6 +118,7 @@
 - [x] **A15** Staff dashboard home — replace M0 stub with role-aware ops console (Needs attention + Upcoming work + primary CTAs)
 - [x] **A16** Visual system — tokens, tenant primary, open layouts (2026-08-20)
 - [x] **A17** Rejected out of feeds — denied jobs/inventory leave Inbox/Jobs/portal primary lists; collapsed Rejected folders; DB rows kept
+- [x] **A19** Jobs / My Jobs calendar view + weekday date format (2026-08-20)
 
 ---
 
@@ -169,3 +170,4 @@
 ### Go-live ops (OPEN_TABS)
 - [x] **A16** Visual system — tokens, tenant primary, open layouts (2026-08-20)
 - [x] **A17** Rejected out of primary feeds (2026-08-20)
+- [x] **A19** Jobs / My Jobs calendar + weekday dates (2026-08-20)
