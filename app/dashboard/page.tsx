@@ -9,6 +9,7 @@ import {
 } from "@/lib/auth/permissions";
 import type { Job } from "@/lib/db/schema";
 import { requireSession } from "@/lib/org/context";
+import { formatJobDate, formatJobDateTime } from "@/lib/format/date";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 
@@ -35,22 +36,8 @@ function kindLabel(
   }
 }
 
-function fmtJobDate(d: Date | null | undefined): string {
-  if (!d) return "—";
-  return d.toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
 function fmtWhen(d: Date): string {
-  return d.toLocaleString(undefined, {
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "2-digit",
-  });
+  return formatJobDateTime(d);
 }
 
 /** Soonest job_start first; undated jobs last. Operational “what’s next.” */
@@ -263,7 +250,7 @@ export default async function DashboardPage() {
                   <th>Name</th>
                   <th>Client</th>
                   <th className="w-[7rem]">Status</th>
-                  <th className="w-[7.5rem]">Date</th>
+                  <th className="w-[11rem]">Date</th>
                   <th className="w-[4rem] text-right"> </th>
                 </tr>
               </thead>
@@ -283,7 +270,7 @@ export default async function DashboardPage() {
                       <StatusBadge status={job.status} kind="job" />
                     </td>
                     <td className="whitespace-nowrap">
-                      {fmtJobDate(job.jobStart)}
+                      {formatJobDate(job.jobStart)}
                     </td>
                     <td className="text-right">
                       <Link href={job.href} className="lp-link-quiet">

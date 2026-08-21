@@ -17,7 +17,7 @@ const REQUEST_STATUS: Record<string, string> = {
 
 type Kind = "job" | "request" | "generic";
 
-function classesFor(status: string, kind: Kind): string {
+export function statusBadgeClass(status: string, kind: Kind = "generic"): string {
   const key = status.toLowerCase();
   if (kind === "job") return JOB_STATUS[key] ?? "lp-status-completed";
   if (kind === "request")
@@ -25,6 +25,10 @@ function classesFor(status: string, kind: Kind): string {
   return (
     JOB_STATUS[key] ?? REQUEST_STATUS[key] ?? "lp-status-completed"
   );
+}
+
+function classesFor(status: string, kind: Kind): string {
+  return statusBadgeClass(status, kind);
 }
 
 type Props = {
