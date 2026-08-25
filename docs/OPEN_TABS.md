@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-25 (Marketing homepage polish — credibility structure + CSS craft).*
+*Last updated: 2026-08-25 (A3b + Privacy/Terms on marketing polish PR #43).*
 
 ---
 
@@ -52,6 +52,7 @@
 - [x] Removed **`demo`** org from seed (and Devon / `admin@demo.test`). Seed creates **`nydac` + `test` + `axis`**. Reset still cleans legacy `demo` / acme + orphaned users.
 - [x] **A3** Marketing / leads homepage at apex `logiparty.com` — invite-only “Request access” form → `marketing_leads` (+ optional Resend notify). Tenant `{slug}.logiparty.com` unchanged. Follow-up: **A4** unknown subdomain → homepage.
 - [x] **A3b** Marketing homepage polish (2026-08-25) — problem → product → how it works → request; brand-first hero; enterprise-calm CSS (no fake logos). Files: `components/marketing/*`, `app/globals.css` marketing block, `app/page.tsx` metadata.
+- [x] **A3c** Apex `/privacy` + `/terms` — soft-pilot policy (accounts, leads, jobs/inventory; NextAuth JWT; Vercel/Neon; hello@logiparty.com); footer links; public in middleware. PR #43.
 - [x] **A4** Unknown subdomain → apex homepage — middleware checks `organizations.slug` via Neon HTTP; missing org → redirect to `https://logiparty.com` / `http://localhost:3000`. Known tenants + apex/www unchanged.
 - [x] **A6** Client inventory UI polish — dense items table (SKU/Name/Description/Qty/Actions); inline qty + description edit; SKU/name read-only after create; soft SKU normalize (trim, uppercase, `A-Z0-9_-`); “+ Add item” collapsed at bottom. Files: `app/dashboard/client-inventory/page.tsx`, `components/client-inventory/*`, `lib/inventory/sku.ts`, `lib/actions/client-inventory.ts`.
 - [x] **A7** Dashboard UI consistency — same A6 list-first / create-last pattern on: **Our inventory**, **Fleet**, **Jobs**, **Team**, **Clients**, **Availability**, **Activity**. Soft SKU normalize on Our inventory. Job detail / portal / marketing unchanged.
