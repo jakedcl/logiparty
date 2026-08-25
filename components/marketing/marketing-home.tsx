@@ -283,6 +283,18 @@ export function MarketingHome({
               Product
             </a>
             <Link
+              href="/privacy"
+              className="transition-colors hover:text-[var(--m-fg)]"
+            >
+              Privacy
+            </Link>
+            <Link
+              href="/terms"
+              className="transition-colors hover:text-[var(--m-fg)]"
+            >
+              Terms
+            </Link>
+            <Link
               href="/login"
               className="transition-colors hover:text-[var(--m-fg)]"
             >
