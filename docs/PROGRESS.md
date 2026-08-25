@@ -102,6 +102,7 @@
 ## Go-live queue (OPEN_TABS)
 
 - [x] **A3** Apex marketing homepage at `logiparty.com` (leads → `marketing_leads`; invite-only CTA)
+- [x] **A3b** Marketing homepage polish — lean credibility sections + craft atmosphere (2026-08-25)
 - [x] **A4** Unknown subdomain → redirect to apex homepage (middleware + Neon slug check)
 - [x] **A6** Client inventory UI polish (dense table; demoted add; soft SKU)
 - [x] **A7** Dashboard UI consistency — list-first tables + collapsed add on Our inventory, Fleet, Jobs, Team, Clients, Availability, Activity; SKU soft-normalize on Our inventory
