@@ -19,9 +19,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
   if (!orgSlug) {
     return {
-      title: "Logiparty — Ops for event logistics 3PLs",
+      title: "Logiparty — Ops software for event logistics 3PLs",
       description:
-        "Inventory, fleet, and crew under your brand. Invite-only multi-tenant ops for live-event 3PLs.",
+        "Jobs, inventory, fleet, and a white-label client portal for live-event 3PLs. Invite-only.",
     };
   }
 

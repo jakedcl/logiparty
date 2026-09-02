@@ -73,13 +73,16 @@ export async function middleware(request: NextRequest) {
     pathname === "/api/stripe/webhook";
   // Apex marketing homepage (A3) — public when host has no org slug.
   const isApexMarketing = !orgSlug && pathname === "/";
+  // Soft-pilot legal pages — public on apex (and harmless if hit elsewhere).
+  const isLegalPage = pathname === "/privacy" || pathname === "/terms";
 
   if (
     !token &&
     !isAuthPage &&
     !isInvitePage &&
     !isPublicApi &&
-    !isApexMarketing
+    !isApexMarketing &&
+    !isLegalPage
   ) {
     return redirectPath(request, "/login");
   }
