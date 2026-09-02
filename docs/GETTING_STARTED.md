@@ -85,7 +85,7 @@ npm run db:relink-admin
 
 After wildcard DNS is live, log in at the tenant that exists on **prod** (today: **https://test.logiparty.com**) with seed accounts or your personal admin. Local Neon **dev** has `nydac`, `test`, and `axis`.
 
-Latest Vercel deployment: **success** on commit `2653b5f` (main).
+Latest Vercel deployment: track **Production** on Vercel (repo `main`; includes marketing polish PR #43 / `006628d`).
 
 ---
 
