@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-08-25 (A3b + Privacy/Terms on marketing polish PR #43).*
+*Last updated: 2026-09-02 (docs audit after PR #43 merge; A3b/A3c already Done).*
 
 ---
 

@@ -1,6 +1,6 @@
 # PROGRESS.md — Ticket tracker
 
-**Current milestone:** M5 (ops polish)
+**Current milestone:** M5 complete. Active work = go-live / ops in [OPEN_TABS.md](OPEN_TABS.md) (M6 Stripe keys + Resend still optional).
 
 ---
 
@@ -143,15 +143,15 @@
 - [x] Test: Mike sees the document on the internal job detail (`scripts/r2-morgan-smoke.ts`)
 
 ### Vercel deployment
-- [ ] Install Vercel CLI: `npm i -g vercel`
-- [ ] Import GitHub repo at vercel.com → New Project
-- [ ] Add all env vars to Vercel project (copy from `.env.local`, add prod `AUTH_URL` = `https://logiparty.com`)
+- [ ] Install Vercel CLI: `npm i -g vercel` (optional — dashboard is enough)
+- [x] Import GitHub repo → Vercel project **logiparty** (live)
+- [x] Core prod env set (`AUTH_URL=https://logiparty.com`, `AUTH_SECRET`, `DATABASE_URL` on Neon `main`, `NEXT_PUBLIC_ROOT_DOMAIN`) — see OPEN_TABS A2 / A5
 - [x] Add `NEXT_PUBLIC_ROOT_DOMAIN=logiparty.com` in Vercel env vars (no `www`, not blank — redeploy after change)
-- [ ] Add `AUTH_SECRET` (generate: `openssl rand -base64 32`)
-- [ ] Add `CRON_SECRET` for `/api/cron/auto-ready`
-- [ ] Add domain `logiparty.com` and wildcard `*.logiparty.com` in Vercel project settings
-- [ ] Point DNS to Vercel (they'll give you the records)
-- [ ] Smoke test production: log in at `nydac.logiparty.com` (prod DB still `test` until renamed)
+- [x] Add `AUTH_SECRET` (login works on prod)
+- [ ] Confirm `CRON_SECRET` for `/api/cron/auto-ready` (if not already set)
+- [x] Domain `logiparty.com` + wildcard `*.logiparty.com` in Vercel + DNS
+- [x] Login smoke: `test.logiparty.com` works (2026-08-20). Full post-login smoke still open → OPEN_TABS **B1**. Prod DB still `test` slug until Jake asks for triple-seed/rename.
+- [ ] Optional: smoke `nydac.logiparty.com` after prod has a `nydac` org row
 
 ### Resend (email — invites)
 - [ ] Create account at resend.com, verify your sending domain

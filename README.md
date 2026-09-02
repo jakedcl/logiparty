@@ -2,7 +2,7 @@
 
 Multi-tenant SaaS for third-party logistics (3PL) companies — jobs, warehouse inventory, fleet, crew, and a white-label client portal.
 
-**Status:** M5 in progress. Neon project `logiparty` provisioned — use `.env.local` (not committed). R2/Resend optional until you connect them.
+**Status:** M5 complete (MVP). Post-MVP go-live / polish in [docs/OPEN_TABS.md](docs/OPEN_TABS.md). Neon project `logiparty` provisioned — use `.env.local` (not committed). Prod: [logiparty.com](https://logiparty.com) · tenant login [test.logiparty.com](https://test.logiparty.com/login). R2 connected; Resend optional until domain verify.
 
 ---
 
