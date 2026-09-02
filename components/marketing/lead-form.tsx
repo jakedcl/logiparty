@@ -10,11 +10,11 @@ export function LeadForm() {
 
   if (done) {
     return (
-      <div className="m-lead-success rounded-lg border border-[var(--m-line)] bg-[var(--m-panel)] p-6 sm:p-8">
+      <div className="m-lead-success border border-[var(--m-line)] bg-[var(--m-panel)] p-6 sm:p-8">
         <p className="text-lg font-medium text-[var(--m-fg)]">
           Thanks — we got your request.
         </p>
-        <p className="mt-2 text-sm text-[var(--m-muted)]">
+        <p className="mt-2 text-sm leading-relaxed text-[var(--m-muted)]">
           Invite-only for now. We&apos;ll follow up by email if there&apos;s a
           fit.
         </p>
@@ -76,7 +76,7 @@ export function LeadForm() {
           name="message"
           rows={4}
           className="m-input w-full resize-y min-h-[6rem]"
-          placeholder="What kind of work do you run?"
+          placeholder="Events, clients, warehouse size — whatever helps us understand fit."
         />
       </label>
       {error ? (
