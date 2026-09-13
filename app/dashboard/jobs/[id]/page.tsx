@@ -36,7 +36,6 @@ import {
   listJobClientCompanies,
   listJobLeadCandidates,
 } from "@/lib/actions/jobs";
-import { formatJobDateRange } from "@/lib/format/date";
 import {
   addJobLocation,
   listJobLocations,
@@ -51,29 +50,6 @@ function toLocalInputValue(d: Date | null | undefined): string {
   if (!d) return "";
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-function fmtRange(
-  start: Date | null | undefined,
-  end: Date | null | undefined
-): string {
-  return formatJobDateRange(start, end);
-}
-
-const JOB_TABS = [
-  { id: "summary", label: "Summary" },
-  { id: "locations", label: "Locations" },
-  { id: "inventory", label: "Inventory" },
-  { id: "fleet", label: "Fleet" },
-  { id: "crew", label: "Crew" },
-  { id: "documents", label: "Documents" },
-] as const;
-
-type JobTabId = (typeof JOB_TABS)[number]["id"];
-
-function parseTab(raw: string | undefined): JobTabId {
-  const match = JOB_TABS.find((t) => t.id === raw);
-  return match?.id ?? "summary";
 }
 
 function statusTone(status: string): string {
@@ -98,14 +74,13 @@ export default async function JobDetailPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ inv?: string; tab?: string }>;
+  searchParams: Promise<{ inv?: string }>;
 }) {
   const session = await requireSession();
   if (!canManageJobs(session.user)) redirect("/dashboard");
 
   const { id } = await params;
-  const { inv, tab: tabRaw } = await searchParams;
-  const tab = parseTab(tabRaw);
+  const { inv } = await searchParams;
   const inventorySource = inv === "org" ? "org" : "client";
 
   const job = await getJob(session.user.orgId, id);
@@ -159,19 +134,8 @@ export default async function JobDetailPage({
   const companyName =
     companies.find((c) => c.id === job.clientCompanyId)?.name ?? "Client";
 
-  const jobId = job.id;
-
-  function tabHref(next: JobTabId): string {
-    const q = new URLSearchParams();
-    q.set("tab", next);
-    if (next === "inventory" && inventorySource === "org") {
-      q.set("inv", "org");
-    }
-    return `/dashboard/jobs/${jobId}?${q.toString()}`;
-  }
-
   return (
-    <div className="space-y-5 max-w-4xl">
+    <div className="space-y-6">
       <div>
         <Link
           href="/dashboard/jobs"
@@ -211,123 +175,69 @@ export default async function JobDetailPage({
         </div>
       </div>
 
-      <nav
-        className="flex gap-0 overflow-x-auto border-b border-neutral-200 -mx-1 px-1"
-        aria-label="Job sections"
-      >
-        {JOB_TABS.map((t) => {
-          const active = tab === t.id;
-          return (
-            <Link
-              key={t.id}
-              href={tabHref(t.id)}
-              scroll={false}
-              aria-current={active ? "page" : undefined}
-              className={`relative shrink-0 px-3 py-2.5 text-sm transition-colors ${
-                active
-                  ? "font-medium text-neutral-900"
-                  : "text-neutral-500 hover:text-neutral-800"
-              }`}
-            >
-              {t.label}
-              {t.id === "locations" && locations.length > 0 ? (
-                <span className="ml-1 text-neutral-400 font-normal">
-                  {locations.length}
-                </span>
-              ) : null}
-              {t.id === "inventory" && inventoryLines.length > 0 ? (
-                <span className="ml-1 text-neutral-400 font-normal">
-                  {inventoryLines.length}
-                </span>
-              ) : null}
-              {t.id === "fleet" && fleetAssignments.length > 0 ? (
-                <span className="ml-1 text-neutral-400 font-normal">
-                  {fleetAssignments.length}
-                </span>
-              ) : null}
-              {t.id === "crew" && crewAssignments.length > 0 ? (
-                <span className="ml-1 text-neutral-400 font-normal">
-                  {crewAssignments.length}
-                </span>
-              ) : null}
-              {t.id === "documents" && jobDocuments.length > 0 ? (
-                <span className="ml-1 text-neutral-400 font-normal">
-                  {jobDocuments.length}
-                </span>
-              ) : null}
-              {active ? (
-                <span
-                  aria-hidden
-                  className="absolute inset-x-3 -bottom-px h-0.5 bg-neutral-900"
-                />
-              ) : null}
-            </Link>
-          );
-        })}
-      </nav>
+      {job.status === "draft" ? (
+        <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-950 space-y-2">
+          <p className="font-medium">Client request — draft</p>
+          <p className="text-xs">
+            Accept to move this job to upcoming so you can assign inventory,
+            fleet, and crew. Deny if you will not take the request.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <form action={acceptDraftJob}>
+              <input type="hidden" name="id" value={job.id} />
+              <button
+                type="submit"
+                className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white"
+              >
+                Accept request
+              </button>
+            </form>
+            <form action={denyDraftJob}>
+              <input type="hidden" name="id" value={job.id} />
+              <ConfirmSubmitButton
+                message="Deny this client job request? They will see it as denied."
+                className="rounded px-3 py-1.5 text-sm font-medium border border-red-300 bg-white text-red-700 hover:bg-red-50"
+              >
+                Deny
+              </ConfirmSubmitButton>
+            </form>
+          </div>
+        </div>
+      ) : null}
+      {job.status === "denied" ? (
+        <div className="rounded-md border border-red-200 bg-red-50 px-3 py-3 text-sm text-red-950">
+          <p className="font-medium">Request denied</p>
+          <p className="text-xs mt-1">
+            This client portal request was rejected. It will not move to
+            upcoming.
+          </p>
+        </div>
+      ) : null}
+      {autoReady ? (
+        <div
+          className={`rounded-md border px-3 py-2 text-sm ${
+            autoReady.eligible
+              ? "border-emerald-300 bg-emerald-50 text-emerald-900"
+              : "border-amber-200 bg-amber-50 text-amber-950"
+          }`}
+        >
+          <p className="font-medium">
+            {autoReady.eligible
+              ? "Auto-ready rules met — status flips to ready when you save crew, fleet, or loaded qty."
+              : "Auto-ready checklist"}
+          </p>
+          {!autoReady.eligible ? (
+            <ul className="mt-1 list-disc pl-5 text-xs space-y-0.5">
+              {autoReady.reasons.map((r) => (
+                <li key={r}>{r}</li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ) : null}
 
-      {tab === "summary" ? (
-        <JobPanel description="Job meta, windows, client POC, and internal notes.">
-          {job.status === "draft" ? (
-            <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-950 space-y-2">
-              <p className="font-medium">Client request — draft</p>
-              <p className="text-xs">
-                Accept to move this job to upcoming so you can assign inventory,
-                fleet, and crew. Deny if you will not take the request.
-              </p>
-              <div className="flex flex-wrap items-center gap-2">
-                <form action={acceptDraftJob}>
-                  <input type="hidden" name="id" value={job.id} />
-                  <button
-                    type="submit"
-                    className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white"
-                  >
-                    Accept request
-                  </button>
-                </form>
-                <form action={denyDraftJob}>
-                  <input type="hidden" name="id" value={job.id} />
-                  <ConfirmSubmitButton
-                    message="Deny this client job request? They will see it as denied."
-                    className="rounded px-3 py-1.5 text-sm font-medium border border-red-300 bg-white text-red-700 hover:bg-red-50"
-                  >
-                    Deny
-                  </ConfirmSubmitButton>
-                </form>
-              </div>
-            </div>
-          ) : null}
-          {job.status === "denied" ? (
-            <div className="rounded-md border border-red-200 bg-red-50 px-3 py-3 text-sm text-red-950">
-              <p className="font-medium">Request denied</p>
-              <p className="text-xs mt-1">
-                This client portal request was rejected. It will not move to
-                upcoming.
-              </p>
-            </div>
-          ) : null}
-          {autoReady ? (
-            <div
-              className={`rounded-md border px-3 py-2 text-sm ${
-                autoReady.eligible
-                  ? "border-emerald-300 bg-emerald-50 text-emerald-900"
-                  : "border-amber-200 bg-amber-50 text-amber-950"
-              }`}
-            >
-              <p className="font-medium">
-                {autoReady.eligible
-                  ? "Auto-ready rules met — status flips to ready when you save crew, fleet, or loaded qty."
-                  : "Auto-ready checklist"}
-              </p>
-              {!autoReady.eligible ? (
-                <ul className="mt-1 list-disc pl-5 text-xs space-y-0.5">
-                  {autoReady.reasons.map((r) => (
-                    <li key={r}>{r}</li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
-          ) : null}
+      <div className="grid gap-x-10 gap-y-8 lg:grid-cols-2">
+        <JobPanel title="Summary">
           <JobSummaryEditor
             job={{
               id: job.id,
@@ -349,30 +259,14 @@ export default async function JobDetailPage({
               loadOutStart: toLocalInputValue(job.loadOutStart),
               loadOutEnd: toLocalInputValue(job.loadOutEnd),
             }}
-            windowLabels={{
-              job: fmtRange(job.jobStart, job.jobEnd),
-              loadIn: fmtRange(job.loadInStart, job.loadInEnd),
-              loadOut: fmtRange(job.loadOutStart, job.loadOutEnd),
-            }}
           />
-          <form action={deleteJob} className="pt-6 border-t border-neutral-100">
-            <input type="hidden" name="id" value={job.id} />
-            <button
-              type="submit"
-              className="text-sm text-neutral-400 hover:text-red-700"
-            >
-              Delete job
-            </button>
-          </form>
         </JobPanel>
-      ) : null}
 
-      {tab === "locations" ? (
-        <JobPanel description="Up to 5 labels + addresses (e.g. Warehouse, Venue).">
+        <JobPanel title="Locations" count={locations.length}>
           {locations.length === 0 ? (
-            <p className="text-sm text-neutral-500 py-2">No locations yet.</p>
+            <p className="text-sm text-neutral-500">No locations yet.</p>
           ) : (
-            <div className="border-t border-[var(--border)] pt-1">
+            <div>
               {locations.map((loc) => (
                 <JobLocationRow key={loc.id} jobId={job.id} location={loc} />
               ))}
@@ -407,14 +301,12 @@ export default async function JobDetailPage({
             <p className="text-sm text-neutral-500">Maximum of 5 locations.</p>
           )}
         </JobPanel>
-      ) : null}
 
-      {tab === "inventory" ? (
-        <JobPanel description="Defaults to this job's client catalog; switch to our inventory when needed.">
+        <JobPanel title="Inventory" count={inventoryLines.length}>
           <InventorySourceToggle jobId={job.id} source={inventorySource} />
 
           {inventoryLines.length === 0 ? (
-            <p className="text-sm text-neutral-500 py-2">
+            <p className="text-sm text-neutral-500">
               No inventory assigned yet.
             </p>
           ) : (
@@ -449,8 +341,8 @@ export default async function JobDetailPage({
               <input type="hidden" name="itemType" value={inventorySource} />
               {pickerItems.length === 0 ? (
                 <p className="text-sm text-neutral-500">
-                  No {inventorySource} inventory items available. Add them in the
-                  catalog first.
+                  No {inventorySource} inventory items available. Add them in
+                  the catalog first.
                 </p>
               ) : (
                 <>
@@ -491,14 +383,10 @@ export default async function JobDetailPage({
             </form>
           </CollapsibleAdd>
         </JobPanel>
-      ) : null}
 
-      {tab === "fleet" ? (
-        <JobPanel description="Vehicles assigned to this job (needed for auto-ready). Locked on upcoming/ready jobs until load-out ends.">
+        <JobPanel title="Fleet" count={fleetAssignments.length}>
           {fleetAssignments.length === 0 ? (
-            <p className="text-sm text-neutral-500 py-2">
-              No vehicles assigned yet.
-            </p>
+            <p className="text-sm text-neutral-500">No vehicles assigned yet.</p>
           ) : (
             <div className="lp-table-wrap">
               <table className="w-full text-sm text-left">
@@ -513,10 +401,7 @@ export default async function JobDetailPage({
                 </thead>
                 <tbody>
                   {fleetAssignments.map((row) => (
-                    <tr
-                      key={row.fleetVehicleId}
-                      className=""
-                    >
+                    <tr key={row.fleetVehicleId}>
                       <td className="py-2 px-3 font-medium text-neutral-900">
                         {row.vehicleName}
                       </td>
@@ -580,12 +465,10 @@ export default async function JobDetailPage({
             </form>
           </CollapsibleAdd>
         </JobPanel>
-      ) : null}
 
-      {tab === "crew" ? (
-        <JobPanel description="Load-in / load-out assignments. Staff with approved time-off during this job are hidden.">
+        <JobPanel title="Crew" count={crewAssignments.length}>
           {crewAssignments.length === 0 ? (
-            <p className="text-sm text-neutral-500 py-2">No crew assigned yet.</p>
+            <p className="text-sm text-neutral-500">No crew assigned yet.</p>
           ) : (
             <div className="lp-table-wrap">
               <table className="w-full min-w-[28rem] text-sm text-left">
@@ -601,10 +484,7 @@ export default async function JobDetailPage({
                 </thead>
                 <tbody>
                   {crewAssignments.map((row) => (
-                    <tr
-                      key={row.id}
-                      className=""
-                    >
+                    <tr key={row.id}>
                       <td className="py-2 px-3">
                         <p className="font-medium text-neutral-900">
                           {row.userLabel}
@@ -640,8 +520,8 @@ export default async function JobDetailPage({
               <input type="hidden" name="jobId" value={job.id} />
               {crewCandidates.length === 0 ? (
                 <p className="text-sm text-neutral-500">
-                  No staff members available. Invite or mark users as Staff on the
-                  Team page.
+                  No staff members available. Invite or mark users as Staff on
+                  the Team page.
                 </p>
               ) : (
                 <>
@@ -703,10 +583,8 @@ export default async function JobDetailPage({
             </form>
           </CollapsibleAdd>
         </JobPanel>
-      ) : null}
 
-      {tab === "documents" ? (
-        <JobPanel description="PDFs and images for this job (permits, overlays, notes).">
+        <JobPanel title="Documents" count={jobDocuments.length}>
           <JobDocuments
             jobId={job.id}
             documents={jobDocuments}
@@ -716,7 +594,17 @@ export default async function JobDetailPage({
             canDeleteAny={canManageJobs(session.user)}
           />
         </JobPanel>
-      ) : null}
+      </div>
+
+      <form action={deleteJob}>
+        <input type="hidden" name="id" value={job.id} />
+        <button
+          type="submit"
+          className="text-sm text-neutral-400 hover:text-red-700"
+        >
+          Delete job
+        </button>
+      </form>
     </div>
   );
 }

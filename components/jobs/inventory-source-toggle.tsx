@@ -12,8 +12,10 @@ export function InventorySourceToggle({ jobId, source }: Props) {
   const router = useRouter();
 
   function go(next: "client" | "org") {
-    const q = new URLSearchParams({ tab: "inventory", inv: next });
-    router.push(`/dashboard/jobs/${jobId}?${q.toString()}`);
+    const q = new URLSearchParams();
+    if (next === "org") q.set("inv", "org");
+    const qs = q.toString();
+    router.push(`/dashboard/jobs/${jobId}${qs ? `?${qs}` : ""}`);
   }
 
   return (

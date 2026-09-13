@@ -1,6 +1,7 @@
 "use client";
 
 import { updateJob } from "@/lib/actions/jobs";
+import { formatJobDateTime } from "@/lib/format/date";
 import { JOB_STATUSES, type JobStatus } from "@/lib/db/schema";
 import {
   DetailFields,
@@ -30,12 +31,6 @@ export type JobSummaryEditorProps = {
     loadOutStart: string;
     loadOutEnd: string;
   };
-  /** Human-readable window labels for view mode */
-  windowLabels: {
-    job: string;
-    loadIn: string;
-    loadOut: string;
-  };
 };
 
 function dash(v: string | null | undefined) {
@@ -43,15 +38,26 @@ function dash(v: string | null | undefined) {
   return t ? t : null;
 }
 
+function WindowValue({ start, end }: { start: string; end: string }) {
+  const from = formatJobDateTime(start || null);
+  const to = formatJobDateTime(end || null);
+  if (from === "—" && to === "—") return null;
+  if (to === "—") return from;
+  if (from === "—") return to;
+  return (
+    <span className="block leading-5">
+      <span className="block">{from}</span>
+      <span className="block text-neutral-500">to {to}</span>
+    </span>
+  );
+}
+
 export function JobSummaryEditor({
   job,
   companies,
   leadCandidates,
   windows,
-  windowLabels,
 }: JobSummaryEditorProps) {
-  const companyName =
-    companies.find((c) => c.id === job.clientCompanyId)?.name ?? "—";
   const leadLabel =
     leadCandidates.find((c) => c.userId === job.jobLeadUserId)?.label ?? null;
   const poc =
@@ -61,19 +67,35 @@ export function JobSummaryEditor({
 
   return (
     <ViewEdit
-      editLabel="Edit summary"
+      editLabel="Edit"
+      variant="inline"
       view={
         <DetailFields
           rows={[
-            { label: "Name", value: job.name },
-            { label: "Client", value: companyName },
             {
-              label: "Status",
-              value: <span className="capitalize">{job.status}</span>,
+              label: "Job window",
+              value: (
+                <WindowValue start={windows.jobStart} end={windows.jobEnd} />
+              ),
             },
-            { label: "Job window", value: windowLabels.job },
-            { label: "Load-in", value: windowLabels.loadIn },
-            { label: "Load-out", value: windowLabels.loadOut },
+            {
+              label: "Load-in",
+              value: (
+                <WindowValue
+                  start={windows.loadInStart}
+                  end={windows.loadInEnd}
+                />
+              ),
+            },
+            {
+              label: "Load-out",
+              value: (
+                <WindowValue
+                  start={windows.loadOutStart}
+                  end={windows.loadOutEnd}
+                />
+              ),
+            },
             { label: "Client POC", value: poc },
             { label: "Job lead", value: leadLabel },
             {
