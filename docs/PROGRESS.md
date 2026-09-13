@@ -112,6 +112,7 @@
 - [x] **F1** Third seed tenant: `axis` (Axis Global Staging / teal logo + Volt Energy); Dev panel host-scoped; Neon **dev** only
 - [x] **A11** View-then-edit detail UIs (job Summary/Locations/Inventory; settings; team) + collapsed job assigns
 - [x] **A11b** Job detail real tabs (`?tab=`) + dense lists (no stacked section dump)
+- [x] Job detail single page — 2-col grid, no tabs (2026-09-13)
 - [x] **Account menu** — top-bar name+role dropdown (My Profile + Sign out); Settings → My Profile; portal `/portal/profile`
 - [x] **A13** Portal inventory requests v1 — `client_inventory_requests`; client request add/qty/remove; manager approve/deny; Notifications + Client inventory; Neon **dev** `0021`
 - [x] **A13b** Portal inventory request UX — ⋯ menu → dedicated `/portal/inventory/requests/new` form (no inline stacked forms)

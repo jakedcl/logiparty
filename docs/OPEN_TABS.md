@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-09-02 (docs audit after PR #43 merge; A3b/A3c already Done).*
+*Last updated: 2026-09-13 (job detail single page — no tabs).*
 
 ---
 
@@ -62,6 +62,7 @@
 - [x] **F1** Third seed tenant — **`axis`** · Axis Global Staging · logo `/seed/axis-logo.svg` (teal) · client Volt Energy · cast `@axis.test` / `@volt.test`. Dev persona switcher host-scoped for all three. Neon **dev** reset-seeded; prod **main** untouched.
 - [x] **A11** View-then-edit detail UIs — default read-only labels/values; **Edit** → form + Save/Cancel. Shared `components/ui/view-edit.tsx`. Applied: job **Summary**, **Locations**, **Inventory** qty; org **settings**; **Team** roles/tags. Fleet/Crew stay list+Remove; assigns/uploads behind collapsed **+ Add**. Portal job detail already read-only. Create/new stays form-like.
 - [x] **A11b** Job detail tabs + density — `?tab=` switches **one** panel (was hash-link dump of all sections). Dense tables/rows for locations/inventory/fleet/crew/docs; Remove behind ⋯; status chip in header; soft panel fade. Files: `app/dashboard/jobs/[id]/page.tsx`, `components/jobs/*`, `components/ui/view-edit.tsx`.
+- [x] **Job detail single page** (2026-09-13) — dropped `?tab=` panels. All sections on one page in a 2-col grid (Summary|Locations, Inventory|Fleet, Crew|Documents). Same dense lists + collapsed + Add. Header keeps name/status/client.
 - [x] **B4 partial** Stripe billing scaffold (optional, no keys required) — Checkout + portal + webhook + Settings Billing; soft `billing_status`; keys TBD.
 - [x] **Nav shell** Staff dashboard — left sidebar + mobile drawer (`DashboardShell`); portal unchanged; run-sheet location bullets → `ul`.
 - [x] **NYDAC rich seed** — `seedNydacRich()` in `lib/db/seed.ts`: Monster Energy + Gotham Glow clients, fat catalogs, 5 fleet, 6 jobs across draft/upcoming/ready/completed with locations/crew/fleet/qty_loaded + activity. Crew spread: Tom/Rob/Paul/Jerome each on 5 jobs; Mike/Don lead multiple; ready jobs full LI+LO. Neon **dev** only.

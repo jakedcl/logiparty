@@ -1,24 +1,20 @@
 type JobPanelProps = {
-  description?: string;
+  title: string;
+  count?: number;
   children: React.ReactNode;
 };
 
-/** Active tab body — no card chrome; tab nav already names the section. */
-export function JobPanel({ description, children }: JobPanelProps) {
+/** Named section on the job detail page (no card chrome). */
+export function JobPanel({ title, count, children }: JobPanelProps) {
   return (
-    <section className="job-panel-in space-y-4">
-      {description ? (
-        <p className="text-sm text-neutral-500 leading-relaxed">{description}</p>
-      ) : null}
+    <section className="min-w-0 space-y-3">
+      <h2 className="text-sm font-semibold text-neutral-900 tracking-tight">
+        {title}
+        {count != null && count > 0 ? (
+          <span className="ml-1.5 font-normal text-neutral-400">{count}</span>
+        ) : null}
+      </h2>
       {children}
     </section>
-  );
-}
-
-export function JobPanelPlaceholder({ message }: { message: string }) {
-  return (
-    <p className="text-sm text-neutral-500 border border-dashed border-neutral-200 rounded-md px-3 py-4">
-      {message}
-    </p>
   );
 }
