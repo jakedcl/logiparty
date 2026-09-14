@@ -75,6 +75,9 @@ export async function middleware(request: NextRequest) {
   const isApexMarketing = !orgSlug && pathname === "/";
   // Soft-pilot legal pages — public on apex (and harmless if hit elsewhere).
   const isLegalPage = pathname === "/privacy" || pathname === "/terms";
+  // Public product tour (static mocks — no auth). Apex only in practice;
+  // allowing the path elsewhere is harmless (page redirects tenants away).
+  const isDemoPage = pathname === "/demo" || pathname.startsWith("/demo/");
 
   if (
     !token &&
@@ -82,7 +85,8 @@ export async function middleware(request: NextRequest) {
     !isInvitePage &&
     !isPublicApi &&
     !isApexMarketing &&
-    !isLegalPage
+    !isLegalPage &&
+    !isDemoPage
   ) {
     return redirectPath(request, "/login");
   }

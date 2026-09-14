@@ -135,7 +135,7 @@ export default async function DashboardPage() {
         actions={
           <>
             {isManager ? (
-              <Link href="/dashboard/jobs" className="lp-btn">
+              <Link href="/dashboard/jobs?new=1" className="lp-btn">
                 + New job
               </Link>
             ) : null}

@@ -2,34 +2,36 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { canManageJobs } from "@/lib/auth/permissions";
 import {
-  createJob,
   listJobClientCompanies,
+  listJobLeadCandidates,
   listJobs,
 } from "@/lib/actions/jobs";
-import { JOB_STATUSES } from "@/lib/db/schema";
 import { requireSession } from "@/lib/org/context";
 import { formatJobDate } from "@/lib/format/date";
 import { parseYearMonth } from "@/lib/jobs/calendar";
 import { JobsMonthCalendar } from "@/components/jobs/jobs-month-calendar";
 import { JobsViewToggle } from "@/components/jobs/jobs-view-toggle";
+import { NewJobModal } from "@/components/jobs/new-job-modal";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 
 export default async function JobsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ view?: string; month?: string }>;
+  searchParams: Promise<{ view?: string; month?: string; new?: string }>;
 }) {
   const session = await requireSession();
   if (!canManageJobs(session.user)) redirect("/dashboard");
 
   const params = await searchParams;
+  const openNew = params.new === "1";
   const view = params.view === "calendar" ? "calendar" : "list";
   const { year, month } = parseYearMonth(params.month);
 
-  const [jobList, companies] = await Promise.all([
+  const [jobList, companies, leadCandidates] = await Promise.all([
     listJobs(session.user.orgId),
     listJobClientCompanies(session.user.orgId),
+    listJobLeadCandidates(session.user.orgId),
   ]);
 
   const companyName = new Map(companies.map((c) => [c.id, c.name]));
@@ -51,11 +53,20 @@ export default async function JobsPage({
         title="Jobs"
         description="Create and manage jobs. Statuses: draft → upcoming → ready → completed (or draft → denied)."
         actions={
-          <JobsViewToggle
-            basePath="/dashboard/jobs"
-            view={view}
-            month={params.month}
-          />
+          <>
+            {companies.length > 0 ? (
+              <NewJobModal
+                companies={companies}
+                leadCandidates={leadCandidates}
+                defaultOpen={openNew}
+              />
+            ) : null}
+            <JobsViewToggle
+              basePath="/dashboard/jobs"
+              view={view}
+              month={params.month}
+            />
+          </>
         }
       />
 
@@ -102,7 +113,7 @@ export default async function JobsPage({
                   before creating jobs.
                 </>
               ) : (
-                " Use + New job below to create one."
+                " Use + New job to create one."
               )}
             </p>
           ) : (
@@ -223,91 +234,6 @@ export default async function JobsPage({
                   </tbody>
                 </table>
               </div>
-            </details>
-          ) : null}
-
-          {companies.length > 0 ? (
-            <details className="group border-t border-border pt-5">
-              <summary className="cursor-pointer list-none text-sm text-neutral-600 hover:text-neutral-900 select-none [&::-webkit-details-marker]:hidden">
-                <span className="inline-flex items-center gap-1.5 font-medium">
-                  <span
-                    className="text-neutral-400 group-open:hidden"
-                    aria-hidden
-                  >
-                    +
-                  </span>
-                  <span
-                    className="hidden text-neutral-400 group-open:inline"
-                    aria-hidden
-                  >
-                    −
-                  </span>
-                  New job
-                </span>
-              </summary>
-              <form action={createJob} className="mt-4 space-y-3 max-w-xl">
-                <label className="app-label">
-                  Job name
-                  <input
-                    name="name"
-                    required
-                    placeholder="Job name"
-                    className="app-input mt-1"
-                  />
-                </label>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <label className="app-label">
-                    Client company
-                    <select
-                      name="clientCompanyId"
-                      required
-                      className="app-input mt-1"
-                    >
-                      <option value="">Select…</option>
-                      {companies.map((c) => (
-                        <option key={c.id} value={c.id}>
-                          {c.name}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="app-label">
-                    Status
-                    <select
-                      name="status"
-                      defaultValue="upcoming"
-                      className="app-input mt-1"
-                    >
-                      {JOB_STATUSES.filter((s) => s !== "denied").map((s) => (
-                        <option key={s} value={s}>
-                          {s}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <label className="app-label">
-                    Job start
-                    <input
-                      type="datetime-local"
-                      name="jobStart"
-                      className="app-input mt-1"
-                    />
-                  </label>
-                  <label className="app-label">
-                    Job end
-                    <input
-                      type="datetime-local"
-                      name="jobEnd"
-                      className="app-input mt-1"
-                    />
-                  </label>
-                </div>
-                <button type="submit" className="app-btn app-btn-primary">
-                  Create job
-                </button>
-              </form>
             </details>
           ) : null}
         </section>

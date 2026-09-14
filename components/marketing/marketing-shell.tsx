@@ -22,6 +22,12 @@ export function MarketingShell({
         </Link>
         <nav className="flex items-center gap-5 text-sm">
           <Link
+            href="/demo"
+            className="text-[var(--m-muted)] transition-colors hover:text-[var(--m-fg)]"
+          >
+            Demo
+          </Link>
+          <Link
             href="/#request"
             className="font-medium text-[var(--m-accent)] underline-offset-4 hover:underline"
           >
@@ -50,6 +56,12 @@ export function MarketingShell({
               className="transition-colors hover:text-[var(--m-fg)]"
             >
               Home
+            </Link>
+            <Link
+              href="/demo"
+              className="transition-colors hover:text-[var(--m-fg)]"
+            >
+              Demo
             </Link>
             <Link
               href="/privacy"

@@ -580,11 +580,190 @@ body {
   animation: m-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
+/* Marketing product tour mocks */
+.m-tour-row {
+  display: grid;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+@media (min-width: 1024px) {
+  .m-tour-row {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 2.5rem;
+  }
+
+  .m-tour-row-flip .m-tour-copy {
+    order: 2;
+  }
+
+  .m-tour-row-flip .m-tour-visual {
+    order: 1;
+  }
+}
+
+.m-mock {
+  border: 1px solid var(--m-line);
+  background: rgba(240, 243, 246, 0.03);
+  overflow: hidden;
+}
+
+.m-mock-bar {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--m-line);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.m-mock-bar-brand {
+  border-top: 3px solid #1e3a5f;
+}
+
+.m-mock-muted {
+  font-weight: 400;
+  color: var(--m-muted);
+  font-size: 0.75rem;
+}
+
+.m-mock-mono {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+  color: var(--m-muted);
+}
+
+.m-mock-rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.m-mock-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--m-line);
+  font-size: 0.8125rem;
+}
+
+.m-mock-row:last-child {
+  border-bottom: none;
+}
+
+.m-mock-row-3 {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+  justify-content: stretch;
+}
+
+.m-mock-chip {
+  font-size: 0.625rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.15rem;
+  border: 1px solid var(--m-line);
+  color: var(--m-muted);
+}
+
+.m-mock-chip-draft {
+  color: #fbbf24;
+  border-color: rgba(251, 191, 36, 0.35);
+}
+
+.m-mock-chip-upcoming {
+  color: #7dd3fc;
+  border-color: rgba(125, 211, 252, 0.35);
+}
+
+.m-mock-chip-ready {
+  color: #86efac;
+  border-color: rgba(134, 239, 172, 0.35);
+}
+
+.m-mock-chip-completed {
+  color: var(--m-muted);
+}
+
+/* /demo — in-app spotlight (hole punched via giant box-shadow) */
+.demo-spotlight {
+  box-shadow: 0 0 0 9999px rgba(11, 21, 38, 0.55);
+  outline: 2px solid #c5e85a;
+  outline-offset: 0;
+  background: transparent;
+  z-index: 30;
+}
+
+.demo-popup {
+  pointer-events: auto;
+  position: relative;
+}
+
+.demo-caret {
+  position: absolute;
+  width: 0;
+  height: 0;
+  border: 8px solid transparent;
+}
+
+.demo-caret-top {
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-bottom-color: #fff;
+  filter: drop-shadow(0 -1px 0 #c9d2de);
+}
+
+.demo-caret-bottom {
+  bottom: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-top-color: #fff;
+  filter: drop-shadow(0 1px 0 #c9d2de);
+}
+
+.demo-caret-left {
+  left: -16px;
+  top: 22px;
+  border-right-color: #fff;
+  filter: drop-shadow(-1px 0 0 #c9d2de);
+}
+
+.demo-caret-right {
+  right: -16px;
+  top: 22px;
+  border-left-color: #fff;
+  filter: drop-shadow(1px 0 0 #c9d2de);
+}
+
+.demo-app {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-spotlight,
+  .demo-popup {
+    transition: none !important;
+  }
+}
+
+/* legacy pulse highlight unused by spotlight tour */
+.demo-hl {
+  outline: 2px solid rgba(197, 232, 90, 0.85);
+  outline-offset: 3px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .m-atmosphere,
   .m-visual-glow,
   .m-visual-grid,
-  .m-visual-dock {
+  .m-visual-dock,
+  .demo-hl {
     animation: none;
   }
 

@@ -2,13 +2,13 @@
  * Golden-path seed — run: npm run db:seed (requires DATABASE_URL)
  * Safe to re-run: uses ON CONFLICT / existence checks.
  *
- * Creates THREE fully populated tenants:
- *   - nydac  → New York Design and Construction (Jake's cast + rich warehouse)
- *   - test   → Acme Event Logistics (playground cast + Monster)
- *   - axis   → Axis Global Staging (generic cast + Volt Energy)
+ * Creates FOUR fully populated tenants:
+ *   - nydac     → New York Design and Construction (Jake's cast + rich warehouse)
+ *   - test      → Acme Event Logistics (playground cast + Monster)
+ *   - axis      → Axis Global Staging (generic cast + Volt Energy)
+ *   - northline → Northline Logistics (public /demo narrative + film seed)
  *
- * After base orgs, seedNydacRich() beefs up nydac only (extra clients,
- * inventory, fleet, multi-status jobs, crew, activity).
+ * After base orgs, seedNydacRich() + seedNorthlineRich() beef up those orgs.
  *
  * users.email is globally unique — casts use different emails.
  */
@@ -16,6 +16,7 @@ import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { neon } from "@neondatabase/serverless";
 import bcrypt from "bcryptjs";
+import { seedNorthlineRich } from "./seed-northline";
 
 function loadEnvLocal() {
   const path = join(process.cwd(), ".env.local");
@@ -192,7 +193,49 @@ const AXIS: SeedOrg = {
   },
 };
 
-const ORGS: readonly SeedOrg[] = [NYDAC, TEST, AXIS];
+/** Public /demo narrative + filmable login tenant (generic names). */
+const NORTHLINE: SeedOrg = {
+  slug: "northline",
+  name: "Northline Logistics",
+  logoUrl: "/seed/northline-logo.svg",
+  primaryColor: "#1e3a5f",
+  people: [
+    { email: "riley@northline.test", first: "Riley", last: "Boss" },
+    { email: "morgan@northline.test", first: "Morgan", last: "Hale" },
+    { email: "dana@northline.test", first: "Dana", last: "Kim" },
+    { email: "chris@northline.test", first: "Chris", last: "Park" },
+    { email: "pat@northline.test", first: "Pat", last: "Ortiz" },
+    { email: "jamie@northline.test", first: "Jamie", last: "Reed" },
+    { email: "alex@summit.test", first: "Alex", last: "Chen" },
+    { email: "jordan@summit.test", first: "Jordan", last: "Lee" },
+  ],
+  orgAdminEmails: ["riley@northline.test"],
+  managerEmails: ["morgan@northline.test", "dana@northline.test"],
+  staffEmails: [
+    "chris@northline.test",
+    "pat@northline.test",
+    "jamie@northline.test",
+  ],
+  warehouseEmails: ["pat@northline.test"],
+  driverEmails: ["chris@northline.test", "jamie@northline.test"],
+  clientEmails: ["alex@summit.test", "jordan@summit.test"],
+  clientCompany: "Summit Brands",
+  clientTitles: {
+    "alex@summit.test": "POC",
+    "jordan@summit.test": "Rep",
+  },
+  clientInventory: { sku: "SB-BAR-01", name: "Branded Bar", qty: 10 },
+  orgInventory: { sku: "DOLLY-01", name: "Dolly", qty: 40 },
+  fleet: { name: "Box Truck 12", plate: "NL-012" },
+  sampleJob: {
+    name: "Campus Pop-Up",
+    locationLabel: "Warehouse",
+    address: "1200 Dock Rd, Brooklyn, NY",
+    pocName: "Alex Chen",
+  },
+};
+
+const ORGS: readonly SeedOrg[] = [NYDAC, TEST, AXIS, NORTHLINE];
 
 async function upsertPeople(sql: Sql, people: readonly SeedPerson[], passwordHash: string) {
   for (const p of people) {
@@ -1596,6 +1639,7 @@ async function seed() {
   }
 
   await seedNydacRich(sql, passwordHash);
+  await seedNorthlineRich(sql, passwordHash);
 
   console.log(`
 Seed complete. Password for all accounts: password123
@@ -1637,6 +1681,20 @@ Seed complete. Password for all accounts: password123
     taylor@volt.test          Client / POC (Volt Energy)
     reese@volt.test           Client (Volt Energy)
     logo: /seed/axis-logo.svg (teal)
+
+  northline — Northline Logistics (http://northline.localhost:3000) · /demo narrative
+    riley@northline.test      OrgAdmin (Riley Boss)
+    morgan@northline.test     Manager + Staff (Morgan Hale)
+    dana@northline.test       Manager + Staff (Dana Kim)
+    chris@northline.test      Staff / driver
+    pat@northline.test        Staff / warehouse
+    jamie@northline.test      Staff / driver
+    alex@summit.test          Client / POC (Summit Brands)
+    jordan@summit.test        Client (Summit Brands)
+    sam@harbor.test           Client / POC (Harbor Co.)
+    logo: /seed/northline-logo.svg
+    jobs: Outdoor Patio (draft) · Campus Pop-Up (upcoming) · Waterfront Festival (ready)
+          · Showroom Load-In (ready) · Trade Show Wrap (completed)
 `);
 }
 
