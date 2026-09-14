@@ -10,17 +10,162 @@ type WorkspaceCta = {
 const CAPABILITIES = [
   {
     title: "Jobs with real windows",
-    body: "Draft → upcoming → ready → completed. Load-in and load-out windows, assigned inventory, fleet, and crew — staff see only their jobs.",
+    body: "Draft → upcoming → ready → completed. Load-in and load-out, inventory, fleet, and crew on one job. Staff only see what they’re assigned.",
   },
   {
     title: "Inventory that locks",
-    body: "Client-owned assets stay in your warehouse until load-out ends. Quantities loaded on the run sheet, not scattered across sheets and texts.",
+    body: "Client assets stay reserved until load-out ends. Loaded quantities live on the run sheet — not in a spreadsheet.",
   },
   {
     title: "White-label portal",
-    body: "Clients request jobs and see their inventory on your subdomain, with your logo and color. Your crew never sees Logiparty in the app.",
+    body: "Clients request jobs and see their inventory on your subdomain, with your logo and color. Your crew never sees Logiparty.",
   },
 ] as const;
+
+const TOUR = [
+  {
+    id: "jobs",
+    label: "01",
+    title: "Jobs",
+    body: "Statuses, calendar, and a run sheet with locations, loads, trucks, and crew.",
+    mock: "jobs",
+  },
+  {
+    id: "inventory",
+    label: "02",
+    title: "Inventory & fleet",
+    body: "Client gear, your equipment, and vehicles — locked to the job while it’s live.",
+    mock: "inventory",
+  },
+  {
+    id: "portal",
+    label: "03",
+    title: "Client portal",
+    body: "Branded requests, docs, and inventory asks. Company-scoped. Invite-only.",
+    mock: "portal",
+  },
+  {
+    id: "staff",
+    label: "04",
+    title: "Staff on the dock",
+    body: "My Jobs only. Loaded vs assigned. Print the run sheet from a phone.",
+    mock: "staff",
+  },
+] as const;
+
+function MockJobs() {
+  return (
+    <div className="m-mock">
+      <div className="m-mock-bar">
+        <span>Jobs</span>
+        <span className="m-mock-muted">List · Calendar</span>
+      </div>
+      <div className="m-mock-rows">
+        {[
+          ["Waterfront Festival", "ready"],
+          ["Campus Pop-Up", "upcoming"],
+          ["Outdoor Patio", "draft"],
+          ["Trade Show Wrap", "completed"],
+        ].map(([name, status]) => (
+          <div key={name} className="m-mock-row">
+            <span>{name}</span>
+            <span className={`m-mock-chip m-mock-chip-${status}`}>{status}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MockInventory() {
+  return (
+    <div className="m-mock">
+      <div className="m-mock-bar">
+        <span>Inventory</span>
+        <span className="m-mock-muted">Client · Equipment · Fleet</span>
+      </div>
+      <div className="m-mock-rows">
+        {[
+          ["SB-BAR-01", "Branded Bar", "10"],
+          ["SB-COOLER", "Rolling Cooler", "36"],
+          ["DOLLY-01", "Dolly", "40"],
+          ["Box Truck 12", "Fleet", "NL-012"],
+        ].map(([a, b, c]) => (
+          <div key={a} className="m-mock-row m-mock-row-3">
+            <span className="m-mock-mono">{a}</span>
+            <span>{b}</span>
+            <span className="m-mock-muted">{c}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MockPortal() {
+  return (
+    <div className="m-mock">
+      <div className="m-mock-bar m-mock-bar-brand">
+        <span>Northline Logistics</span>
+        <span className="m-mock-muted">Client portal</span>
+      </div>
+      <div className="m-mock-rows">
+        <div className="m-mock-row">
+          <span>Your jobs</span>
+          <span className="m-mock-chip m-mock-chip-ready">ready</span>
+        </div>
+        <div className="m-mock-row">
+          <span>Waterfront Festival</span>
+          <span className="m-mock-muted">Sep 19</span>
+        </div>
+        <div className="m-mock-row">
+          <span>Request inventory change</span>
+          <span className="m-mock-muted">+24 coolers</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MockStaff() {
+  return (
+    <div className="m-mock">
+      <div className="m-mock-bar">
+        <span>My Jobs</span>
+        <span className="m-mock-muted">Staff</span>
+      </div>
+      <div className="m-mock-rows">
+        <div className="m-mock-row">
+          <span>Waterfront Festival</span>
+          <span className="m-mock-chip m-mock-chip-ready">ready</span>
+        </div>
+        <div className="m-mock-row m-mock-row-3">
+          <span>Branded Bar</span>
+          <span className="m-mock-muted">3 assigned</span>
+          <span className="text-emerald-300/90">3 loaded</span>
+        </div>
+        <div className="m-mock-row m-mock-row-3">
+          <span>Dolly</span>
+          <span className="m-mock-muted">10 assigned</span>
+          <span className="text-emerald-300/90">10 loaded</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function TourMock({ kind }: { kind: (typeof TOUR)[number]["mock"] }) {
+  switch (kind) {
+    case "jobs":
+      return <MockJobs />;
+    case "inventory":
+      return <MockInventory />;
+    case "portal":
+      return <MockPortal />;
+    case "staff":
+      return <MockStaff />;
+  }
+}
 
 export function MarketingHome({
   workspace,
@@ -45,6 +190,12 @@ export function MarketingHome({
           >
             Product
           </a>
+          <Link
+            href="/demo"
+            className="font-medium text-[var(--m-accent)] underline-offset-4 hover:underline"
+          >
+            Demo
+          </Link>
           <a
             href="#how"
             className="hidden text-[var(--m-muted)] transition-colors hover:text-[var(--m-fg)] sm:inline"
@@ -70,7 +221,6 @@ export function MarketingHome({
       </header>
 
       <main id="top">
-        {/* Hero — one composition: brand, headline, support, CTAs, full-bleed plane */}
         <section className="relative z-10 flex min-h-[calc(100svh-4.5rem)] flex-col justify-end px-5 pb-16 pt-12 sm:px-8 sm:pb-20 lg:px-12 lg:pb-28">
           <div
             className="m-visual pointer-events-none absolute inset-0 -z-10 overflow-hidden"
@@ -102,24 +252,82 @@ export function MarketingHome({
                   Go to {workspace.isClient ? "portal" : "dashboard"}
                 </a>
               ) : (
+                <Link
+                  href="/demo"
+                  className="m-btn-primary px-6 py-3 text-sm font-semibold"
+                >
+                  Try the demo →
+                </Link>
+              )}
+              {workspace ? (
+                <Link
+                  href="/demo"
+                  className="m-btn-ghost px-5 py-3 text-sm font-medium text-[var(--m-muted)]"
+                >
+                  Product tour
+                </Link>
+              ) : (
                 <a
                   href="#request"
-                  className="m-btn-primary px-6 py-3 text-sm font-semibold"
+                  className="m-btn-ghost px-5 py-3 text-sm font-medium text-[var(--m-muted)]"
                 >
                   Request access
                 </a>
               )}
-              <a
-                href="#how"
-                className="m-btn-ghost px-5 py-3 text-sm font-medium text-[var(--m-muted)]"
-              >
-                How it works
-              </a>
             </div>
           </div>
         </section>
 
-        {/* Problem — one job */}
+        <section
+          id="tour"
+          className="relative z-10 border-t border-[var(--m-line)] px-5 py-20 sm:px-8 sm:py-24 lg:px-12"
+        >
+          <div className="mx-auto max-w-5xl">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <div className="max-w-xl">
+                <p className="m-section-label">Demo</p>
+                <h2 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+                  Walk the product — no login.
+                </h2>
+                <p className="mt-4 text-[var(--m-muted)] leading-relaxed">
+                  Step through jobs, inventory, fleet, crew, and the client
+                  portal with in-app callouts. Sample workspace only.
+                </p>
+              </div>
+              <Link
+                href="/demo"
+                className="m-btn-primary px-5 py-2.5 text-sm font-semibold"
+              >
+                Start interactive demo →
+              </Link>
+            </div>
+
+            <div className="mt-12 grid gap-10 lg:gap-14">
+              {TOUR.map((item, i) => (
+                <div
+                  key={item.id}
+                  className={`m-tour-row ${i % 2 === 1 ? "m-tour-row-flip" : ""}`}
+                >
+                  <div className="m-tour-copy">
+                    <span className="m-step-num">{item.label}</span>
+                    <h3 className="mt-3 text-xl font-semibold tracking-tight">
+                      {item.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
+                      {item.body}
+                    </p>
+                  </div>
+                  <div className="m-tour-visual">
+                    <Link href="/demo" className="block transition-opacity hover:opacity-90">
+                      <TourMock kind={item.mock} />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section
           id="problem"
           className="relative z-10 border-t border-[var(--m-line)] px-5 py-20 sm:px-8 sm:py-24 lg:px-12"
@@ -131,15 +339,13 @@ export function MarketingHome({
             </h2>
             <p className="mt-5 text-[var(--m-muted)] leading-relaxed sm:text-lg">
               Group chats lose the run sheet. Generic WMS doesn&apos;t know a
-              festival load-in. Event logistics needs one place for the job,
-              the assets locked to it, the trucks and crew, and a portal your
-              clients can actually use — without putting platform branding in
-              front of your staff.
+              festival load-in. Event logistics needs one place for the job, the
+              assets locked to it, the trucks and crew, and a portal clients can
+              use — without platform branding in front of your staff.
             </p>
           </div>
         </section>
 
-        {/* Product — lean capability list, not card spam */}
         <section
           id="product"
           className="relative z-10 border-t border-[var(--m-line)] px-5 py-20 sm:px-8 sm:py-24 lg:px-12"
@@ -172,7 +378,6 @@ export function MarketingHome({
           </div>
         </section>
 
-        {/* How it works */}
         <section
           id="how"
           className="relative z-10 border-t border-[var(--m-line)] px-5 py-20 sm:px-8 sm:py-24 lg:px-12"
@@ -223,7 +428,6 @@ export function MarketingHome({
           </div>
         </section>
 
-        {/* Contact / request */}
         <section
           id="request"
           className="relative z-10 border-t border-[var(--m-line)] px-5 py-20 sm:px-8 sm:py-24 lg:px-12"
@@ -249,6 +453,13 @@ export function MarketingHome({
                 <span className="text-[var(--m-fg)]/75">
                   your-org.logiparty.com
                 </span>
+                . Want a look first?{" "}
+                <Link
+                  href="/demo"
+                  className="text-[var(--m-fg)] underline-offset-4 hover:underline"
+                >
+                  Open the demo
+                </Link>
                 .
               </p>
             </div>
@@ -270,6 +481,12 @@ export function MarketingHome({
             </p>
           </div>
           <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[var(--m-muted)]">
+            <Link
+              href="/demo"
+              className="transition-colors hover:text-[var(--m-fg)]"
+            >
+              Demo
+            </Link>
             <a
               href="#request"
               className="transition-colors hover:text-[var(--m-fg)]"

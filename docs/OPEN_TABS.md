@@ -4,7 +4,7 @@
 **Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
 **Human:** Pick **one** active item before starting a new convo or subagent.
 
-*Last updated: 2026-09-13 (job detail single page — no tabs).*
+*Last updated: 2026-09-13 (A20 marketing + /demo + northline seed).*
 
 ---
 
@@ -63,6 +63,8 @@
 - [x] **A11** View-then-edit detail UIs — default read-only labels/values; **Edit** → form + Save/Cancel. Shared `components/ui/view-edit.tsx`. Applied: job **Summary**, **Locations**, **Inventory** qty; org **settings**; **Team** roles/tags. Fleet/Crew stay list+Remove; assigns/uploads behind collapsed **+ Add**. Portal job detail already read-only. Create/new stays form-like.
 - [x] **A11b** Job detail tabs + density — `?tab=` switches **one** panel (was hash-link dump of all sections). Dense tables/rows for locations/inventory/fleet/crew/docs; Remove behind ⋯; status chip in header; soft panel fade. Files: `app/dashboard/jobs/[id]/page.tsx`, `components/jobs/*`, `components/ui/view-edit.tsx`.
 - [x] **Job detail single page** (2026-09-13) — dropped `?tab=` panels. All sections on one page in a 2-col grid (Summary|Locations, Inventory|Fleet, Crew|Documents). Same dense lists + collapsed + Add. Header keeps name/status/client.
+- [x] **New job form** (2026-09-13) — create includes load-in/out windows, POC, job lead, notes (same summary fields as job detail). Locations / inventory / fleet / crew / docs still on the job after create.
+- [x] **New job modal** (2026-09-13) — `+ New job` in Jobs header (and dashboard `?new=1`) opens a dialog; no create form at the bottom of the list.
 - [x] **B4 partial** Stripe billing scaffold (optional, no keys required) — Checkout + portal + webhook + Settings Billing; soft `billing_status`; keys TBD.
 - [x] **Nav shell** Staff dashboard — left sidebar + mobile drawer (`DashboardShell`); portal unchanged; run-sheet location bullets → `ul`.
 - [x] **NYDAC rich seed** — `seedNydacRich()` in `lib/db/seed.ts`: Monster Energy + Gotham Glow clients, fat catalogs, 5 fleet, 6 jobs across draft/upcoming/ready/completed with locations/crew/fleet/qty_loaded + activity. Crew spread: Tom/Rob/Paul/Jerome each on 5 jobs; Mike/Don lead multiple; ready jobs full LI+LO. Neon **dev** only.
@@ -84,6 +86,7 @@
 - [x] **A18 fleet view + Equipment ⋯** — all staff roles **view** Fleet tab (D21); Manager/OrgAdmin only Add/Edit/Delete; Equipment rows match Client ⋯ Edit/Delete (no Save/Delete on every row). Clients stay portal-only. PR #40.
 - [x] **A18 Inventory nested sidebar** — Inventory expands to Client | Equipment | Fleet in the staff sidebar (primary nav); `?tab=` deep-links kept; page segment tabs removed to avoid double chrome. PR #40.
 - [x] **RowActions portal** — shared `RowActionsMenu` portals ⋯ menus to `document.body` (fixed + flip-up) so `.lp-table-wrap` overflow cannot clip; Client/Equipment/portal inventory + QuietRemove. Org Settings: removed Email from name; invites use `organizations.name`.
+- [x] **A20** Marketing homepage product tour + public `/demo` guided walkthrough (static mocks, no login). Seed tenant **`northline`** (Summit Brands / Harbor Co.) for film/login; matches demo copy. Middleware allows `/demo` on apex.
 ---
 
 ## Current environments
@@ -96,7 +99,9 @@
 | **Local NYDAC** | http://nydac.localhost:3000 (`.env.local` → Neon **`dev`**) |
 | **Local playground** | http://test.localhost:3000 |
 | **Local Axis** | http://axis.localhost:3000 |
-| **Seed orgs** | `nydac` · New York Design and Construction · `/seed/nydac-logo.svg`; `test` · Acme Event Logistics · `/seed/test-tenant-logo.svg`; `axis` · Axis Global Staging · `/seed/axis-logo.svg` |
+| **Local Northline** | http://northline.localhost:3000 (film seed · matches `/demo`) |
+| **Public demo** | http://localhost:3000/demo (works with or without `NEXT_PUBLIC_DEV_ORG_SLUG`) · prod `https://logiparty.com/demo` |
+| **Seed orgs** | `nydac` · `test` · `axis` · `northline` |
 | **NYDAC OrgAdmin** | `ed@test.test` / `password123` |
 | **NYDAC manager** | `mike@test.test` / `password123` |
 | **Test OrgAdmin** | `boss@playground.test` / `password123` |
@@ -115,6 +120,7 @@
 | **nydac** · NYDAC | http://nydac.localhost:3000 | `ed@test.test` | `mike@test.test` | `michaela@redbull.test` (Red Bull) · also Monster / Gotham Glow |
 | **test** · Acme | http://test.localhost:3000 | `boss@playground.test` | `riley@playground.test` | `nina@monster.test` (Monster) |
 | **axis** · Axis Global Staging | http://axis.localhost:3000 | `jordan@axis.test` | `avery@axis.test` | `taylor@volt.test` (Volt Energy) |
+| **northline** · Northline | http://northline.localhost:3000 | `riley@northline.test` | `morgan@northline.test` | `alex@summit.test` (Summit Brands) · `sam@harbor.test` (Harbor Co.) |
 
 **NYDAC rich seed (Neon `dev`)** — busy warehouse for poking around:
 

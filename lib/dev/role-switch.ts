@@ -3,7 +3,7 @@
  * Hard-deny on Vercel Production even if ALLOW_DEV_ROLE_SWITCH is set.
  *
  * Personas are keyed by org slug (current host).
- *   nydac → Jake's cast · test → Acme · axis → Axis Global Staging
+ *   nydac → Jake's cast · test → Acme · axis → Axis · northline → /demo film
  */
 
 export function isDevRoleSwitchAllowed(): boolean {
@@ -150,6 +150,51 @@ const AXIS_PERSONAS: readonly DevPersonaMeta[] = [
   },
 ] as const;
 
+const NORTHLINE_PERSONAS: readonly DevPersonaMeta[] = [
+  {
+    id: "orgAdmin",
+    buttonLabel: "Riley — OrgAdmin",
+    roleLabel: "OrgAdmin",
+    email: "riley@northline.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "manager",
+    buttonLabel: "Morgan — Manager",
+    roleLabel: "Manager",
+    email: "morgan@northline.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "manager2",
+    buttonLabel: "Dana — Manager",
+    roleLabel: "Manager",
+    email: "dana@northline.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "warehouse",
+    buttonLabel: "Pat — Warehouse",
+    roleLabel: "Staff (Warehouse)",
+    email: "pat@northline.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "driver",
+    buttonLabel: "Chris — Driver",
+    roleLabel: "Staff (Driver)",
+    email: "chris@northline.test",
+    redirectPath: "/dashboard",
+  },
+  {
+    id: "client",
+    buttonLabel: "Alex — Client",
+    roleLabel: "Client (Summit)",
+    email: "alex@summit.test",
+    redirectPath: "/portal",
+  },
+] as const;
+
 /** Persona map keyed by organization slug (current host). */
 export const DEV_PERSONAS_BY_ORG: Readonly<
   Record<string, readonly DevPersonaMeta[]>
@@ -157,6 +202,7 @@ export const DEV_PERSONAS_BY_ORG: Readonly<
   nydac: NYDAC_PERSONAS,
   test: TEST_PERSONAS,
   axis: AXIS_PERSONAS,
+  northline: NORTHLINE_PERSONAS,
 };
 
 /** @deprecated Prefer getDevPersonasForOrg — defaults to nydac for older imports. */
@@ -188,6 +234,9 @@ export function getDevPersonaHint(orgSlug: string | null | undefined): string {
   }
   if (orgSlug === "axis") {
     return "Seed quick-login · Client = Taylor (Volt)";
+  }
+  if (orgSlug === "northline") {
+    return "Seed quick-login · Client = Alex (Summit)";
   }
   return "No seed personas for this org";
 }

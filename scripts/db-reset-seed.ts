@@ -1,5 +1,5 @@
 /**
- * Wipe seeded orgs (nydac + test + axis + legacy demo/acme/…) and re-run golden-path seed.
+ * Wipe seeded orgs (nydac + test + axis + northline + legacy demo/acme/…) and re-run golden-path seed.
  *
  * Run: npm run db:reset-seed -- --confirm
  *
@@ -7,18 +7,19 @@
  * (CASCADE org-scoped rows / memberships — users are NOT auto-deleted), then
  * seed-only users by email. Non-seed users are kept.
  *
- * After re-seed, `nydac`, `test`, and `axis` exist (fully populated).
+ * After re-seed, `nydac`, `test`, `axis`, and `northline` exist (fully populated).
  */
 import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { neon } from "@neondatabase/serverless";
 import { execSync } from "child_process";
 
-/** Orgs wiped on reset. Seed recreates nydac + test + axis; others are legacy cleanup. */
+/** Orgs wiped on reset. Seed recreates nydac + test + axis + northline; others are legacy cleanup. */
 const SEED_ORG_SLUGS = [
   "nydac",
   "test",
   "axis",
+  "northline",
   "demo",
   "acme",
   "testtenant3pl",
@@ -56,6 +57,16 @@ const SEED_USER_EMAILS = [
   "blake@axis.test",
   "taylor@volt.test",
   "reese@volt.test",
+  // Northline Logistics (public /demo narrative)
+  "riley@northline.test",
+  "morgan@northline.test",
+  "dana@northline.test",
+  "chris@northline.test",
+  "pat@northline.test",
+  "jamie@northline.test",
+  "alex@summit.test",
+  "jordan@summit.test",
+  "sam@harbor.test",
   // Legacy cast (cleanup on reset — includes former demo OrgAdmin Devon)
   "admin@demo.test",
   "admin@test.test",
