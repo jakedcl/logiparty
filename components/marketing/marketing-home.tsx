@@ -115,7 +115,7 @@ export function MarketingHome({
                   )}
                 </div>
               </div>
-              <AppWindow title="Logiparty — Jobs">
+              <AppWindow title="Logiparty — Jobs" heroMotion>
                 <MockJobs />
               </AppWindow>
             </div>
