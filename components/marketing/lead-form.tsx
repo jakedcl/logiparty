@@ -11,10 +11,8 @@ export function LeadForm() {
   if (done) {
     return (
       <div className="m-lead-success">
-        <p className="text-base font-bold text-[var(--m-fg)]">
-          Thanks — we got your request.
-        </p>
-        <p className="mt-2 text-sm leading-relaxed text-[var(--m-muted)]">
+        <p>Thanks — we got your request.</p>
+        <p className="mt-2 text-sm leading-relaxed">
           Invite-only for now. We&apos;ll follow up by email if there&apos;s a
           fit.
         </p>
@@ -43,7 +41,7 @@ export function LeadForm() {
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <label className="block text-sm">
-          <span className="mb-1.5 block text-[var(--m-muted)]">Name</span>
+          <span className="mb-1.5 block">Name</span>
           <input
             name="name"
             required
@@ -52,7 +50,7 @@ export function LeadForm() {
           />
         </label>
         <label className="block text-sm">
-          <span className="mb-1.5 block text-[var(--m-muted)]">Email</span>
+          <span className="mb-1.5 block">Email</span>
           <input
             name="email"
             type="email"
@@ -63,7 +61,7 @@ export function LeadForm() {
         </label>
       </div>
       <label className="block text-sm">
-        <span className="mb-1.5 block text-[var(--m-muted)]">Company</span>
+        <span className="mb-1.5 block">Company</span>
         <input
           name="company"
           autoComplete="organization"
@@ -71,7 +69,7 @@ export function LeadForm() {
         />
       </label>
       <label className="block text-sm">
-        <span className="mb-1.5 block text-[var(--m-muted)]">Message</span>
+        <span className="mb-1.5 block">Message</span>
         <textarea
           name="message"
           rows={4}
@@ -80,16 +78,16 @@ export function LeadForm() {
         />
       </label>
       {error ? (
-        <p className="text-sm font-medium text-red-700" role="alert">
+        <p className="text-sm font-medium text-red-800" role="alert">
           {error}
         </p>
       ) : null}
       <button
         type="submit"
         disabled={pending}
-        className="m-btn-primary inline-flex items-center justify-center px-4 py-2 text-sm font-semibold disabled:opacity-60"
+        className="m-btn-primary disabled:opacity-60"
       >
-        {pending ? "Sending…" : "Request access"}
+        {pending ? "Sending…" : "Submit request"}
       </button>
     </form>
   );

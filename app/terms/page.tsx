@@ -13,9 +13,9 @@ const UPDATED = "August 25, 2026";
 export default function TermsPage() {
   return (
     <MarketingShell active="terms">
-      <article className="mx-auto max-w-2xl">
-        <p className="text-sm font-bold text-[var(--m-accent)]">Legal</p>
-        <h1 className="m-section-title mt-2 text-2xl sm:text-3xl">Terms</h1>
+      <article>
+        <p className="m-legal-kicker">Legal</p>
+        <h1 className="m-section-title">Terms</h1>
         <p className="mt-3 text-sm text-[var(--m-muted)]">
           Last updated {UPDATED}. Soft-pilot terms — invite-only access while we
           onboard carefully.

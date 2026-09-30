@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { LeadForm } from "@/components/marketing/lead-form";
+import { marketingFontVars } from "@/components/marketing/fonts";
+import { MarketingMotion } from "@/components/marketing/marketing-motion";
 
 type WorkspaceCta = {
   orgName: string;
@@ -7,165 +9,54 @@ type WorkspaceCta = {
   isClient: boolean;
 };
 
-const CAPABILITIES = [
-  {
-    title: "Jobs with real windows",
-    body: "Draft → upcoming → ready → completed. Load-in and load-out, inventory, fleet, and crew on one job. Staff only see what they’re assigned.",
-  },
-  {
-    title: "Inventory that locks",
-    body: "Client assets stay reserved until load-out ends. Loaded quantities live on the run sheet — not in a spreadsheet.",
-  },
-  {
-    title: "White-label portal",
-    body: "Clients request jobs and see their inventory on your subdomain, with your logo and color. Your crew never sees Logiparty.",
-  },
-] as const;
-
-const TOUR = [
+const BAYS = [
   {
     id: "jobs",
-    label: "01",
+    num: "01",
     title: "Jobs",
-    body: "Statuses, calendar, and a run sheet with locations, loads, trucks, and crew.",
-    mock: "jobs",
+    body: "Draft → upcoming → ready → completed. Load-in and load-out, inventory, fleet, and crew on one run sheet. Staff only see what they’re assigned.",
+    shape: "a",
   },
   {
     id: "inventory",
-    label: "02",
+    num: "02",
     title: "Inventory & fleet",
-    body: "Client gear, your equipment, and vehicles — locked to the job while it’s live.",
-    mock: "inventory",
+    body: "Client assets stay reserved until load-out ends. Loaded quantities live on the job — not in a spreadsheet that dies at call time.",
+    shape: "b",
   },
   {
     id: "portal",
-    label: "03",
+    num: "03",
     title: "Client portal",
-    body: "Branded requests, docs, and inventory asks. Company-scoped. Invite-only.",
-    mock: "portal",
+    body: "Branded requests, docs, and inventory asks on your subdomain. Company-scoped. Your crew never sees Logiparty.",
+    shape: "c",
   },
   {
     id: "staff",
-    label: "04",
+    num: "04",
     title: "Staff on the dock",
-    body: "My Jobs only. Loaded vs assigned. Print the run sheet from a phone.",
-    mock: "staff",
+    body: "My Jobs only. Loaded vs assigned. Print the run sheet from a phone when the truck is already at the door.",
+    shape: "d",
   },
 ] as const;
 
-function MockJobs() {
-  return (
-    <div className="m-mock">
-      <div className="m-mock-bar">
-        <span>Jobs</span>
-        <span className="m-mock-muted">List · Calendar</span>
-      </div>
-      <div className="m-mock-rows">
-        {[
-          ["Waterfront Festival", "ready"],
-          ["Campus Pop-Up", "upcoming"],
-          ["Outdoor Patio", "draft"],
-          ["Trade Show Wrap", "completed"],
-        ].map(([name, status]) => (
-          <div key={name} className="m-mock-row">
-            <span>{name}</span>
-            <span className={`m-mock-chip m-mock-chip-${status}`}>{status}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function MockInventory() {
-  return (
-    <div className="m-mock">
-      <div className="m-mock-bar">
-        <span>Inventory</span>
-        <span className="m-mock-muted">Client · Equipment · Fleet</span>
-      </div>
-      <div className="m-mock-rows">
-        {[
-          ["SB-BAR-01", "Branded Bar", "10"],
-          ["SB-COOLER", "Rolling Cooler", "36"],
-          ["DOLLY-01", "Dolly", "40"],
-          ["Box Truck 12", "Fleet", "NL-012"],
-        ].map(([a, b, c]) => (
-          <div key={a} className="m-mock-row m-mock-row-3">
-            <span className="m-mock-mono">{a}</span>
-            <span>{b}</span>
-            <span className="m-mock-muted">{c}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function MockPortal() {
-  return (
-    <div className="m-mock">
-      <div className="m-mock-bar m-mock-bar-brand">
-        <span>Northline Logistics</span>
-        <span className="m-mock-muted">Client portal</span>
-      </div>
-      <div className="m-mock-rows">
-        <div className="m-mock-row">
-          <span>Your jobs</span>
-          <span className="m-mock-chip m-mock-chip-ready">ready</span>
-        </div>
-        <div className="m-mock-row">
-          <span>Waterfront Festival</span>
-          <span className="m-mock-muted">Sep 19</span>
-        </div>
-        <div className="m-mock-row">
-          <span>Request inventory change</span>
-          <span className="m-mock-muted">+24 coolers</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MockStaff() {
-  return (
-    <div className="m-mock">
-      <div className="m-mock-bar">
-        <span>My Jobs</span>
-        <span className="m-mock-muted">Staff</span>
-      </div>
-      <div className="m-mock-rows">
-        <div className="m-mock-row">
-          <span>Waterfront Festival</span>
-          <span className="m-mock-chip m-mock-chip-ready">ready</span>
-        </div>
-        <div className="m-mock-row m-mock-row-3">
-          <span>Branded Bar</span>
-          <span className="m-mock-muted">3 assigned</span>
-          <span className="text-[#1b6b2a]">3 loaded</span>
-        </div>
-        <div className="m-mock-row m-mock-row-3">
-          <span>Dolly</span>
-          <span className="m-mock-muted">10 assigned</span>
-          <span className="text-[#1b6b2a]">10 loaded</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TourMock({ kind }: { kind: (typeof TOUR)[number]["mock"] }) {
-  switch (kind) {
-    case "jobs":
-      return <MockJobs />;
-    case "inventory":
-      return <MockInventory />;
-    case "portal":
-      return <MockPortal />;
-    case "staff":
-      return <MockStaff />;
-  }
-}
+const STEPS = [
+  {
+    num: "01",
+    title: "Stage",
+    body: "Client assets sit in the warehouse. You assign inventory, fleet, and crew with real load-in / load-out windows.",
+  },
+  {
+    num: "02",
+    title: "Load",
+    body: "Staff work assigned jobs only. Quantities and docs live on the job — ready for the dock and the venue.",
+  },
+  {
+    num: "03",
+    title: "Return",
+    body: "After load-out ends, inventory and fleet locks release. Assets go back to storage for the next activation.",
+  },
+] as const;
 
 export function MarketingHome({
   workspace,
@@ -173,285 +64,228 @@ export function MarketingHome({
   workspace?: WorkspaceCta | null;
 }) {
   return (
-    <div className="marketing min-h-screen">
-      <div className="m-bubbles" aria-hidden>
-        <span className="m-bubble m-bubble-a" />
-        <span className="m-bubble m-bubble-b" />
-        <span className="m-bubble m-bubble-c" />
-      </div>
-
-      <header className="m-header flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <a href="#top" className="m-brand">
-          Logiparty
-        </a>
-        <nav className="flex flex-wrap items-center justify-end gap-x-4 gap-y-1 text-sm">
-          <a href="#product" className="m-nav-link hidden sm:inline">
-            Product
+    <div className={`marketing ${marketingFontVars} min-h-screen`}>
+      <MarketingMotion>
+        <header className="m-header">
+          <a href="#top" className="m-brand">
+            Logiparty
           </a>
-          <Link href="/demo" className="m-nav-link">
-            Demo
-          </Link>
-          <a href="#how" className="m-nav-link hidden sm:inline">
-            How it works
-          </a>
-          {workspace ? (
-            <a href={workspace.href} className="m-nav-link-strong">
-              Open {workspace.orgName}
+          <nav className="m-nav" aria-label="Primary">
+            <a href="#product" className="m-nav-link hidden sm:inline">
+              Bays
             </a>
-          ) : (
-            <a href="#request" className="m-nav-link-strong">
-              Request access
-            </a>
-          )}
-        </nav>
-      </header>
-
-      <main id="top" className="relative z-10 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl space-y-6">
-          <section className="m-hero p-5 sm:p-7">
-            <p className="text-2xl font-bold text-[var(--m-accent)] sm:text-3xl">
-              Logiparty
-            </p>
-            <h1 className="mt-2 text-lg font-semibold text-[var(--m-fg)] sm:text-xl">
-              Ops software for 3PLs that run live events.
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
-              Jobs, inventory, fleet, and a branded client portal — under your
-              name, on your subdomain. Invite-only while we onboard carefully.
-            </p>
-            <div className="mt-5 flex flex-wrap items-center gap-2">
-              {workspace ? (
-                <a
-                  href={workspace.href}
-                  className="m-btn-primary px-4 py-2 text-sm font-semibold"
-                >
-                  Go to {workspace.isClient ? "portal" : "dashboard"}
-                </a>
-              ) : (
-                <Link
-                  href="/demo"
-                  className="m-btn-primary px-4 py-2 text-sm font-semibold"
-                >
-                  Try the demo
-                </Link>
-              )}
-              {workspace ? (
-                <Link
-                  href="/demo"
-                  className="m-btn-ghost px-4 py-2 text-sm font-medium"
-                >
-                  Product tour
-                </Link>
-              ) : (
-                <a
-                  href="#request"
-                  className="m-btn-ghost px-4 py-2 text-sm font-medium"
-                >
-                  Request access
-                </a>
-              )}
-            </div>
-          </section>
-
-          <section id="tour" className="m-panel m-rise m-rise-1 p-5 sm:p-6">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div className="max-w-xl">
-                <h2 className="m-section-title">Product demo</h2>
-                <p className="mt-3 text-sm leading-relaxed text-[var(--m-muted)]">
-                  Walk the product — no login. Step through jobs, inventory,
-                  fleet, crew, and the client portal. Sample workspace only.
-                </p>
-              </div>
-              <Link
-                href="/demo"
-                className="m-btn-primary px-4 py-2 text-sm font-semibold"
-              >
-                Start interactive demo
-              </Link>
-            </div>
-
-            <div className="m-tour-grid mt-5">
-              {TOUR.map((item, i) => (
-                <div
-                  key={item.id}
-                  className={`m-tour-card m-rise m-rise-${Math.min(i + 1, 4)}`}
-                >
-                  <div className="m-tour-card-head">
-                    <span className="m-step-num">{item.label}</span>
-                    <h3 className="mt-0.5 text-sm font-bold text-white">
-                      {item.title}
-                    </h3>
-                    <p className="mt-1 text-xs leading-relaxed text-[var(--m-muted)]">
-                      {item.body}
-                    </p>
-                  </div>
-                  <div className="m-tour-card-body">
-                    <Link
-                      href="/demo"
-                      className="block hover:opacity-90"
-                      aria-label={`Open demo — ${item.title}`}
-                    >
-                      <TourMock kind={item.mock} />
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section id="problem" className="m-panel m-rise m-rise-2 p-5 sm:p-6">
-            <h2 className="m-section-title">The gap</h2>
-            <h3 className="mt-3 text-base font-semibold sm:text-lg">
-              Spreadsheets break when the load-out window moves.
-            </h3>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
-              Group chats lose the run sheet. Generic WMS doesn&apos;t know a
-              festival load-in. Event logistics needs one place for the job, the
-              assets locked to it, the trucks and crew, and a portal clients can
-              use — without platform branding in front of your staff.
-            </p>
-          </section>
-
-          <section id="product" className="m-panel m-rise m-rise-2 p-5 sm:p-6">
-            <h2 className="m-section-title">Product</h2>
-            <h3 className="mt-3 max-w-xl text-base font-semibold sm:text-lg">
-              Built for the warehouse-to-venue loop.
-            </h3>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-[var(--m-muted)]">
-              Multi-tenant by design. Each 3PL gets an isolated workspace on{" "}
-              <span className="font-medium text-[var(--m-fg)]">
-                your-org.logiparty.com
-              </span>
-              , white-labeled end to end.
-            </p>
-
-            <ul className="m-capability-list mt-5">
-              {CAPABILITIES.map((item) => (
-                <li key={item.title} className="m-capability-item">
-                  <h4 className="text-sm font-bold sm:text-base">{item.title}</h4>
-                  <p className="mt-1 text-sm leading-relaxed text-[var(--m-muted)]">
-                    {item.body}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <section id="how" className="m-panel m-rise m-rise-3 p-5 sm:p-6">
-            <h2 className="m-section-title">How it works</h2>
-            <h3 className="mt-3 text-base font-semibold sm:text-lg">
-              Stage → load → return.
-            </h3>
-            <ol className="m-steps mt-4">
-              <li className="m-step">
-                <span className="m-step-num" aria-hidden>
-                  01
-                </span>
-                <div>
-                  <p className="text-sm font-bold">Stage the job</p>
-                  <p className="mt-1 text-sm leading-relaxed text-[var(--m-muted)]">
-                    Client assets sit in the warehouse. You assign inventory,
-                    fleet, and crew with load-in / load-out windows.
-                  </p>
-                </div>
-              </li>
-              <li className="m-step">
-                <span className="m-step-num" aria-hidden>
-                  02
-                </span>
-                <div>
-                  <p className="text-sm font-bold">Run the work</p>
-                  <p className="mt-1 text-sm leading-relaxed text-[var(--m-muted)]">
-                    Staff work assigned jobs only. Loaded quantities and docs
-                    live on the job — ready for the dock and the venue.
-                  </p>
-                </div>
-              </li>
-              <li className="m-step">
-                <span className="m-step-num" aria-hidden>
-                  03
-                </span>
-                <div>
-                  <p className="text-sm font-bold">Return &amp; release</p>
-                  <p className="mt-1 text-sm leading-relaxed text-[var(--m-muted)]">
-                    After load-out ends, inventory and fleet locks release.
-                    Assets go back to storage for the next activation.
-                  </p>
-                </div>
-              </li>
-            </ol>
-          </section>
-
-          <section id="request" className="m-panel m-rise m-rise-3 p-5 sm:p-6">
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-start">
-              <div>
-                <h2 className="m-section-title">Request access</h2>
-                <p className="mt-3 text-sm leading-relaxed text-[var(--m-muted)]">
-                  No self-serve signup. Tell us about your 3PL — we hand-onboard
-                  orgs that fit. Prefer email?{" "}
-                  <a
-                    href="mailto:hello@logiparty.com"
-                    className="m-nav-link-strong"
-                  >
-                    hello@logiparty.com
-                  </a>
-                </p>
-                <p className="mt-4 text-sm text-[var(--m-muted)] leading-relaxed">
-                  Existing customers sign in at{" "}
-                  <span className="font-medium text-[var(--m-fg)]">
-                    your-org.logiparty.com
-                  </span>
-                  . Want a look first?{" "}
-                  <Link href="/demo" className="m-nav-link-strong">
-                    Open the demo
-                  </Link>
-                  .
-                </p>
-              </div>
-              <div className="m-lead-box">
-                <LeadForm />
-              </div>
-            </div>
-          </section>
-        </div>
-      </main>
-
-      <footer className="m-footer mt-4 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-5xl flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-sm font-bold text-[var(--m-accent)]">Logiparty</p>
-            <p className="mt-1 max-w-sm text-xs text-[var(--m-muted)]">
-              Multi-tenant ops for event logistics 3PLs.
-            </p>
-          </div>
-          <nav className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--m-muted)]">
             <Link href="/demo" className="m-nav-link">
               Demo
             </Link>
-            <a href="#request" className="m-nav-link">
-              Request access
+            <a href="#how" className="m-nav-link hidden sm:inline">
+              Run
             </a>
-            <a href="#product" className="m-nav-link">
-              Product
-            </a>
-            <Link href="/privacy" className="m-nav-link">
-              Privacy
-            </Link>
-            <Link href="/terms" className="m-nav-link">
-              Terms
-            </Link>
-            <Link href="/login" className="m-nav-link">
-              Sign in
-            </Link>
-            <a href="mailto:hello@logiparty.com" className="m-nav-link">
-              hello@logiparty.com
-            </a>
+            {workspace ? (
+              <a href={workspace.href} className="m-nav-link-strong">
+                Open {workspace.orgName}
+              </a>
+            ) : (
+              <a href="#request" className="m-nav-link-strong">
+                Request access
+              </a>
+            )}
           </nav>
-        </div>
-        <p className="mx-auto mt-5 max-w-5xl text-xs text-[var(--m-muted)]">
-          © {new Date().getFullYear()} Logiparty
-        </p>
-      </footer>
+        </header>
+
+        <main id="top">
+          <section className="m-hero" aria-label="Intro">
+            <div className="m-hero-plane" aria-hidden />
+            <div className="m-hero-tape" aria-hidden />
+            <div className="m-hero-door" aria-hidden />
+            <div className="m-hero-marks" aria-hidden />
+
+            <div className="m-hero-copy">
+              <p className="m-hero-bay m-mono">Bay 00 · Apex</p>
+              <p className="m-hero-brand m-display" aria-label="Logiparty">
+                <span>Logi</span>
+                <span>party</span>
+              </p>
+              <h1 className="m-hero-line">
+                Ops software for 3PLs that run live events.
+              </h1>
+              <p className="m-hero-sub">
+                Jobs, inventory, fleet, and a branded client portal — under your
+                name, on your subdomain. Invite-only.
+              </p>
+              <div className="m-hero-ctas">
+                {workspace ? (
+                  <a href={workspace.href} className="m-btn-primary">
+                    Go to {workspace.isClient ? "portal" : "dashboard"}
+                  </a>
+                ) : (
+                  <Link href="/demo" className="m-btn-primary">
+                    Try the demo
+                  </Link>
+                )}
+                {workspace ? (
+                  <Link href="/demo" className="m-btn-ghost">
+                    Product tour
+                  </Link>
+                ) : (
+                  <a href="#request" className="m-btn-ghost">
+                    Request access
+                  </a>
+                )}
+              </div>
+            </div>
+          </section>
+
+          <div className="m-bays-rail" id="product">
+            <div>
+              <h2 className="m-display">The bays</h2>
+              <p>
+                Four lanes of the warehouse-to-venue loop. Scroll the strip —
+                or open the interactive demo.
+              </p>
+            </div>
+            <Link href="/demo" className="m-btn-primary">
+              Start interactive demo
+            </Link>
+          </div>
+
+          <div className="m-bays" data-bay-strip>
+            {BAYS.map((bay, i) => (
+              <article
+                key={bay.id}
+                className="m-bay"
+                data-bay
+                data-active={i === 0 ? "true" : "false"}
+                id={bay.id}
+              >
+                <p className="m-bay-num m-mono" aria-hidden>
+                  {bay.num}
+                </p>
+                <h3 className="m-bay-title m-display">{bay.title}</h3>
+                <p className="m-bay-body">{bay.body}</p>
+                <div
+                  className={`m-bay-shape m-bay-shape-${bay.shape}`}
+                  aria-hidden
+                />
+              </article>
+            ))}
+          </div>
+
+          <section className="m-gap" id="problem" aria-labelledby="gap-title">
+            <div className="m-gap-inner">
+              <p className="m-gap-label m-mono">The gap</p>
+              <h2 id="gap-title" className="m-display">
+                Spreadsheets break when the load-out window moves.
+              </h2>
+              <p>
+                Group chats lose the run sheet. Generic WMS doesn&apos;t know a
+                festival load-in. Event logistics needs one place for the job,
+                the assets locked to it, the trucks and crew, and a portal
+                clients can use — without platform branding in front of your
+                staff.
+              </p>
+            </div>
+          </section>
+
+          <section
+            className="m-timeline"
+            id="how"
+            data-timeline
+            aria-labelledby="timeline-title"
+          >
+            <div className="m-timeline-head">
+              <p className="m-gap-label m-mono">How it runs</p>
+              <h2 id="timeline-title" className="m-display">
+                Stage → load → return
+              </h2>
+            </div>
+            <div className="m-timeline-track" data-timeline-track>
+              <div className="m-timeline-fill" aria-hidden />
+              <div className="m-timeline-marker" aria-hidden />
+              {STEPS.map((step) => (
+                <div key={step.num} className="m-timeline-step">
+                  <p className="m-timeline-step-num m-mono">{step.num}</p>
+                  <h3 className="m-display">{step.title}</h3>
+                  <p>{step.body}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section
+            className="m-manifest"
+            id="request"
+            aria-labelledby="manifest-title"
+          >
+            <div className="m-manifest-grid">
+              <div className="m-manifest-copy">
+                <p className="m-gap-label m-mono">Manifest</p>
+                <h2 id="manifest-title" className="m-display">
+                  Request access
+                </h2>
+                <p>
+                  No self-serve signup. Tell us about your 3PL — we hand-onboard
+                  orgs that fit. Prefer email?{" "}
+                  <a href="mailto:hello@logiparty.com">hello@logiparty.com</a>
+                </p>
+                <p>
+                  Existing customers sign in at{" "}
+                  <span className="m-mono text-[var(--m-concrete)]">
+                    your-org.logiparty.com
+                  </span>
+                  . Want a look first?{" "}
+                  <Link href="/demo">Open the demo</Link>.
+                </p>
+              </div>
+              <div className="m-ticket">
+                <div className="m-ticket-head">
+                  <span>Access request</span>
+                  <span>Form · A-01</span>
+                </div>
+                <div className="m-ticket-body">
+                  <LeadForm />
+                </div>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <footer className="m-footer">
+          <div className="m-footer-inner">
+            <div>
+              <p className="m-footer-brand">Logiparty</p>
+              <p className="m-footer-tag">
+                Multi-tenant ops for event logistics 3PLs.
+              </p>
+            </div>
+            <nav aria-label="Footer">
+              <Link href="/demo" className="m-nav-link">
+                Demo
+              </Link>
+              <a href="#request" className="m-nav-link">
+                Request access
+              </a>
+              <a href="#product" className="m-nav-link">
+                Bays
+              </a>
+              <Link href="/privacy" className="m-nav-link">
+                Privacy
+              </Link>
+              <Link href="/terms" className="m-nav-link">
+                Terms
+              </Link>
+              <Link href="/login" className="m-nav-link">
+                Sign in
+              </Link>
+              <a href="mailto:hello@logiparty.com" className="m-nav-link">
+                hello@logiparty.com
+              </a>
+            </nav>
+          </div>
+          <p className="m-footer-copy">
+            © {new Date().getFullYear()} Logiparty
+          </p>
+        </footer>
+      </MarketingMotion>
     </div>
   );
 }

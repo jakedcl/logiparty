@@ -13,9 +13,9 @@ const UPDATED = "August 25, 2026";
 export default function PrivacyPage() {
   return (
     <MarketingShell active="privacy">
-      <article className="mx-auto max-w-2xl">
-        <p className="text-sm font-bold text-[var(--m-accent)]">Legal</p>
-        <h1 className="m-section-title mt-2 text-2xl sm:text-3xl">Privacy</h1>
+      <article>
+        <p className="m-legal-kicker">Legal</p>
+        <h1 className="m-section-title">Privacy</h1>
         <p className="mt-3 text-sm text-[var(--m-muted)]">
           Last updated {UPDATED}. Soft-pilot policy — honest about what we
           collect while we onboard invite-only customers.

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { marketingFontVars } from "@/components/marketing/fonts";
 
 /** Shared apex marketing chrome (header + footer) for legal / secondary pages. */
 export function MarketingShell({
@@ -10,18 +11,12 @@ export function MarketingShell({
   active?: "privacy" | "terms";
 }) {
   return (
-    <div className="marketing min-h-screen">
-      <div className="m-bubbles" aria-hidden>
-        <span className="m-bubble m-bubble-a" />
-        <span className="m-bubble m-bubble-b" />
-        <span className="m-bubble m-bubble-c" />
-      </div>
-
-      <header className="m-header flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+    <div className={`marketing ${marketingFontVars} min-h-screen`}>
+      <header className="m-header">
         <Link href="/" className="m-brand">
           Logiparty
         </Link>
-        <nav className="flex items-center gap-4 text-sm">
+        <nav className="m-nav" aria-label="Primary">
           <Link href="/demo" className="m-nav-link">
             Demo
           </Link>
@@ -31,21 +26,19 @@ export function MarketingShell({
         </nav>
       </header>
 
-      <main className="relative z-10 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="m-panel m-rise mx-auto max-w-3xl p-5 sm:p-7">
-          {children}
-        </div>
+      <main>
+        <div className="m-legal-panel">{children}</div>
       </main>
 
-      <footer className="m-footer mt-4 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-3xl flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <footer className="m-footer">
+        <div className="m-footer-inner">
           <div>
-            <p className="text-sm font-bold text-[var(--m-accent)]">Logiparty</p>
-            <p className="mt-1 max-w-sm text-xs text-[var(--m-muted)]">
+            <p className="m-footer-brand">Logiparty</p>
+            <p className="m-footer-tag">
               Multi-tenant ops for event logistics 3PLs.
             </p>
           </div>
-          <nav className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--m-muted)]">
+          <nav aria-label="Footer">
             <Link href="/" className="m-nav-link">
               Home
             </Link>
@@ -54,19 +47,21 @@ export function MarketingShell({
             </Link>
             <Link
               href="/privacy"
-              className={
-                active === "privacy" ? "font-semibold text-[var(--m-fg)]" : "m-nav-link"
-              }
+              className="m-nav-link"
               aria-current={active === "privacy" ? "page" : undefined}
+              style={
+                active === "privacy" ? { color: "var(--m-yellow)" } : undefined
+              }
             >
               Privacy
             </Link>
             <Link
               href="/terms"
-              className={
-                active === "terms" ? "font-semibold text-[var(--m-fg)]" : "m-nav-link"
-              }
+              className="m-nav-link"
               aria-current={active === "terms" ? "page" : undefined}
+              style={
+                active === "terms" ? { color: "var(--m-yellow)" } : undefined
+              }
             >
               Terms
             </Link>
@@ -75,7 +70,7 @@ export function MarketingShell({
             </a>
           </nav>
         </div>
-        <p className="mx-auto mt-5 max-w-3xl text-xs text-[var(--m-muted)]">
+        <p className="m-footer-copy">
           © {new Date().getFullYear()} Logiparty
         </p>
       </footer>
