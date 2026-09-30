@@ -35,7 +35,7 @@ export function PortalShell({
 
   return (
     <OrgTheme primaryColor={primaryColor} className="flex flex-col">
-      <header className="shrink-0 border-b border-[var(--border-subtle)] bg-[var(--surface)]">
+      <header className="app-topbar shrink-0 border-b border-[var(--border-subtle)] bg-[var(--surface)]">
         <div className="h-[3px] bg-[var(--primary)]" aria-hidden />
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3.5 md:px-6">
           <div className="flex min-w-0 items-center gap-2.5">

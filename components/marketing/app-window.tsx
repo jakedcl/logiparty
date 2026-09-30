@@ -69,25 +69,25 @@ export function AppWindow({
   return (
     <motion.div
       className={`m-window m-window-hero-glass ${className}`.trim()}
-      initial={reduceMotion ? false : { opacity: 0, y: 24, scale: 0.98 }}
+      initial={false}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
     >
-      {reduceMotion ? (
-        windowChrome
-      ) : (
-        <motion.div
-          animate={{ y: [0, -4, 0, 3, 0] }}
-          transition={{
-            duration: 7,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 0.55,
-          }}
-        >
-          {windowChrome}
-        </motion.div>
-      )}
+      <motion.div
+        animate={reduceMotion ? undefined : { y: [0, -4, 0, 3, 0] }}
+        transition={
+          reduceMotion
+            ? undefined
+            : {
+                duration: 7,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.55,
+              }
+        }
+      >
+        {windowChrome}
+      </motion.div>
     </motion.div>
   );
 }
