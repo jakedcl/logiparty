@@ -1,6 +1,6 @@
 # APP_CONTEXT.md — Logiparty
-### Master reference for AI agents, collaborators, and future self.
-### Read [AGENTS.md](AGENTS.md) and [HOW_TO_BUILD.md](HOW_TO_BUILD.md) before touching code.
+### Master reference for collaborators and future self.
+### Read [HOW_TO_BUILD.md](HOW_TO_BUILD.md) before touching code.
 
 ---
 
@@ -310,8 +310,7 @@ See [docs/SCHEMA.md](docs/SCHEMA.md) for full table list.
 ├── middleware.ts
 ├── thirdpartylogistics/     # LEGACY REFERENCE — do not modify
 ├── APP_CONTEXT.md
-├── HOW_TO_BUILD.md
-└── AGENTS.md
+└── HOW_TO_BUILD.md
 ```
 
 ---
@@ -404,31 +403,6 @@ Full routes implemented incrementally per [HOW_TO_BUILD.md](HOW_TO_BUILD.md).
 - GPS / driver tracking
 - Custom capability tags per org
 - In-app messaging
-
----
-
-## 19. Prompt for AI Agents
-
-```
-You are building Logiparty — multi-tenant 3PL SaaS.
-
-Read in order: AGENTS.md → HOW_TO_BUILD.md → APP_CONTEXT.md → docs/SCHEMA.md.
-Implement ONE ticket ID per session. Update docs/PROGRESS.md when done.
-
-Stack: Next.js 15, Tailwind v4, shadcn/ui, NextAuth v5, Drizzle, Neon, R2, Vercel.
-
-Critical rules:
-- RLS on all org tables; set app.current_org_id per request.
-- Subdomain tenancy: {slug}.logiparty.com
-- 3PL staff UI: no "Logiparty" branding.
-- Staff see only assigned jobs (RLS + queries).
-- Clients: portal only, per client_company isolation.
-- quantity_loaded not quantity_staged; release locks after load_out_end.
-- Files to R2 only; no signed URLs in DB.
-- Log mutations to activity_logs.
-- Do not edit thirdpartylogistics/ (legacy reference).
-- Do not commit secrets.
-```
 
 ---
 

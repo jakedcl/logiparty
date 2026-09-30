@@ -1,6 +1,6 @@
 # SCHEMA.md — Logiparty database
 
-Source of truth for Drizzle schema and RLS. **Agents must not invent tables or columns not listed here** without updating this file.
+Source of truth for Drizzle schema and RLS. Do not add tables or columns without updating this file.
 
 All `id` fields are UUID v4 unless noted. All timestamps are `timestamptz`.
 

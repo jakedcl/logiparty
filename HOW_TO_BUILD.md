@@ -1,8 +1,8 @@
 # HOW_TO_BUILD.md — Logiparty
 
-Methodical build playbook for humans and AI agents. **One ticket per session.**
+Methodical build playbook. **One ticket per session.**
 
-**Read first:** [AGENTS.md](AGENTS.md) → this file → [APP_CONTEXT.md](APP_CONTEXT.md) → [docs/SCHEMA.md](docs/SCHEMA.md)
+**Read first:** this file → [APP_CONTEXT.md](APP_CONTEXT.md) → [docs/SCHEMA.md](docs/SCHEMA.md)
 
 **Track progress:** [docs/PROGRESS.md](docs/PROGRESS.md)
 
@@ -227,18 +227,6 @@ M0 Foundation
 | Update loaded qty | yes | warehouse tag | no | no |
 | Upload doc | yes | no | yes | own |
 | Cross-org URL | 403 | 403 | 403 | 403 |
-
----
-
-## 14. Agent session template
-
-```
-Ticket: [e.g. M3-9]
-Read: APP_CONTEXT §4, docs/SCHEMA.md (job_* tables), docs/GOLDEN_PATH.md steps 9-10
-Implement ONLY this ticket. Do not start the next ticket.
-Definition of done: [paste from section above]
-Update docs/PROGRESS.md when complete.
-```
 
 ---
 

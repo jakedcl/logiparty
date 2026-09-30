@@ -1,8 +1,7 @@
 # OPEN_TABS.md — Active work queue
 
 **Purpose:** Single source of truth for what's open, blocked, and done.  
-**Agents:** Read this every session (see [AGENTS.md](../AGENTS.md)). Update when you finish or start an item.  
-**Human:** Pick **one** active item before starting a new convo or subagent.
+Update this when you finish or start an item. Pick **one** active item before starting a new one.
 
 *Last updated: 2026-09-13 (A20 marketing + /demo + northline seed).*
 
@@ -136,19 +135,8 @@ Extra portal logins (still `password123`): `sara@monster.nydac.test`, `maya@goth
 
 ---
 
-## New session prompt (copy-paste)
+## Working rules
 
-```
-Read AGENTS.md and docs/OPEN_TABS.md first.
-Work ONLY on OPEN_TABS item [A3 / A4 / etc].
-Update docs/OPEN_TABS.md when done (move to Done, note blockers).
-Do not start other active items.
-```
-
----
-
-## Subagent rules
-
-1. **One active item per agent** — parallel agents on different A-items will conflict.
+1. **One active item at a time.**
 2. **Always update this file** in the same PR as the work.
-3. **PROGRESS.md** = milestone tickets; **OPEN_TABS.md** = current human/agent queue.
+3. **PROGRESS.md** = milestone tickets; **OPEN_TABS.md** = current queue.

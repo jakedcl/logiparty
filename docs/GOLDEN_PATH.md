@@ -1,6 +1,6 @@
 # GOLDEN_PATH.md — Pilot acceptance test
 
-End-to-end flow the first paying 3PL must complete. QA and agents use this to verify MVP.
+End-to-end flow the first paying 3PL must complete. Use this to verify the MVP.
 
 **Prerequisites:** Milestones M0–M4 complete (M5 availability optional).
 
