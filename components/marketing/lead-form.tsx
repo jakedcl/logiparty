@@ -128,7 +128,7 @@ export function LeadForm() {
         <button
           type="submit"
           disabled={pending}
-          className="m-btn-primary inline-flex items-center justify-center px-4 py-2 text-sm font-semibold disabled:opacity-60"
+          className="m-btn-primary inline-flex items-center justify-center px-4 py-2 text-sm disabled:opacity-60"
         >
           {pending ? "Sending…" : "Submit request"}
         </button>

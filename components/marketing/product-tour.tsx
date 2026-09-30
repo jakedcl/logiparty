@@ -32,7 +32,7 @@ export function ProductTour() {
             interactive tour.
           </p>
         </div>
-        <Link href="/demo" className="m-btn-primary px-4 py-2 text-sm font-semibold">
+        <Link href="/demo" className="m-btn-primary px-4 py-2 text-sm">
           Start interactive demo
         </Link>
       </div>
