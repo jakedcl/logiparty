@@ -1,6 +1,6 @@
 # DECISIONS.md — Locked v1 defaults
 
-Ambiguous product choices resolved here. Agents follow these unless the user overrides.
+Ambiguous product choices resolved here. These stand unless changed here.
 
 | # | Question | Decision | Rationale |
 |---|----------|----------|-----------|

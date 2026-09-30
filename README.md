@@ -1,122 +1,66 @@
 # Logiparty
 
-Multi-tenant SaaS for third-party logistics (3PL) companies — jobs, warehouse inventory, fleet, crew, and a white-label client portal.
+Logiparty is a multi-tenant web app for third-party logistics (3PL) companies that run warehouse, fleet and crew for live events, deliveries and corporate jobs. Each company gets its own workspace on its own subdomain, plus a white-label portal where its clients can request jobs and see their own inventory.
 
-**Status:** M5 complete (MVP). Post-MVP go-live / polish in [docs/OPEN_TABS.md](docs/OPEN_TABS.md). Neon project `logiparty` provisioned — use `.env.local` (not committed). Prod: [logiparty.com](https://logiparty.com) · tenant login [test.logiparty.com](https://test.logiparty.com/login). R2 connected; Resend optional until domain verify.
+Live at [logiparty.com](https://logiparty.com). A demo tenant login is at [test.logiparty.com](https://test.logiparty.com/login).
 
----
+![Logiparty landing page](docs/screenshot.png)
 
-## Documentation map
+## What it does
 
-| Doc | Purpose |
-|-----|---------|
-| [README.md](README.md) | This file — entry point |
-| [AGENTS.md](AGENTS.md) | Rules for AI agents |
-| [HOW_TO_BUILD.md](HOW_TO_BUILD.md) | Milestones, tickets, DoD |
-| [APP_CONTEXT.md](APP_CONTEXT.md) | Product + stack spec |
-| [docs/SCHEMA.md](docs/SCHEMA.md) | Database tables |
-| [docs/GOLDEN_PATH.md](docs/GOLDEN_PATH.md) | Pilot acceptance test |
-| [docs/DECISIONS.md](docs/DECISIONS.md) | Locked v1 defaults |
-| [docs/PROGRESS.md](docs/PROGRESS.md) | Ticket checklist |
-| [docs/GETTING_STARTED.md](docs/GETTING_STARTED.md) | **Start here** — local, prod, Neon, Vercel |
-
-**Legacy reference only:** [`thirdpartylogistics/`](thirdpartylogistics/) — school capstone; do not modify.
-
----
+- Invite-only accounts with four roles: org admin, manager, staff and client. Staff can carry capability tags such as driver or warehouse.
+- Jobs are the unit of work. A job holds inventory lines, vehicles, crew, up to five locations, documents and an activity trail. Status moves from draft to upcoming to ready to completed (or denied).
+- Client portal: clients request jobs, upload PDFs and images, and only see their own company's jobs and inventory.
+- Separate catalogs for client-owned inventory, the 3PL's own inventory and the fleet. Items and vehicles are locked while a job is upcoming or ready and released after load-out.
+- Documents are stored in Cloudflare R2 and served with signed URLs.
+- Time-off requests that managers approve, and an activity log scoped by role.
+- White-label settings per org: name, logo, primary color and email from-name.
+- Stripe billing is scaffolded (checkout, portal, webhook) but off unless the keys are set.
 
 ## Stack
 
-Next.js 15 · Tailwind v4 · shadcn/ui · NextAuth v5 · Drizzle · Neon · R2 · Resend · Vercel
+Next.js 15 (App Router), React 19, Tailwind CSS 4, shadcn/ui, NextAuth v5, Drizzle ORM on Neon Postgres with row-level security, Cloudflare R2, Resend, deployed on Vercel.
 
----
+## Running it locally
 
-## Local development
+You need Node.js 20 or newer and a Postgres database (a free Neon project works).
 
-### Prerequisites
+1. Install dependencies with `npm install`.
+2. Copy `.env.example` to `.env.local` and fill in at least `DATABASE_URL` and `AUTH_SECRET` (generate one with `openssl rand -base64 32`). R2, Resend and Stripe are optional for local work.
+3. Tenants are picked by subdomain, so add these to `/etc/hosts`:
 
-- Node.js 20+
-- Neon PostgreSQL database (or local Postgres for RLS dev)
-- Copy `.env.example` → `.env.local` and fill values
-
-### Subdomain routing (local)
-
-Production uses `{slug}.logiparty.com`. For local dev:
-
-1. Add to `/etc/hosts`:
    ```
    127.0.0.1 nydac.localhost
    127.0.0.1 test.localhost
    127.0.0.1 axis.localhost
    ```
-2. Run `npm run dev` and open `http://nydac.localhost:3000` (or `test` / `axis`)
 
-Alternatively set `NEXT_PUBLIC_DEV_ORG_SLUG=nydac` if using a dev fallback (see middleware).
+4. Apply the migrations and seed the demo orgs:
 
-### Commands
+   ```sh
+   npm run db:migrate:sql
+   npm run db:seed
+   ```
 
-```bash
-npm install
-npm run db:migrate:sql   # apply SQL in lib/db/migrations/
-npm run db:seed          # golden-path users (password123) — nydac + test + axis
-npm run db:reset-seed -- --confirm  # wipe seed filler + re-seed all three orgs
-npm run test:integration
-npm run dev              # http://nydac.localhost:3000
-```
+5. Start the dev server with `npm run dev` and open `http://nydac.localhost:3000`.
 
-Seed accounts (all password `password123`):
+The seed script creates three demo organizations with sample users. The demo accounts and their shared password are listed in `docs/GETTING_STARTED.md`. They are local test data only.
 
-**nydac** — New York Design and Construction
+Other scripts you might need: `npm run db:reset-seed -- --confirm` to wipe and reseed, `npm run test:integration` for the integration checks, and `npm run db:verify-rls` to check the row-level security policies.
 
-| Email | Role |
-|-------|------|
-| `ed@test.test` | OrgAdmin (Ed) |
-| `mike@test.test` | Manager (Mike Oso) |
-| `don@test.test` | Manager (Don) |
-| `tom@test.test` / `rob@test.test` | Staff / warehouse |
-| `paul@test.test` / `jerome@test.test` | Staff / driver |
-| `michaela@redbull.test` | Client POC (Red Bull) |
-| `dom@redbull.test` | Client (Red Bull) |
+## Project layout
 
-**test** — Acme Event Logistics (playground)
+- `app/` routes: the marketing site, `dashboard/` for staff, `portal/` for clients, `demo/`, and `api/`
+- `lib/` server code: auth, database schema and migrations, jobs, inventory, storage, email
+- `docs/` schema notes, decisions, staging setup and the open task list
+- `scripts/` migration, seed and test scripts
 
-| Email | Role |
-|-------|------|
-| `boss@playground.test` | OrgAdmin |
-| `riley@playground.test` | Manager |
-| `chris@playground.test` / `pat@playground.test` | Staff / warehouse |
-| `jamie@playground.test` | Staff / driver |
-| `nina@monster.test` | Client POC (Monster) |
-| `kai@monster.test` | Client (Monster) |
+Logiparty grew out of an earlier school project, [thirdpartylogistics](https://github.com/jakedcl/thirdpartylogistics).
 
-**axis** — Axis Global Staging
+## Status
 
-| Email | Role |
-|-------|------|
-| `jordan@axis.test` | OrgAdmin (Jordan Hale) |
-| `avery@axis.test` | Manager (Avery Quinn) |
-| `casey@axis.test` / `drew@axis.test` | Staff / warehouse |
-| `blake@axis.test` | Staff / driver |
-| `taylor@volt.test` | Client POC (Volt Energy) |
-| `reese@volt.test` | Client (Volt Energy) |
-
-A second Neon **branch** (staging) is optional — see [docs/STAGING.md](docs/STAGING.md). You can keep using one DATABASE_URL until you are ready to connect more services.
-
----
-
-## Environment variables
-
-See [.env.example](.env.example).
-
----
-
-## Building agentically
-
-1. Open [docs/PROGRESS.md](docs/PROGRESS.md) — find the next unchecked ticket.
-2. Start a session with the prompt template in [AGENTS.md](AGENTS.md).
-3. Complete one ticket; check it off in PROGRESS.md.
-
----
+The MVP milestones are built and the app is running in production. Onboarding is by hand for now rather than public signup. Remaining work is tracked in `docs/OPEN_TABS.md`.
 
 ## License
 
-Private — All rights reserved.
+Private, all rights reserved.
