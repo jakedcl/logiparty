@@ -10,65 +10,44 @@ export function MarketingShell({
   active?: "privacy" | "terms";
 }) {
   return (
-    <div className="marketing min-h-screen text-[var(--m-fg)]">
-      <div className="m-atmosphere" aria-hidden />
-
-      <header className="relative z-10 flex items-center justify-between px-5 py-5 sm:px-8 lg:px-12">
-        <Link
-          href="/"
-          className="text-sm font-semibold tracking-[0.2em] uppercase"
-        >
+    <div className="marketing min-h-screen">
+      <header className="m-header flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        <Link href="/" className="m-brand">
           Logiparty
         </Link>
-        <nav className="flex items-center gap-5 text-sm">
-          <Link
-            href="/demo"
-            className="text-[var(--m-muted)] transition-colors hover:text-[var(--m-fg)]"
-          >
+        <nav className="flex items-center gap-4 text-sm">
+          <Link href="/demo" className="m-nav-link">
             Demo
           </Link>
-          <Link
-            href="/#request"
-            className="font-medium text-[var(--m-accent)] underline-offset-4 hover:underline"
-          >
+          <Link href="/#request" className="m-nav-link-strong">
             Request access
           </Link>
         </nav>
       </header>
 
-      <main className="relative z-10 px-5 py-12 sm:px-8 sm:py-16 lg:px-12">
-        {children}
+      <main className="px-4 py-6 sm:px-6 lg:px-8">
+        <div className="m-panel mx-auto max-w-3xl p-5 sm:p-7">{children}</div>
       </main>
 
-      <footer className="relative z-10 border-t border-[var(--m-line)] px-5 py-10 sm:px-8 lg:px-12">
-        <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+      <footer className="m-footer mt-4 px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-3xl flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p className="text-sm font-semibold tracking-[0.16em] uppercase">
-              Logiparty
-            </p>
-            <p className="mt-2 max-w-sm text-sm text-[var(--m-muted)]">
+            <p className="text-sm font-bold text-[var(--m-accent)]">Logiparty</p>
+            <p className="mt-1 max-w-sm text-xs text-[var(--m-muted)]">
               Multi-tenant ops for event logistics 3PLs.
             </p>
           </div>
-          <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[var(--m-muted)]">
-            <Link
-              href="/"
-              className="transition-colors hover:text-[var(--m-fg)]"
-            >
+          <nav className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--m-muted)]">
+            <Link href="/" className="m-nav-link">
               Home
             </Link>
-            <Link
-              href="/demo"
-              className="transition-colors hover:text-[var(--m-fg)]"
-            >
+            <Link href="/demo" className="m-nav-link">
               Demo
             </Link>
             <Link
               href="/privacy"
               className={
-                active === "privacy"
-                  ? "text-[var(--m-fg)]"
-                  : "transition-colors hover:text-[var(--m-fg)]"
+                active === "privacy" ? "font-semibold text-[var(--m-fg)]" : "m-nav-link"
               }
               aria-current={active === "privacy" ? "page" : undefined}
             >
@@ -77,23 +56,18 @@ export function MarketingShell({
             <Link
               href="/terms"
               className={
-                active === "terms"
-                  ? "text-[var(--m-fg)]"
-                  : "transition-colors hover:text-[var(--m-fg)]"
+                active === "terms" ? "font-semibold text-[var(--m-fg)]" : "m-nav-link"
               }
               aria-current={active === "terms" ? "page" : undefined}
             >
               Terms
             </Link>
-            <a
-              href="mailto:hello@logiparty.com"
-              className="transition-colors hover:text-[var(--m-fg)]"
-            >
+            <a href="mailto:hello@logiparty.com" className="m-nav-link">
               hello@logiparty.com
             </a>
           </nav>
         </div>
-        <p className="mt-8 text-xs text-[var(--m-muted)]/65">
+        <p className="mx-auto mt-5 max-w-3xl text-xs text-[var(--m-muted)]">
           © {new Date().getFullYear()} Logiparty
         </p>
       </footer>

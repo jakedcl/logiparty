@@ -14,10 +14,8 @@ export default function TermsPage() {
   return (
     <MarketingShell active="terms">
       <article className="mx-auto max-w-2xl">
-        <p className="m-section-label">Legal</p>
-        <h1 className="mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
-          Terms
-        </h1>
+        <p className="text-sm font-bold text-[var(--m-accent)]">Legal</p>
+        <h1 className="m-section-title mt-2 text-2xl sm:text-3xl">Terms</h1>
         <p className="mt-3 text-sm text-[var(--m-muted)]">
           Last updated {UPDATED}. Soft-pilot terms — invite-only access while we
           onboard carefully.
