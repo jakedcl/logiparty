@@ -351,7 +351,11 @@ body {
     linear-gradient(180deg, #e8edf3 0%, #d5dde6 100%);
   color: var(--m-fg);
   overflow-x: clip;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --m-font:
+    "Lucida Grande", "Lucida Sans Unicode", var(--font-marketing),
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--m-font);
+  font-weight: 400;
 }
 
 /* Soft floating bubbles — early iOS wallpaper energy */
@@ -434,6 +438,7 @@ body {
 }
 
 .m-brand {
+  font-family: var(--m-font);
   font-size: 1.0625rem;
   font-weight: 700;
   color: #ffffff;
@@ -457,9 +462,16 @@ body {
   text-decoration: underline;
 }
 
+.m-nav-link-current {
+  color: var(--m-fg);
+  font-family: var(--m-font);
+  font-weight: 600;
+  text-decoration: none;
+}
+
 .m-nav-link-strong {
   color: var(--m-accent);
-  font-weight: 700;
+  font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 2px;
   text-shadow: none;
@@ -695,6 +707,27 @@ body {
 }
 
 /* Glossy aqua buttons — early iPhone / Aqua */
+.m-btn-primary,
+.m-btn-ghost,
+.m-seg-wrap,
+.m-seg,
+.m-seg-item,
+.m-access-tab,
+.m-stepper-btn,
+.m-stepper-label,
+.m-header .m-nav-link-strong,
+.m-nav-link-current,
+.m-window-title,
+.m-access-form label > span {
+  font-family: var(--m-font);
+  font-weight: 600;
+}
+
+.m-window-title,
+.m-stepper-panel-title {
+  font-weight: 700;
+}
+
 .m-btn-primary {
   position: relative;
   display: inline-block;
@@ -1018,7 +1051,6 @@ body {
   margin: 0;
   text-align: center;
   font-size: 0.75rem;
-  font-weight: 700;
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.3);
   white-space: nowrap;
@@ -1105,7 +1137,6 @@ body {
   background: transparent;
   color: #0b5cab;
   font-size: 0.72rem;
-  font-weight: 700;
   letter-spacing: 0.02em;
   padding: 0.5rem 0.5rem;
   cursor: pointer;
@@ -1324,7 +1355,6 @@ body {
   border: 1px solid #1a6bb0;
   background: linear-gradient(to bottom, #ffffff 0%, #dce8f5 100%);
   color: #0b5cab;
-  font-weight: 700;
   font-size: 0.75rem;
   letter-spacing: 0.04em;
   cursor: pointer;
@@ -1379,7 +1409,6 @@ body {
 .m-stepper-label {
   margin: 0;
   font-size: 0.8rem;
-  font-weight: 700;
   color: var(--m-fg);
 }
 
@@ -1395,7 +1424,6 @@ body {
 .m-stepper-panel-title {
   margin: 0;
   font-size: 0.95rem;
-  font-weight: 700;
   color: var(--m-fg);
 }
 
@@ -1837,7 +1865,6 @@ body {
   border-right: 1px solid var(--m-line);
   padding: 0.45rem 0.5rem;
   font-size: 0.68rem;
-  font-weight: 700;
   color: var(--m-muted);
   background: transparent;
   cursor: pointer;
@@ -2093,7 +2120,11 @@ body {
 }
 
 .demo-app {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --m-font:
+    "Lucida Grande", "Lucida Sans Unicode", var(--font-marketing),
+    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: var(--m-font);
+  font-weight: 400;
 }
 
 @media (prefers-reduced-motion: reduce) {

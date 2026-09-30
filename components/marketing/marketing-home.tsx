@@ -5,6 +5,7 @@ import { LeadForm } from "@/components/marketing/lead-form";
 import { MockJobs } from "@/components/marketing/product-mocks";
 import { ProductTour } from "@/components/marketing/product-tour";
 import { ProcessStepper } from "@/components/marketing/process-stepper";
+import { marketingFont } from "@/components/marketing/fonts";
 
 type WorkspaceCta = {
   orgName: string;
@@ -33,7 +34,7 @@ export function MarketingHome({
   workspace?: WorkspaceCta | null;
 }) {
   return (
-    <div className="marketing min-h-screen">
+    <div className={`marketing min-h-screen ${marketingFont.variable}`}>
       <div className="m-bubbles" aria-hidden>
         <span className="m-bubble m-bubble-a" />
         <span className="m-bubble m-bubble-b" />
@@ -92,14 +93,14 @@ export function MarketingHome({
                   {workspace ? (
                     <a
                       href={workspace.href}
-                      className="m-btn-primary px-4 py-2 text-sm font-semibold"
+                      className="m-btn-primary px-4 py-2 text-sm"
                     >
                       Go to {workspace.isClient ? "portal" : "dashboard"}
                     </a>
                   ) : (
                     <Link
                       href="/demo"
-                      className="m-btn-primary px-4 py-2 text-sm font-semibold"
+                      className="m-btn-primary px-4 py-2 text-sm"
                     >
                       Try the demo
                     </Link>
@@ -107,14 +108,14 @@ export function MarketingHome({
                   {workspace ? (
                     <Link
                       href="/demo"
-                      className="m-btn-ghost px-4 py-2 text-sm font-medium"
+                      className="m-btn-ghost px-4 py-2 text-sm"
                     >
                       Product tour
                     </Link>
                   ) : (
                     <a
                       href="#request"
-                      className="m-btn-ghost px-4 py-2 text-sm font-medium"
+                      className="m-btn-ghost px-4 py-2 text-sm"
                     >
                       Request access
                     </a>

@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { DemoScreen } from "@/components/demo/demo-screens";
+import { marketingFont } from "@/components/marketing/fonts";
 import { DEMO_STEPS, type DemoPopupPlacement } from "@/lib/demo/steps";
 
 type Rect = { top: number; left: number; width: number; height: number };
@@ -163,7 +164,9 @@ export function DemoTour() {
   }, [finished, next, prev]);
 
   return (
-    <div className="demo-app fixed inset-0 flex flex-col bg-[#f3f5f8]">
+    <div
+      className={`demo-app fixed inset-0 flex flex-col bg-[#f3f5f8] ${marketingFont.variable}`}
+    >
       {/* Slim demo chrome — not a marketing page */}
       <div className="relative z-50 flex items-center justify-between gap-3 border-b border-[#0b1526] bg-[#0b1526] px-3 py-2 text-[#f0f4fa] sm:px-4">
         <div className="flex min-w-0 items-center gap-3">
