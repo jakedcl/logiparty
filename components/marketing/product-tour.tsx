@@ -14,17 +14,13 @@ const SEGMENTS = [
   { id: "staff", label: "Staff", title: "Staff on the dock", body: "My Jobs only. Loaded vs assigned. Print the run sheet from a phone." },
 ] as const;
 
-const fade = {
-  initial: { opacity: 0 },
-  animate: { opacity: 1 },
-  exit: { opacity: 0 },
-};
-
 export function ProductTour() {
   const [active, setActive] = useState<string>("jobs");
   const current = SEGMENTS.find((s) => s.id === active) ?? SEGMENTS[0];
   const reduceMotion = useReducedMotion();
-  const crossfade = reduceMotion ? { duration: 0 } : { duration: 0.22, ease: "easeInOut" as const };
+  const panelTransition = reduceMotion
+    ? { duration: 0 }
+    : { duration: 0.38, ease: [0.22, 1, 0.36, 1] as const };
 
   return (
     <div className="m-tour-block">
@@ -52,30 +48,64 @@ export function ProductTour() {
 
       <AppWindow
         title={current.title}
+        inset
         toolbar={
           <AnimatePresence mode="wait" initial={false}>
             <motion.p
               key={active}
               className="m-window-caption text-[var(--m-muted)]"
-              {...fade}
-              transition={crossfade}
+              initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reduceMotion ? undefined : { opacity: 0, y: -4 }}
+              transition={panelTransition}
             >
               {current.body}
             </motion.p>
           </AnimatePresence>
         }
       >
-        <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={active} {...fade} transition={crossfade}>
-            <Link
-              href="/demo"
-              className="m-tour-window-link"
-              aria-label={`Open demo — ${current.title}`}
-            >
-              <TourMock kind={current.id as MockKind} />
-            </Link>
-          </motion.div>
-        </AnimatePresence>
+        <div className="m-tour-split">
+          <nav className="m-tour-sidebar" aria-label="Demo sections">
+            {SEGMENTS.map((seg) => {
+              const selected = seg.id === active;
+              return (
+                <button
+                  key={seg.id}
+                  type="button"
+                  className={`m-tour-sidebar-item${selected ? " m-tour-sidebar-item-active" : ""}`}
+                  onClick={() => setActive(seg.id)}
+                  aria-current={selected ? "true" : undefined}
+                >
+                  <span className="m-tour-sidebar-dot" aria-hidden />
+                  {seg.label}
+                </button>
+              );
+            })}
+          </nav>
+          <div className="m-tour-stage">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={active}
+                initial={
+                  reduceMotion ? false : { opacity: 0, x: 28, filter: "blur(6px)" }
+                }
+                animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+                exit={
+                  reduceMotion ? undefined : { opacity: 0, x: -20, filter: "blur(4px)" }
+                }
+                transition={panelTransition}
+              >
+                <Link
+                  href="/demo"
+                  className="m-tour-window-link"
+                  aria-label={`Open demo — ${current.title}`}
+                >
+                  <TourMock kind={current.id as MockKind} />
+                </Link>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+        </div>
       </AppWindow>
     </div>
   );
