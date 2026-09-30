@@ -53,8 +53,8 @@ export function ComparePane() {
         <motion.ul
           className="m-compare-list m-compare-list-sheet"
           variants={listVariants}
-          initial={reduceMotion ? false : "hidden"}
-          whileInView="show"
+          initial={false}
+          whileInView={reduceMotion ? undefined : "show"}
           viewport={{ once: true, amount: 0.35 }}
         >
           {BEFORE_ROWS.map((row, i) => (
@@ -98,8 +98,8 @@ export function ComparePane() {
         <motion.ul
           className="m-compare-list"
           variants={listVariants}
-          initial={reduceMotion ? false : "hidden"}
-          whileInView="show"
+          initial={false}
+          whileInView={reduceMotion ? undefined : "show"}
           viewport={{ once: true, amount: 0.35 }}
         >
           {AFTER_ROWS.map((row) => (

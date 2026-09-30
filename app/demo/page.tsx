@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { DemoTour } from "@/components/demo/demo-tour";
+import { MarketingRoot } from "@/components/marketing/marketing-root";
 import { absoluteRedirectUrl } from "@/lib/auth/redirect";
 import { getOrgSlugFromHost } from "@/lib/org/subdomain";
 
@@ -30,5 +31,9 @@ export default async function DemoPage() {
     redirect(absoluteRedirectUrl(headersList, "/"));
   }
 
-  return <DemoTour />;
+  return (
+    <MarketingRoot className="demo-app fixed inset-0 flex min-h-0 flex-col overflow-hidden">
+      <DemoTour />
+    </MarketingRoot>
+  );
 }

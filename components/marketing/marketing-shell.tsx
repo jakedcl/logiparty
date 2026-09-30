@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { marketingFont } from "@/components/marketing/fonts";
+import { MarketingRoot } from "@/components/marketing/marketing-root";
 
 /** Shared apex marketing chrome (header + footer) for legal / secondary pages. */
 export function MarketingShell({
@@ -11,7 +11,7 @@ export function MarketingShell({
   active?: "privacy" | "terms";
 }) {
   return (
-    <div className={`marketing min-h-screen ${marketingFont.variable}`}>
+    <MarketingRoot>
       <div className="m-bubbles" aria-hidden>
         <span className="m-bubble m-bubble-a" />
         <span className="m-bubble m-bubble-b" />
@@ -80,6 +80,6 @@ export function MarketingShell({
           © {new Date().getFullYear()} Logiparty
         </p>
       </footer>
-    </div>
+    </MarketingRoot>
   );
 }

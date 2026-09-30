@@ -5,7 +5,7 @@ import { LeadForm } from "@/components/marketing/lead-form";
 import { MockJobs } from "@/components/marketing/product-mocks";
 import { ProductTour } from "@/components/marketing/product-tour";
 import { ProcessStepper } from "@/components/marketing/process-stepper";
-import { marketingFont } from "@/components/marketing/fonts";
+import { MarketingRoot } from "@/components/marketing/marketing-root";
 
 type WorkspaceCta = {
   orgName: string;
@@ -34,7 +34,7 @@ export function MarketingHome({
   workspace?: WorkspaceCta | null;
 }) {
   return (
-    <div className={`marketing min-h-screen ${marketingFont.variable}`}>
+    <MarketingRoot>
       <div className="m-bubbles" aria-hidden>
         <span className="m-bubble m-bubble-a" />
         <span className="m-bubble m-bubble-b" />
@@ -264,6 +264,6 @@ export function MarketingHome({
           © {new Date().getFullYear()} Logiparty
         </p>
       </footer>
-    </div>
+    </MarketingRoot>
   );
 }

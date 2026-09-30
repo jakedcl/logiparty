@@ -1,15 +1,37 @@
 @import "tailwindcss";
 
 /*
-  Logiparty product theme (staff + portal)
-  — High contrast ink on cool canvas
-  — Tenant brand via --primary (OrgTheme)
-  — Hairlines + type hierarchy; no decorative card soup
+  Logiparty design tokens (shared)
+  — Change radii, gloss, canvas, and type stacks here → .marketing + .lp-app inherit.
+  — Tenant brand: --primary (set per org via OrgTheme on .lp-app)
 */
 
 :root {
+  /* Typography */
+  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  /* Set on .marketing / MarketingRoot via next/font */
+  --font-marketing-fallback: "Lucida Grande", "Lucida Sans Unicode", var(--font-sans);
+
+  /* Shape & motion */
+  --lp-radius-sm: 0.375rem;
+  --lp-radius-md: 0.5rem;
+  --lp-radius-lg: 0.625rem;
+  --lp-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --lp-gloss-inset: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --lp-gloss-elevated:
+    0 1px 2px rgba(11, 21, 38, 0.06),
+    0 4px 14px rgba(11, 21, 38, 0.05),
+    var(--lp-gloss-inset);
+  --lp-gloss-pressed: inset 0 1px 2px rgba(11, 21, 38, 0.12);
+
   /* Canvas */
   --background: #f3f5f8;
+  --background-subtle: linear-gradient(
+    180deg,
+    #eef1f6 0%,
+    var(--background) 42%,
+    #e8ecf2 100%
+  );
   --foreground: #0b1526;
   --surface: #ffffff;
   --surface-hover: #eef1f6;
@@ -56,7 +78,7 @@
   --color-border: var(--border);
   --color-surface: var(--surface);
   --color-ring: var(--ring);
-  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-sans);
 }
 
 body {
@@ -70,7 +92,28 @@ body {
 
 .lp-app {
   color: var(--foreground);
-  background: var(--background);
+  background: var(--background-subtle);
+}
+
+.lp-surface {
+  background: var(--surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--lp-radius-md);
+  box-shadow: var(--lp-gloss-elevated);
+}
+
+.app-topbar {
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(10px);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.65) inset,
+    0 1px 3px rgba(11, 21, 38, 0.04);
+}
+
+.app-sidebar {
+  box-shadow:
+    inset -1px 0 0 rgba(255, 255, 255, 0.04),
+    4px 0 18px rgba(0, 0, 0, 0.12);
 }
 
 .lp-page-title {
@@ -153,16 +196,30 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.375rem;
+  border-radius: var(--lp-radius-sm);
   padding: 0.375rem 0.75rem;
   font-size: 0.875rem;
   font-weight: 600;
-  background: var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary) 72%, #000);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--primary) 88%, #fff) 0%,
+    var(--primary) 48%,
+    color-mix(in srgb, var(--primary) 92%, #000) 100%
+  );
   color: var(--primary-foreground);
-  transition: filter 0.15s ease, background 0.15s ease;
+  box-shadow: var(--lp-gloss-elevated);
+  transition:
+    filter 0.15s var(--lp-ease-out),
+    box-shadow 0.15s var(--lp-ease-out),
+    transform 0.12s var(--lp-ease-out);
 }
 .lp-btn:hover {
-  filter: brightness(1.08);
+  filter: brightness(1.06);
+}
+.lp-btn:active {
+  box-shadow: var(--lp-gloss-pressed);
+  transform: translateY(1px);
 }
 
 .lp-btn-ink {
@@ -342,18 +399,18 @@ body {
   --m-accent: #0b5cab;
   --m-accent-ink: #ffffff;
   --m-line: #aeb6bf;
-  --m-panel: #ffffff;
+  --m-panel: var(--surface);
   --m-header: #f5f5f5;
   --m-bar: #dcdcdc;
+  --m-radius: var(--lp-radius-lg);
+  --m-gloss: var(--lp-gloss-elevated);
   position: relative;
   background:
     radial-gradient(ellipse 80% 50% at 50% -10%, rgba(90, 160, 230, 0.22), transparent 55%),
     linear-gradient(180deg, #e8edf3 0%, #d5dde6 100%);
   color: var(--m-fg);
   overflow-x: clip;
-  --m-font:
-    "Lucida Grande", "Lucida Sans Unicode", var(--font-marketing),
-    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --m-font: var(--font-marketing), var(--font-marketing-fallback);
   font-family: var(--m-font);
   font-weight: 400;
 }
@@ -2120,9 +2177,7 @@ body {
 }
 
 .demo-app {
-  --m-font:
-    "Lucida Grande", "Lucida Sans Unicode", var(--font-marketing),
-    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --m-font: var(--font-marketing), var(--font-marketing-fallback);
   font-family: var(--m-font);
   font-weight: 400;
 }
