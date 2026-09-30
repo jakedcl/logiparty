@@ -109,7 +109,7 @@
 | **Jake admin** | `jakedcl73@gmail.com` (your password) — linked to **nydac** |
 | **AUTH_URL (correct)** | `https://logiparty.com` |
 | **NEXT_PUBLIC_ROOT_DOMAIN** | `logiparty.com` |
-| **NEXT_PUBLIC_DEV_ORG_SLUG** | Local primary: `nydac` (do not set in Production) |
+| **NEXT_PUBLIC_DEV_ORG_SLUG** | Prefer **unset** locally → `localhost:3000` = marketing, `nydac.localhost:3000` = app. Only set `nydac` if you want bare localhost = tenant. Never set in Production. |
 | **Do NOT set in prod** | `NEXT_PUBLIC_DEV_ORG_SLUG`, `ALLOW_DEV_ROLE_SWITCH` |
 | **Neon branches** | Production = **`main`**; local = **`dev`** (never reset-seed on main) |
 

@@ -11,6 +11,12 @@ export function MarketingShell({
 }) {
   return (
     <div className="marketing min-h-screen">
+      <div className="m-bubbles" aria-hidden>
+        <span className="m-bubble m-bubble-a" />
+        <span className="m-bubble m-bubble-b" />
+        <span className="m-bubble m-bubble-c" />
+      </div>
+
       <header className="m-header flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/" className="m-brand">
           Logiparty
@@ -25,8 +31,10 @@ export function MarketingShell({
         </nav>
       </header>
 
-      <main className="px-4 py-6 sm:px-6 lg:px-8">
-        <div className="m-panel mx-auto max-w-3xl p-5 sm:p-7">{children}</div>
+      <main className="relative z-10 px-4 py-6 sm:px-6 lg:px-8">
+        <div className="m-panel m-rise mx-auto max-w-3xl p-5 sm:p-7">
+          {children}
+        </div>
       </main>
 
       <footer className="m-footer mt-4 px-4 py-6 sm:px-6 lg:px-8">
