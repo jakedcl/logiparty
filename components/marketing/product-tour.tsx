@@ -1,5 +1,6 @@
 "use client";
 
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";
 import { AppWindow } from "@/components/marketing/app-window";
@@ -13,9 +14,17 @@ const SEGMENTS = [
   { id: "staff", label: "Staff", title: "Staff on the dock", body: "My Jobs only. Loaded vs assigned. Print the run sheet from a phone." },
 ] as const;
 
+const fade = {
+  initial: { opacity: 0 },
+  animate: { opacity: 1 },
+  exit: { opacity: 0 },
+};
+
 export function ProductTour() {
   const [active, setActive] = useState<string>("jobs");
   const current = SEGMENTS.find((s) => s.id === active) ?? SEGMENTS[0];
+  const reduceMotion = useReducedMotion();
+  const crossfade = reduceMotion ? { duration: 0 } : { duration: 0.22, ease: "easeInOut" as const };
 
   return (
     <div className="m-tour-block">
@@ -44,16 +53,29 @@ export function ProductTour() {
       <AppWindow
         title={current.title}
         toolbar={
-          <p className="m-window-caption text-[var(--m-muted)]">{current.body}</p>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.p
+              key={active}
+              className="m-window-caption text-[var(--m-muted)]"
+              {...fade}
+              transition={crossfade}
+            >
+              {current.body}
+            </motion.p>
+          </AnimatePresence>
         }
       >
-        <Link
-          href="/demo"
-          className="m-tour-window-link"
-          aria-label={`Open demo — ${current.title}`}
-        >
-          <TourMock kind={current.id as MockKind} />
-        </Link>
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div key={active} {...fade} transition={crossfade}>
+            <Link
+              href="/demo"
+              className="m-tour-window-link"
+              aria-label={`Open demo — ${current.title}`}
+            >
+              <TourMock kind={current.id as MockKind} />
+            </Link>
+          </motion.div>
+        </AnimatePresence>
       </AppWindow>
     </div>
   );

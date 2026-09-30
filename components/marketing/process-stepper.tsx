@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
 
 const STEPS = [
@@ -26,13 +27,21 @@ const STEPS = [
 /** Glossy circular iOS-style process stepper. */
 export function ProcessStepper() {
   const [active, setActive] = useState(0);
+  const reduceMotion = useReducedMotion();
+  const fillTransition = reduceMotion
+    ? { duration: 0 }
+    : { type: "spring" as const, stiffness: 320, damping: 28 };
+  const nodeTransition = reduceMotion
+    ? { duration: 0 }
+    : { type: "spring" as const, stiffness: 420, damping: 22 };
 
   return (
     <div className="m-stepper">
       <div className="m-stepper-track" aria-hidden>
-        <div
+        <motion.div
           className="m-stepper-fill"
-          style={{ width: `${(active / (STEPS.length - 1)) * 100}%` }}
+          animate={{ width: `${(active / (STEPS.length - 1)) * 100}%` }}
+          transition={fillTransition}
         />
       </div>
       <ol className="m-stepper-nodes">
@@ -40,14 +49,16 @@ export function ProcessStepper() {
           const selected = i === active;
           return (
             <li key={step.id} className="m-stepper-node">
-              <button
+              <motion.button
                 type="button"
                 className={`m-stepper-btn${selected ? " m-stepper-btn-active" : ""}`}
                 aria-pressed={selected}
                 onClick={() => setActive(i)}
+                animate={{ scale: selected ? 1.08 : 1 }}
+                transition={nodeTransition}
               >
                 <span className="m-stepper-num">{step.num}</span>
-              </button>
+              </motion.button>
               <p className="m-stepper-label">{step.title}</p>
             </li>
           );
