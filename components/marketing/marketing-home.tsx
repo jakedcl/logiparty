@@ -174,6 +174,12 @@ export function MarketingHome({
 }) {
   return (
     <div className="marketing min-h-screen">
+      <div className="m-bubbles" aria-hidden>
+        <span className="m-bubble m-bubble-a" />
+        <span className="m-bubble m-bubble-b" />
+        <span className="m-bubble m-bubble-c" />
+      </div>
+
       <header className="m-header flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <a href="#top" className="m-brand">
           Logiparty
@@ -200,7 +206,7 @@ export function MarketingHome({
         </nav>
       </header>
 
-      <main id="top" className="px-4 py-6 sm:px-6 lg:px-8">
+      <main id="top" className="relative z-10 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl space-y-6">
           <section className="m-hero p-5 sm:p-7">
             <p className="text-2xl font-bold text-[var(--m-accent)] sm:text-3xl">
@@ -247,7 +253,7 @@ export function MarketingHome({
             </div>
           </section>
 
-          <section id="tour" className="m-panel p-5 sm:p-6">
+          <section id="tour" className="m-panel m-rise m-rise-1 p-5 sm:p-6">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div className="max-w-xl">
                 <h2 className="m-section-title">Product demo</h2>
@@ -265,11 +271,16 @@ export function MarketingHome({
             </div>
 
             <div className="m-tour-grid mt-5">
-              {TOUR.map((item) => (
-                <div key={item.id} className="m-tour-card">
+              {TOUR.map((item, i) => (
+                <div
+                  key={item.id}
+                  className={`m-tour-card m-rise m-rise-${Math.min(i + 1, 4)}`}
+                >
                   <div className="m-tour-card-head">
                     <span className="m-step-num">{item.label}</span>
-                    <h3 className="mt-0.5 text-sm font-bold">{item.title}</h3>
+                    <h3 className="mt-0.5 text-sm font-bold text-white">
+                      {item.title}
+                    </h3>
                     <p className="mt-1 text-xs leading-relaxed text-[var(--m-muted)]">
                       {item.body}
                     </p>
@@ -288,7 +299,7 @@ export function MarketingHome({
             </div>
           </section>
 
-          <section id="problem" className="m-panel p-5 sm:p-6">
+          <section id="problem" className="m-panel m-rise m-rise-2 p-5 sm:p-6">
             <h2 className="m-section-title">The gap</h2>
             <h3 className="mt-3 text-base font-semibold sm:text-lg">
               Spreadsheets break when the load-out window moves.
@@ -301,7 +312,7 @@ export function MarketingHome({
             </p>
           </section>
 
-          <section id="product" className="m-panel p-5 sm:p-6">
+          <section id="product" className="m-panel m-rise m-rise-2 p-5 sm:p-6">
             <h2 className="m-section-title">Product</h2>
             <h3 className="mt-3 max-w-xl text-base font-semibold sm:text-lg">
               Built for the warehouse-to-venue loop.
@@ -326,7 +337,7 @@ export function MarketingHome({
             </ul>
           </section>
 
-          <section id="how" className="m-panel p-5 sm:p-6">
+          <section id="how" className="m-panel m-rise m-rise-3 p-5 sm:p-6">
             <h2 className="m-section-title">How it works</h2>
             <h3 className="mt-3 text-base font-semibold sm:text-lg">
               Stage → load → return.
@@ -371,7 +382,7 @@ export function MarketingHome({
             </ol>
           </section>
 
-          <section id="request" className="m-panel p-5 sm:p-6">
+          <section id="request" className="m-panel m-rise m-rise-3 p-5 sm:p-6">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] lg:items-start">
               <div>
                 <h2 className="m-section-title">Request access</h2>
