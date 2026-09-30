@@ -1,5 +1,11 @@
 import Link from "next/link";
+import { AppWindow } from "@/components/marketing/app-window";
+import { ComparePane } from "@/components/marketing/compare-pane";
 import { LeadForm } from "@/components/marketing/lead-form";
+import { MockJobs } from "@/components/marketing/product-mocks";
+import { ProductTour } from "@/components/marketing/product-tour";
+import { ProcessStepper } from "@/components/marketing/process-stepper";
+import { MarketingRoot } from "@/components/marketing/marketing-root";
 
 type WorkspaceCta = {
   orgName: string;
@@ -22,158 +28,13 @@ const CAPABILITIES = [
   },
 ] as const;
 
-const TOUR = [
-  {
-    id: "jobs",
-    label: "01",
-    title: "Jobs",
-    body: "Statuses, calendar, and a run sheet with locations, loads, trucks, and crew.",
-    mock: "jobs",
-  },
-  {
-    id: "inventory",
-    label: "02",
-    title: "Inventory & fleet",
-    body: "Client gear, your equipment, and vehicles — locked to the job while it’s live.",
-    mock: "inventory",
-  },
-  {
-    id: "portal",
-    label: "03",
-    title: "Client portal",
-    body: "Branded requests, docs, and inventory asks. Company-scoped. Invite-only.",
-    mock: "portal",
-  },
-  {
-    id: "staff",
-    label: "04",
-    title: "Staff on the dock",
-    body: "My Jobs only. Loaded vs assigned. Print the run sheet from a phone.",
-    mock: "staff",
-  },
-] as const;
-
-function MockJobs() {
-  return (
-    <div className="m-mock">
-      <div className="m-mock-bar">
-        <span>Jobs</span>
-        <span className="m-mock-muted">List · Calendar</span>
-      </div>
-      <div className="m-mock-rows">
-        {[
-          ["Waterfront Festival", "ready"],
-          ["Campus Pop-Up", "upcoming"],
-          ["Outdoor Patio", "draft"],
-          ["Trade Show Wrap", "completed"],
-        ].map(([name, status]) => (
-          <div key={name} className="m-mock-row">
-            <span>{name}</span>
-            <span className={`m-mock-chip m-mock-chip-${status}`}>{status}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function MockInventory() {
-  return (
-    <div className="m-mock">
-      <div className="m-mock-bar">
-        <span>Inventory</span>
-        <span className="m-mock-muted">Client · Equipment · Fleet</span>
-      </div>
-      <div className="m-mock-rows">
-        {[
-          ["SB-BAR-01", "Branded Bar", "10"],
-          ["SB-COOLER", "Rolling Cooler", "36"],
-          ["DOLLY-01", "Dolly", "40"],
-          ["Box Truck 12", "Fleet", "NL-012"],
-        ].map(([a, b, c]) => (
-          <div key={a} className="m-mock-row m-mock-row-3">
-            <span className="m-mock-mono">{a}</span>
-            <span>{b}</span>
-            <span className="m-mock-muted">{c}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function MockPortal() {
-  return (
-    <div className="m-mock">
-      <div className="m-mock-bar m-mock-bar-brand">
-        <span>Northline Logistics</span>
-        <span className="m-mock-muted">Client portal</span>
-      </div>
-      <div className="m-mock-rows">
-        <div className="m-mock-row">
-          <span>Your jobs</span>
-          <span className="m-mock-chip m-mock-chip-ready">ready</span>
-        </div>
-        <div className="m-mock-row">
-          <span>Waterfront Festival</span>
-          <span className="m-mock-muted">Sep 19</span>
-        </div>
-        <div className="m-mock-row">
-          <span>Request inventory change</span>
-          <span className="m-mock-muted">+24 coolers</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function MockStaff() {
-  return (
-    <div className="m-mock">
-      <div className="m-mock-bar">
-        <span>My Jobs</span>
-        <span className="m-mock-muted">Staff</span>
-      </div>
-      <div className="m-mock-rows">
-        <div className="m-mock-row">
-          <span>Waterfront Festival</span>
-          <span className="m-mock-chip m-mock-chip-ready">ready</span>
-        </div>
-        <div className="m-mock-row m-mock-row-3">
-          <span>Branded Bar</span>
-          <span className="m-mock-muted">3 assigned</span>
-          <span className="text-[#1b6b2a]">3 loaded</span>
-        </div>
-        <div className="m-mock-row m-mock-row-3">
-          <span>Dolly</span>
-          <span className="m-mock-muted">10 assigned</span>
-          <span className="text-[#1b6b2a]">10 loaded</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function TourMock({ kind }: { kind: (typeof TOUR)[number]["mock"] }) {
-  switch (kind) {
-    case "jobs":
-      return <MockJobs />;
-    case "inventory":
-      return <MockInventory />;
-    case "portal":
-      return <MockPortal />;
-    case "staff":
-      return <MockStaff />;
-  }
-}
-
 export function MarketingHome({
   workspace,
 }: {
   workspace?: WorkspaceCta | null;
 }) {
   return (
-    <div className="marketing min-h-screen">
+    <MarketingRoot>
       <div className="m-bubbles" aria-hidden>
         <span className="m-bubble m-bubble-a" />
         <span className="m-bubble m-bubble-b" />
@@ -209,94 +70,78 @@ export function MarketingHome({
       <main id="top" className="relative z-10 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl space-y-6">
           <section className="m-hero p-5 sm:p-7">
-            <p className="text-2xl font-bold text-[var(--m-accent)] sm:text-3xl">
-              Logiparty
-            </p>
-            <h1 className="mt-2 text-lg font-semibold text-[var(--m-fg)] sm:text-xl">
-              Ops software for 3PLs that run live events.
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
-              Jobs, inventory, fleet, and a branded client portal — under your
-              name, on your subdomain. Invite-only while we onboard carefully.
-            </p>
-            <div className="mt-5 flex flex-wrap items-center gap-2">
-              {workspace ? (
-                <a
-                  href={workspace.href}
-                  className="m-btn-primary px-4 py-2 text-sm font-semibold"
+            <div className="m-hero-split">
+              <div>
+                <div className="m-hero-brand">
+                  <span className="m-hero-brand-mark" aria-hidden>
+                    LP
+                  </span>
+                  <div>
+                    <p className="m-hero-brand-name">Logiparty</p>
+                    <p className="m-hero-brand-tag">Event logistics workspace</p>
+                  </div>
+                </div>
+                <h1 className="mt-4 text-lg font-semibold text-[var(--m-fg)] sm:text-xl">
+                  Ops software for 3PLs that run live events.
+                </h1>
+                <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
+                  Jobs, inventory, fleet, and a branded client portal — under
+                  your name, on your subdomain. Invite-only while we onboard
+                  carefully.
+                </p>
+                <div className="mt-5 flex flex-wrap items-center gap-2">
+                  {workspace ? (
+                    <a
+                      href={workspace.href}
+                      className="m-btn-primary px-4 py-2 text-sm"
+                    >
+                      Go to {workspace.isClient ? "portal" : "dashboard"}
+                    </a>
+                  ) : (
+                    <Link
+                      href="/demo"
+                      className="m-btn-primary px-4 py-2 text-sm"
+                    >
+                      Try the demo
+                    </Link>
+                  )}
+                  {workspace ? (
+                    <Link
+                      href="/demo"
+                      className="m-btn-ghost px-4 py-2 text-sm"
+                    >
+                      Product tour
+                    </Link>
+                  ) : (
+                    <a
+                      href="#request"
+                      className="m-btn-ghost px-4 py-2 text-sm"
+                    >
+                      Request access
+                    </a>
+                  )}
+                </div>
+              </div>
+              <div className="m-hero-window-stack">
+                <div className="m-hero-sticky" aria-hidden>
+                  <span className="m-hero-sticky-pin" />
+                  Load-out moved — check run sheet
+                </div>
+                <AppWindow
+                  title="Logiparty — Jobs"
+                  heroMotion
+                  heroChrome
+                  inset
+                  className="m-hero-window-front"
                 >
-                  Go to {workspace.isClient ? "portal" : "dashboard"}
-                </a>
-              ) : (
-                <Link
-                  href="/demo"
-                  className="m-btn-primary px-4 py-2 text-sm font-semibold"
-                >
-                  Try the demo
-                </Link>
-              )}
-              {workspace ? (
-                <Link
-                  href="/demo"
-                  className="m-btn-ghost px-4 py-2 text-sm font-medium"
-                >
-                  Product tour
-                </Link>
-              ) : (
-                <a
-                  href="#request"
-                  className="m-btn-ghost px-4 py-2 text-sm font-medium"
-                >
-                  Request access
-                </a>
-              )}
+                  <MockJobs />
+                </AppWindow>
+              </div>
             </div>
           </section>
 
           <section id="tour" className="m-panel m-rise m-rise-1 p-5 sm:p-6">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div className="max-w-xl">
-                <h2 className="m-section-title">Product demo</h2>
-                <p className="mt-3 text-sm leading-relaxed text-[var(--m-muted)]">
-                  Walk the product — no login. Step through jobs, inventory,
-                  fleet, crew, and the client portal. Sample workspace only.
-                </p>
-              </div>
-              <Link
-                href="/demo"
-                className="m-btn-primary px-4 py-2 text-sm font-semibold"
-              >
-                Start interactive demo
-              </Link>
-            </div>
-
-            <div className="m-tour-grid mt-5">
-              {TOUR.map((item, i) => (
-                <div
-                  key={item.id}
-                  className={`m-tour-card m-rise m-rise-${Math.min(i + 1, 4)}`}
-                >
-                  <div className="m-tour-card-head">
-                    <span className="m-step-num">{item.label}</span>
-                    <h3 className="mt-0.5 text-sm font-bold text-white">
-                      {item.title}
-                    </h3>
-                    <p className="mt-1 text-xs leading-relaxed text-[var(--m-muted)]">
-                      {item.body}
-                    </p>
-                  </div>
-                  <div className="m-tour-card-body">
-                    <Link
-                      href="/demo"
-                      className="block hover:opacity-90"
-                      aria-label={`Open demo — ${item.title}`}
-                    >
-                      <TourMock kind={item.mock} />
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ProductTour />
           </section>
 
           <section id="problem" className="m-panel m-rise m-rise-2 p-5 sm:p-6">
@@ -306,10 +151,9 @@ export function MarketingHome({
             </h3>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
               Group chats lose the run sheet. Generic WMS doesn&apos;t know a
-              festival load-in. Event logistics needs one place for the job, the
-              assets locked to it, the trucks and crew, and a portal clients can
-              use — without platform branding in front of your staff.
+              festival load-in. Same work — different tools.
             </p>
+            <ComparePane />
           </section>
 
           <section id="product" className="m-panel m-rise m-rise-2 p-5 sm:p-6">
@@ -317,69 +161,37 @@ export function MarketingHome({
             <h3 className="mt-3 max-w-xl text-base font-semibold sm:text-lg">
               Built for the warehouse-to-venue loop.
             </h3>
-            <p className="mt-2 max-w-xl text-sm leading-relaxed text-[var(--m-muted)]">
+            <p className="mt-2 mb-4 max-w-xl text-sm leading-relaxed text-[var(--m-muted)]">
               Multi-tenant by design. Each 3PL gets an isolated workspace on{" "}
               <span className="font-medium text-[var(--m-fg)]">
                 your-org.logiparty.com
               </span>
               , white-labeled end to end.
             </p>
-
-            <ul className="m-capability-list mt-5">
-              {CAPABILITIES.map((item) => (
-                <li key={item.title} className="m-capability-item">
-                  <h4 className="text-sm font-bold sm:text-base">{item.title}</h4>
-                  <p className="mt-1 text-sm leading-relaxed text-[var(--m-muted)]">
-                    {item.body}
-                  </p>
-                </li>
-              ))}
-            </ul>
+            <AppWindow title="Preferences — Capabilities" inset>
+              <ul className="m-inspector">
+                {CAPABILITIES.map((item, i) => (
+                  <li
+                    key={item.title}
+                    className={`m-inspector-row${i % 2 === 1 ? " m-inspector-row-alt" : ""}`}
+                  >
+                    <span className="m-inspector-icon" aria-hidden />
+                    <div className="m-inspector-copy">
+                      <p className="m-inspector-title">{item.title}</p>
+                      <p className="m-inspector-body">{item.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </AppWindow>
           </section>
 
           <section id="how" className="m-panel m-rise m-rise-3 p-5 sm:p-6">
             <h2 className="m-section-title">How it works</h2>
-            <h3 className="mt-3 text-base font-semibold sm:text-lg">
+            <h3 className="mt-3 mb-4 text-base font-semibold sm:text-lg">
               Stage → load → return.
             </h3>
-            <ol className="m-steps mt-4">
-              <li className="m-step">
-                <span className="m-step-num" aria-hidden>
-                  01
-                </span>
-                <div>
-                  <p className="text-sm font-bold">Stage the job</p>
-                  <p className="mt-1 text-sm leading-relaxed text-[var(--m-muted)]">
-                    Client assets sit in the warehouse. You assign inventory,
-                    fleet, and crew with load-in / load-out windows.
-                  </p>
-                </div>
-              </li>
-              <li className="m-step">
-                <span className="m-step-num" aria-hidden>
-                  02
-                </span>
-                <div>
-                  <p className="text-sm font-bold">Run the work</p>
-                  <p className="mt-1 text-sm leading-relaxed text-[var(--m-muted)]">
-                    Staff work assigned jobs only. Loaded quantities and docs
-                    live on the job — ready for the dock and the venue.
-                  </p>
-                </div>
-              </li>
-              <li className="m-step">
-                <span className="m-step-num" aria-hidden>
-                  03
-                </span>
-                <div>
-                  <p className="text-sm font-bold">Return &amp; release</p>
-                  <p className="mt-1 text-sm leading-relaxed text-[var(--m-muted)]">
-                    After load-out ends, inventory and fleet locks release.
-                    Assets go back to storage for the next activation.
-                  </p>
-                </div>
-              </li>
-            </ol>
+            <ProcessStepper />
           </section>
 
           <section id="request" className="m-panel m-rise m-rise-3 p-5 sm:p-6">
@@ -408,9 +220,9 @@ export function MarketingHome({
                   .
                 </p>
               </div>
-              <div className="m-lead-box">
+              <AppWindow title="Access Request" className="m-access-window">
                 <LeadForm />
-              </div>
+              </AppWindow>
             </div>
           </section>
         </div>
@@ -452,6 +264,6 @@ export function MarketingHome({
           © {new Date().getFullYear()} Logiparty
         </p>
       </footer>
-    </div>
+    </MarketingRoot>
   );
 }

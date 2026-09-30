@@ -14,7 +14,7 @@ type Props = {
 export function OrgTheme({ primaryColor, className, children }: Props) {
   return (
     <div
-      className={cn("lp-app min-h-screen", className)}
+      className={cn("lp-app app-shell min-h-screen", className)}
       style={tenantThemeStyle(primaryColor) as React.CSSProperties}
     >
       {children}

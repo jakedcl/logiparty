@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { MarketingRoot } from "@/components/marketing/marketing-root";
 
 /** Shared apex marketing chrome (header + footer) for legal / secondary pages. */
 export function MarketingShell({
@@ -10,7 +11,7 @@ export function MarketingShell({
   active?: "privacy" | "terms";
 }) {
   return (
-    <div className="marketing min-h-screen">
+    <MarketingRoot>
       <div className="m-bubbles" aria-hidden>
         <span className="m-bubble m-bubble-a" />
         <span className="m-bubble m-bubble-b" />
@@ -55,7 +56,7 @@ export function MarketingShell({
             <Link
               href="/privacy"
               className={
-                active === "privacy" ? "font-semibold text-[var(--m-fg)]" : "m-nav-link"
+                active === "privacy" ? "m-nav-link m-nav-link-current" : "m-nav-link"
               }
               aria-current={active === "privacy" ? "page" : undefined}
             >
@@ -64,7 +65,7 @@ export function MarketingShell({
             <Link
               href="/terms"
               className={
-                active === "terms" ? "font-semibold text-[var(--m-fg)]" : "m-nav-link"
+                active === "terms" ? "m-nav-link m-nav-link-current" : "m-nav-link"
               }
               aria-current={active === "terms" ? "page" : undefined}
             >
@@ -79,6 +80,6 @@ export function MarketingShell({
           © {new Date().getFullYear()} Logiparty
         </p>
       </footer>
-    </div>
+    </MarketingRoot>
   );
 }

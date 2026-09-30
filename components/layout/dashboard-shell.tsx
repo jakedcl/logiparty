@@ -316,8 +316,8 @@ export function DashboardShell({
   return (
     <OrgTheme primaryColor={primaryColor}>
       {/* Desktop sidebar — ink chrome, brand accent */}
-      <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-56 flex-col bg-[var(--sidebar)] lg:flex">
-        <div className="h-[3px] shrink-0 bg-[var(--primary)]" aria-hidden />
+      <aside className="app-sidebar no-print fixed inset-y-0 left-0 z-30 hidden w-56 flex-col bg-[var(--sidebar)] lg:flex">
+        <div className="h-[3px] shrink-0 bg-[var(--primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]" aria-hidden />
         <div className="border-b border-white/10 px-4 py-5">
           <Brand orgName={orgName} logoUrl={logoUrl} onInk />
         </div>
@@ -365,7 +365,7 @@ export function DashboardShell({
       ) : null}
 
       <div className="lg:pl-56">
-        <header className="no-print sticky top-0 z-20 flex h-12 items-center justify-between gap-3 border-b border-[var(--border-subtle)] bg-[color-mix(in_srgb,var(--surface)_92%,transparent)] px-3 backdrop-blur supports-[backdrop-filter]:bg-[color-mix(in_srgb,var(--surface)_85%,transparent)] sm:px-5">
+        <header className="app-topbar no-print sticky top-0 z-20 flex h-12 items-center justify-between gap-3 border-b border-[var(--border-subtle)] px-3 sm:px-5">
           <div className="flex min-w-0 items-center gap-2 lg:hidden">
             <button
               type="button"
