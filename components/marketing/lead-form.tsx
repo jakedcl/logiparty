@@ -10,8 +10,8 @@ export function LeadForm() {
 
   if (done) {
     return (
-      <div className="m-lead-success border border-[var(--m-line)] bg-[var(--m-panel)] p-6 sm:p-8">
-        <p className="text-lg font-medium text-[var(--m-fg)]">
+      <div className="m-lead-success">
+        <p className="text-base font-bold text-[var(--m-fg)]">
           Thanks — we got your request.
         </p>
         <p className="mt-2 text-sm leading-relaxed text-[var(--m-muted)]">
@@ -80,14 +80,14 @@ export function LeadForm() {
         />
       </label>
       {error ? (
-        <p className="text-sm text-red-400" role="alert">
+        <p className="text-sm font-medium text-red-700" role="alert">
           {error}
         </p>
       ) : null}
       <button
         type="submit"
         disabled={pending}
-        className="m-btn-primary inline-flex items-center justify-center px-6 py-3 text-sm font-semibold disabled:opacity-60"
+        className="m-btn-primary inline-flex items-center justify-center px-4 py-2 text-sm font-semibold disabled:opacity-60"
       >
         {pending ? "Sending…" : "Request access"}
       </button>
