@@ -71,10 +71,16 @@ export function MarketingHome({
           <section className="m-hero p-5 sm:p-7">
             <div className="m-hero-split">
               <div>
-                <p className="text-2xl font-bold text-[var(--m-accent)] sm:text-3xl">
-                  Logiparty
-                </p>
-                <h1 className="mt-2 text-lg font-semibold text-[var(--m-fg)] sm:text-xl">
+                <div className="m-hero-brand">
+                  <span className="m-hero-brand-mark" aria-hidden>
+                    LP
+                  </span>
+                  <div>
+                    <p className="m-hero-brand-name">Logiparty</p>
+                    <p className="m-hero-brand-tag">Event logistics workspace</p>
+                  </div>
+                </div>
+                <h1 className="mt-4 text-lg font-semibold text-[var(--m-fg)] sm:text-xl">
                   Ops software for 3PLs that run live events.
                 </h1>
                 <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
@@ -115,9 +121,21 @@ export function MarketingHome({
                   )}
                 </div>
               </div>
-              <AppWindow title="Logiparty — Jobs" heroMotion>
-                <MockJobs />
-              </AppWindow>
+              <div className="m-hero-window-stack">
+                <div className="m-hero-sticky" aria-hidden>
+                  <span className="m-hero-sticky-pin" />
+                  Load-out moved — check run sheet
+                </div>
+                <AppWindow
+                  title="Logiparty — Jobs"
+                  heroMotion
+                  heroChrome
+                  inset
+                  className="m-hero-window-front"
+                >
+                  <MockJobs />
+                </AppWindow>
+              </div>
             </div>
           </section>
 
@@ -149,23 +167,21 @@ export function MarketingHome({
               </span>
               , white-labeled end to end.
             </p>
-            <AppWindow title="What’s included">
-              <table className="m-cap-table">
-                <thead>
-                  <tr>
-                    <th scope="col">Capability</th>
-                    <th scope="col">Detail</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {CAPABILITIES.map((item) => (
-                    <tr key={item.title}>
-                      <td>{item.title}</td>
-                      <td>{item.body}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <AppWindow title="Preferences — Capabilities" inset>
+              <ul className="m-inspector">
+                {CAPABILITIES.map((item, i) => (
+                  <li
+                    key={item.title}
+                    className={`m-inspector-row${i % 2 === 1 ? " m-inspector-row-alt" : ""}`}
+                  >
+                    <span className="m-inspector-icon" aria-hidden />
+                    <div className="m-inspector-copy">
+                      <p className="m-inspector-title">{item.title}</p>
+                      <p className="m-inspector-body">{item.body}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
             </AppWindow>
           </section>
 
@@ -203,10 +219,8 @@ export function MarketingHome({
                   .
                 </p>
               </div>
-              <AppWindow title="Access request">
-                <div className="px-1 py-1">
-                  <LeadForm />
-                </div>
+              <AppWindow title="Access Request" className="m-access-window">
+                <LeadForm />
               </AppWindow>
             </div>
           </section>

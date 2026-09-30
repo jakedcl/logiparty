@@ -3,6 +3,22 @@
 import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 
+function HeroToolbar() {
+  return (
+    <div className="m-window-hero-tools" aria-hidden>
+      <span className="m-window-menu">
+        <span className="m-window-menu-item">File</span>
+        <span className="m-window-menu-item">View</span>
+        <span className="m-window-menu-item">Help</span>
+      </span>
+      <span className="m-window-search">
+        <span className="m-window-search-icon" />
+        Search jobs…
+      </span>
+    </div>
+  );
+}
+
 /** Early Mac / iOS-era window chrome for marketing mocks. */
 export function AppWindow({
   title,
@@ -10,6 +26,8 @@ export function AppWindow({
   children,
   className = "",
   heroMotion = false,
+  inset = false,
+  heroChrome = false,
 }: {
   title: string;
   toolbar?: ReactNode;
@@ -17,6 +35,10 @@ export function AppWindow({
   className?: string;
   /** Float-in + subtle idle drift (hero only). */
   heroMotion?: boolean;
+  /** Inset bevel + glass well around content. */
+  inset?: boolean;
+  /** Fake menu row + search field (hero). */
+  heroChrome?: boolean;
 }) {
   const reduceMotion = useReducedMotion();
   const windowChrome = (
@@ -30,8 +52,11 @@ export function AppWindow({
         <p className="m-window-title">{title}</p>
         <span className="m-window-bar-spacer" aria-hidden />
       </div>
+      {heroChrome ? <HeroToolbar /> : null}
       {toolbar ? <div className="m-window-toolbar">{toolbar}</div> : null}
-      <div className="m-window-body">{children}</div>
+      <div className={`m-window-body${inset ? " m-window-body-inset" : ""}`}>
+        {children}
+      </div>
     </>
   );
 
@@ -43,10 +68,10 @@ export function AppWindow({
 
   return (
     <motion.div
-      className={`m-window ${className}`.trim()}
-      initial={reduceMotion ? false : { opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      className={`m-window m-window-hero-glass ${className}`.trim()}
+      initial={reduceMotion ? false : { opacity: 0, y: 24, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
     >
       {reduceMotion ? (
         windowChrome
