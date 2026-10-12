@@ -1534,6 +1534,14 @@ body {
   background: linear-gradient(to bottom, #f7f9fb 0%, #e8edf3 100%);
 }
 
+/* App/portal title band — same metal as .m-window-toolbar, not the site header. */
+.lp-window-head {
+  border-bottom: 1px solid var(--m-line);
+  background: linear-gradient(to bottom, #f7f9fb 0%, #e8edf3 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: var(--lp-fg);
+}
+
 .m-window-caption {
   margin: 0;
   font-size: 0.75rem;
@@ -1597,16 +1605,27 @@ body {
 .m-seg-item {
   position: relative;
   z-index: 1;
+  display: flex;
   flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
   border: none;
   border-right: 1px solid rgba(26, 107, 176, 0.25);
   background: transparent;
   color: #0b5cab;
   font-size: 0.72rem;
+  font-weight: 700;
   letter-spacing: 0.02em;
   padding: 0.5rem 0.5rem;
   cursor: pointer;
+  text-align: center;
+  text-decoration: none;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.m-seg-wrap-wide {
+  max-width: none;
 }
 
 .m-seg-item:last-child {
@@ -2427,7 +2446,7 @@ body {
 }
 
 .m-mock-bar-brand {
-  border-top: 3px solid #1e3a5f;
+  border-top: 3px solid var(--m-accent);
 }
 
 .m-mock-muted {
@@ -2534,10 +2553,12 @@ body {
   }
 }
 
-/* /demo — in-app spotlight (hole punched via giant box-shadow) */
+/* /demo — spotlight. Dim and ring use the landing header blue, not lime. */
 .demo-spotlight {
-  box-shadow: 0 0 0 9999px rgba(11, 21, 38, 0.55);
-  outline: 2px solid #c5e85a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 0 9999px rgba(15, 74, 130, 0.48);
+  outline: 2px solid #1a6bb0;
   outline-offset: 0;
   background: transparent;
   z-index: 30;
@@ -2602,18 +2623,6 @@ body {
   }
 }
 
-/* legacy pulse highlight unused by spotlight tour */
-.demo-hl {
-  outline: 2px solid rgba(197, 232, 90, 0.85);
-  outline-offset: 3px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .demo-hl {
-    animation: none;
-  }
-}
-
 @media print {
   .no-print {
     display: none !important;
@@ -2651,6 +2660,10 @@ body {
   .lp-tabs,
   .lp-tab,
   .lp-tab-active,
+  .lp-window-head,
+  .m-seg,
+  .m-seg-thumb,
+  .m-seg-item-active,
   .lp-enter {
     background: white !important;
     background-image: none !important;
@@ -2672,7 +2685,10 @@ body {
   .lp-bar,
   .app-topbar,
   .app-bar,
-  .app-sidebar {
+  .app-sidebar,
+  .lp-window-head,
+  .m-seg-item,
+  .m-seg-item-active {
     color: black !important;
     border-color: #666 !important;
   }

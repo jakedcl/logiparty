@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { SegmentedControl } from "@/components/marketing/segmented-control";
 import {
   INVENTORY_TABS,
   inventoryHref,
@@ -17,24 +17,18 @@ export function InventoryTabs({
   const tabs = INVENTORY_TABS.filter((t) => allowed.includes(t.id));
 
   return (
-    <nav className="lp-tabs" aria-label="Inventory sections">
-      {tabs.map((t) => {
-        const active = tab === t.id;
-        return (
-          <Link
-            key={t.id}
-            href={inventoryHref({
-              tab: t.id,
-              companyId: t.id === "client" ? companyId : undefined,
-            })}
-            scroll={false}
-            aria-current={active ? "page" : undefined}
-            className={active ? "lp-tab lp-tab-active" : "lp-tab"}
-          >
-            {t.label}
-          </Link>
-        );
-      })}
-    </nav>
+    <SegmentedControl
+      ariaLabel="Inventory sections"
+      value={tab}
+      segments={tabs.map((t) => ({
+        id: t.id,
+        label: t.label,
+        scroll: false,
+        href: inventoryHref({
+          tab: t.id,
+          companyId: t.id === "client" ? companyId : undefined,
+        }),
+      }))}
+    />
   );
 }

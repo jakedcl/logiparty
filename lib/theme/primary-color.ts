@@ -3,7 +3,8 @@ export const FALLBACK_PRIMARY_COLOR = "#0b5cab";
 
 const HEX = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 const PAPER = "#ffffff";
-const INK = "#0b1526";
+/** Landing body ink. Pale brands use this instead of the old navy. */
+const INK = "#1a1a1a";
 
 /** Normalize org `primary_color` or fall back to the product blue. */
 export function resolvePrimaryColor(

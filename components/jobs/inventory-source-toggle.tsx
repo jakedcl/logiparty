@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { SegmentedControl } from "@/components/marketing/segmented-control";
 
 type Props = {
   jobId: string;
@@ -19,23 +20,14 @@ export function InventorySourceToggle({ jobId, source }: Props) {
   }
 
   return (
-    <div className="lp-tabs" role="group" aria-label="Inventory source">
-      <button
-        type="button"
-        className={source === "client" ? "lp-tab lp-tab-active" : "lp-tab"}
-        aria-pressed={source === "client"}
-        onClick={() => go("client")}
-      >
-        Client items
-      </button>
-      <button
-        type="button"
-        className={source === "org" ? "lp-tab lp-tab-active" : "lp-tab"}
-        aria-pressed={source === "org"}
-        onClick={() => go("org")}
-      >
-        Our items
-      </button>
-    </div>
+    <SegmentedControl
+      ariaLabel="Inventory source"
+      value={source}
+      onChange={(id) => go(id === "org" ? "org" : "client")}
+      segments={[
+        { id: "client", label: "Client items" },
+        { id: "org", label: "Our items" },
+      ]}
+    />
   );
 }

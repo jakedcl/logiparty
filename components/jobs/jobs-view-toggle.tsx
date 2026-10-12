@@ -1,5 +1,4 @@
-import Link from "next/link";
-import { cn } from "@/lib/utils";
+import { SegmentedControl } from "@/components/marketing/segmented-control";
 
 type View = "list" | "calendar";
 
@@ -17,21 +16,13 @@ export function JobsViewToggle({ basePath, view, month }: Props) {
       : `${basePath}?view=calendar`;
 
   return (
-    <div className="lp-tabs" role="group" aria-label="View">
-      <Link
-        href={basePath}
-        className={cn("lp-tab", view === "list" && "lp-tab-active")}
-        aria-current={view === "list" ? "page" : undefined}
-      >
-        List
-      </Link>
-      <Link
-        href={calendarHref}
-        className={cn("lp-tab", view === "calendar" && "lp-tab-active")}
-        aria-current={view === "calendar" ? "page" : undefined}
-      >
-        Calendar
-      </Link>
-    </div>
+    <SegmentedControl
+      ariaLabel="View"
+      value={view}
+      segments={[
+        { id: "list", label: "List", href: basePath },
+        { id: "calendar", label: "Calendar", href: calendarHref },
+      ]}
+    />
   );
 }

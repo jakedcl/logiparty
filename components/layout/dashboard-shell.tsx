@@ -305,7 +305,6 @@ export function DashboardShell({
     <OrgTheme primaryColor={primaryColor}>
       {/* Desktop sidebar — gloss metal, brand pill for the active item */}
       <aside className="app-sidebar no-print fixed inset-y-0 left-0 z-30 hidden w-56 flex-col bg-[var(--sidebar)] lg:flex">
-        <div className="h-[3px] shrink-0 bg-[var(--primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]" aria-hidden />
         <div className="border-b border-[var(--lp-line)] px-4 py-5">
           <Brand orgName={orgName} logoUrl={logoUrl} onInk />
         </div>
@@ -329,7 +328,6 @@ export function DashboardShell({
             aria-modal="true"
             aria-label="Navigation"
           >
-            <div className="h-[3px] shrink-0 bg-[var(--primary)]" aria-hidden />
             <div className="flex items-start justify-between gap-2 border-b border-[var(--lp-line)] px-4 py-4">
               <Brand orgName={orgName} logoUrl={logoUrl} onInk />
               <button

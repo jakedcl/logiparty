@@ -1,5 +1,6 @@
 "use client";
 
+import { SegmentedControl } from "@/components/marketing/segmented-control";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { cn } from "@/lib/utils";
 import { tenantThemeStyle } from "@/lib/theme/primary-color";
@@ -38,10 +39,6 @@ function Shell({
       style={tenantThemeStyle(DEMO_ORG.primary)}
     >
       <aside className="app-sidebar hidden w-52 shrink-0 flex-col sm:flex">
-        <div
-          className="h-[3px] shrink-0 bg-[var(--primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
-          aria-hidden
-        />
         <div data-demo-hl="brand" className="border-b border-[var(--lp-line)] px-4 py-5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--sidebar-muted)]">
             Workspace
@@ -65,14 +62,14 @@ function Shell({
         </nav>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="app-topbar flex items-center justify-between border-b border-[var(--border-subtle)] px-5 py-3">
+        <header className="lp-window-head flex items-center justify-between px-5 py-3">
           <p
             data-demo-hl="brand"
-            className="text-xs font-medium text-[var(--muted)] sm:hidden"
+            className="text-xs font-medium text-[var(--lp-muted)] sm:hidden"
           >
             {brand}
           </p>
-          <p className="ml-auto text-xs text-[var(--muted)]">{user}</p>
+          <p className="ml-auto text-xs text-[var(--lp-muted)]">{user}</p>
         </header>
         <main className="min-h-0 flex-1 overflow-auto p-5 sm:p-6">
           {children}
@@ -127,15 +124,13 @@ function Tabs({
   hlKey?: string;
 }) {
   return (
-    <div data-demo-hl={hlKey} className="lp-tabs">
-      {items.map((t) => (
-        <span
-          key={t}
-          className={cn("lp-tab", t === active && "lp-tab-active")}
-        >
-          {t}
-        </span>
-      ))}
+    <div data-demo-hl={hlKey}>
+      <SegmentedControl
+        className="m-seg-wrap-wide"
+        ariaLabel="Sections"
+        value={active}
+        segments={items.map((t) => ({ id: t, label: t }))}
+      />
     </div>
   );
 }
@@ -157,39 +152,28 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
         className="lp-app flex h-full min-h-0 flex-col"
         style={tenantThemeStyle(DEMO_ORG.primary)}
       >
-        <header
-          data-demo-hl="portal-brand"
-          className="app-topbar shrink-0 border-b"
-        >
-          <div
-            className="h-[3px] bg-[var(--primary)]"
-            aria-hidden
-          />
+        <header data-demo-hl="portal-brand" className="lp-window-head shrink-0">
           <div className="flex items-center justify-between px-5 py-4">
             <div>
-              <p className="text-sm font-semibold tracking-tight">
+              <p className="text-sm font-semibold tracking-tight text-[var(--lp-fg)]">
                 {DEMO_ORG.name}
               </p>
-              <p className="text-[11px] text-[var(--subtle)]">Client portal</p>
+              <p className="text-[11px] text-[var(--lp-muted)]">Client portal</p>
             </div>
-            <p className="text-xs text-[var(--muted)]">
+            <p className="text-xs text-[var(--lp-muted)]">
               Alex Chen · Summit Brands
             </p>
           </div>
-          <div className="lp-tabs mx-5 mb-3">
-            {["Home", "Jobs", "Inventory", "Notes"].map((l) => (
-              <span
-                key={l}
-                className={cn(
-                  "lp-tab",
-                  ((screen === "portal-jobs" && l === "Jobs") ||
-                    (screen === "portal-inventory" && l === "Inventory")) &&
-                    "lp-tab-active"
-                )}
-              >
-                {l}
-              </span>
-            ))}
+          <div className="px-5 pb-3.5">
+            <SegmentedControl
+              className="m-seg-wrap-wide"
+              ariaLabel="Portal"
+              value={screen === "portal-inventory" ? "Inventory" : "Jobs"}
+              segments={["Home", "Jobs", "Inventory", "Notes"].map((label) => ({
+                id: label,
+                label,
+              }))}
+            />
           </div>
         </header>
         <main className="min-h-0 flex-1 overflow-auto p-5 sm:p-6">

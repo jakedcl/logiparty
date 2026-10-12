@@ -8,6 +8,7 @@ import {
   useState,
 } from "react";
 import { DemoScreen } from "@/components/demo/demo-screens";
+import { MarketingHeader } from "@/components/marketing/marketing-header";
 import { DEMO_STEPS, type DemoPopupPlacement } from "@/lib/demo/steps";
 
 type Rect = { top: number; left: number; width: number; height: number };
@@ -164,36 +165,22 @@ export function DemoTour() {
 
   return (
     <div className="lp-app flex min-h-0 flex-1 flex-col">
-      {/* Slim demo chrome — marketing brand only here, not inside product mock */}
-      <div className="app-topbar relative z-50 flex items-center justify-between gap-3 border-b px-3 py-2 sm:px-4">
-        <div className="flex min-w-0 items-center gap-3">
-          <Link
-            href="/"
-            className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--sidebar-muted)] hover:text-[var(--sidebar-fg)]"
-          >
-            Logiparty
-          </Link>
-          <span className="hidden text-[11px] text-[var(--sidebar-muted)] sm:inline">
-            Sample tour · not live data
+      <MarketingHeader className="relative z-50 shrink-0">
+        <span className="m-nav-link hidden sm:inline">
+          Sample tour · not live data
+        </span>
+        {!finished ? (
+          <span className="m-nav-link tabular-nums">
+            {index + 1}/{DEMO_STEPS.length}
           </span>
-        </div>
-        <div className="flex items-center gap-3">
-          {!finished ? (
-            <span className="text-[11px] tabular-nums text-[var(--sidebar-muted)]">
-              {index + 1}/{DEMO_STEPS.length}
-            </span>
-          ) : null}
-          <Link href="/#request" className="lp-btn px-2.5 py-1 text-[11px]">
-            Request access
-          </Link>
-          <Link
-            href="/"
-            className="text-[11px] text-[var(--sidebar-muted)] underline-offset-2 hover:text-[var(--sidebar-fg)] hover:underline"
-          >
-            Exit
-          </Link>
-        </div>
-      </div>
+        ) : null}
+        <Link href="/#request" className="m-nav-link-strong">
+          Request access
+        </Link>
+        <Link href="/" className="m-nav-link">
+          Exit
+        </Link>
+      </MarketingHeader>
 
       <div className="relative min-h-0 flex-1">
         <div className="absolute inset-0 overflow-hidden">

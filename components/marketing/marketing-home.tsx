@@ -5,6 +5,7 @@ import { LeadForm } from "@/components/marketing/lead-form";
 import { MockJobs } from "@/components/marketing/product-mocks";
 import { ProductTour } from "@/components/marketing/product-tour";
 import { ProcessStepper } from "@/components/marketing/process-stepper";
+import { MarketingHeader } from "@/components/marketing/marketing-header";
 import { MarketingRoot } from "@/components/marketing/marketing-root";
 
 type WorkspaceCta = {
@@ -41,31 +42,26 @@ export function MarketingHome({
         <span className="m-bubble m-bubble-c" />
       </div>
 
-      <header className="m-header flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <a href="#top" className="m-brand">
-          Logiparty
+      <MarketingHeader brandHref="#top" brandAnchor>
+        <a href="#product" className="m-nav-link hidden sm:inline">
+          Product
         </a>
-        <nav className="flex flex-wrap items-center justify-end gap-x-4 gap-y-1 text-sm">
-          <a href="#product" className="m-nav-link hidden sm:inline">
-            Product
+        <Link href="/demo" className="m-nav-link">
+          Demo
+        </Link>
+        <a href="#how" className="m-nav-link hidden sm:inline">
+          How it works
+        </a>
+        {workspace ? (
+          <a href={workspace.href} className="m-nav-link-strong">
+            Open {workspace.orgName}
           </a>
-          <Link href="/demo" className="m-nav-link">
-            Demo
-          </Link>
-          <a href="#how" className="m-nav-link hidden sm:inline">
-            How it works
+        ) : (
+          <a href="#request" className="m-nav-link-strong">
+            Request access
           </a>
-          {workspace ? (
-            <a href={workspace.href} className="m-nav-link-strong">
-              Open {workspace.orgName}
-            </a>
-          ) : (
-            <a href="#request" className="m-nav-link-strong">
-              Request access
-            </a>
-          )}
-        </nav>
-      </header>
+        )}
+      </MarketingHeader>
 
       <main id="top" className="relative z-10 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl space-y-6">
