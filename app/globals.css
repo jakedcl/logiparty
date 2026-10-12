@@ -2136,7 +2136,6 @@ body {
 
 .demo-popup {
   pointer-events: auto;
-  position: relative;
 }
 
 .demo-caret {
@@ -2180,6 +2179,11 @@ body {
   --m-font: var(--font-marketing), var(--font-marketing-fallback);
   font-family: var(--m-font);
   font-weight: 400;
+  /* Unlayered, so this beats `.marketing { position: relative }` (which
+     overrides Tailwind's layered `fixed`) and keeps the tour viewport-sized. */
+  position: fixed;
+  inset: 0;
+  height: 100dvh;
 }
 
 @media (prefers-reduced-motion: reduce) {
