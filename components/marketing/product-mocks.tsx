@@ -89,12 +89,12 @@ export function MockStaff() {
         <div className="m-mock-row m-mock-row-3">
           <span>Branded Bar</span>
           <span className="m-mock-muted">3 assigned</span>
-          <span className="text-[#1b6b2a]">3 loaded</span>
+          <span className="text-[var(--success)]">3 loaded</span>
         </div>
         <div className="m-mock-row m-mock-row-3">
           <span>Dolly</span>
           <span className="m-mock-muted">10 assigned</span>
-          <span className="text-[#1b6b2a]">10 loaded</span>
+          <span className="text-[var(--success)]">10 loaded</span>
         </div>
       </div>
     </div>

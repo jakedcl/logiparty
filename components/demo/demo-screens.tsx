@@ -1,5 +1,6 @@
 "use client";
 
+import { StatusBadge } from "@/components/ui/status-badge";
 import { cn } from "@/lib/utils";
 import {
   DEMO_CLIENTS,
@@ -17,33 +18,6 @@ import {
 } from "@/lib/demo/scenario";
 import type { DemoScreenId } from "@/lib/demo/steps";
 
-function Chip({
-  children,
-  tone = "neutral",
-}: {
-  children: React.ReactNode;
-  tone?: "draft" | "upcoming" | "ready" | "completed" | "denied" | "neutral";
-}) {
-  const tones: Record<string, string> = {
-    draft: "bg-amber-50 text-amber-900 ring-amber-200",
-    upcoming: "bg-sky-50 text-sky-900 ring-sky-200",
-    ready: "bg-emerald-50 text-emerald-900 ring-emerald-200",
-    completed: "bg-neutral-100 text-neutral-600 ring-neutral-200",
-    denied: "bg-red-50 text-red-900 ring-red-200",
-    neutral: "bg-neutral-100 text-neutral-700 ring-neutral-200",
-  };
-  return (
-    <span
-      className={cn(
-        "inline-flex rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1 ring-inset",
-        tones[tone]
-      )}
-    >
-      {children}
-    </span>
-  );
-}
-
 function Shell({
   children,
   brand,
@@ -58,10 +32,17 @@ function Shell({
   activeNav: string;
 }) {
   return (
-    <div className="flex h-full min-h-0 bg-[#f3f5f8] text-[#0b1526]">
-      <aside className="hidden w-52 shrink-0 flex-col bg-[#0b1526] text-[#f0f4fa] sm:flex">
+    <div
+      className="lp-app flex h-full min-h-0"
+      style={{ ["--primary" as string]: DEMO_ORG.primary }}
+    >
+      <aside className="app-sidebar hidden w-52 shrink-0 flex-col bg-[var(--sidebar)] text-[var(--sidebar-fg)] sm:flex">
+        <div
+          className="h-[3px] shrink-0 bg-[var(--primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
+          aria-hidden
+        />
         <div data-demo-hl="brand" className="border-b border-white/10 px-4 py-5">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#9aabbf]">
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--sidebar-muted)]">
             Workspace
           </p>
           <p className="mt-1.5 text-sm font-semibold leading-snug">{brand}</p>
@@ -71,10 +52,10 @@ function Shell({
             <span
               key={label}
               className={cn(
-                "rounded px-2.5 py-2",
+                "rounded-md px-2.5 py-2",
                 label === activeNav
-                  ? "bg-white/10 font-medium"
-                  : "text-[#9aabbf]"
+                  ? "bg-[var(--sidebar-active)] font-medium text-[var(--sidebar-fg)]"
+                  : "text-[var(--sidebar-muted)]"
               )}
             >
               {label}
@@ -83,16 +64,18 @@ function Shell({
         </nav>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-[#c9d2de] bg-white px-5 py-3">
+        <header className="app-topbar flex items-center justify-between border-b border-[var(--border-subtle)] px-5 py-3">
           <p
             data-demo-hl="brand"
-            className="text-xs font-medium text-[#3d4a5c] sm:hidden"
+            className="text-xs font-medium text-[var(--muted)] sm:hidden"
           >
             {brand}
           </p>
-          <p className="ml-auto text-xs text-[#3d4a5c]">{user}</p>
+          <p className="ml-auto text-xs text-[var(--muted)]">{user}</p>
         </header>
-        <div className="min-h-0 flex-1 overflow-auto p-5 sm:p-6">{children}</div>
+        <main className="min-h-0 flex-1 overflow-auto p-5 sm:p-6">
+          {children}
+        </main>
       </div>
     </div>
   );
@@ -108,25 +91,20 @@ function Table({
   hlKey?: string;
 }) {
   return (
-    <div
-      data-demo-hl={hlKey}
-      className="overflow-hidden rounded-sm border border-[#c9d2de] bg-white"
-    >
-      <table className="w-full text-left text-xs">
-        <thead className="border-b border-[#dde3ec] bg-[#eef1f6] text-[10px] uppercase tracking-wide text-[#5c6b7e]">
+    <div data-demo-hl={hlKey} className="lp-surface overflow-hidden">
+      <table className="lp-table text-xs">
+        <thead>
           <tr>
             {headers.map((h) => (
-              <th key={h} className="px-3 py-2.5 font-semibold">
-                {h}
-              </th>
+              <th key={h}>{h}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} className="border-b border-[#dde3ec] last:border-0">
+            <tr key={i}>
               {row.map((cell, j) => (
-                <td key={j} className="px-3 py-2.5 align-middle">
+                <td key={j} className={j === 0 ? "lp-cell-strong" : undefined}>
                   {cell}
                 </td>
               ))}
@@ -134,6 +112,29 @@ function Table({
           ))}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+function Tabs({
+  items,
+  active,
+  hlKey,
+}: {
+  items: string[];
+  active: string;
+  hlKey?: string;
+}) {
+  return (
+    <div data-demo-hl={hlKey} className="lp-tabs">
+      {items.map((t) => (
+        <span
+          key={t}
+          className={cn("lp-tab", t === active && "lp-tab-active")}
+        >
+          {t}
+        </span>
+      ))}
     </div>
   );
 }
@@ -151,39 +152,50 @@ const STAFF_NAV = [
 export function DemoScreen({ screen }: { screen: DemoScreenId }) {
   if (screen === "portal-jobs" || screen === "portal-inventory") {
     return (
-      <div className="flex h-full min-h-0 flex-col bg-white text-[#0b1526]">
+      <div
+        className="lp-app flex h-full min-h-0 flex-col"
+        style={{ ["--primary" as string]: DEMO_ORG.primary }}
+      >
         <header
           data-demo-hl="portal-brand"
-          className="flex items-center justify-between border-b border-[#c9d2de] px-5 py-4"
-          style={{ borderTop: `3px solid ${DEMO_ORG.primary}` }}
+          className="app-topbar shrink-0 border-b border-[var(--border-subtle)]"
         >
-          <div>
-            <p className="text-sm font-semibold">{DEMO_ORG.name}</p>
-            <p className="text-[11px] text-[#5c6b7e]">Client portal</p>
+          <div
+            className="h-[3px] bg-[var(--primary)]"
+            aria-hidden
+          />
+          <div className="flex items-center justify-between px-5 py-4">
+            <div>
+              <p className="text-sm font-semibold tracking-tight">
+                {DEMO_ORG.name}
+              </p>
+              <p className="text-[11px] text-[var(--subtle)]">Client portal</p>
+            </div>
+            <p className="text-xs text-[var(--muted)]">
+              Alex Chen · Summit Brands
+            </p>
           </div>
-          <p className="text-xs text-[#3d4a5c]">Alex Chen · Summit Brands</p>
+          <div className="lp-tabs px-5">
+            {["Home", "Jobs", "Inventory", "Notes"].map((l) => (
+              <span
+                key={l}
+                className={cn(
+                  "lp-tab",
+                  ((screen === "portal-jobs" && l === "Jobs") ||
+                    (screen === "portal-inventory" && l === "Inventory")) &&
+                    "lp-tab-active"
+                )}
+              >
+                {l}
+              </span>
+            ))}
+          </div>
         </header>
-        <div className="flex gap-5 border-b border-[#dde3ec] px-5 text-xs">
-          {["Home", "Jobs", "Inventory", "Notes"].map((l) => (
-            <span
-              key={l}
-              className={cn(
-                "border-b-2 py-3",
-                (screen === "portal-jobs" && l === "Jobs") ||
-                  (screen === "portal-inventory" && l === "Inventory")
-                  ? "border-[#1e3a5f] font-semibold"
-                  : "border-transparent text-[#5c6b7e]"
-              )}
-            >
-              {l}
-            </span>
-          ))}
-        </div>
-        <div className="min-h-0 flex-1 overflow-auto p-5 sm:p-6">
+        <main className="min-h-0 flex-1 overflow-auto p-5 sm:p-6">
           {screen === "portal-jobs" ? (
             <>
-              <h2 className="text-lg font-semibold tracking-tight">Your jobs</h2>
-              <p className="mt-1 text-xs text-[#5c6b7e]">
+              <h2 className="lp-page-title text-lg">Your jobs</h2>
+              <p className="lp-page-sub text-xs">
                 Request work. Track status. Upload docs.
               </p>
               <div className="mt-4">
@@ -192,19 +204,15 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
                   rows={DEMO_PORTAL_JOBS.map((j) => [
                     j.name,
                     j.when,
-                    <Chip key={j.id} tone={j.status}>
-                      {j.status}
-                    </Chip>,
+                    <StatusBadge key={j.id} status={j.status} kind="job" />,
                   ])}
                 />
               </div>
             </>
           ) : (
             <>
-              <h2 className="text-lg font-semibold tracking-tight">
-                Your inventory
-              </h2>
-              <p className="mt-1 text-xs text-[#5c6b7e]">
+              <h2 className="lp-page-title text-lg">Your inventory</h2>
+              <p className="lp-page-sub text-xs">
                 Stored with {DEMO_ORG.shortName}. Request changes anytime.
               </p>
               <div data-demo-hl="portal-inv" className="mt-4">
@@ -219,7 +227,7 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
               </div>
             </>
           )}
-        </div>
+        </main>
       </div>
     );
   }
@@ -232,10 +240,8 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
         user="Chris Park · Staff"
         activeNav="My Jobs"
       >
-        <h2 className="text-lg font-semibold tracking-tight">My Jobs</h2>
-        <p className="mt-1 text-xs text-[#5c6b7e]">
-          Only jobs you’re assigned to.
-        </p>
+        <h2 className="lp-page-title text-lg">My Jobs</h2>
+        <p className="lp-page-sub text-xs">Only jobs you’re assigned to.</p>
         <div data-demo-hl="my-jobs" className="mt-4">
           <Table
             headers={["Job", "Client", "When", "Status"]}
@@ -243,9 +249,7 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
               j.name,
               j.client,
               j.when,
-              <Chip key={j.id} tone={j.status}>
-                {j.status}
-              </Chip>,
+              <StatusBadge key={j.id} status={j.status} kind="job" />,
             ])}
           />
         </div>
@@ -261,39 +265,34 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
         user="Morgan Hale · Manager"
         activeNav="Dashboard"
       >
-        <h2 className="text-lg font-semibold tracking-tight">
-          Good morning, Morgan
-        </h2>
-        <p className="mt-1 text-xs text-[#5c6b7e]">{DEMO_ORG.name}</p>
+        <h2 className="lp-page-title text-lg">Good morning, Morgan</h2>
+        <p className="lp-page-sub text-xs">{DEMO_ORG.name}</p>
         <div className="mt-5 grid gap-5 lg:grid-cols-2">
           <div data-demo-hl="needs">
-            <p className="mb-2 text-xs font-semibold">Needs attention</p>
-            <ul className="border border-[#c9d2de] bg-white">
+            <p className="lp-section-title mb-2">Needs attention</p>
+            <ul className="lp-list text-xs">
               {DEMO_NEEDS.map((n) => (
-                <li
-                  key={n.title}
-                  className="border-b border-[#dde3ec] px-3 py-2.5 last:border-0"
-                >
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-[#5c6b7e]">
+                <li key={n.title}>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--subtle)]">
                     {n.kind}
                   </p>
-                  <p className="text-xs font-medium">{n.title}</p>
-                  <p className="text-[11px] text-[#5c6b7e]">{n.detail}</p>
+                  <p className="font-medium text-[var(--foreground)]">
+                    {n.title}
+                  </p>
+                  <p className="text-[11px] text-[var(--subtle)]">{n.detail}</p>
                 </li>
               ))}
             </ul>
           </div>
           <div>
-            <p className="mb-2 text-xs font-semibold">Upcoming work</p>
+            <p className="lp-section-title mb-2">Upcoming work</p>
             <Table
               headers={["Job", "Status", "When"]}
               rows={DEMO_JOBS.filter((j) =>
                 ["upcoming", "ready"].includes(j.status)
               ).map((j) => [
                 j.name,
-                <Chip key={j.id} tone={j.status}>
-                  {j.status}
-                </Chip>,
+                <StatusBadge key={j.id} status={j.status} kind="job" />,
                 j.when,
               ])}
             />
@@ -311,8 +310,8 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
         user="Morgan Hale · Manager"
         activeNav="Jobs"
       >
-        <h2 className="text-lg font-semibold tracking-tight">Jobs</h2>
-        <p className="mt-1 text-xs text-[#5c6b7e]">List · Calendar</p>
+        <h2 className="lp-page-title text-lg">Jobs</h2>
+        <p className="lp-page-sub text-xs">List · Calendar</p>
         <div data-demo-hl="statuses" className="mt-4">
           <Table
             headers={["Job", "Client", "When", "Status"]}
@@ -320,9 +319,7 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
               j.name,
               j.client,
               j.when,
-              <Chip key={j.id} tone={j.status}>
-                {j.status}
-              </Chip>,
+              <StatusBadge key={j.id} status={j.status} kind="job" />,
             ])}
           />
         </div>
@@ -339,38 +336,25 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
         activeNav="Jobs"
       >
         <div className="flex flex-wrap items-center gap-2">
-          <h2 className="text-lg font-semibold tracking-tight">
-            Waterfront Festival
-          </h2>
-          <Chip tone="ready">ready</Chip>
+          <h2 className="lp-page-title text-lg">Waterfront Festival</h2>
+          <StatusBadge status="ready" kind="job" />
         </div>
-        <p className="mt-1 text-xs text-[#5c6b7e]">
+        <p className="lp-page-sub text-xs">
           Summit Brands · Fri, Sep 19, 2026 · POC Jordan Lee
         </p>
-        <div
-          data-demo-hl="tabs"
-          className="mt-4 flex gap-4 border-b border-[#c9d2de] text-xs"
-        >
-          {[
-            "Summary",
-            "Locations",
-            "Inventory",
-            "Fleet",
-            "Crew",
-            "Documents",
-          ].map((t, i) => (
-            <span
-              key={t}
-              className={cn(
-                "border-b-2 py-2.5",
-                i === 2
-                  ? "border-[#1e3a5f] font-semibold"
-                  : "border-transparent text-[#5c6b7e]"
-              )}
-            >
-              {t}
-            </span>
-          ))}
+        <div className="mt-4">
+          <Tabs
+            hlKey="tabs"
+            active="Inventory"
+            items={[
+              "Summary",
+              "Locations",
+              "Inventory",
+              "Fleet",
+              "Crew",
+              "Documents",
+            ]}
+          />
         </div>
         <div data-demo-hl="loaded" className="mt-4">
           <Table
@@ -379,7 +363,10 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
               l.source,
               l.name,
               String(l.assigned),
-              <span key={l.name} className="font-semibold text-emerald-800">
+              <span
+                key={l.name}
+                className="font-semibold text-[var(--success)]"
+              >
                 {l.loaded}
               </span>,
             ])}
@@ -387,29 +374,23 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
         </div>
         <div data-demo-hl="crew" className="mt-5 grid gap-4 sm:grid-cols-2">
           <div>
-            <p className="mb-2 text-xs font-semibold">Fleet</p>
-            <ul className="border border-[#c9d2de] bg-white text-xs">
+            <p className="lp-section-title mb-2">Fleet</p>
+            <ul className="lp-list text-xs">
               {DEMO_FLEET.slice(0, 2).map((f) => (
-                <li
-                  key={f.name}
-                  className="border-b border-[#dde3ec] px-3 py-2.5 last:border-0"
-                >
+                <li key={f.name}>
                   {f.name}{" "}
-                  <span className="text-[#5c6b7e]">· {f.plate}</span>
+                  <span className="text-[var(--subtle)]">· {f.plate}</span>
                 </li>
               ))}
             </ul>
           </div>
           <div>
-            <p className="mb-2 text-xs font-semibold">Crew</p>
-            <ul className="border border-[#c9d2de] bg-white text-xs">
+            <p className="lp-section-title mb-2">Crew</p>
+            <ul className="lp-list text-xs">
               {DEMO_CREW.slice(0, 4).map((c) => (
-                <li
-                  key={`${c.name}-${c.phase}`}
-                  className="border-b border-[#dde3ec] px-3 py-2.5 last:border-0"
-                >
+                <li key={`${c.name}-${c.phase}`}>
                   {c.name}{" "}
-                  <span className="text-[#5c6b7e]">
+                  <span className="text-[var(--subtle)]">
                     · {c.phase} · {c.role}
                   </span>
                 </li>
@@ -429,24 +410,13 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
         user="Morgan Hale · Manager"
         activeNav="Inventory"
       >
-        <h2 className="text-lg font-semibold tracking-tight">Inventory</h2>
-        <div
-          data-demo-hl="tabs-inv"
-          className="mt-4 flex gap-4 border-b border-[#c9d2de] text-xs"
-        >
-          {["Client", "Equipment", "Fleet"].map((t, i) => (
-            <span
-              key={t}
-              className={cn(
-                "border-b-2 py-2.5",
-                i === 0
-                  ? "border-[#1e3a5f] font-semibold"
-                  : "border-transparent text-[#5c6b7e]"
-              )}
-            >
-              {t}
-            </span>
-          ))}
+        <h2 className="lp-page-title text-lg">Inventory</h2>
+        <div className="mt-4">
+          <Tabs
+            hlKey="tabs-inv"
+            active="Client"
+            items={["Client", "Equipment", "Fleet"]}
+          />
         </div>
         <p className="mt-4 text-sm font-semibold">Summit Brands</p>
         <div className="mt-3">
@@ -459,7 +429,7 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
             ])}
           />
         </div>
-        <p className="mt-4 text-xs font-semibold text-[#5c6b7e]">
+        <p className="mt-4 text-xs font-semibold text-[var(--subtle)]">
           Equipment (yours) · {DEMO_INVENTORY_ORG.length} items · Fleet ·{" "}
           {DEMO_FLEET.length} vehicles
         </p>
@@ -475,22 +445,22 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
         user="Morgan Hale · Manager"
         activeNav="Notifications"
       >
-        <h2 className="text-lg font-semibold tracking-tight">Notifications</h2>
+        <h2 className="lp-page-title text-lg">Notifications</h2>
         <div data-demo-hl="inbox" className="mt-4">
-          <ul className="border border-[#c9d2de] bg-white">
+          <ul className="lp-list">
             {DEMO_NEEDS.map((n) => (
               <li
                 key={n.title}
-                className="flex items-center justify-between gap-3 border-b border-[#dde3ec] px-3 py-3 last:border-0"
+                className="flex items-center justify-between gap-3"
               >
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-[#5c6b7e]">
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-[var(--subtle)]">
                     {n.kind}
                   </p>
                   <p className="text-xs font-medium">{n.title}</p>
-                  <p className="text-[11px] text-[#5c6b7e]">{n.detail}</p>
+                  <p className="text-[11px] text-[var(--subtle)]">{n.detail}</p>
                 </div>
-                <span className="shrink-0 text-[11px] font-semibold text-[#1e3a5f]">
+                <span className="shrink-0 text-[11px] font-semibold text-[var(--primary)]">
                   Review
                 </span>
               </li>
@@ -509,19 +479,19 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
       activeNav="Team"
     >
       <div data-demo-hl="people">
-        <h2 className="text-lg font-semibold tracking-tight">Team</h2>
+        <h2 className="lp-page-title text-lg">Team</h2>
         <div className="mt-3">
           <Table
             headers={["Name", "Role", "Tags"]}
             rows={DEMO_TEAM.map((t) => [t.name, t.role, t.tags])}
           />
         </div>
-        <h2 className="mt-6 text-lg font-semibold tracking-tight">Clients</h2>
+        <h2 className="lp-page-title mt-6 text-lg">Clients</h2>
         <div className="mt-3 space-y-3">
           {DEMO_CLIENTS.map((c) => (
-            <div key={c.company} className="border border-[#c9d2de] bg-white p-3">
+            <div key={c.company} className="lp-surface p-3">
               <p className="text-sm font-semibold">{c.company}</p>
-              <p className="mt-1 text-xs text-[#5c6b7e]">
+              <p className="mt-1 text-xs text-[var(--subtle)]">
                 {c.contacts.map((x) => `${x.name} (${x.title})`).join(" · ")}
               </p>
             </div>

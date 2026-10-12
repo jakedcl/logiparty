@@ -163,35 +163,32 @@ export function DemoTour() {
   }, [finished, next, prev]);
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-[#f3f5f8]">
-      {/* Slim demo chrome — not a marketing page */}
-      <div className="relative z-50 flex items-center justify-between gap-3 border-b border-[#0b1526] bg-[#0b1526] px-3 py-2 text-[#f0f4fa] sm:px-4">
+    <div className="lp-app flex min-h-0 flex-1 flex-col">
+      {/* Slim demo chrome — marketing brand only here, not inside product mock */}
+      <div className="relative z-50 flex items-center justify-between gap-3 border-b border-[var(--sidebar)] bg-[var(--sidebar)] px-3 py-2 text-[var(--sidebar-fg)] sm:px-4">
         <div className="flex min-w-0 items-center gap-3">
           <Link
             href="/"
-            className="text-[11px] font-semibold tracking-[0.14em] uppercase text-[#9aabbf] hover:text-white"
+            className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[var(--sidebar-muted)] hover:text-[var(--sidebar-fg)]"
           >
             Logiparty
           </Link>
-          <span className="hidden text-[11px] text-[#9aabbf] sm:inline">
+          <span className="hidden text-[11px] text-[var(--sidebar-muted)] sm:inline">
             Sample tour · not live data
           </span>
         </div>
         <div className="flex items-center gap-3">
           {!finished ? (
-            <span className="text-[11px] tabular-nums text-[#9aabbf]">
+            <span className="text-[11px] tabular-nums text-[var(--sidebar-muted)]">
               {index + 1}/{DEMO_STEPS.length}
             </span>
           ) : null}
-          <Link
-            href="/#request"
-            className="rounded-sm bg-[var(--m-accent,#c5e85a)] px-2.5 py-1 text-[11px] font-semibold text-[#0a0c0f]"
-          >
+          <Link href="/#request" className="lp-btn px-2.5 py-1 text-[11px]">
             Request access
           </Link>
           <Link
             href="/"
-            className="text-[11px] text-[#9aabbf] underline-offset-2 hover:text-white hover:underline"
+            className="text-[11px] text-[var(--sidebar-muted)] underline-offset-2 hover:text-[var(--sidebar-fg)] hover:underline"
           >
             Exit
           </Link>
@@ -218,7 +215,10 @@ export function DemoTour() {
         ) : null}
 
         {finished ? (
-          <div className="fixed inset-0 z-30 bg-[#0b1526]/55" aria-hidden />
+          <div
+            className="fixed inset-0 z-30 bg-[var(--foreground)]/55"
+            aria-hidden
+          />
         ) : null}
 
         {/* In-app popup anchored to the highlight */}
@@ -226,14 +226,11 @@ export function DemoTour() {
           <div
             role="dialog"
             aria-labelledby="demo-pop-title"
-            className="demo-popup fixed z-40 rounded-sm border border-[#c9d2de] bg-white p-4 text-[#0b1526] shadow-[0_12px_40px_rgba(0,0,0,0.28)] transition-[top,left] duration-300 ease-out"
+            className="demo-popup lp-surface fixed z-40 p-4 transition-[top,left] duration-300 ease-out"
             style={popupStyle(rect, step.placement)}
           >
-            <span
-              className={caretClass(step.placement)}
-              aria-hidden
-            />
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#5c6b7e]">
+            <span className={caretClass(step.placement)} aria-hidden />
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--subtle)]">
               {index + 1} of {DEMO_STEPS.length}
             </p>
             <h2
@@ -242,7 +239,7 @@ export function DemoTour() {
             >
               {step.title}
             </h2>
-            <p className="mt-1.5 text-xs leading-relaxed text-[#3d4a5c]">
+            <p className="mt-1.5 text-xs leading-relaxed text-[var(--muted)]">
               {step.body}
             </p>
             <div className="mt-3.5 flex items-center gap-2">
@@ -250,14 +247,14 @@ export function DemoTour() {
                 type="button"
                 onClick={prev}
                 disabled={isFirst}
-                className="inline-flex items-center gap-1 rounded-sm border border-[#c9d2de] px-2.5 py-1.5 text-xs font-medium text-[#3d4a5c] disabled:opacity-35"
+                className="inline-flex items-center gap-1 rounded-[var(--lp-radius-sm)] border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1.5 text-xs font-semibold text-[var(--muted)] shadow-[var(--lp-gloss-inset)] disabled:opacity-35"
               >
                 <span aria-hidden>←</span> Back
               </button>
               <button
                 type="button"
                 onClick={next}
-                className="inline-flex items-center gap-1 rounded-sm bg-[#1e3a5f] px-3 py-1.5 text-xs font-semibold text-white"
+                className="lp-btn gap-1 px-3 py-1.5 text-xs"
               >
                 {isLast ? (
                   "Finish"
@@ -275,9 +272,9 @@ export function DemoTour() {
           <div
             role="dialog"
             aria-labelledby="demo-done-title"
-            className="fixed left-1/2 top-1/2 z-40 w-[min(92vw,360px)] -translate-x-1/2 -translate-y-1/2 rounded-sm border border-[#c9d2de] bg-white p-6 text-center text-[#0b1526] shadow-[0_20px_60px_rgba(0,0,0,0.35)]"
+            className="lp-surface fixed left-1/2 top-1/2 z-40 w-[min(92vw,360px)] -translate-x-1/2 -translate-y-1/2 p-6 text-center"
           >
-            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#1e3a5f]">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--primary)]">
               Stage → load → return
             </p>
             <h2
@@ -286,7 +283,7 @@ export function DemoTour() {
             >
               That’s the loop
             </h2>
-            <p className="mt-2 text-sm leading-relaxed text-[#3d4a5c]">
+            <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
               Inventory and fleet unlock after load-out. Ready to talk?
             </p>
             <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
@@ -296,14 +293,11 @@ export function DemoTour() {
                   setFinished(false);
                   setIndex(0);
                 }}
-                className="rounded-sm border border-[#c9d2de] px-3 py-2 text-xs font-medium text-[#3d4a5c]"
+                className="rounded-[var(--lp-radius-sm)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-xs font-semibold text-[var(--muted)] shadow-[var(--lp-gloss-inset)]"
               >
                 Replay
               </button>
-              <Link
-                href="/#request"
-                className="rounded-sm bg-[#1e3a5f] px-4 py-2 text-xs font-semibold text-white"
-              >
+              <Link href="/#request" className="lp-btn px-4 py-2 text-xs">
                 Request access
               </Link>
             </div>

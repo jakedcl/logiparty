@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
 /*
-  Logiparty design tokens (shared)
-  — Change radii, gloss, canvas, and type stacks here → .marketing + .lp-app inherit.
-  — Tenant brand: --primary (set per org via OrgTheme on .lp-app)
+  Shared look (marketing + /demo + dashboard + portal)
+  Change ONLY the :root block below — surfaces, gloss, type follow.
+  Tenant brand: --primary via OrgTheme on .lp-app
+  Prefer classes: .lp-surface .lp-btn .lp-table .lp-status .lp-tabs
+  Avoid new hex in components.
 */
 
 :root {
@@ -79,6 +81,17 @@
   --color-surface: var(--surface);
   --color-ring: var(--ring);
   --font-sans: var(--font-sans);
+  /* Pull Tailwind neutrals onto the same palette (legacy classnames stay cohesive) */
+  --color-neutral-50: var(--surface-hover);
+  --color-neutral-100: #e8ecf2;
+  --color-neutral-200: var(--border-subtle);
+  --color-neutral-300: var(--border);
+  --color-neutral-400: var(--faint);
+  --color-neutral-500: var(--subtle);
+  --color-neutral-600: var(--muted);
+  --color-neutral-700: var(--muted);
+  --color-neutral-800: var(--foreground);
+  --color-neutral-900: var(--foreground);
 }
 
 body {
@@ -100,6 +113,51 @@ body {
   border: 1px solid var(--border-subtle);
   border-radius: var(--lp-radius-md);
   box-shadow: var(--lp-gloss-elevated);
+}
+
+/* Legacy bordered white boxes inside product → same gloss as .lp-surface */
+.lp-app main
+  :where(.rounded-md, .rounded-lg, .rounded):where(
+    .border,
+    .border-neutral-200,
+    .border-neutral-300
+  ):where(.bg-white, .bg-surface) {
+  border-color: var(--border-subtle);
+  box-shadow: var(--lp-gloss-elevated);
+}
+
+.lp-tabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.75rem;
+}
+.lp-tab {
+  border-bottom: 2px solid transparent;
+  padding-block: 0.625rem;
+  color: var(--subtle);
+  font-weight: 500;
+}
+.lp-tab-active {
+  border-bottom-color: var(--primary);
+  color: var(--foreground);
+  font-weight: 600;
+}
+
+.lp-list {
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--lp-radius-md);
+  background: var(--surface);
+  box-shadow: var(--lp-gloss-elevated);
+}
+.lp-list > li,
+.lp-list > div {
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 0.625rem 0.75rem;
+}
+.lp-list > :last-child {
+  border-bottom: none;
 }
 
 .app-topbar {
@@ -165,22 +223,38 @@ body {
   color: var(--foreground);
 }
 
+/* Legacy alias — same gloss primary as .lp-btn */
 .app-btn,
 .app-btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 0.375rem;
+  border-radius: var(--lp-radius-sm);
   padding: 0.375rem 0.75rem;
   font-size: 0.875rem;
   font-weight: 600;
-  background: var(--primary);
+  border: 1px solid color-mix(in srgb, var(--primary) 72%, #000);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--primary) 88%, #fff) 0%,
+    var(--primary) 48%,
+    color-mix(in srgb, var(--primary) 92%, #000) 100%
+  );
   color: var(--primary-foreground);
-  transition: filter 0.15s ease;
+  box-shadow: var(--lp-gloss-elevated);
+  transition:
+    filter 0.15s var(--lp-ease-out),
+    box-shadow 0.15s var(--lp-ease-out),
+    transform 0.12s var(--lp-ease-out);
 }
 .app-btn:hover,
 .app-btn-primary:hover {
-  filter: brightness(1.08);
+  filter: brightness(1.06);
+}
+.app-btn:active,
+.app-btn-primary:active {
+  box-shadow: var(--lp-gloss-pressed);
+  transform: translateY(1px);
 }
 
 .lp-link-quiet {
