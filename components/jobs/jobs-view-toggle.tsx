@@ -17,31 +17,17 @@ export function JobsViewToggle({ basePath, view, month }: Props) {
       : `${basePath}?view=calendar`;
 
   return (
-    <div
-      className="inline-flex rounded-md border border-border bg-white p-0.5 text-sm"
-      role="group"
-      aria-label="View"
-    >
+    <div className="lp-tabs" role="group" aria-label="View">
       <Link
         href={basePath}
-        className={cn(
-          "rounded px-2.5 py-1 font-medium transition-colors",
-          view === "list"
-            ? "bg-neutral-900 text-white"
-            : "text-neutral-600 hover:text-neutral-900"
-        )}
+        className={cn("lp-tab", view === "list" && "lp-tab-active")}
         aria-current={view === "list" ? "page" : undefined}
       >
         List
       </Link>
       <Link
         href={calendarHref}
-        className={cn(
-          "rounded px-2.5 py-1 font-medium transition-colors",
-          view === "calendar"
-            ? "bg-neutral-900 text-white"
-            : "text-neutral-600 hover:text-neutral-900"
-        )}
+        className={cn("lp-tab", view === "calendar" && "lp-tab-active")}
         aria-current={view === "calendar" ? "page" : undefined}
       >
         Calendar

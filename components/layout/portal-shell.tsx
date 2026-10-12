@@ -35,7 +35,7 @@ export function PortalShell({
 
   return (
     <OrgTheme primaryColor={primaryColor} className="flex flex-col">
-      <header className="app-topbar shrink-0 border-b border-[var(--border-subtle)] bg-[var(--surface)]">
+      <header className="app-topbar shrink-0 border-b">
         <div className="h-[3px] bg-[var(--primary)]" aria-hidden />
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3.5 md:px-6">
           <div className="flex min-w-0 items-center gap-2.5">
@@ -68,7 +68,6 @@ export function PortalShell({
           </div>
         </div>
         <PortalNav
-          underline
           className="mx-auto hidden max-w-3xl gap-5 px-4 sm:flex md:px-6"
           itemClassName="py-2.5 text-sm transition-colors"
         />
@@ -79,7 +78,7 @@ export function PortalShell({
       </main>
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-10 border-t border-[var(--border)] bg-[color-mix(in_srgb,var(--surface)_94%,transparent)] backdrop-blur sm:hidden"
+        className="app-bar fixed inset-x-0 bottom-0 z-10 border-t sm:hidden"
         aria-label="Portal navigation"
       >
         <div className="mx-auto flex max-w-3xl items-stretch justify-around pb-[env(safe-area-inset-bottom,0px)]">

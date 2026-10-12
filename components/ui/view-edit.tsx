@@ -46,7 +46,7 @@ export function ViewEdit({
           <button
             type="button"
             onClick={() => setEditing(true)}
-            className="shrink-0 text-xs font-medium text-neutral-500 hover:text-neutral-900 pt-0.5"
+            className="lp-link-quiet shrink-0 pt-0.5 font-bold"
           >
             {editLabel}
           </button>
@@ -61,7 +61,7 @@ export function ViewEdit({
         <button
           type="button"
           onClick={() => setEditing(true)}
-          className="rounded px-2.5 py-1 text-sm font-medium text-neutral-700 border border-neutral-300 hover:bg-neutral-50"
+          className="lp-btn-quiet"
         >
           {editLabel}
         </button>
@@ -81,10 +81,10 @@ export function DetailFields({
     <dl className="grid gap-x-4 gap-y-2.5 sm:grid-cols-[7.5rem_1fr] text-sm">
       {rows.map((row) => (
         <div key={row.label} className="contents">
-          <dt className="text-neutral-500 sm:pt-0.5">{row.label}</dt>
-          <dd className="text-neutral-900 min-w-0 break-words">
+          <dt className="text-[var(--muted)] sm:pt-0.5">{row.label}</dt>
+          <dd className="min-w-0 break-words text-[var(--foreground)]">
             {row.value ?? (
-              <span className="text-neutral-400">—</span>
+              <span className="text-[var(--faint)]">—</span>
             )}
           </dd>
         </div>
@@ -104,14 +104,14 @@ export function EditFormActions({
     <div className="flex flex-wrap items-center gap-2 pt-1">
       <button
         type="submit"
-        className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
+        className="lp-btn"
       >
         {saveLabel}
       </button>
       <button
         type="button"
         onClick={onCancel}
-        className="rounded px-3 py-2 text-sm text-neutral-600 border border-neutral-300 hover:bg-neutral-50"
+        className="lp-btn-quiet"
       >
         Cancel
       </button>

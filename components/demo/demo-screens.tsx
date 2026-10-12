@@ -2,6 +2,7 @@
 
 import { StatusBadge } from "@/components/ui/status-badge";
 import { cn } from "@/lib/utils";
+import { tenantThemeStyle } from "@/lib/theme/primary-color";
 import {
   DEMO_CLIENTS,
   DEMO_CREW,
@@ -34,14 +35,14 @@ function Shell({
   return (
     <div
       className="lp-app flex h-full min-h-0"
-      style={{ ["--primary" as string]: DEMO_ORG.primary }}
+      style={tenantThemeStyle(DEMO_ORG.primary)}
     >
-      <aside className="app-sidebar hidden w-52 shrink-0 flex-col bg-[var(--sidebar)] text-[var(--sidebar-fg)] sm:flex">
+      <aside className="app-sidebar hidden w-52 shrink-0 flex-col sm:flex">
         <div
           className="h-[3px] shrink-0 bg-[var(--primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
           aria-hidden
         />
-        <div data-demo-hl="brand" className="border-b border-white/10 px-4 py-5">
+        <div data-demo-hl="brand" className="border-b border-[var(--lp-line)] px-4 py-5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--sidebar-muted)]">
             Workspace
           </p>
@@ -52,9 +53,9 @@ function Shell({
             <span
               key={label}
               className={cn(
-                "rounded-md px-2.5 py-2",
+                "rounded-full border border-transparent px-2.5 py-2",
                 label === activeNav
-                  ? "bg-[var(--sidebar-active)] font-medium text-[var(--sidebar-fg)]"
+                  ? "app-nav-active"
                   : "text-[var(--sidebar-muted)]"
               )}
             >
@@ -154,11 +155,11 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
     return (
       <div
         className="lp-app flex h-full min-h-0 flex-col"
-        style={{ ["--primary" as string]: DEMO_ORG.primary }}
+        style={tenantThemeStyle(DEMO_ORG.primary)}
       >
         <header
           data-demo-hl="portal-brand"
-          className="app-topbar shrink-0 border-b border-[var(--border-subtle)]"
+          className="app-topbar shrink-0 border-b"
         >
           <div
             className="h-[3px] bg-[var(--primary)]"
@@ -175,7 +176,7 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
               Alex Chen · Summit Brands
             </p>
           </div>
-          <div className="lp-tabs px-5">
+          <div className="lp-tabs mx-5 mb-3">
             {["Home", "Jobs", "Inventory", "Notes"].map((l) => (
               <span
                 key={l}

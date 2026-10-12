@@ -4,22 +4,10 @@ import {
   reviewAvailabilityRequest,
   submitAvailabilityRequest,
 } from "@/lib/actions/availability";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 function fmt(d: Date): string {
   return d.toLocaleString();
-}
-
-function statusClass(status: string): string {
-  switch (status) {
-    case "Pending":
-      return "bg-amber-100 text-amber-900";
-    case "Approved":
-      return "bg-emerald-100 text-emerald-900";
-    case "Denied":
-      return "bg-red-100 text-red-900";
-    default:
-      return "bg-neutral-100 text-neutral-700";
-  }
 }
 
 type Props = {
@@ -146,11 +134,7 @@ export async function TimeOffPanel({ orgId, canSubmit, canReview }: Props) {
                         {req.reason || "—"}
                       </td>
                       <td className="py-2 px-3">
-                        <span
-                          className={`rounded px-1.5 py-0.5 text-xs ${statusClass(req.status)}`}
-                        >
-                          {req.status}
-                        </span>
+                        <StatusBadge status={req.status} kind="request" />
                       </td>
                     </tr>
                   ))}

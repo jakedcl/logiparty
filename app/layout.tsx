@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import { marketingFont } from "@/components/marketing/fonts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={marketingFont.variable}>
       <body className="min-h-screen antialiased">{children}</body>
     </html>
   );

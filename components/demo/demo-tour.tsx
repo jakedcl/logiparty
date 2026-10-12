@@ -165,7 +165,7 @@ export function DemoTour() {
   return (
     <div className="lp-app flex min-h-0 flex-1 flex-col">
       {/* Slim demo chrome — marketing brand only here, not inside product mock */}
-      <div className="relative z-50 flex items-center justify-between gap-3 border-b border-[var(--sidebar)] bg-[var(--sidebar)] px-3 py-2 text-[var(--sidebar-fg)] sm:px-4">
+      <div className="app-topbar relative z-50 flex items-center justify-between gap-3 border-b px-3 py-2 sm:px-4">
         <div className="flex min-w-0 items-center gap-3">
           <Link
             href="/"
@@ -247,7 +247,7 @@ export function DemoTour() {
                 type="button"
                 onClick={prev}
                 disabled={isFirst}
-                className="inline-flex items-center gap-1 rounded-[var(--lp-radius-sm)] border border-[var(--border)] bg-[var(--surface)] px-2.5 py-1.5 text-xs font-semibold text-[var(--muted)] shadow-[var(--lp-gloss-inset)] disabled:opacity-35"
+                className="lp-btn-quiet lp-btn-sm gap-1 disabled:opacity-35"
               >
                 <span aria-hidden>←</span> Back
               </button>
@@ -293,7 +293,7 @@ export function DemoTour() {
                   setFinished(false);
                   setIndex(0);
                 }}
-                className="rounded-[var(--lp-radius-sm)] border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-xs font-semibold text-[var(--muted)] shadow-[var(--lp-gloss-inset)]"
+                className="lp-btn-quiet lp-btn-sm"
               >
                 Replay
               </button>

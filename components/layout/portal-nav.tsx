@@ -14,12 +14,9 @@ const NAV = [
 export function PortalNav({
   className,
   itemClassName,
-  underline = false,
 }: {
   className?: string;
   itemClassName?: string;
-  /** Desktop top nav uses brand underline for active */
-  underline?: boolean;
 }) {
   const pathname = usePathname();
   return (
@@ -35,15 +32,12 @@ export function PortalNav({
             href={item.href}
             className={cn(
               itemClassName,
+              "rounded-full border border-transparent px-3",
               active
-                ? "font-semibold text-[var(--foreground)]"
+                ? "app-nav-active"
                 : "text-[var(--muted)] hover:text-[var(--foreground)]"
             )}
-            style={
-              underline && active
-                ? { boxShadow: "inset 0 -2px 0 var(--primary)" }
-                : undefined
-            }
+            aria-current={active ? "page" : undefined}
           >
             {item.label}
           </Link>

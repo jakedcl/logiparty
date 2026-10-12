@@ -57,7 +57,7 @@ export function NewJobModal({
         }}
       >
         <div
-          className="flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl flex-col overflow-y-auto rounded-lg border border-neutral-200 bg-white p-6 shadow-xl sm:p-7"
+          className="lp-surface lp-enter flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl flex-col overflow-y-auto p-6 sm:p-7"
           onClick={(e) => e.stopPropagation()}
         >
           <div className="mb-4 flex items-start justify-between gap-3">
@@ -185,7 +185,7 @@ export function NewJobModal({
               <button
                 type="button"
                 onClick={close}
-                className="rounded-md px-3 py-1.5 text-sm text-neutral-600 hover:text-neutral-900"
+                className="lp-btn-ghost"
               >
                 Cancel
               </button>
