@@ -48,6 +48,8 @@ The seed script creates three demo organizations with sample users. The demo acc
 
 Other scripts you might need: `npm run db:reset-seed -- --confirm` to wipe and reseed, `npm run test:integration` for the integration checks, and `npm run db:verify-rls` to check the row-level security policies.
 
+See [docs/how-it-works.md](docs/how-it-works.md) for how tenant routing, row-level security and the job lock rules fit together.
+
 ## Project layout
 
 - `app/` routes: the marketing site, `dashboard/` for staff, `portal/` for clients, `demo/`, and `api/`
