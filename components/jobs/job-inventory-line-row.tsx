@@ -1,6 +1,7 @@
 "use client";
 
 import { QuietRemove } from "@/components/jobs/quiet-remove";
+import { Button } from "@/components/ui/button";
 import { ViewEdit } from "@/components/ui/view-edit";
 import {
   deleteJobInventoryLine,
@@ -61,12 +62,9 @@ export function JobInventoryLineRow({
                     className="mt-1 w-20 border border-neutral-200 rounded px-2 py-1.5 text-sm tabular-nums"
                   />
                 </label>
-                <button
-                  type="submit"
-                  className="rounded px-2.5 py-1.5 text-xs border border-neutral-300 h-[34px]"
-                >
+                <Button type="submit" variant="outline" size="sm" className="h-[34px]">
                   Save
-                </button>
+                </Button>
               </form>
               <form
                 action={updateQuantityLoaded}
@@ -86,20 +84,19 @@ export function JobInventoryLineRow({
                     className="mt-1 w-20 border border-neutral-200 rounded px-2 py-1.5 text-sm tabular-nums"
                   />
                 </label>
-                <button
-                  type="submit"
-                  className="rounded px-2.5 py-1.5 text-xs border border-neutral-300 h-[34px]"
-                >
+                <Button type="submit" variant="outline" size="sm" className="h-[34px]">
                   Save
-                </button>
+                </Button>
               </form>
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
+                className="h-[34px]"
                 onClick={onCancel}
-                className="rounded px-2.5 py-1.5 text-xs text-neutral-600 border border-neutral-300 h-[34px]"
               >
                 Cancel
-              </button>
+              </Button>
             </div>
           )}
         />

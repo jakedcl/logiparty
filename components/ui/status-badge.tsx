@@ -38,7 +38,7 @@ type Props = {
   children?: React.ReactNode;
 };
 
-/** Quiet status chip — intent color, not rounded-full pill soup. */
+/** Glossy status capsule. Color stays tied to the status, not the org brand. */
 export function StatusBadge({
   status,
   kind = "generic",

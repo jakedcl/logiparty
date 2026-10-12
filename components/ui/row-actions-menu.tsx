@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+import { Button } from "@/components/ui/button";
 
 type Placement = "bottom" | "top";
 
@@ -124,20 +125,21 @@ export function RowActionsMenu({
 
   return (
     <>
-      <button
+      <Button
         ref={triggerRef}
         type="button"
+        variant="outline"
         aria-expanded={open}
         aria-haspopup="menu"
         aria-controls={open ? menuId : undefined}
         aria-label={label}
-        className="rounded px-1.5 py-0.5 text-neutral-400 hover:text-neutral-700 hover:bg-neutral-100"
+        className="lp-btn-icon text-base leading-none"
         onClick={() => setOpen((v) => !v)}
       >
         <span aria-hidden className="text-base leading-none tracking-tighter">
           ⋯
         </span>
-      </button>
+      </Button>
       {open && coords
         ? createPortal(
             <div
@@ -153,7 +155,7 @@ export function RowActionsMenu({
               }}
               className={
                 menuClassName ??
-                "min-w-[7.5rem] rounded-md border border-neutral-200 bg-white py-1 shadow-md"
+                "lp-popover min-w-[7.5rem] py-1"
               }
               onClick={(e) => {
                 const el = e.target as HTMLElement;
@@ -199,8 +201,8 @@ export function RowActionItem({
       onClick={onClick}
       className={
         destructive
-          ? "block w-full px-2.5 py-1.5 text-left text-sm text-red-600 hover:bg-red-50"
-          : "block w-full px-2.5 py-1.5 text-left text-sm text-neutral-800 hover:bg-neutral-50"
+          ? "lp-menu-item lp-menu-item-danger"
+          : "lp-menu-item"
       }
       {...rest}
     >

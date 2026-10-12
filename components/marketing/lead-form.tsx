@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { submitMarketingLead } from "@/lib/actions/leads";
+import { Button } from "@/components/ui/button";
 
 const TABS = [
   { id: "details", label: "Details", enabled: true },
@@ -125,13 +126,13 @@ export function LeadForm() {
             {error}
           </p>
         ) : null}
-        <button
+        <Button
           type="submit"
           disabled={pending}
-          className="m-btn-primary inline-flex items-center justify-center px-4 py-2 text-sm disabled:opacity-60"
+          className="px-4 py-2 text-sm"
         >
           {pending ? "Sending…" : "Submit request"}
-        </button>
+        </Button>
       </form>
     </div>
   );

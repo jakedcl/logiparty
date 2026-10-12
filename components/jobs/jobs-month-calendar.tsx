@@ -65,7 +65,7 @@ export function JobsMonthCalendar({ jobs, hrefBase, year, month }: Props) {
             {WEEKDAYS.map((d) => (
               <div
                 key={d}
-                className="bg-neutral-50 px-1.5 py-1.5 text-center text-[0.65rem] font-semibold uppercase tracking-wide text-neutral-500"
+                className="lp-bar px-1.5 py-1.5 text-center text-[0.65rem] font-bold uppercase tracking-wide"
               >
                 {d}
               </div>

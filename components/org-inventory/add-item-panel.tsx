@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { SkuInput } from "@/components/client-inventory/sku-input";
 import { createOrgInventoryItem } from "@/lib/actions/inventory";
+import { Button } from "@/components/ui/button";
 
 /** Caption left, + Add item right. Form opens below the row. */
 export function AddOrgInventoryItemPanel({ caption }: { caption?: string }) {
@@ -64,12 +65,9 @@ export function AddOrgInventoryItemPanel({ caption }: { caption?: string }) {
               className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
             />
           </label>
-          <button
-            type="submit"
-            className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white h-[34px] mt-5 lg:mt-0"
-          >
+          <Button type="submit" size="sm" className="mt-5 h-[34px] lg:mt-0">
             Add
-          </button>
+          </Button>
         </form>
       ) : null}
     </div>

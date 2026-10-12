@@ -6,6 +6,7 @@ import {
   updateStaffTags,
 } from "@/lib/actions/team";
 import { STAFF_TAGS } from "@/lib/db/schema";
+import { Button } from "@/components/ui/button";
 
 function roleLabels(m: {
   isOrgAdmin: boolean;
@@ -49,21 +50,25 @@ export function TeamMemberRow({
           <p className="text-xs text-neutral-500">{user.email}</p>
         </div>
         {!editing ? (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
+            className="shrink-0"
             onClick={() => setEditing(true)}
-            className="shrink-0 rounded px-2.5 py-1 text-sm font-medium text-neutral-700 border border-neutral-300 hover:bg-neutral-50"
           >
             Edit
-          </button>
+          </Button>
         ) : (
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="sm"
+            className="shrink-0"
             onClick={() => setEditing(false)}
-            className="shrink-0 rounded px-2.5 py-1 text-sm text-neutral-600 border border-neutral-300 hover:bg-neutral-50"
           >
             Cancel
-          </button>
+          </Button>
         )}
       </div>
 

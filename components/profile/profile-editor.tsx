@@ -10,6 +10,7 @@ import {
   changeOwnPassword,
   updateProfileName,
 } from "@/lib/actions/profile";
+import { Button } from "@/components/ui/button";
 
 type Profile = {
   email: string;
@@ -108,17 +109,19 @@ export function ProfileEditor({ profile }: { profile: Profile }) {
               </p>
             </div>
             {!changingPassword ? (
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
+                className="shrink-0"
                 onClick={() => {
                   setChangingPassword(true);
                   setPasswordError(null);
                   setPasswordOk(false);
                 }}
-                className="shrink-0 rounded px-2.5 py-1 text-sm font-medium text-neutral-700 border border-neutral-300 hover:bg-neutral-50"
               >
                 Change
-              </button>
+              </Button>
             ) : null}
           </div>
 

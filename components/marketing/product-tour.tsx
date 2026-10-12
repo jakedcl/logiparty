@@ -6,6 +6,7 @@ import { useState } from "react";
 import { AppWindow } from "@/components/marketing/app-window";
 import { TourMock, type MockKind } from "@/components/marketing/product-mocks";
 import { SegmentedControl } from "@/components/marketing/segmented-control";
+import { Button } from "@/components/ui/button";
 
 const SEGMENTS = [
   { id: "jobs", label: "Jobs", title: "Jobs", body: "Statuses, calendar, and a run sheet with locations, loads, trucks, and crew." },
@@ -32,9 +33,9 @@ export function ProductTour() {
             interactive tour.
           </p>
         </div>
-        <Link href="/demo" className="m-btn-primary px-4 py-2 text-sm">
-          Start interactive demo
-        </Link>
+        <Button asChild className="px-4 py-2 text-sm">
+          <Link href="/demo">Start interactive demo</Link>
+        </Button>
       </div>
 
       <div className="m-tour-controls">

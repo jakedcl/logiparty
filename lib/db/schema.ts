@@ -60,7 +60,7 @@ export const organizations = pgTable("organizations", {
   slug: text("slug").notNull().unique(),
   name: text("name").notNull(),
   logoUrl: text("logo_url"),
-  primaryColor: text("primary_color").default("#2563eb"),
+  primaryColor: text("primary_color").default("#0b5cab"),
   emailFromName: text("email_from_name"),
   /** Stripe customer for this org (optional billing). */
   stripeCustomerId: text("stripe_customer_id"),

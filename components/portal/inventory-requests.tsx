@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   requestInventoryAdd,
   requestInventoryQtyChange,
@@ -8,19 +9,7 @@ import {
 } from "@/lib/actions/inventory-requests";
 import type { ClientInventoryItem } from "@/lib/db/schema";
 import { RowActionsMenu } from "@/components/ui/row-actions-menu";
-
-function statusClass(status: string): string {
-  switch (status) {
-    case "pending":
-      return "bg-amber-100 text-amber-900";
-    case "approved":
-      return "bg-emerald-100 text-emerald-900";
-    case "denied":
-      return "bg-red-100 text-red-900";
-    default:
-      return "bg-neutral-100 text-neutral-700";
-  }
-}
+import { StatusBadge } from "@/components/ui/status-badge";
 
 function typeLabel(type: string): string {
   switch (type) {
@@ -37,18 +26,18 @@ function typeLabel(type: string): string {
 
 function ItemActionsMenu({ itemId }: { itemId: string }) {
   return (
-    <RowActionsMenu menuClassName="min-w-[11rem] rounded-md border border-neutral-200 bg-white py-1 shadow-md">
+    <RowActionsMenu menuClassName="lp-popover min-w-[11rem] py-1">
       <Link
         href={`/portal/inventory/requests/new?type=qty_change&itemId=${itemId}`}
         role="menuitem"
-        className="block px-2.5 py-1.5 text-sm text-neutral-800 hover:bg-neutral-50"
+        className="lp-menu-item"
       >
         Change quantity
       </Link>
       <Link
         href={`/portal/inventory/requests/new?type=remove&itemId=${itemId}`}
         role="menuitem"
-        className="block px-2.5 py-1.5 text-sm text-red-600 hover:bg-red-50"
+        className="lp-menu-item lp-menu-item-danger"
       >
         Remove from storage
       </Link>
@@ -316,16 +305,9 @@ function FormActions({
 }) {
   return (
     <div className="flex flex-wrap items-center gap-3 pt-1">
-      <button
-        type="submit"
-        className={`rounded-md px-4 py-2 text-sm font-medium text-white ${
-          danger
-            ? "bg-red-600 hover:bg-red-700"
-            : "bg-neutral-900 hover:bg-neutral-800"
-        }`}
-      >
+      <Button type="submit" variant={danger ? "destructive" : "default"}>
         {submitLabel}
-      </button>
+      </Button>
       <Link
         href="/portal/inventory"
         className="text-sm text-neutral-500 hover:text-neutral-800"
@@ -409,11 +391,7 @@ export function PortalInventoryRequestsList({
                   ) : null}
                 </td>
                 <td className="py-2 px-3">
-                  <span
-                    className={`inline-block rounded-full px-2 py-0.5 text-xs capitalize ${statusClass(req.status)}`}
-                  >
-                    {req.status}
-                  </span>
+                  <StatusBadge status={req.status} kind="request" />
                 </td>
               </tr>
             );

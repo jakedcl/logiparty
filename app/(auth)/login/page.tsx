@@ -8,6 +8,7 @@ import { db } from "@/lib/db";
 import { organizations } from "@/lib/db/schema";
 import { getOrgSlugFromHeaders } from "@/lib/org/subdomain";
 import { OrgTheme } from "@/components/layout/org-theme";
+import { Button } from "@/components/ui/button";
 import {
   FALLBACK_PRIMARY_COLOR,
   resolvePrimaryColor,
@@ -31,8 +32,8 @@ export default async function LoginPage({
 
   if (!orgSlug) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--background)] p-4">
-        <div className="w-full max-w-sm">
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <div className="lp-surface lp-enter w-full max-w-sm p-6">
           <h1 className="lp-page-title mb-2">Sign in</h1>
           <p className="lp-page-sub">
             Open your organization subdomain to sign in (for example{" "}
@@ -48,7 +49,7 @@ export default async function LoginPage({
           <p className="mt-6 text-sm text-[var(--muted)]">
             <Link
               href="/"
-              className="font-medium text-[var(--foreground)] underline underline-offset-2"
+              className="app-link"
             >
               ← Back to Logiparty
             </Link>
@@ -84,19 +85,9 @@ export default async function LoginPage({
 
   return (
     <OrgTheme primaryColor={primaryColor}>
-      <div className="relative flex min-h-screen flex-col justify-center px-4 py-12">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-[0.55]"
-          aria-hidden
-          style={{
-            background: `
-              radial-gradient(ellipse 70% 50% at 15% 10%, color-mix(in srgb, var(--primary) 14%, transparent), transparent 55%),
-              radial-gradient(ellipse 50% 40% at 90% 80%, color-mix(in srgb, var(--primary) 8%, transparent), transparent 50%)
-            `,
-          }}
-        />
-        <div className="relative mx-auto w-full max-w-sm">
-          <div className="mb-8 flex flex-col items-start gap-4">
+      <div className="flex min-h-screen items-center justify-center px-4 py-12">
+        <div className="lp-surface lp-enter w-full max-w-sm p-6 sm:p-7">
+          <div className="mb-6 flex flex-col items-start gap-4">
             {org?.logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -111,7 +102,7 @@ export default async function LoginPage({
             </div>
           </div>
           {params.error ? (
-            <p className="mb-4 text-sm font-medium text-[var(--danger)]">
+            <p className="mb-4 text-sm font-bold text-[var(--danger)]">
               Invalid email or password.
             </p>
           ) : null}
@@ -144,13 +135,10 @@ export default async function LoginPage({
                 redirect("/login?error=1");
               }
             }}
-            className="space-y-4 border-t border-[var(--border)] pt-6"
+            className="space-y-4"
           >
             <div>
-              <label
-                htmlFor="email"
-                className="mb-1.5 block text-sm font-medium text-[var(--foreground)]"
-              >
+              <label htmlFor="email" className="app-label mb-1.5">
                 Email
               </label>
               <input
@@ -163,10 +151,7 @@ export default async function LoginPage({
               />
             </div>
             <div>
-              <label
-                htmlFor="password"
-                className="mb-1.5 block text-sm font-medium text-[var(--foreground)]"
-              >
+              <label htmlFor="password" className="app-label mb-1.5">
                 Password
               </label>
               <input
@@ -178,9 +163,9 @@ export default async function LoginPage({
                 className="lp-input"
               />
             </div>
-            <button type="submit" className="lp-btn w-full py-2.5">
+            <Button type="submit" className="w-full py-2.5">
               Sign in
-            </button>
+            </Button>
           </form>
         </div>
       </div>

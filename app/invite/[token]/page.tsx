@@ -5,6 +5,9 @@ import { invites, organizations } from "@/lib/db/schema";
 import { acceptInvite } from "@/lib/actions/invites";
 import { signIn } from "@/lib/auth";
 import { absoluteRedirectUrl } from "@/lib/auth/redirect";
+import { OrgTheme } from "@/components/layout/org-theme";
+import { Button } from "@/components/ui/button";
+import { resolvePrimaryColor } from "@/lib/theme/primary-color";
 
 export default async function InviteAcceptPage({
   params,
@@ -14,7 +17,13 @@ export default async function InviteAcceptPage({
   const { token } = await params;
 
   if (!db) {
-    return <p className="p-6">Database not configured.</p>;
+    return (
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <p className="lp-surface max-w-sm p-6 text-sm text-[var(--muted)]">
+          Database not configured.
+        </p>
+      </div>
+    );
   }
 
   const [invite] = await db
@@ -25,8 +34,10 @@ export default async function InviteAcceptPage({
 
   if (!invite || invite.acceptedAt) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <p className="text-neutral-600">This invitation is invalid or expired.</p>
+      <div className="flex min-h-screen items-center justify-center p-4">
+        <p className="lp-surface lp-enter max-w-sm p-6 text-sm text-[var(--muted)]">
+          This invitation is invalid or expired.
+        </p>
       </div>
     );
   }
@@ -38,10 +49,11 @@ export default async function InviteAcceptPage({
     .limit(1);
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-sm border rounded-lg bg-white p-6 shadow-sm">
-        <h1 className="text-xl font-semibold mb-1">{org?.name ?? "Organization"}</h1>
-        <p className="text-sm text-neutral-500 mb-6">
+    <OrgTheme primaryColor={resolvePrimaryColor(org?.primaryColor)}>
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <div className="lp-surface lp-enter w-full max-w-sm p-6">
+        <h1 className="lp-page-title mb-1">{org?.name ?? "Organization"}</h1>
+        <p className="lp-page-sub mb-6">
           Complete your account for {invite.email}
         </p>
         <form
@@ -67,42 +79,38 @@ export default async function InviteAcceptPage({
         >
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label htmlFor="firstName" className="block text-sm font-medium mb-1">
+              <label htmlFor="firstName" className="app-label mb-1">
                 First name
               </label>
               <input
                 id="firstName"
                 name="firstName"
                 required
-                className="w-full border rounded px-3 py-2 text-sm"
+                className="lp-input"
               />
             </div>
             <div>
-              <label htmlFor="lastName" className="block text-sm font-medium mb-1">
+              <label htmlFor="lastName" className="app-label mb-1">
                 Last name
               </label>
               <input
                 id="lastName"
                 name="lastName"
                 required
-                className="w-full border rounded px-3 py-2 text-sm"
+                className="lp-input"
               />
             </div>
           </div>
           {invite.isClient && (
             <div>
-              <label htmlFor="title" className="block text-sm font-medium mb-1">
+              <label htmlFor="title" className="app-label mb-1">
                 Job title
               </label>
-              <input
-                id="title"
-                name="title"
-                className="w-full border rounded px-3 py-2 text-sm"
-              />
+              <input id="title" name="title" className="lp-input" />
             </div>
           )}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium mb-1">
+            <label htmlFor="password" className="app-label mb-1">
               Password
             </label>
             <input
@@ -111,17 +119,15 @@ export default async function InviteAcceptPage({
               type="password"
               required
               minLength={8}
-              className="w-full border rounded px-3 py-2 text-sm"
+              className="lp-input"
             />
           </div>
-          <button
-            type="submit"
-            className="w-full rounded py-2 text-sm font-medium text-white bg-neutral-900"
-          >
+          <Button type="submit" className="w-full py-2">
             Create account
-          </button>
+          </Button>
         </form>
       </div>
     </div>
+    </OrgTheme>
   );
 }

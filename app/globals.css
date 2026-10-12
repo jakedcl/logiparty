@@ -1,20 +1,30 @@
 @import "tailwindcss";
 
 /*
-  Shared look (marketing + /demo + dashboard + portal)
-  Change ONLY the :root block below — surfaces, gloss, type follow.
-  Tenant brand: --primary via OrgTheme on .lp-app
+  Shared look (marketing + /demo + dashboard + portal + login)
+  Change the :root block — surfaces, gloss, and type follow.
+  Tenant brand: --primary via OrgTheme on .lp-app (gloss mixes from it).
   Prefer classes: .lp-surface .lp-btn .lp-table .lp-status .lp-tabs
-  Avoid new hex in components.
+  Avoid new hex in components. Landing page keeps its own .m-* rules.
 */
 
 :root {
-  /* Typography */
-  --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  /* Set on .marketing / MarketingRoot via next/font */
-  --font-marketing-fallback: "Lucida Grande", "Lucida Sans Unicode", var(--font-sans);
+  /* Typography — PT Sans via next/font on <html> (--font-marketing). */
+  --font-marketing-fallback: "Lucida Grande", "Lucida Sans Unicode", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font-sans: var(--font-marketing), var(--font-marketing-fallback);
 
-  /* Shape & motion */
+  /* Landing-page metal, shared with the app. --m-* aliases these. */
+  --lp-accent: #0b5cab;
+  --lp-bg: #dfe4ea;
+  --lp-fg: #1a1a1a;
+  --lp-muted: #3f4650;
+  --lp-line: #aeb6bf;
+  /* Darker than --lp-line so input/quiet edges clear 3:1 on white. */
+  --lp-line-strong: #7d8794;
+  --lp-header: #f5f5f5;
+  --lp-bar: #dcdcdc;
+
+  /* Shape & motion — don't retune elevated/pressed; marketing aliases them. */
   --lp-radius-sm: 0.375rem;
   --lp-radius-md: 0.5rem;
   --lp-radius-lg: 0.625rem;
@@ -25,39 +35,65 @@
     0 4px 14px rgba(11, 21, 38, 0.05),
     var(--lp-gloss-inset);
   --lp-gloss-pressed: inset 0 1px 2px rgba(11, 21, 38, 0.12);
+  --lp-gloss-panel:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 1px 2px rgba(40, 60, 90, 0.06),
+    0 8px 18px rgba(40, 70, 110, 0.08);
+  --lp-gloss-bar:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 1px 0 rgba(255, 255, 255, 0.35);
+  --lp-panel-fill: linear-gradient(to bottom, #ffffff 0%, #f7f9fb 100%);
+  /* Same blue gloss as the landing header / aqua button.
+     :root bakes the default accent. .lp-app repeats these so a tenant --primary wins. */
+  --lp-chrome-edge: hsl(from var(--primary) h s 28%);
+  --lp-chrome: linear-gradient(
+    to bottom,
+    hsl(from var(--primary) h s 68%) 0%,
+    hsl(from var(--primary) h s 53%) 48%,
+    hsl(from var(--primary) h s 43%) 52%,
+    hsl(from var(--primary) h s 36%) 100%
+  );
+  --lp-btn-fill: linear-gradient(
+    to bottom,
+    hsl(from var(--primary) h s 73%) 0%,
+    hsl(from var(--primary) h s 53%) 46%,
+    hsl(from var(--primary) h s 40%) 54%,
+    hsl(from var(--primary) h s 32%) 100%
+  );
+  --lp-bar-fill: var(--lp-chrome);
+  /* Same wallpaper as .marketing — not a darkened mix of the brand. */
+  --lp-canvas:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(90, 160, 230, 0.22), transparent 55%),
+    linear-gradient(180deg, #e8edf3 0%, #d5dde6 100%);
 
   /* Canvas */
-  --background: #f3f5f8;
-  --background-subtle: linear-gradient(
-    180deg,
-    #eef1f6 0%,
-    var(--background) 42%,
-    #e8ecf2 100%
-  );
-  --foreground: #0b1526;
+  --background: var(--lp-bg);
+  --background-subtle: var(--lp-canvas);
+  --foreground: var(--lp-fg);
   --surface: #ffffff;
-  --surface-hover: #eef1f6;
+  --surface-hover: #e8eef5;
 
-  /* Text — muted still readable (not gray-on-gray) */
-  --muted: #3d4a5c;
-  --subtle: #5c6b7e;
-  --faint: #8b97a8;
+  /* Text — sized to clear 4.5:1 on the grey canvas and on white panels */
+  --muted: var(--lp-muted);
+  --subtle: #556274;
+  --faint: #5c6570;
 
   /* Structure */
-  --border: #c9d2de;
-  --border-subtle: #dde3ec;
-  --divider: #d5dde8;
+  --border: var(--lp-line-strong);
+  --border-subtle: var(--lp-line);
+  --divider: var(--lp-line);
 
   /* Brand — overridden per-tenant by OrgTheme */
-  --primary: #1e3a5f;
+  --primary: var(--lp-accent);
   --primary-foreground: #ffffff;
+  --primary-border: #084a8a;
 
-  /* Chrome (staff sidebar) */
-  --sidebar: #0b1526;
-  --sidebar-fg: #f0f4fa;
-  --sidebar-muted: #9aabbf;
-  --sidebar-hover: rgba(255, 255, 255, 0.06);
-  --sidebar-active: rgba(255, 255, 255, 0.1);
+  /* Chrome — light gloss sidebar (text, not the old ink slab) */
+  --sidebar: #e4edf5;
+  --sidebar-fg: var(--lp-fg);
+  --sidebar-muted: var(--lp-muted);
+  --sidebar-hover: rgba(255, 255, 255, 0.72);
+  --sidebar-active: transparent;
 
   --ring: var(--primary);
   --danger: #b91c1c;
@@ -95,7 +131,7 @@
 }
 
 body {
-  background: var(--background);
+  background: var(--lp-canvas);
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -103,53 +139,88 @@ body {
 
 /* —— Product utilities —— */
 
-.lp-app {
+.lp-app,
+.app-shell {
   color: var(--foreground);
-  background: var(--background-subtle);
+  background: var(--lp-canvas);
+  /*
+    Respecify the gloss. A custom property set on :root is inherited
+    already substituted, so OrgTheme's --primary would never reach it.
+  */
+  --lp-chrome-edge: hsl(from var(--primary) h s 28%);
+  --lp-chrome: linear-gradient(
+    to bottom,
+    hsl(from var(--primary) h s 68%) 0%,
+    hsl(from var(--primary) h s 53%) 48%,
+    hsl(from var(--primary) h s 43%) 52%,
+    hsl(from var(--primary) h s 36%) 100%
+  );
+  --lp-btn-fill: linear-gradient(
+    to bottom,
+    hsl(from var(--primary) h s 73%) 0%,
+    hsl(from var(--primary) h s 53%) 46%,
+    hsl(from var(--primary) h s 40%) 54%,
+    hsl(from var(--primary) h s 32%) 100%
+  );
+  --lp-bar-fill: var(--lp-chrome);
 }
 
 .lp-surface {
-  background: var(--surface);
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--lp-radius-md);
-  box-shadow: var(--lp-gloss-elevated);
+  background: var(--lp-panel-fill);
+  border: 1px solid var(--lp-line);
+  border-radius: var(--lp-radius-lg);
+  box-shadow: var(--lp-gloss-panel);
 }
 
 /* Legacy bordered white boxes inside product → same gloss as .lp-surface */
-.lp-app main
-  :where(.rounded-md, .rounded-lg, .rounded):where(
+.lp-app
+  :where(.rounded-md, .rounded-lg, .rounded-xl, .rounded):where(
     .border,
     .border-neutral-200,
     .border-neutral-300
-  ):where(.bg-white, .bg-surface) {
-  border-color: var(--border-subtle);
-  box-shadow: var(--lp-gloss-elevated);
+  ):where(.bg-white, .bg-surface):not(button):not(a):not(input):not(select):not(textarea) {
+  background: var(--lp-panel-fill);
+  border-color: var(--lp-line);
+  box-shadow: var(--lp-gloss-panel);
 }
 
 .lp-tabs {
-  display: flex;
-  gap: 1rem;
-  border-bottom: 1px solid var(--border);
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  width: max-content;
+  max-width: 100%;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid var(--lp-line-strong);
+  background: linear-gradient(to bottom, #d5dee8 0%, #eef3f8 100%);
+  box-shadow:
+    inset 0 1px 2px rgba(40, 60, 90, 0.14),
+    0 1px 0 rgba(255, 255, 255, 0.85);
   font-size: 0.75rem;
 }
 .lp-tab {
-  border-bottom: 2px solid transparent;
-  padding-block: 0.625rem;
-  color: var(--subtle);
-  font-weight: 500;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  color: var(--muted);
+  font-weight: 700;
+  background: transparent;
+  text-decoration: none;
 }
 .lp-tab-active {
-  border-bottom-color: var(--primary);
-  color: var(--foreground);
-  font-weight: 600;
+  color: var(--primary-foreground);
+  border-color: var(--lp-chrome-edge);
+  background: var(--lp-btn-fill);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 .lp-list {
   overflow: hidden;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--lp-radius-md);
-  background: var(--surface);
-  box-shadow: var(--lp-gloss-elevated);
+  border: 1px solid var(--lp-line);
+  border-radius: var(--lp-radius-lg);
+  background: var(--lp-panel-fill);
+  box-shadow: var(--lp-gloss-panel);
 }
 .lp-list > li,
 .lp-list > div {
@@ -160,25 +231,60 @@ body {
   border-bottom: none;
 }
 
-.app-topbar {
-  background: color-mix(in srgb, var(--surface) 88%, transparent);
-  backdrop-filter: blur(10px);
+.app-topbar,
+.app-bar {
+  background: var(--lp-chrome);
+  color: var(--primary-foreground);
+  border-color: var(--lp-chrome-edge);
   box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.65) inset,
-    0 1px 3px rgba(11, 21, 38, 0.04);
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 1px 3px rgba(0, 0, 0, 0.18);
+  --foreground: var(--primary-foreground);
+  --muted: color-mix(in srgb, var(--primary-foreground) 80%, transparent);
+  --subtle: color-mix(in srgb, var(--primary-foreground) 72%, transparent);
+  --sidebar-fg: var(--primary-foreground);
+  --sidebar-muted: color-mix(in srgb, var(--primary-foreground) 78%, transparent);
+  --lp-line: color-mix(in srgb, var(--primary-foreground) 35%, transparent);
+  --border-subtle: color-mix(in srgb, var(--primary-foreground) 28%, transparent);
+}
+.app-topbar .app-nav-active,
+.app-bar .app-nav-active {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--primary-foreground) 40%, transparent),
+    color-mix(in srgb, var(--primary-foreground) 14%, transparent)
+  );
+  color: var(--primary-foreground);
+  border-color: color-mix(in srgb, var(--primary-foreground) 55%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--primary-foreground) 60%, transparent);
 }
 
 .app-sidebar {
+  background: linear-gradient(180deg, #f7f9fb 0%, #e3ebf3 46%, #d4dee8 100%);
+  color: var(--foreground);
+  border-right: 1px solid var(--lp-line);
   box-shadow:
-    inset -1px 0 0 rgba(255, 255, 255, 0.04),
-    4px 0 18px rgba(0, 0, 0, 0.12);
+    inset -1px 0 0 rgba(255, 255, 255, 0.75),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    4px 0 16px rgba(40, 60, 90, 0.06);
+}
+
+.app-nav-active {
+  background: var(--lp-btn-fill);
+  color: var(--primary-foreground);
+  border: 1px solid var(--lp-chrome-edge);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.18);
+  border-radius: 999px;
+  font-weight: 700;
 }
 
 .lp-page-title {
   font-size: 1.625rem;
-  font-weight: 650;
-  letter-spacing: -0.025em;
-  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
   color: var(--foreground);
 }
 
@@ -192,7 +298,7 @@ body {
 .lp-section-title,
 .app-section-label {
   font-size: 0.8125rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.01em;
   color: var(--foreground);
 }
@@ -204,14 +310,18 @@ body {
 }
 
 .app-empty {
-  padding-block: 1rem;
+  padding: 0.9rem 1rem;
   font-size: 0.875rem;
   color: var(--muted);
+  border: 1px solid var(--lp-line);
+  border-radius: var(--lp-radius-lg);
+  background: var(--lp-panel-fill);
+  box-shadow: var(--lp-gloss-panel);
 }
 
 .app-link {
-  color: var(--foreground);
-  font-weight: 550;
+  color: var(--primary);
+  font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -219,105 +329,180 @@ body {
 .app-label {
   display: block;
   font-size: 0.8125rem;
-  font-weight: 550;
+  font-weight: 700;
   color: var(--foreground);
-}
-
-/* Legacy alias — same gloss primary as .lp-btn */
-.app-btn,
-.app-btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--lp-radius-sm);
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: 1px solid color-mix(in srgb, var(--primary) 72%, #000);
-  background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--primary) 88%, #fff) 0%,
-    var(--primary) 48%,
-    color-mix(in srgb, var(--primary) 92%, #000) 100%
-  );
-  color: var(--primary-foreground);
-  box-shadow: var(--lp-gloss-elevated);
-  transition:
-    filter 0.15s var(--lp-ease-out),
-    box-shadow 0.15s var(--lp-ease-out),
-    transform 0.12s var(--lp-ease-out);
-}
-.app-btn:hover,
-.app-btn-primary:hover {
-  filter: brightness(1.06);
-}
-.app-btn:active,
-.app-btn-primary:active {
-  box-shadow: var(--lp-gloss-pressed);
-  transform: translateY(1px);
 }
 
 .lp-link-quiet {
   font-size: 0.75rem;
-  color: var(--subtle);
+  color: var(--muted);
   text-decoration: none;
 }
 .lp-link-quiet:hover {
-  color: var(--foreground);
+  color: var(--primary);
 }
 
-.lp-btn {
+.lp-btn,
+.lp-btn-quiet,
+.lp-btn-ghost,
+.lp-btn-ink,
+.lp-btn-danger,
+.app-btn,
+.app-btn-primary,
+.m-btn-primary,
+.m-btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: var(--lp-radius-sm);
+  gap: 0.35rem;
+  border-radius: 999px;
   padding: 0.375rem 0.75rem;
   font-size: 0.875rem;
-  font-weight: 600;
-  border: 1px solid color-mix(in srgb, var(--primary) 72%, #000);
-  background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--primary) 88%, #fff) 0%,
-    var(--primary) 48%,
-    color-mix(in srgb, var(--primary) 92%, #000) 100%
-  );
-  color: var(--primary-foreground);
-  box-shadow: var(--lp-gloss-elevated);
+  font-weight: 700;
+  line-height: 1.2;
+  text-decoration: none;
+  cursor: pointer;
   transition:
     filter 0.15s var(--lp-ease-out),
     box-shadow 0.15s var(--lp-ease-out),
     transform 0.12s var(--lp-ease-out);
 }
-.lp-btn:hover {
+.lp-btn:hover,
+.lp-btn-quiet:hover,
+.lp-btn-ink:hover,
+.lp-btn-danger:hover,
+.app-btn:hover,
+.app-btn-primary:hover,
+.m-btn-primary:hover,
+.m-btn-ghost:hover {
   filter: brightness(1.06);
 }
-.lp-btn:active {
+.lp-btn:active,
+.lp-btn-quiet:active,
+.lp-btn-ink:active,
+.lp-btn-danger:active,
+.app-btn:active,
+.app-btn-primary:active,
+.m-btn-primary:active,
+.m-btn-ghost:active {
   box-shadow: var(--lp-gloss-pressed);
   transform: translateY(1px);
 }
+.lp-btn:disabled,
+.lp-btn-quiet:disabled,
+.lp-btn-ink:disabled,
+.lp-btn-danger:disabled,
+.app-btn:disabled,
+.app-btn-primary:disabled {
+  opacity: 0.45;
+  filter: none;
+  transform: none;
+  cursor: not-allowed;
+}
+.lp-btn-sm {
+  padding: 0.25rem 0.55rem;
+  font-size: 0.75rem;
+}
+.lp-btn-icon {
+  padding: 0.1rem 0.4rem;
+  min-width: 1.6rem;
+  line-height: 1;
+}
+
+.lp-btn,
+.app-btn,
+.app-btn-primary,
+.m-btn-primary {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--lp-chrome-edge);
+  background: var(--lp-btn-fill);
+  color: var(--primary-foreground);
+  text-decoration: none;
+  text-shadow: 0 -1px 0 color-mix(in srgb, var(--primary) 45%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+}
+.lp-btn::after,
+.app-btn::after,
+.app-btn-primary::after,
+.m-btn-primary::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 2px;
+  height: 45%;
+  border-radius: 999px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.65) 0%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  pointer-events: none;
+}
+
+.lp-btn-quiet,
+.m-btn-ghost {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--lp-line-strong);
+  background: linear-gradient(to bottom, #ffffff 0%, #f3f6f9 100%);
+  color: var(--foreground);
+  text-decoration: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 1px 1px rgba(40, 60, 90, 0.06);
+}
+
+.lp-btn-ghost {
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  box-shadow: none;
+}
+.lp-btn-ghost:hover {
+  filter: none;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--foreground);
+}
 
 .lp-btn-ink {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.375rem;
-  padding: 0.375rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  background: var(--foreground);
+  border: 1px solid #000;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--foreground) 72%, white) 0%,
+    var(--foreground) 50%,
+    #000 100%
+  );
   color: #fff;
-  transition: background 0.15s ease;
+  box-shadow: var(--lp-gloss-elevated);
 }
-.lp-btn-ink:hover {
-  background: #1a2740;
+
+.lp-btn-danger {
+  border: 1px solid color-mix(in srgb, var(--danger) 72%, black);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--danger) 70%, white) 0%,
+    var(--danger) 48%,
+    color-mix(in srgb, var(--danger) 85%, black) 100%
+  );
+  color: #fff;
+  box-shadow: var(--lp-gloss-elevated);
 }
 
 .lp-input,
 .app-input {
   width: 100%;
-  border: 1px solid var(--border);
-  border-radius: 0.375rem;
-  background: var(--surface);
+}
+.lp-input,
+.app-input,
+.lp-app :where(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="submit"]):not([type="button"]):not(.border-transparent) {
+  border: 1px solid var(--lp-line-strong);
+  border-radius: var(--lp-radius-sm);
+  background: linear-gradient(to bottom, #ffffff 0%, #f7f9fb 100%);
+  box-shadow: inset 0 1px 2px rgba(40, 60, 90, 0.12);
   padding: 0.5rem 0.75rem;
   font-size: 0.875rem;
   color: var(--foreground);
@@ -325,21 +510,44 @@ body {
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .lp-input:focus,
-.app-input:focus {
+.app-input:focus,
+.lp-app :where(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus {
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+  box-shadow:
+    inset 0 1px 2px rgba(40, 60, 90, 0.08),
+    0 0 0 3px color-mix(in srgb, var(--primary) 28%, transparent);
 }
 .lp-input::placeholder,
-.app-input::placeholder {
+.app-input::placeholder,
+.lp-app :where(input, textarea)::placeholder {
   color: var(--faint);
 }
 
-/* Dense data tables — open, no card chrome */
+.lp-app input[type="checkbox"],
+.lp-app input[type="radio"] {
+  accent-color: var(--primary);
+}
+
+.lp-app input[type="file"]::file-selector-button {
+  margin-right: 0.75rem;
+  border: 1px solid var(--lp-chrome-edge);
+  border-radius: var(--lp-radius-sm);
+  background: var(--lp-btn-fill);
+  color: var(--primary-foreground);
+  font-weight: 700;
+  padding: 0.4rem 0.75rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+/* Dense tables — glossy header bar, padding kept tight */
 .lp-table-wrap,
 .app-table-wrap {
   overflow-x: auto;
   margin-inline: -1rem;
-  border-top: 1px solid var(--border);
+  border: 1px solid var(--lp-line);
+  border-radius: var(--lp-radius-lg);
+  background: #fff;
+  box-shadow: var(--lp-gloss-panel);
 }
 @media (min-width: 640px) {
   .lp-table-wrap,
@@ -358,32 +566,36 @@ body {
 
 .lp-table thead tr,
 .app-table thead tr {
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--lp-line);
 }
 
 .lp-table th,
 .app-table th {
-  padding: 0.625rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   font-size: 0.6875rem;
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--subtle);
-  background: transparent;
+  color: var(--primary-foreground);
+  background: var(--lp-chrome);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
   white-space: nowrap;
 }
 
 .lp-table td,
 .app-table td {
-  padding: 0.625rem 0.75rem;
+  padding: 0.5rem 0.75rem;
   vertical-align: middle;
   color: var(--muted);
 }
 
 .lp-table tbody tr,
 .app-table tbody tr {
-  border-bottom: 1px solid var(--border-subtle);
-  transition: background 0.1s ease;
+  border-bottom: 1px solid var(--lp-line);
+}
+.lp-table tbody tr:nth-child(even),
+.app-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--lp-bar) 35%, white);
 }
 .lp-table tbody tr:last-child,
 .app-table tbody tr:last-child {
@@ -391,91 +603,245 @@ body {
 }
 .lp-table tbody tr:hover,
 .app-table tbody tr:hover {
-  background: color-mix(in srgb, var(--primary) 4%, var(--surface-hover));
+  background: color-mix(in srgb, var(--primary) 7%, white);
 }
 
 .lp-table .lp-cell-strong {
-  font-weight: 550;
+  font-weight: 700;
   color: var(--foreground);
 }
 
-/* Status — intent, not pastel soup; slightly rounded, not pill clusters */
+/* Status capsules — same hues, gloss inset, still one line tall */
 .lp-status {
   display: inline-block;
-  border-radius: 0.25rem;
-  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  padding: 0.08rem 0.45rem;
   font-size: 0.6875rem;
-  font-weight: 650;
+  font-weight: 700;
   letter-spacing: 0.02em;
   text-transform: capitalize;
   line-height: 1.25;
+  border: 1px solid transparent;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
-.lp-status-draft {
-  background: var(--warning-soft);
-  color: var(--warning);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--warning) 25%, transparent);
+.lp-status-draft,
+.lp-status-pending {
+  color: #6a5200;
+  border-color: #c9a84a;
+  background: linear-gradient(to bottom, #fff6c8 0%, #f0d56a 100%);
 }
 .lp-status-upcoming {
-  background: var(--info-soft);
   color: var(--info);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--info) 22%, transparent);
+  border-color: color-mix(in srgb, var(--info) 45%, white);
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    color-mix(in srgb, var(--info) 18%, white) 100%
+  );
 }
-.lp-status-ready {
-  background: var(--success-soft);
+.lp-status-ready,
+.lp-status-approved {
   color: var(--success);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--success) 22%, transparent);
+  border-color: color-mix(in srgb, var(--success) 40%, white);
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    color-mix(in srgb, var(--success) 16%, white) 100%
+  );
 }
 .lp-status-completed {
-  background: #e8ecf2;
   color: #334155;
-  box-shadow: inset 0 0 0 1px #c9d2de;
+  border-color: var(--lp-line-strong);
+  background: linear-gradient(to bottom, #f7f7f7 0%, #e4e4e4 100%);
 }
 .lp-status-denied {
-  background: var(--danger-soft);
   color: var(--danger);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 22%, transparent);
-}
-.lp-status-pending {
-  background: var(--warning-soft);
-  color: var(--warning);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--warning) 25%, transparent);
-}
-.lp-status-approved {
-  background: var(--success-soft);
-  color: var(--success);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--success) 22%, transparent);
+  border-color: color-mix(in srgb, var(--danger) 40%, white);
+  background: linear-gradient(
+    to bottom,
+    #ffffff 0%,
+    color-mix(in srgb, var(--danger) 14%, white) 100%
+  );
 }
 
-/* Open nav list (settings, portal home) — interaction without card chrome */
 .lp-nav-list {
-  border-top: 1px solid var(--border);
+  overflow: hidden;
+  border: 1px solid var(--lp-line);
+  border-radius: var(--lp-radius-lg);
+  background: var(--lp-panel-fill);
+  box-shadow: var(--lp-gloss-panel);
 }
 .lp-nav-list a,
 .lp-nav-list > a {
   display: block;
-  padding: 0.875rem 0;
-  border-bottom: 1px solid var(--border-subtle);
-  transition: color 0.12s ease;
+  padding: 0.8rem 0.9rem;
+  border-bottom: 1px solid var(--lp-line);
+  transition: color 0.12s ease, background 0.12s ease;
+}
+.lp-nav-list a:last-child,
+.lp-nav-list > a:last-child {
+  border-bottom: none;
 }
 .lp-nav-list a:hover {
   color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 6%, white);
 }
 
 .lp-hairline {
-  border-color: var(--border);
+  border-color: var(--lp-line);
+}
+
+.lp-identity {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 100%;
+  border-radius: 999px;
+  border: 1px solid var(--lp-line-strong);
+  background: linear-gradient(to bottom, #ffffff 0%, #eef2f6 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 1px 1px rgba(40, 60, 90, 0.06);
+  padding: 0.15rem 0.55rem 0.15rem 0.15rem;
+  /* Reset chrome tokens so the chip stays dark-on-light on a blue bar. */
+  --foreground: var(--lp-fg);
+  --muted: var(--lp-muted);
+  --subtle: #556274;
+  color: var(--lp-fg);
+}
+.lp-avatar {
+  display: grid;
+  place-items: center;
+  width: 1.65rem;
+  height: 1.65rem;
+  flex: none;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--primary-foreground);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--primary) 65%, white) 0%,
+    var(--primary) 55%,
+    color-mix(in srgb, var(--primary) 80%, black) 100%
+  );
+  border: 1px solid var(--primary-border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+.lp-popover {
+  border: 1px solid var(--lp-line-strong);
+  border-radius: var(--lp-radius-lg);
+  background: var(--lp-panel-fill);
+  box-shadow: var(--lp-gloss-panel);
+  --foreground: var(--lp-fg);
+  --muted: var(--lp-muted);
+  color: var(--lp-fg);
+}
+.lp-menu-item {
+  display: block;
+  width: 100%;
+  padding: 0.45rem 0.7rem;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--foreground);
+  background: transparent;
+}
+.lp-menu-item:hover {
+  background: color-mix(in srgb, var(--primary) 8%, white);
+}
+.lp-menu-item-danger {
+  color: var(--danger);
+}
+.lp-menu-item-danger:hover {
+  background: var(--danger-soft);
+}
+
+.lp-bar {
+  background: var(--lp-chrome);
+  color: var(--primary-foreground);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.lp-enter {
+  animation: lp-enter 0.32s var(--lp-ease-out);
+}
+@keyframes lp-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.lp-app :focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Leftover ink / outline controls that predate the shared classes. */
+.lp-app :is(a, button).bg-neutral-900 {
+  border: 1px solid var(--lp-chrome-edge);
+  border-radius: var(--lp-radius-sm);
+  background: var(--lp-btn-fill);
+  color: var(--primary-foreground);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.2);
+  font-weight: 700;
+}
+.lp-app :is(a, button).bg-neutral-900:hover {
+  filter: brightness(1.06);
+}
+.lp-app :is(a, button).bg-neutral-900:active {
+  box-shadow: var(--lp-gloss-pressed);
+  transform: translateY(1px);
+}
+.lp-app :is(a, button).border-neutral-300 {
+  border-color: var(--lp-line-strong);
+  border-radius: var(--lp-radius-sm);
+  background: linear-gradient(to bottom, #ffffff 0%, #f3f6f9 100%);
+  color: var(--foreground);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    0 1px 1px rgba(40, 60, 90, 0.06);
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-enter,
+  .lp-app main {
+    animation: none;
+  }
+  .lp-btn,
+  .lp-btn-quiet,
+  .lp-btn-ghost,
+  .lp-btn-ink,
+  .lp-btn-danger,
+  .app-btn,
+  .app-btn-primary,
+  .app-nav-active,
+  .lp-tab,
+  .lp-input,
+  .app-input {
+    transition: none;
+  }
 }
 
 /* —— Marketing (apex logiparty.com) — 2010s enterprise + early-iPhone gloss —— */
 .marketing {
-  --m-bg: #dfe4ea;
-  --m-fg: #1a1a1a;
-  --m-muted: #3f4650;
-  --m-accent: #0b5cab;
+  --m-bg: var(--lp-bg);
+  --m-fg: var(--lp-fg);
+  --m-muted: var(--lp-muted);
+  --m-accent: var(--lp-accent);
   --m-accent-ink: #ffffff;
-  --m-line: #aeb6bf;
+  --m-line: var(--lp-line);
   --m-panel: var(--surface);
-  --m-header: #f5f5f5;
-  --m-bar: #dcdcdc;
+  --m-header: var(--lp-header);
+  --m-bar: var(--lp-bar);
   --m-radius: var(--lp-radius-lg);
   --m-gloss: var(--lp-gloss-elevated);
   position: relative;
@@ -620,8 +986,8 @@ body {
 
 /* Header only — white text + glossy pill CTA on blue chrome */
 .m-header .m-nav-link {
-  color: rgba(255, 255, 255, 0.92);
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.35);
 }
 
 .m-header .m-nav-link:hover {
@@ -838,8 +1204,6 @@ body {
 }
 
 /* Glossy aqua buttons — early iPhone / Aqua */
-.m-btn-primary,
-.m-btn-ghost,
 .m-seg-wrap,
 .m-seg,
 .m-seg-item,
@@ -859,93 +1223,7 @@ body {
   font-weight: 700;
 }
 
-.m-btn-primary {
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
-  border-radius: 999px;
-  border: 1px solid #0a4a8c;
-  background: linear-gradient(
-    to bottom,
-    #7ec2f7 0%,
-    #2f8fe0 46%,
-    #0b6cc0 54%,
-    #08549a 100%
-  );
-  color: var(--m-accent-ink);
-  text-decoration: none;
-  cursor: pointer;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.35);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    0 1px 2px rgba(0, 0, 0, 0.2);
-  transition: filter 0.15s ease, box-shadow 0.15s ease;
-}
-
-.m-btn-primary::after {
-  content: "";
-  position: absolute;
-  left: 8%;
-  right: 8%;
-  top: 2px;
-  height: 45%;
-  border-radius: 999px;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.65) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  pointer-events: none;
-}
-
-.m-btn-primary:hover {
-  filter: brightness(1.06);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    0 2px 6px rgba(11, 92, 171, 0.35);
-}
-
-.m-btn-primary:active {
-  filter: brightness(0.96);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.m-btn-ghost {
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
-  border-radius: 999px;
-  border: 1px solid #9aa3ad;
-  background: linear-gradient(to bottom, #ffffff 0%, #e4e8ec 100%);
-  color: var(--m-fg);
-  text-decoration: none;
-  cursor: pointer;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 1px 2px rgba(0, 0, 0, 0.1);
-  transition: filter 0.15s ease;
-}
-
-.m-btn-ghost::after {
-  content: "";
-  position: absolute;
-  left: 10%;
-  right: 10%;
-  top: 2px;
-  height: 42%;
-  border-radius: 999px;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.85) 0%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
-  pointer-events: none;
-}
-
-.m-btn-ghost:hover {
-  filter: brightness(1.03);
-  border-color: #7a8490;
-}
+/* .m-btn-primary / .m-btn-ghost share .lp-btn / .lp-btn-quiet above. */
 
 .m-input {
   border-radius: 6px;
@@ -1199,6 +1477,14 @@ body {
   background: linear-gradient(to bottom, #f7f9fb 0%, #e8edf3 100%);
 }
 
+/* App/portal title band — same metal as .m-window-toolbar, not the site header. */
+.lp-window-head {
+  border-bottom: 1px solid var(--m-line);
+  background: linear-gradient(to bottom, #f7f9fb 0%, #e8edf3 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: var(--lp-fg);
+}
+
 .m-window-caption {
   margin: 0;
   font-size: 0.75rem;
@@ -1214,16 +1500,11 @@ body {
   border-radius: 4px;
 }
 
-/* —— Segmented control —— */
+/* —— Segmented control ——
+   One track border. The selected cell is a flush gloss fill, not a second ring. */
 .m-seg-wrap {
   width: 100%;
   max-width: 32rem;
-  padding: 3px;
-  border-radius: 999px;
-  background: linear-gradient(to bottom, #c5d4e4 0%, #eef3f8 100%);
-  box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.12),
-    0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .m-seg {
@@ -1233,28 +1514,24 @@ body {
   border-radius: 999px;
   border: 1px solid #1a6bb0;
   overflow: hidden;
-  background: linear-gradient(to bottom, #e8eef5 0%, #c8d8ea 100%);
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  background: linear-gradient(to bottom, #f7fbff 0%, #d7e6f4 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .m-seg-thumb {
   position: absolute;
-  top: 2px;
-  bottom: 2px;
-  border-radius: 999px;
-  border: 1px solid #084a8a;
+  top: 0;
+  bottom: 0;
+  border: none;
+  border-radius: 0;
   background: linear-gradient(
     to bottom,
-    #9fd4ff 0%,
+    #8ec8f8 0%,
     #2f8fe0 46%,
     #0b6cc0 54%,
-    #063d72 100%
+    #08549a 100%
   );
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
   pointer-events: none;
   z-index: 0;
 }
@@ -1262,20 +1539,36 @@ body {
 .m-seg-item {
   position: relative;
   z-index: 1;
+  display: flex;
   flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
   border: none;
   border-right: 1px solid rgba(26, 107, 176, 0.25);
   background: transparent;
   color: #0b5cab;
   font-size: 0.72rem;
+  font-weight: 700;
   letter-spacing: 0.02em;
   padding: 0.5rem 0.5rem;
   cursor: pointer;
+  text-align: center;
+  text-decoration: none;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.m-seg-wrap-wide {
+  max-width: none;
 }
 
 .m-seg-item:last-child {
   border-right: none;
+}
+
+.m-seg-item-active,
+.m-seg-item:has(+ .m-seg-item-active) {
+  border-right-color: transparent;
 }
 
 .m-seg-item-active {
@@ -1289,12 +1582,12 @@ body {
   .m-seg-item-active {
     background: linear-gradient(
       to bottom,
-      #7ec2f7 0%,
+      #8ec8f8 0%,
       #2f8fe0 46%,
       #0b6cc0 54%,
       #08549a 100%
     );
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
   }
 }
 
@@ -2092,7 +2385,7 @@ body {
 }
 
 .m-mock-bar-brand {
-  border-top: 3px solid #1e3a5f;
+  border-top: 3px solid var(--m-accent);
 }
 
 .m-mock-muted {
@@ -2199,10 +2492,12 @@ body {
   }
 }
 
-/* /demo — in-app spotlight (hole punched via giant box-shadow) */
+/* /demo — spotlight. Dim and ring use the landing header blue, not lime. */
 .demo-spotlight {
-  box-shadow: 0 0 0 9999px rgba(11, 21, 38, 0.55);
-  outline: 2px solid #c5e85a;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 0 0 9999px rgba(15, 74, 130, 0.48);
+  outline: 2px solid #1a6bb0;
   outline-offset: 0;
   background: transparent;
   z-index: 30;
@@ -2249,6 +2544,11 @@ body {
   filter: drop-shadow(1px 0 0 #c9d2de);
 }
 
+/* Above the tour spotlight (z-index 30). Tailwind z-50 loses to unlayered .m-header. */
+.demo-app .m-header {
+  z-index: 60;
+}
+
 .demo-app {
   --m-font: var(--font-marketing), var(--font-marketing-fallback);
   font-family: var(--m-font);
@@ -2267,26 +2567,74 @@ body {
   }
 }
 
-/* legacy pulse highlight unused by spotlight tour */
-.demo-hl {
-  outline: 2px solid rgba(197, 232, 90, 0.85);
-  outline-offset: 3px;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .demo-hl {
-    animation: none;
-  }
-}
-
 @media print {
   .no-print {
     display: none !important;
   }
 
-  body {
-    background: white;
+  body,
+  .lp-app,
+  .app-shell {
+    background: white !important;
+    background-image: none !important;
     color: black;
+  }
+
+  .lp-surface,
+  .lp-btn,
+  .lp-btn-quiet,
+  .lp-btn-ghost,
+  .lp-btn-ink,
+  .lp-btn-danger,
+  .app-btn,
+  .app-btn-primary,
+  .lp-status,
+  .app-nav-active,
+  .app-sidebar,
+  .app-topbar,
+  .app-bar,
+  .lp-table th,
+  .app-table th,
+  .lp-table-wrap,
+  .app-table-wrap,
+  .app-empty,
+  .lp-popover,
+  .lp-identity,
+  .lp-avatar,
+  .lp-tabs,
+  .lp-tab,
+  .lp-tab-active,
+  .lp-window-head,
+  .m-seg,
+  .m-seg-thumb,
+  .m-seg-item-active,
+  .lp-enter {
+    background: white !important;
+    background-image: none !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    animation: none !important;
+  }
+
+  .lp-btn,
+  .lp-btn-ink,
+  .lp-btn-danger,
+  .app-btn,
+  .app-nav-active,
+  .lp-tab-active,
+  .lp-avatar,
+  .lp-table th,
+  .app-table th,
+  .lp-bar,
+  .app-topbar,
+  .app-bar,
+  .app-sidebar,
+  .lp-window-head,
+  .m-seg-item,
+  .m-seg-item-active {
+    color: black !important;
+    border-color: #666 !important;
   }
 
   main {

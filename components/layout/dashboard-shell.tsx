@@ -6,6 +6,7 @@ import { Suspense, useEffect, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { OrgTheme } from "@/components/layout/org-theme";
 import { cn } from "@/lib/utils";
+import { navPillClass } from "@/components/ui/nav-pill";
 import { FALLBACK_PRIMARY_COLOR } from "@/lib/theme/primary-color";
 
 export type DashboardNavChild = {
@@ -123,23 +124,7 @@ function Brand({
 }
 
 function linkClass(active: boolean, nested = false) {
-  return cn(
-    "relative rounded-md text-sm transition-colors",
-    nested ? "px-3 py-1.5" : "px-3 py-2",
-    active
-      ? "bg-[var(--sidebar-active)] font-medium text-[var(--sidebar-fg)]"
-      : "text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-fg)]"
-  );
-}
-
-function ActiveBar({ show }: { show: boolean }) {
-  if (!show) return null;
-  return (
-    <span
-      className="absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-[var(--primary)]"
-      aria-hidden
-    />
-  );
+  return navPillClass(active, nested);
 }
 
 function NavGroup({
@@ -171,8 +156,8 @@ function NavGroup({
         href={item.href}
         onClick={onNavigate}
         className={linkClass(active)}
+        aria-current={active ? "page" : undefined}
       >
-        <ActiveBar show={active} />
         {item.label}
       </Link>
     );
@@ -189,7 +174,6 @@ function NavGroup({
           "flex w-full items-center justify-between gap-2 text-left"
         )}
       >
-        <ActiveBar show={sectionActive && !anyChildActive} />
         <span>{item.label}</span>
         <ChevronDown
           className={cn(
@@ -202,7 +186,7 @@ function NavGroup({
       </button>
       {open ? (
         <div
-          className="ml-2 flex flex-col gap-0.5 border-l border-white/10 pl-1.5"
+          className="ml-2 flex flex-col gap-0.5 border-l border-[var(--lp-line)] pl-1.5"
           role="group"
           aria-label={item.label}
         >
@@ -221,7 +205,6 @@ function NavGroup({
                 className={linkClass(active, true)}
                 aria-current={active ? "page" : undefined}
               >
-                <ActiveBar show={active} />
                 {child.label}
               </Link>
             );
@@ -315,10 +298,9 @@ export function DashboardShell({
 
   return (
     <OrgTheme primaryColor={primaryColor}>
-      {/* Desktop sidebar — ink chrome, brand accent */}
+      {/* Desktop sidebar — gloss metal, brand pill for the active item */}
       <aside className="app-sidebar no-print fixed inset-y-0 left-0 z-30 hidden w-56 flex-col bg-[var(--sidebar)] lg:flex">
-        <div className="h-[3px] shrink-0 bg-[var(--primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]" aria-hidden />
-        <div className="border-b border-white/10 px-4 py-5">
+        <div className="border-b border-[var(--lp-line)] px-4 py-5">
           <Brand orgName={orgName} logoUrl={logoUrl} onInk />
         </div>
         <div className="flex-1 overflow-y-auto py-3">
@@ -336,13 +318,12 @@ export function DashboardShell({
             onClick={() => setDrawerOpen(false)}
           />
           <aside
-            className="absolute inset-y-0 left-0 flex w-[min(18rem,85vw)] flex-col bg-[var(--sidebar)]"
+            className="app-sidebar absolute inset-y-0 left-0 flex w-[min(18rem,85vw)] flex-col"
             role="dialog"
             aria-modal="true"
             aria-label="Navigation"
           >
-            <div className="h-[3px] shrink-0 bg-[var(--primary)]" aria-hidden />
-            <div className="flex items-start justify-between gap-2 border-b border-white/10 px-4 py-4">
+            <div className="flex items-start justify-between gap-2 border-b border-[var(--lp-line)] px-4 py-4">
               <Brand orgName={orgName} logoUrl={logoUrl} onInk />
               <button
                 type="button"

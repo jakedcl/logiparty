@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { AppWindow } from "@/components/marketing/app-window";
+import { Button } from "@/components/ui/button";
 import { ComparePane } from "@/components/marketing/compare-pane";
 import { LeadForm } from "@/components/marketing/lead-form";
 import { MockJobs } from "@/components/marketing/product-mocks";
 import { ProductTour } from "@/components/marketing/product-tour";
 import { ProcessStepper } from "@/components/marketing/process-stepper";
+import { MarketingHeader } from "@/components/marketing/marketing-header";
 import { MarketingRoot } from "@/components/marketing/marketing-root";
 
 type WorkspaceCta = {
@@ -41,31 +43,26 @@ export function MarketingHome({
         <span className="m-bubble m-bubble-c" />
       </div>
 
-      <header className="m-header flex items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <a href="#top" className="m-brand">
-          Logiparty
+      <MarketingHeader brandHref="#top" brandAnchor>
+        <a href="#product" className="m-nav-link hidden sm:inline">
+          Product
         </a>
-        <nav className="flex flex-wrap items-center justify-end gap-x-4 gap-y-1 text-sm">
-          <a href="#product" className="m-nav-link hidden sm:inline">
-            Product
+        <Link href="/demo" className="m-nav-link">
+          Demo
+        </Link>
+        <a href="#how" className="m-nav-link hidden sm:inline">
+          How it works
+        </a>
+        {workspace ? (
+          <a href={workspace.href} className="m-nav-link-strong">
+            Open {workspace.orgName}
           </a>
-          <Link href="/demo" className="m-nav-link">
-            Demo
-          </Link>
-          <a href="#how" className="m-nav-link hidden sm:inline">
-            How it works
+        ) : (
+          <a href="#request" className="m-nav-link-strong">
+            Request access
           </a>
-          {workspace ? (
-            <a href={workspace.href} className="m-nav-link-strong">
-              Open {workspace.orgName}
-            </a>
-          ) : (
-            <a href="#request" className="m-nav-link-strong">
-              Request access
-            </a>
-          )}
-        </nav>
-      </header>
+        )}
+      </MarketingHeader>
 
       <main id="top" className="relative z-10 px-4 py-6 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-5xl space-y-6">
@@ -91,34 +88,24 @@ export function MarketingHome({
                 </p>
                 <div className="mt-5 flex flex-wrap items-center gap-2">
                   {workspace ? (
-                    <a
-                      href={workspace.href}
-                      className="m-btn-primary px-4 py-2 text-sm"
-                    >
-                      Go to {workspace.isClient ? "portal" : "dashboard"}
-                    </a>
+                    <Button asChild className="px-4 py-2 text-sm">
+                      <a href={workspace.href}>
+                        Go to {workspace.isClient ? "portal" : "dashboard"}
+                      </a>
+                    </Button>
                   ) : (
-                    <Link
-                      href="/demo"
-                      className="m-btn-primary px-4 py-2 text-sm"
-                    >
-                      Try the demo
-                    </Link>
+                    <Button asChild className="px-4 py-2 text-sm">
+                      <Link href="/demo">Try the demo</Link>
+                    </Button>
                   )}
                   {workspace ? (
-                    <Link
-                      href="/demo"
-                      className="m-btn-ghost px-4 py-2 text-sm"
-                    >
-                      Product tour
-                    </Link>
+                    <Button asChild variant="outline" className="px-4 py-2 text-sm">
+                      <Link href="/demo">Product tour</Link>
+                    </Button>
                   ) : (
-                    <a
-                      href="#request"
-                      className="m-btn-ghost px-4 py-2 text-sm"
-                    >
-                      Request access
-                    </a>
+                    <Button asChild variant="outline" className="px-4 py-2 text-sm">
+                      <a href="#request">Request access</a>
+                    </Button>
                   )}
                 </div>
               </div>

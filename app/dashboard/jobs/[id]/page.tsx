@@ -8,6 +8,7 @@ import { JobLocationRow } from "@/components/jobs/job-location-row";
 import { JobPanel } from "@/components/jobs/job-panel";
 import { QuietRemove } from "@/components/jobs/quiet-remove";
 import { JobSummaryEditor } from "@/components/jobs/job-summary-editor";
+import { Button } from "@/components/ui/button";
 import { canManageJobs, canUploadDocuments } from "@/lib/auth/permissions";
 import {
   addJobInventoryLine,
@@ -45,28 +46,12 @@ import { evaluateAutoReady } from "@/lib/jobs/auto-ready";
 import { requireSession } from "@/lib/org/context";
 import { isStorageConfigured } from "@/lib/storage/r2";
 import { ConfirmSubmitButton } from "@/components/ui/confirm-submit-button";
+import { StatusBadge } from "@/components/ui/status-badge";
 
 function toLocalInputValue(d: Date | null | undefined): string {
   if (!d) return "";
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-function statusTone(status: string): string {
-  switch (status) {
-    case "draft":
-      return "bg-amber-50 text-amber-900 ring-amber-200";
-    case "upcoming":
-      return "bg-sky-50 text-sky-900 ring-sky-200";
-    case "ready":
-      return "bg-emerald-50 text-emerald-900 ring-emerald-200";
-    case "completed":
-      return "bg-neutral-100 text-neutral-600 ring-neutral-200";
-    case "denied":
-      return "bg-red-50 text-red-900 ring-red-200";
-    default:
-      return "bg-neutral-100 text-neutral-700 ring-neutral-200";
-  }
 }
 
 export default async function JobDetailPage({
@@ -139,21 +124,15 @@ export default async function JobDetailPage({
       <div>
         <Link
           href="/dashboard/jobs"
-          className="text-sm text-neutral-500 hover:text-neutral-800"
+          className="lp-link-quiet"
         >
           ← Jobs
         </Link>
         <div className="flex flex-wrap items-start justify-between gap-3 mt-2">
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2.5">
-              <h1 className="text-2xl font-semibold tracking-tight text-neutral-900">
-                {job.name}
-              </h1>
-              <span
-                className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium capitalize ring-1 ring-inset ${statusTone(job.status)}`}
-              >
-                {job.status}
-              </span>
+              <h1 className="lp-page-title">{job.name}</h1>
+              <StatusBadge status={job.status} kind="job" />
             </div>
             <p className="text-sm text-neutral-500 mt-1">
               {companyName}
@@ -166,12 +145,9 @@ export default async function JobDetailPage({
               ) : null}
             </p>
           </div>
-          <Link
-            href={`/dashboard/jobs/${job.id}/print`}
-            className="rounded-md px-3 py-2 text-sm border border-neutral-300 text-neutral-700 hover:bg-neutral-50 shrink-0"
-          >
-            Print run sheet
-          </Link>
+          <Button asChild variant="outline" className="shrink-0">
+            <Link href={`/dashboard/jobs/${job.id}/print`}>Print run sheet</Link>
+          </Button>
         </div>
       </div>
 
@@ -185,18 +161,14 @@ export default async function JobDetailPage({
           <div className="flex flex-wrap items-center gap-2">
             <form action={acceptDraftJob}>
               <input type="hidden" name="id" value={job.id} />
-              <button
-                type="submit"
-                className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white"
-              >
-                Accept request
-              </button>
+              <Button type="submit">Accept request</Button>
             </form>
             <form action={denyDraftJob}>
               <input type="hidden" name="id" value={job.id} />
               <ConfirmSubmitButton
                 message="Deny this client job request? They will see it as denied."
-                className="rounded px-3 py-1.5 text-sm font-medium border border-red-300 bg-white text-red-700 hover:bg-red-50"
+                variant="destructive"
+                size="sm"
               >
                 Deny
               </ConfirmSubmitButton>
@@ -289,12 +261,7 @@ export default async function JobDetailPage({
                   placeholder="Address"
                   className="w-full border border-neutral-200 rounded px-3 py-2 text-sm"
                 />
-                <button
-                  type="submit"
-                  className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-                >
-                  Add location
-                </button>
+                <Button type="submit">Add location</Button>
               </form>
             </CollapsibleAdd>
           ) : (
@@ -372,12 +339,7 @@ export default async function JobDetailPage({
                       className="mt-1 w-full border border-neutral-200 rounded px-3 py-2 text-sm"
                     />
                   </label>
-                  <button
-                    type="submit"
-                    className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-                  >
-                    Assign to job
-                  </button>
+                  <Button type="submit">Assign to job</Button>
                 </>
               )}
             </form>
@@ -454,12 +416,7 @@ export default async function JobDetailPage({
                       ))}
                     </select>
                   </label>
-                  <button
-                    type="submit"
-                    className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-                  >
-                    Assign vehicle
-                  </button>
+                  <Button type="submit">Assign vehicle</Button>
                 </>
               )}
             </form>
@@ -572,12 +529,7 @@ export default async function JobDetailPage({
                       </select>
                     </label>
                   </div>
-                  <button
-                    type="submit"
-                    className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-                  >
-                    Assign crew
-                  </button>
+                  <Button type="submit">Assign crew</Button>
                 </>
               )}
             </form>

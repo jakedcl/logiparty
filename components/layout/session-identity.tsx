@@ -17,7 +17,16 @@ type Props = {
   signOutAction: () => Promise<void>;
 };
 
-/** Name + role button → dropdown with My Profile and Sign out. */
+function initials(name?: string | null, email?: string | null): string {
+  const source = (name?.trim() || email || "").replace(/@.*/, "");
+  const parts = source.split(/[\s._-]+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return `${parts[0][0] ?? ""}${parts[1][0] ?? ""}`.toUpperCase();
+  }
+  return (source.slice(0, 2) || "•").toUpperCase();
+}
+
+/** Name + role chip → glossy menu with My Profile and Sign out. */
 export function SessionIdentity({
   name,
   email,
@@ -52,20 +61,23 @@ export function SessionIdentity({
     <div ref={rootRef} className="relative">
       <button
         type="button"
-        className="flex items-center gap-1.5 rounded-md px-1.5 py-1 text-right leading-tight min-w-0 hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+        className="lp-identity text-right leading-tight focus-visible:outline-none"
         aria-expanded={open}
         aria-haspopup="menu"
         aria-controls={menuId}
         onClick={() => setOpen((v) => !v)}
       >
+        <span className="lp-avatar" aria-hidden>
+          {initials(name, email)}
+        </span>
         <span className="min-w-0">
-          <span className="block text-sm text-neutral-800 truncate max-w-[10rem] sm:max-w-[14rem]">
+          <span className="block truncate text-sm font-bold max-w-[10rem] sm:max-w-[14rem]">
             {label}
           </span>
-          <span className="block text-xs text-neutral-500">{role}</span>
+          <span className="block text-xs text-[var(--muted)]">{role}</span>
         </span>
         <ChevronDown
-          className={`h-3.5 w-3.5 shrink-0 text-neutral-400 transition-transform ${
+          className={`h-3.5 w-3.5 shrink-0 text-[var(--subtle)] transition-transform ${
             open ? "rotate-180" : ""
           }`}
           strokeWidth={1.75}
@@ -77,22 +89,18 @@ export function SessionIdentity({
         <div
           id={menuId}
           role="menu"
-          className="absolute right-0 top-full z-50 mt-1 min-w-[10.5rem] rounded-md border border-neutral-200 bg-white py-1 shadow-md"
+          className="lp-popover absolute right-0 top-full z-50 mt-1 min-w-[10.5rem] py-1"
         >
           <Link
             href={profileHref}
             role="menuitem"
-            className="block px-3 py-2 text-sm text-neutral-800 hover:bg-neutral-50"
+            className="lp-menu-item"
             onClick={() => setOpen(false)}
           >
             My Profile
           </Link>
           <form action={signOutAction}>
-            <button
-              type="submit"
-              role="menuitem"
-              className="w-full px-3 py-2 text-left text-sm text-neutral-800 hover:bg-neutral-50"
-            >
+            <button type="submit" role="menuitem" className="lp-menu-item">
               Sign out
             </button>
           </form>

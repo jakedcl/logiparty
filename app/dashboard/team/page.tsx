@@ -4,6 +4,7 @@ import { canInviteUsers } from "@/lib/auth/permissions";
 import { createStaffInvite } from "@/lib/actions/invites";
 import { listTeamMembers } from "@/lib/actions/team";
 import { requireSession } from "@/lib/org/context";
+import { Button } from "@/components/ui/button";
 
 export default async function TeamPage() {
   const session = await requireSession();
@@ -93,12 +94,7 @@ export default async function TeamPage() {
               Managers can also be staff — check both to appear in crew
               assignments.
             </p>
-            <button
-              type="submit"
-              className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white"
-            >
-              Send invite
-            </button>
+            <Button type="submit">Send invite</Button>
           </form>
         </details>
       </section>

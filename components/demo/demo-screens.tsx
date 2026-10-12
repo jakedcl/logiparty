@@ -1,7 +1,10 @@
 "use client";
 
+import { SegmentedControl } from "@/components/marketing/segmented-control";
+import { navPillClass } from "@/components/ui/nav-pill";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { cn } from "@/lib/utils";
+import { WindowToolbar } from "@/components/ui/window-chrome";
+import { tenantThemeStyle } from "@/lib/theme/primary-color";
 import {
   DEMO_CLIENTS,
   DEMO_CREW,
@@ -34,14 +37,10 @@ function Shell({
   return (
     <div
       className="lp-app flex h-full min-h-0"
-      style={{ ["--primary" as string]: DEMO_ORG.primary }}
+      style={tenantThemeStyle(DEMO_ORG.primary)}
     >
-      <aside className="app-sidebar hidden w-52 shrink-0 flex-col bg-[var(--sidebar)] text-[var(--sidebar-fg)] sm:flex">
-        <div
-          className="h-[3px] shrink-0 bg-[var(--primary)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
-          aria-hidden
-        />
-        <div data-demo-hl="brand" className="border-b border-white/10 px-4 py-5">
+      <aside className="app-sidebar hidden w-52 shrink-0 flex-col sm:flex">
+        <div data-demo-hl="brand" className="border-b border-[var(--lp-line)] px-4 py-5">
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--sidebar-muted)]">
             Workspace
           </p>
@@ -51,12 +50,7 @@ function Shell({
           {nav.map((label) => (
             <span
               key={label}
-              className={cn(
-                "rounded-md px-2.5 py-2",
-                label === activeNav
-                  ? "bg-[var(--sidebar-active)] font-medium text-[var(--sidebar-fg)]"
-                  : "text-[var(--sidebar-muted)]"
-              )}
+              className={navPillClass(label === activeNav)}
             >
               {label}
             </span>
@@ -64,15 +58,18 @@ function Shell({
         </nav>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="app-topbar flex items-center justify-between border-b border-[var(--border-subtle)] px-5 py-3">
+        <WindowToolbar
+          as="header"
+          className="flex items-center justify-between px-5 py-3"
+        >
           <p
             data-demo-hl="brand"
-            className="text-xs font-medium text-[var(--muted)] sm:hidden"
+            className="text-xs font-medium text-[var(--lp-muted)] sm:hidden"
           >
             {brand}
           </p>
-          <p className="ml-auto text-xs text-[var(--muted)]">{user}</p>
-        </header>
+          <p className="ml-auto text-xs text-[var(--lp-muted)]">{user}</p>
+        </WindowToolbar>
         <main className="min-h-0 flex-1 overflow-auto p-5 sm:p-6">
           {children}
         </main>
@@ -126,15 +123,13 @@ function Tabs({
   hlKey?: string;
 }) {
   return (
-    <div data-demo-hl={hlKey} className="lp-tabs">
-      {items.map((t) => (
-        <span
-          key={t}
-          className={cn("lp-tab", t === active && "lp-tab-active")}
-        >
-          {t}
-        </span>
-      ))}
+    <div data-demo-hl={hlKey}>
+      <SegmentedControl
+        className="m-seg-wrap-wide"
+        ariaLabel="Sections"
+        value={active}
+        segments={items.map((t) => ({ id: t, label: t }))}
+      />
     </div>
   );
 }
@@ -154,43 +149,36 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
     return (
       <div
         className="lp-app flex h-full min-h-0 flex-col"
-        style={{ ["--primary" as string]: DEMO_ORG.primary }}
+        style={tenantThemeStyle(DEMO_ORG.primary)}
       >
-        <header
+        <WindowToolbar
+          as="header"
           data-demo-hl="portal-brand"
-          className="app-topbar shrink-0 border-b border-[var(--border-subtle)]"
+          className="shrink-0"
         >
-          <div
-            className="h-[3px] bg-[var(--primary)]"
-            aria-hidden
-          />
           <div className="flex items-center justify-between px-5 py-4">
             <div>
-              <p className="text-sm font-semibold tracking-tight">
+              <p className="text-sm font-semibold tracking-tight text-[var(--lp-fg)]">
                 {DEMO_ORG.name}
               </p>
-              <p className="text-[11px] text-[var(--subtle)]">Client portal</p>
+              <p className="text-[11px] text-[var(--lp-muted)]">Client portal</p>
             </div>
-            <p className="text-xs text-[var(--muted)]">
+            <p className="text-xs text-[var(--lp-muted)]">
               Alex Chen · Summit Brands
             </p>
           </div>
-          <div className="lp-tabs px-5">
-            {["Home", "Jobs", "Inventory", "Notes"].map((l) => (
-              <span
-                key={l}
-                className={cn(
-                  "lp-tab",
-                  ((screen === "portal-jobs" && l === "Jobs") ||
-                    (screen === "portal-inventory" && l === "Inventory")) &&
-                    "lp-tab-active"
-                )}
-              >
-                {l}
-              </span>
-            ))}
+          <div className="px-5 pb-3.5">
+            <SegmentedControl
+              className="m-seg-wrap-wide"
+              ariaLabel="Portal"
+              value={screen === "portal-inventory" ? "Inventory" : "Jobs"}
+              segments={["Home", "Jobs", "Inventory", "Notes"].map((label) => ({
+                id: label,
+                label,
+              }))}
+            />
           </div>
-        </header>
+        </WindowToolbar>
         <main className="min-h-0 flex-1 overflow-auto p-5 sm:p-6">
           {screen === "portal-jobs" ? (
             <>

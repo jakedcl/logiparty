@@ -10,6 +10,7 @@ import {
 import type { Job } from "@/lib/db/schema";
 import { requireSession } from "@/lib/org/context";
 import { formatJobDate, formatJobDateTime } from "@/lib/format/date";
+import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 
@@ -135,9 +136,9 @@ export default async function DashboardPage() {
         actions={
           <>
             {isManager ? (
-              <Link href="/dashboard/jobs?new=1" className="lp-btn">
-                + New job
-              </Link>
+              <Button asChild>
+                <Link href="/dashboard/jobs?new=1">+ New job</Link>
+              </Button>
             ) : null}
             {isStaff && !isManager ? (
               <>
