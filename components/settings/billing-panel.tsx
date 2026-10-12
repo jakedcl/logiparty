@@ -4,6 +4,7 @@ import {
   createBillingPortalSession,
   createCheckoutSession,
 } from "@/lib/actions/billing";
+import { Button } from "@/components/ui/button";
 
 const STATUS_LABEL: Record<string, string> = {
   none: "Not subscribed",
@@ -60,22 +61,14 @@ export function BillingPanel({
       <div className="flex flex-wrap gap-2">
         {!isActive && (
           <form action={createCheckoutSession}>
-            <button
-              type="submit"
-              className="rounded bg-neutral-900 px-3 py-2 text-sm text-white hover:bg-neutral-800"
-            >
-              Subscribe
-            </button>
+            <Button type="submit">Subscribe</Button>
           </form>
         )}
         {hasCustomer && (
           <form action={createBillingPortalSession}>
-            <button
-              type="submit"
-              className="rounded border border-neutral-300 px-3 py-2 text-sm text-neutral-800 hover:bg-neutral-50"
-            >
+            <Button type="submit" variant="outline">
               Manage billing
-            </button>
+            </Button>
           </form>
         )}
       </div>

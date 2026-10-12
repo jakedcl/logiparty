@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
+import { Button } from "@/components/ui/button";
 
 type ViewEditProps = {
   /** Read-only content shown by default */
@@ -58,13 +59,9 @@ export function ViewEdit({
   return (
     <div className={className}>
       <div className="flex justify-end mb-3">
-        <button
-          type="button"
-          onClick={() => setEditing(true)}
-          className="lp-btn-quiet"
-        >
+        <Button type="button" variant="outline" onClick={() => setEditing(true)}>
           {editLabel}
-        </button>
+        </Button>
       </div>
       {view}
     </div>
@@ -102,19 +99,10 @@ export function EditFormActions({
 }) {
   return (
     <div className="flex flex-wrap items-center gap-2 pt-1">
-      <button
-        type="submit"
-        className="lp-btn"
-      >
-        {saveLabel}
-      </button>
-      <button
-        type="button"
-        onClick={onCancel}
-        className="lp-btn-quiet"
-      >
+      <Button type="submit">{saveLabel}</Button>
+      <Button type="button" variant="outline" onClick={onCancel}>
         Cancel
-      </button>
+      </Button>
     </div>
   );
 }

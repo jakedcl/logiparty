@@ -6,6 +6,7 @@ import {
 } from "@/lib/actions/clients";
 import { createClientInvite } from "@/lib/actions/invites";
 import { requireSession } from "@/lib/org/context";
+import { Button } from "@/components/ui/button";
 
 function contactDisplayName(
   firstName: string | null,
@@ -149,12 +150,9 @@ export default async function ClientsPage() {
                         className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
                       />
                     </label>
-                    <button
-                      type="submit"
-                      className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white h-[34px] mt-4 sm:mt-0"
-                    >
+                    <Button type="submit" size="sm" className="mt-4 h-[34px] sm:mt-0">
                       Send invite
-                    </button>
+                    </Button>
                   </form>
                 </details>
               </li>
@@ -190,12 +188,9 @@ export default async function ClientsPage() {
                 className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
               />
             </label>
-            <button
-              type="submit"
-              className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white h-[34px]"
-            >
+            <Button type="submit" size="sm" className="h-[34px]">
               Add
-            </button>
+            </Button>
           </form>
         </details>
       </section>

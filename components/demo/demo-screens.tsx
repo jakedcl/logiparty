@@ -1,8 +1,9 @@
 "use client";
 
 import { SegmentedControl } from "@/components/marketing/segmented-control";
+import { navPillClass } from "@/components/ui/nav-pill";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { cn } from "@/lib/utils";
+import { WindowToolbar } from "@/components/ui/window-chrome";
 import { tenantThemeStyle } from "@/lib/theme/primary-color";
 import {
   DEMO_CLIENTS,
@@ -49,12 +50,7 @@ function Shell({
           {nav.map((label) => (
             <span
               key={label}
-              className={cn(
-                "rounded-full border border-transparent px-2.5 py-2",
-                label === activeNav
-                  ? "app-nav-active"
-                  : "text-[var(--sidebar-muted)]"
-              )}
+              className={navPillClass(label === activeNav)}
             >
               {label}
             </span>
@@ -62,7 +58,10 @@ function Shell({
         </nav>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="lp-window-head flex items-center justify-between px-5 py-3">
+        <WindowToolbar
+          as="header"
+          className="flex items-center justify-between px-5 py-3"
+        >
           <p
             data-demo-hl="brand"
             className="text-xs font-medium text-[var(--lp-muted)] sm:hidden"
@@ -70,7 +69,7 @@ function Shell({
             {brand}
           </p>
           <p className="ml-auto text-xs text-[var(--lp-muted)]">{user}</p>
-        </header>
+        </WindowToolbar>
         <main className="min-h-0 flex-1 overflow-auto p-5 sm:p-6">
           {children}
         </main>
@@ -152,7 +151,11 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
         className="lp-app flex h-full min-h-0 flex-col"
         style={tenantThemeStyle(DEMO_ORG.primary)}
       >
-        <header data-demo-hl="portal-brand" className="lp-window-head shrink-0">
+        <WindowToolbar
+          as="header"
+          data-demo-hl="portal-brand"
+          className="shrink-0"
+        >
           <div className="flex items-center justify-between px-5 py-4">
             <div>
               <p className="text-sm font-semibold tracking-tight text-[var(--lp-fg)]">
@@ -175,7 +178,7 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
               }))}
             />
           </div>
-        </header>
+        </WindowToolbar>
         <main className="min-h-0 flex-1 overflow-auto p-5 sm:p-6">
           {screen === "portal-jobs" ? (
             <>

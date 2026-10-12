@@ -4,6 +4,7 @@ import {
   reviewAvailabilityRequest,
   submitAvailabilityRequest,
 } from "@/lib/actions/availability";
+import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 
 function fmt(d: Date): string {
@@ -191,12 +192,7 @@ export async function TimeOffPanel({ orgId, canSubmit, canReview }: Props) {
                   className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
                 />
               </label>
-              <button
-                type="submit"
-                className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white"
-              >
-                Submit request
-              </button>
+              <Button type="submit">Submit request</Button>
             </form>
           </details>
         </section>

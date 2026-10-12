@@ -1,16 +1,15 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+
 export function PrintButton({ className }: { className?: string }) {
   return (
-    <button
+    <Button
       type="button"
       onClick={() => window.print()}
-      className={
-        className ??
-        "rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white no-print"
-      }
+      className={className ?? "no-print"}
     >
       Print run sheet
-    </button>
+    </Button>
   );
 }

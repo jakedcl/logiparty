@@ -8,6 +8,7 @@ import { db } from "@/lib/db";
 import { organizations } from "@/lib/db/schema";
 import { getOrgSlugFromHeaders } from "@/lib/org/subdomain";
 import { OrgTheme } from "@/components/layout/org-theme";
+import { Button } from "@/components/ui/button";
 import {
   FALLBACK_PRIMARY_COLOR,
   resolvePrimaryColor,
@@ -162,9 +163,9 @@ export default async function LoginPage({
                 className="lp-input"
               />
             </div>
-            <button type="submit" className="lp-btn w-full py-2.5">
+            <Button type="submit" className="w-full py-2.5">
               Sign in
-            </button>
+            </Button>
           </form>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createJob } from "@/lib/actions/jobs";
+import { Button } from "@/components/ui/button";
 import { JOB_STATUSES } from "@/lib/db/schema";
 
 type Props = {
@@ -43,9 +44,9 @@ export function NewJobModal({
 
   return (
     <>
-      <button type="button" onClick={open} className="lp-btn">
+      <Button type="button" onClick={open}>
         + New job
-      </button>
+      </Button>
 
       <dialog
         ref={dialogRef}
@@ -67,13 +68,9 @@ export function NewJobModal({
             >
               New job
             </h2>
-            <button
-              type="button"
-              onClick={close}
-              className="rounded-md px-2 py-1 text-sm text-neutral-500 hover:bg-neutral-50 hover:text-neutral-900"
-            >
+            <Button type="button" variant="ghost" onClick={close}>
               Close
-            </button>
+            </Button>
           </div>
 
           <form action={createJob} className="space-y-3">
@@ -179,16 +176,10 @@ export function NewJobModal({
               />
             </label>
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              <button type="submit" className="app-btn app-btn-primary">
-                Create job
-              </button>
-              <button
-                type="button"
-                onClick={close}
-                className="lp-btn-ghost"
-              >
+              <Button type="submit">Create job</Button>
+              <Button type="button" variant="ghost" onClick={close}>
                 Cancel
-              </button>
+              </Button>
             </div>
           </form>
         </div>

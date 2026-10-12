@@ -6,6 +6,7 @@ import {
   updateOrgInventoryItem,
 } from "@/lib/actions/inventory";
 import type { InventoryItem } from "@/lib/db/schema";
+import { Button } from "@/components/ui/button";
 import {
   RowActionItem,
   RowActionsMenu,
@@ -68,19 +69,18 @@ function ItemRow({ item }: { item: InventoryItem }) {
                 className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm tabular-nums bg-white"
               />
             </label>
-            <button
-              type="submit"
-              className="rounded px-2.5 py-1.5 text-sm font-medium bg-neutral-900 text-white h-[34px]"
-            >
+            <Button type="submit" size="sm" className="h-[34px]">
               Save
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
+              className="h-[34px]"
               onClick={() => setEditing(false)}
-              className="rounded px-2.5 py-1.5 text-sm text-neutral-600 border border-neutral-300 h-[34px]"
             >
               Cancel
-            </button>
+            </Button>
           </form>
         </td>
         <td className="py-2 px-3" />

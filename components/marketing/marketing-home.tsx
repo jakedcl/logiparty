@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AppWindow } from "@/components/marketing/app-window";
+import { Button } from "@/components/ui/button";
 import { ComparePane } from "@/components/marketing/compare-pane";
 import { LeadForm } from "@/components/marketing/lead-form";
 import { MockJobs } from "@/components/marketing/product-mocks";
@@ -87,34 +88,24 @@ export function MarketingHome({
                 </p>
                 <div className="mt-5 flex flex-wrap items-center gap-2">
                   {workspace ? (
-                    <a
-                      href={workspace.href}
-                      className="m-btn-primary px-4 py-2 text-sm"
-                    >
-                      Go to {workspace.isClient ? "portal" : "dashboard"}
-                    </a>
+                    <Button asChild className="px-4 py-2 text-sm">
+                      <a href={workspace.href}>
+                        Go to {workspace.isClient ? "portal" : "dashboard"}
+                      </a>
+                    </Button>
                   ) : (
-                    <Link
-                      href="/demo"
-                      className="m-btn-primary px-4 py-2 text-sm"
-                    >
-                      Try the demo
-                    </Link>
+                    <Button asChild className="px-4 py-2 text-sm">
+                      <Link href="/demo">Try the demo</Link>
+                    </Button>
                   )}
                   {workspace ? (
-                    <Link
-                      href="/demo"
-                      className="m-btn-ghost px-4 py-2 text-sm"
-                    >
-                      Product tour
-                    </Link>
+                    <Button asChild variant="outline" className="px-4 py-2 text-sm">
+                      <Link href="/demo">Product tour</Link>
+                    </Button>
                   ) : (
-                    <a
-                      href="#request"
-                      className="m-btn-ghost px-4 py-2 text-sm"
-                    >
-                      Request access
-                    </a>
+                    <Button asChild variant="outline" className="px-4 py-2 text-sm">
+                      <a href="#request">Request access</a>
+                    </Button>
                   )}
                 </div>
               </div>

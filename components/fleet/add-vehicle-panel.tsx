@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createFleetVehicle } from "@/lib/actions/fleet";
+import { Button } from "@/components/ui/button";
 
 /** Caption left, + Add vehicle right (managers only). Form opens below the row. */
 export function AddFleetVehiclePanel({
@@ -71,12 +72,9 @@ export function AddFleetVehiclePanel({
               />
               Active
             </label>
-            <button
-              type="submit"
-              className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white h-[34px]"
-            >
+            <Button type="submit" size="sm" className="h-[34px]">
               Add
-            </button>
+            </Button>
           </div>
         </form>
       ) : null}

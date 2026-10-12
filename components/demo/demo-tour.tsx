@@ -9,6 +9,7 @@ import {
 } from "react";
 import { DemoScreen } from "@/components/demo/demo-screens";
 import { MarketingHeader } from "@/components/marketing/marketing-header";
+import { Button } from "@/components/ui/button";
 import { DEMO_STEPS, type DemoPopupPlacement } from "@/lib/demo/steps";
 
 type Rect = { top: number; left: number; width: number; height: number };
@@ -230,18 +231,21 @@ export function DemoTour() {
               {step.body}
             </p>
             <div className="mt-3.5 flex items-center gap-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={prev}
                 disabled={isFirst}
-                className="lp-btn-quiet lp-btn-sm gap-1 disabled:opacity-35"
+                className="gap-1"
               >
                 <span aria-hidden>←</span> Back
-              </button>
-              <button
+              </Button>
+              <Button
                 type="button"
+                size="sm"
                 onClick={next}
-                className="lp-btn gap-1 px-3 py-1.5 text-xs"
+                className="gap-1"
               >
                 {isLast ? (
                   "Finish"
@@ -250,7 +254,7 @@ export function DemoTour() {
                     Next <span aria-hidden>→</span>
                   </>
                 )}
-              </button>
+              </Button>
             </div>
           </div>
         ) : null}
@@ -274,19 +278,20 @@ export function DemoTour() {
               Inventory and fleet unlock after load-out. Ready to talk?
             </p>
             <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-              <button
+              <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => {
                   setFinished(false);
                   setIndex(0);
                 }}
-                className="lp-btn-quiet lp-btn-sm"
               >
                 Replay
-              </button>
-              <Link href="/#request" className="lp-btn px-4 py-2 text-xs">
-                Request access
-              </Link>
+              </Button>
+              <Button asChild size="sm">
+                <Link href="/#request">Request access</Link>
+              </Button>
             </div>
           </div>
         ) : null}

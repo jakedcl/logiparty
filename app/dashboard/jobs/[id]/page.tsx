@@ -8,6 +8,7 @@ import { JobLocationRow } from "@/components/jobs/job-location-row";
 import { JobPanel } from "@/components/jobs/job-panel";
 import { QuietRemove } from "@/components/jobs/quiet-remove";
 import { JobSummaryEditor } from "@/components/jobs/job-summary-editor";
+import { Button } from "@/components/ui/button";
 import { canManageJobs, canUploadDocuments } from "@/lib/auth/permissions";
 import {
   addJobInventoryLine,
@@ -144,12 +145,9 @@ export default async function JobDetailPage({
               ) : null}
             </p>
           </div>
-          <Link
-            href={`/dashboard/jobs/${job.id}/print`}
-            className="rounded-md px-3 py-2 text-sm border border-neutral-300 text-neutral-700 hover:bg-neutral-50 shrink-0"
-          >
-            Print run sheet
-          </Link>
+          <Button asChild variant="outline" className="shrink-0">
+            <Link href={`/dashboard/jobs/${job.id}/print`}>Print run sheet</Link>
+          </Button>
         </div>
       </div>
 
@@ -163,18 +161,14 @@ export default async function JobDetailPage({
           <div className="flex flex-wrap items-center gap-2">
             <form action={acceptDraftJob}>
               <input type="hidden" name="id" value={job.id} />
-              <button
-                type="submit"
-                className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white"
-              >
-                Accept request
-              </button>
+              <Button type="submit">Accept request</Button>
             </form>
             <form action={denyDraftJob}>
               <input type="hidden" name="id" value={job.id} />
               <ConfirmSubmitButton
                 message="Deny this client job request? They will see it as denied."
-                className="rounded px-3 py-1.5 text-sm font-medium border border-red-300 bg-white text-red-700 hover:bg-red-50"
+                variant="destructive"
+                size="sm"
               >
                 Deny
               </ConfirmSubmitButton>
@@ -267,12 +261,7 @@ export default async function JobDetailPage({
                   placeholder="Address"
                   className="w-full border border-neutral-200 rounded px-3 py-2 text-sm"
                 />
-                <button
-                  type="submit"
-                  className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-                >
-                  Add location
-                </button>
+                <Button type="submit">Add location</Button>
               </form>
             </CollapsibleAdd>
           ) : (
@@ -350,12 +339,7 @@ export default async function JobDetailPage({
                       className="mt-1 w-full border border-neutral-200 rounded px-3 py-2 text-sm"
                     />
                   </label>
-                  <button
-                    type="submit"
-                    className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-                  >
-                    Assign to job
-                  </button>
+                  <Button type="submit">Assign to job</Button>
                 </>
               )}
             </form>
@@ -432,12 +416,7 @@ export default async function JobDetailPage({
                       ))}
                     </select>
                   </label>
-                  <button
-                    type="submit"
-                    className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-                  >
-                    Assign vehicle
-                  </button>
+                  <Button type="submit">Assign vehicle</Button>
                 </>
               )}
             </form>
@@ -550,12 +529,7 @@ export default async function JobDetailPage({
                       </select>
                     </label>
                   </div>
-                  <button
-                    type="submit"
-                    className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-                  >
-                    Assign crew
-                  </button>
+                  <Button type="submit">Assign crew</Button>
                 </>
               )}
             </form>

@@ -348,12 +348,14 @@ body {
 .lp-btn-ink,
 .lp-btn-danger,
 .app-btn,
-.app-btn-primary {
+.app-btn-primary,
+.m-btn-primary,
+.m-btn-ghost {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  border-radius: var(--lp-radius-sm);
+  border-radius: 999px;
   padding: 0.375rem 0.75rem;
   font-size: 0.875rem;
   font-weight: 700;
@@ -370,7 +372,9 @@ body {
 .lp-btn-ink:hover,
 .lp-btn-danger:hover,
 .app-btn:hover,
-.app-btn-primary:hover {
+.app-btn-primary:hover,
+.m-btn-primary:hover,
+.m-btn-ghost:hover {
   filter: brightness(1.06);
 }
 .lp-btn:active,
@@ -378,7 +382,9 @@ body {
 .lp-btn-ink:active,
 .lp-btn-danger:active,
 .app-btn:active,
-.app-btn-primary:active {
+.app-btn-primary:active,
+.m-btn-primary:active,
+.m-btn-ghost:active {
   box-shadow: var(--lp-gloss-pressed);
   transform: translateY(1px);
 }
@@ -405,21 +411,46 @@ body {
 
 .lp-btn,
 .app-btn,
-.app-btn-primary {
-  border: 1px solid var(--primary-border);
-  border-color: var(--lp-chrome-edge);
+.app-btn-primary,
+.m-btn-primary {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--lp-chrome-edge);
   background: var(--lp-btn-fill);
   color: var(--primary-foreground);
+  text-decoration: none;
   text-shadow: 0 -1px 0 color-mix(in srgb, var(--primary) 45%, transparent);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.55),
     0 1px 2px rgba(0, 0, 0, 0.2);
 }
+.lp-btn::after,
+.app-btn::after,
+.app-btn-primary::after,
+.m-btn-primary::after {
+  content: "";
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 2px;
+  height: 45%;
+  border-radius: 999px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.65) 0%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  pointer-events: none;
+}
 
-.lp-btn-quiet {
+.lp-btn-quiet,
+.m-btn-ghost {
+  position: relative;
+  overflow: hidden;
   border: 1px solid var(--lp-line-strong);
   background: linear-gradient(to bottom, #ffffff 0%, #f3f6f9 100%);
   color: var(--foreground);
+  text-decoration: none;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.95),
     0 1px 1px rgba(40, 60, 90, 0.06);
@@ -955,8 +986,8 @@ body {
 
 /* Header only — white text + glossy pill CTA on blue chrome */
 .m-header .m-nav-link {
-  color: rgba(255, 255, 255, 0.92);
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.2);
+  color: #ffffff;
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.35);
 }
 
 .m-header .m-nav-link:hover {
@@ -1173,8 +1204,6 @@ body {
 }
 
 /* Glossy aqua buttons — early iPhone / Aqua */
-.m-btn-primary,
-.m-btn-ghost,
 .m-seg-wrap,
 .m-seg,
 .m-seg-item,
@@ -1194,93 +1223,7 @@ body {
   font-weight: 700;
 }
 
-.m-btn-primary {
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
-  border-radius: 999px;
-  border: 1px solid #0a4a8c;
-  background: linear-gradient(
-    to bottom,
-    #7ec2f7 0%,
-    #2f8fe0 46%,
-    #0b6cc0 54%,
-    #08549a 100%
-  );
-  color: var(--m-accent-ink);
-  text-decoration: none;
-  cursor: pointer;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.35);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    0 1px 2px rgba(0, 0, 0, 0.2);
-  transition: filter 0.15s ease, box-shadow 0.15s ease;
-}
-
-.m-btn-primary::after {
-  content: "";
-  position: absolute;
-  left: 8%;
-  right: 8%;
-  top: 2px;
-  height: 45%;
-  border-radius: 999px;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.65) 0%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  pointer-events: none;
-}
-
-.m-btn-primary:hover {
-  filter: brightness(1.06);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    0 2px 6px rgba(11, 92, 171, 0.35);
-}
-
-.m-btn-primary:active {
-  filter: brightness(0.96);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.m-btn-ghost {
-  position: relative;
-  display: inline-block;
-  overflow: hidden;
-  border-radius: 999px;
-  border: 1px solid #9aa3ad;
-  background: linear-gradient(to bottom, #ffffff 0%, #e4e8ec 100%);
-  color: var(--m-fg);
-  text-decoration: none;
-  cursor: pointer;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 1px 2px rgba(0, 0, 0, 0.1);
-  transition: filter 0.15s ease;
-}
-
-.m-btn-ghost::after {
-  content: "";
-  position: absolute;
-  left: 10%;
-  right: 10%;
-  top: 2px;
-  height: 42%;
-  border-radius: 999px;
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.85) 0%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
-  pointer-events: none;
-}
-
-.m-btn-ghost:hover {
-  filter: brightness(1.03);
-  border-color: #7a8490;
-}
+/* .m-btn-primary / .m-btn-ghost share .lp-btn / .lp-btn-quiet above. */
 
 .m-input {
   border-radius: 6px;
@@ -1557,16 +1500,11 @@ body {
   border-radius: 4px;
 }
 
-/* —— Segmented control —— */
+/* —— Segmented control ——
+   One track border. The selected cell is a flush gloss fill, not a second ring. */
 .m-seg-wrap {
   width: 100%;
   max-width: 32rem;
-  padding: 3px;
-  border-radius: 999px;
-  background: linear-gradient(to bottom, #c5d4e4 0%, #eef3f8 100%);
-  box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.12),
-    0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .m-seg {
@@ -1576,28 +1514,24 @@ body {
   border-radius: 999px;
   border: 1px solid #1a6bb0;
   overflow: hidden;
-  background: linear-gradient(to bottom, #e8eef5 0%, #c8d8ea 100%);
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  background: linear-gradient(to bottom, #f7fbff 0%, #d7e6f4 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .m-seg-thumb {
   position: absolute;
-  top: 2px;
-  bottom: 2px;
-  border-radius: 999px;
-  border: 1px solid #084a8a;
+  top: 0;
+  bottom: 0;
+  border: none;
+  border-radius: 0;
   background: linear-gradient(
     to bottom,
-    #9fd4ff 0%,
+    #8ec8f8 0%,
     #2f8fe0 46%,
     #0b6cc0 54%,
-    #063d72 100%
+    #08549a 100%
   );
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    0 1px 3px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
   pointer-events: none;
   z-index: 0;
 }
@@ -1632,6 +1566,11 @@ body {
   border-right: none;
 }
 
+.m-seg-item-active,
+.m-seg-item:has(+ .m-seg-item-active) {
+  border-right-color: transparent;
+}
+
 .m-seg-item-active {
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.35);
@@ -1643,12 +1582,12 @@ body {
   .m-seg-item-active {
     background: linear-gradient(
       to bottom,
-      #7ec2f7 0%,
+      #8ec8f8 0%,
       #2f8fe0 46%,
       #0b6cc0 54%,
       #08549a 100%
     );
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
   }
 }
 
@@ -2603,6 +2542,11 @@ body {
   top: 22px;
   border-left-color: #fff;
   filter: drop-shadow(1px 0 0 #c9d2de);
+}
+
+/* Above the tour spotlight (z-index 30). Tailwind z-50 loses to unlayered .m-header. */
+.demo-app .m-header {
+  z-index: 60;
 }
 
 .demo-app {

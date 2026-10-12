@@ -1,4 +1,5 @@
 import { sendClientNote } from "@/lib/actions/client-notes";
+import { Button } from "@/components/ui/button";
 import type { ClientNoteView } from "@/lib/actions/client-notes";
 
 function fmt(d: Date): string {
@@ -118,12 +119,7 @@ export function PortalComposeNote() {
               className="mt-1 w-full border border-neutral-200 rounded px-2 py-1.5 text-sm"
             />
           </label>
-          <button
-            type="submit"
-            className="rounded px-3 py-1.5 text-sm font-medium bg-neutral-900 text-white"
-          >
-            Send note
-          </button>
+          <Button type="submit">Send note</Button>
         </form>
       </div>
     </details>

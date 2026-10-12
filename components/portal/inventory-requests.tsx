@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import {
   requestInventoryAdd,
   requestInventoryQtyChange,
@@ -304,16 +305,9 @@ function FormActions({
 }) {
   return (
     <div className="flex flex-wrap items-center gap-3 pt-1">
-      <button
-        type="submit"
-        className={`rounded-md px-4 py-2 text-sm font-medium text-white ${
-          danger
-            ? "bg-red-600 hover:bg-red-700"
-            : "bg-neutral-900 hover:bg-neutral-800"
-        }`}
-      >
+      <Button type="submit" variant={danger ? "destructive" : "default"}>
         {submitLabel}
-      </button>
+      </Button>
       <Link
         href="/portal/inventory"
         className="text-sm text-neutral-500 hover:text-neutral-800"

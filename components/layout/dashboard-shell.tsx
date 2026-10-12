@@ -6,6 +6,7 @@ import { Suspense, useEffect, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { OrgTheme } from "@/components/layout/org-theme";
 import { cn } from "@/lib/utils";
+import { navPillClass } from "@/components/ui/nav-pill";
 import { FALLBACK_PRIMARY_COLOR } from "@/lib/theme/primary-color";
 
 export type DashboardNavChild = {
@@ -123,13 +124,7 @@ function Brand({
 }
 
 function linkClass(active: boolean, nested = false) {
-  return cn(
-    "rounded-full border border-transparent text-sm transition-colors",
-    nested ? "px-3 py-1.5" : "px-3 py-2",
-    active
-      ? "app-nav-active"
-      : "text-[var(--sidebar-muted)] hover:bg-[var(--sidebar-hover)] hover:text-[var(--sidebar-fg)]"
-  );
+  return navPillClass(active, nested);
 }
 
 function NavGroup({

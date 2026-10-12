@@ -6,6 +6,7 @@ import { acceptInvite } from "@/lib/actions/invites";
 import { signIn } from "@/lib/auth";
 import { absoluteRedirectUrl } from "@/lib/auth/redirect";
 import { OrgTheme } from "@/components/layout/org-theme";
+import { Button } from "@/components/ui/button";
 import { resolvePrimaryColor } from "@/lib/theme/primary-color";
 
 export default async function InviteAcceptPage({
@@ -121,9 +122,9 @@ export default async function InviteAcceptPage({
               className="lp-input"
             />
           </div>
-          <button type="submit" className="lp-btn w-full py-2">
+          <Button type="submit" className="w-full py-2">
             Create account
-          </button>
+          </Button>
         </form>
       </div>
     </div>

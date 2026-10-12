@@ -6,6 +6,7 @@ import { DevRoleSwitchPanel } from "@/components/dev/dev-role-switch-panel";
 import { OrgTheme } from "@/components/layout/org-theme";
 import { PortalNav } from "@/components/layout/portal-nav";
 import { SessionIdentity } from "@/components/layout/session-identity";
+import { WindowToolbar } from "@/components/ui/window-chrome";
 import { FALLBACK_PRIMARY_COLOR } from "@/lib/theme/primary-color";
 
 type Props = {
@@ -35,7 +36,7 @@ export function PortalShell({
 
   return (
     <OrgTheme primaryColor={primaryColor} className="flex flex-col">
-      <header className="lp-window-head shrink-0">
+      <WindowToolbar as="header" className="shrink-0">
         <div className="mx-auto flex max-w-3xl items-center justify-between gap-3 px-4 py-3.5 md:px-6">
           <div className="flex min-w-0 items-center gap-2.5">
             {logoUrl ? (
@@ -69,20 +70,21 @@ export function PortalShell({
         <div className="mx-auto hidden max-w-3xl px-4 pb-3.5 sm:block md:px-6">
           <PortalNav />
         </div>
-      </header>
+      </WindowToolbar>
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-6 pb-24 md:px-6 md:py-8 sm:pb-8">
         {children}
       </main>
 
-      <nav
-        className="lp-window-head fixed inset-x-0 bottom-0 z-10 border-t sm:hidden"
+      <WindowToolbar
+        as="nav"
+        className="fixed inset-x-0 bottom-0 z-10 border-t sm:hidden"
         aria-label="Portal navigation"
       >
         <div className="mx-auto max-w-3xl px-3 py-2 pb-[max(0.5rem,env(safe-area-inset-bottom,0px))]">
           <PortalNav />
         </div>
-      </nav>
+      </WindowToolbar>
       <DevRoleSwitchPanel />
     </OrgTheme>
   );

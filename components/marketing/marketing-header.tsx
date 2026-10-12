@@ -1,6 +1,6 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { Wordmark } from "@/components/ui/wordmark";
 
 /**
  * The landing header: blue gloss bar + Logiparty wordmark.
@@ -20,15 +20,7 @@ export function MarketingHeader({
   navClassName?: string;
   children?: ReactNode;
 }) {
-  const brand = brandAnchor ? (
-    <a href={brandHref} className="m-brand">
-      Logiparty
-    </a>
-  ) : (
-    <Link href={brandHref} className="m-brand">
-      Logiparty
-    </Link>
-  );
+  const brand = <Wordmark href={brandHref} anchor={brandAnchor} />;
 
   return (
     <header

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { requestJob, listPortalJobs } from "@/lib/actions/portal-jobs";
 import { getSessionClientCompany, requireSession } from "@/lib/org/context";
+import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusBadge } from "@/components/ui/status-badge";
 
@@ -227,9 +228,7 @@ export default async function PortalJobsPage() {
                     className="lp-input mt-1"
                   />
                 </label>
-                <button type="submit" className="lp-btn">
-                  Submit request
-                </button>
+                <Button type="submit">Submit request</Button>
               </form>
             </div>
           </details>

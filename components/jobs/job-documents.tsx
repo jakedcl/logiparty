@@ -1,4 +1,5 @@
 import { CollapsibleAdd } from "@/components/jobs/collapsible-add";
+import { Button } from "@/components/ui/button";
 import { QuietRemove } from "@/components/jobs/quiet-remove";
 import {
   deleteJobDocument,
@@ -104,12 +105,7 @@ export function JobDocuments({
                 className="mt-2 block w-full text-sm file:mr-3 file:rounded file:border-0 file:bg-neutral-900 file:px-3 file:py-2 file:text-white file:text-sm file:font-medium"
               />
             </label>
-            <button
-              type="submit"
-              className="rounded px-4 py-2 text-sm font-medium bg-neutral-900 text-white"
-            >
-              Upload document
-            </button>
+            <Button type="submit">Upload document</Button>
           </form>
         </CollapsibleAdd>
       ) : null}

@@ -16,6 +16,7 @@ import {
 } from "@/lib/db/schema";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 import { formatJobDateTime } from "@/lib/format/date";
+import { Button } from "@/components/ui/button";
 
 function fmt(d: Date | null | undefined): string {
   return formatJobDateTime(d);
@@ -79,12 +80,11 @@ export default async function MyJobDetailPage({
                 .join(" · ")}
             </p>
           </div>
-          <Link
-            href={`/dashboard/my-jobs/${job.id}/print`}
-            className="rounded px-3 py-2 text-sm border border-neutral-300 hover:bg-neutral-50"
-          >
-            Print run sheet
-          </Link>
+          <Button asChild variant="outline" className="shrink-0">
+            <Link href={`/dashboard/my-jobs/${job.id}/print`}>
+              Print run sheet
+            </Link>
+          </Button>
         </div>
       </div>
 
@@ -148,12 +148,9 @@ export default async function MyJobDetailPage({
                           className="mt-1 w-28 border rounded px-3 py-2 text-sm"
                         />
                       </label>
-                      <button
-                        type="submit"
-                        className="rounded px-3 py-2 text-sm border border-neutral-300 h-[42px]"
-                      >
+                      <Button type="submit" variant="outline" className="h-[42px]">
                         Save
-                      </button>
+                      </Button>
                     </form>
                   ) : null}
                 </li>

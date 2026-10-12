@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
+import { Button } from "@/components/ui/button";
 
 type Placement = "bottom" | "top";
 
@@ -124,20 +125,21 @@ export function RowActionsMenu({
 
   return (
     <>
-      <button
+      <Button
         ref={triggerRef}
         type="button"
+        variant="outline"
         aria-expanded={open}
         aria-haspopup="menu"
         aria-controls={open ? menuId : undefined}
         aria-label={label}
-        className="lp-btn-quiet lp-btn-icon text-base leading-none"
+        className="lp-btn-icon text-base leading-none"
         onClick={() => setOpen((v) => !v)}
       >
         <span aria-hidden className="text-base leading-none tracking-tighter">
           ⋯
         </span>
-      </button>
+      </Button>
       {open && coords
         ? createPortal(
             <div

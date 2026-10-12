@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
+import { WindowTitleBar, WindowToolbar } from "@/components/ui/window-chrome";
 
 function HeroToolbar() {
   return (
@@ -43,17 +44,9 @@ export function AppWindow({
   const reduceMotion = useReducedMotion();
   const windowChrome = (
     <>
-      <div className="m-window-bar">
-        <div className="m-window-dots" aria-hidden>
-          <span className="m-window-dot m-window-dot-close" />
-          <span className="m-window-dot m-window-dot-min" />
-          <span className="m-window-dot m-window-dot-max" />
-        </div>
-        <p className="m-window-title">{title}</p>
-        <span className="m-window-bar-spacer" aria-hidden />
-      </div>
+      <WindowTitleBar title={title} />
       {heroChrome ? <HeroToolbar /> : null}
-      {toolbar ? <div className="m-window-toolbar">{toolbar}</div> : null}
+      {toolbar ? <WindowToolbar className="m-window-toolbar">{toolbar}</WindowToolbar> : null}
       <div className={`m-window-body${inset ? " m-window-body-inset" : ""}`}>
         {children}
       </div>
