@@ -43,13 +43,27 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.92),
     0 1px 0 rgba(255, 255, 255, 0.35);
   --lp-panel-fill: linear-gradient(to bottom, #ffffff 0%, #f7f9fb 100%);
-  --lp-bar-fill: linear-gradient(to bottom, var(--lp-header) 0%, var(--lp-bar) 100%);
+  /* Same blue gloss as the landing header / aqua button.
+     :root bakes the default accent. .lp-app repeats these so a tenant --primary wins. */
+  --lp-chrome-edge: hsl(from var(--primary) h s 28%);
+  --lp-chrome: linear-gradient(
+    to bottom,
+    hsl(from var(--primary) h s 68%) 0%,
+    hsl(from var(--primary) h s 53%) 48%,
+    hsl(from var(--primary) h s 43%) 52%,
+    hsl(from var(--primary) h s 36%) 100%
+  );
+  --lp-btn-fill: linear-gradient(
+    to bottom,
+    hsl(from var(--primary) h s 73%) 0%,
+    hsl(from var(--primary) h s 53%) 46%,
+    hsl(from var(--primary) h s 40%) 54%,
+    hsl(from var(--primary) h s 32%) 100%
+  );
+  --lp-bar-fill: var(--lp-chrome);
+  /* Same wallpaper as .marketing — not a darkened mix of the brand. */
   --lp-canvas:
-    radial-gradient(
-      ellipse 80% 50% at 50% -10%,
-      color-mix(in srgb, var(--primary) 22%, transparent),
-      transparent 55%
-    ),
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(90, 160, 230, 0.22), transparent 55%),
     linear-gradient(180deg, #e8edf3 0%, #d5dde6 100%);
 
   /* Canvas */
@@ -129,6 +143,26 @@ body {
 .app-shell {
   color: var(--foreground);
   background: var(--lp-canvas);
+  /*
+    Respecify the gloss. A custom property set on :root is inherited
+    already substituted, so OrgTheme's --primary would never reach it.
+  */
+  --lp-chrome-edge: hsl(from var(--primary) h s 28%);
+  --lp-chrome: linear-gradient(
+    to bottom,
+    hsl(from var(--primary) h s 68%) 0%,
+    hsl(from var(--primary) h s 53%) 48%,
+    hsl(from var(--primary) h s 43%) 52%,
+    hsl(from var(--primary) h s 36%) 100%
+  );
+  --lp-btn-fill: linear-gradient(
+    to bottom,
+    hsl(from var(--primary) h s 73%) 0%,
+    hsl(from var(--primary) h s 53%) 46%,
+    hsl(from var(--primary) h s 40%) 54%,
+    hsl(from var(--primary) h s 32%) 100%
+  );
+  --lp-bar-fill: var(--lp-chrome);
 }
 
 .lp-surface {
@@ -176,14 +210,9 @@ body {
 }
 .lp-tab-active {
   color: var(--primary-foreground);
-  border-color: var(--primary-border);
-  background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--primary) 70%, white) 0%,
-    var(--primary) 48%,
-    color-mix(in srgb, var(--primary) 86%, black) 100%
-  );
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-color: var(--lp-chrome-edge);
+  background: var(--lp-btn-fill);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 .lp-list {
@@ -204,9 +233,30 @@ body {
 
 .app-topbar,
 .app-bar {
-  background: var(--lp-bar-fill);
-  border-color: var(--lp-line);
-  box-shadow: var(--lp-gloss-bar);
+  background: var(--lp-chrome);
+  color: var(--primary-foreground);
+  border-color: var(--lp-chrome-edge);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 1px 3px rgba(0, 0, 0, 0.18);
+  --foreground: var(--primary-foreground);
+  --muted: color-mix(in srgb, var(--primary-foreground) 80%, transparent);
+  --subtle: color-mix(in srgb, var(--primary-foreground) 72%, transparent);
+  --sidebar-fg: var(--primary-foreground);
+  --sidebar-muted: color-mix(in srgb, var(--primary-foreground) 78%, transparent);
+  --lp-line: color-mix(in srgb, var(--primary-foreground) 35%, transparent);
+  --border-subtle: color-mix(in srgb, var(--primary-foreground) 28%, transparent);
+}
+.app-topbar .app-nav-active,
+.app-bar .app-nav-active {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--primary-foreground) 40%, transparent),
+    color-mix(in srgb, var(--primary-foreground) 14%, transparent)
+  );
+  color: var(--primary-foreground);
+  border-color: color-mix(in srgb, var(--primary-foreground) 55%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--primary-foreground) 60%, transparent);
 }
 
 .app-sidebar {
@@ -220,17 +270,12 @@ body {
 }
 
 .app-nav-active {
-  background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--primary) 70%, white) 0%,
-    var(--primary) 48%,
-    color-mix(in srgb, var(--primary) 88%, black) 100%
-  );
+  background: var(--lp-btn-fill);
   color: var(--primary-foreground);
-  border: 1px solid var(--primary-border);
+  border: 1px solid var(--lp-chrome-edge);
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.48),
-    inset 0 -1px 0 color-mix(in srgb, var(--primary) 50%, black);
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.18);
   border-radius: 999px;
   font-weight: 700;
 }
@@ -362,14 +407,13 @@ body {
 .app-btn,
 .app-btn-primary {
   border: 1px solid var(--primary-border);
-  background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--primary) 72%, white) 0%,
-    var(--primary) 46%,
-    color-mix(in srgb, var(--primary) 86%, black) 100%
-  );
+  border-color: var(--lp-chrome-edge);
+  background: var(--lp-btn-fill);
   color: var(--primary-foreground);
-  box-shadow: var(--lp-gloss-elevated);
+  text-shadow: 0 -1px 0 color-mix(in srgb, var(--primary) 45%, transparent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .lp-btn-quiet {
@@ -455,18 +499,13 @@ body {
 
 .lp-app input[type="file"]::file-selector-button {
   margin-right: 0.75rem;
-  border: 1px solid var(--primary-border);
+  border: 1px solid var(--lp-chrome-edge);
   border-radius: var(--lp-radius-sm);
-  background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--primary) 72%, white) 0%,
-    var(--primary) 48%,
-    color-mix(in srgb, var(--primary) 86%, black) 100%
-  );
+  background: var(--lp-btn-fill);
   color: var(--primary-foreground);
   font-weight: 700;
   padding: 0.4rem 0.75rem;
-  box-shadow: var(--lp-gloss-inset);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 /* Dense tables — glossy header bar, padding kept tight */
@@ -506,9 +545,9 @@ body {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: var(--muted);
-  background: var(--lp-bar-fill);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  color: var(--primary-foreground);
+  background: var(--lp-chrome);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
   white-space: nowrap;
 }
 
@@ -633,7 +672,11 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.95),
     0 1px 1px rgba(40, 60, 90, 0.06);
   padding: 0.15rem 0.55rem 0.15rem 0.15rem;
-  color: var(--foreground);
+  /* Reset chrome tokens so the chip stays dark-on-light on a blue bar. */
+  --foreground: var(--lp-fg);
+  --muted: var(--lp-muted);
+  --subtle: #556274;
+  color: var(--lp-fg);
 }
 .lp-avatar {
   display: grid;
@@ -660,7 +703,9 @@ body {
   border-radius: var(--lp-radius-lg);
   background: var(--lp-panel-fill);
   box-shadow: var(--lp-gloss-panel);
-  color: var(--foreground);
+  --foreground: var(--lp-fg);
+  --muted: var(--lp-muted);
+  color: var(--lp-fg);
 }
 .lp-menu-item {
   display: block;
@@ -682,9 +727,9 @@ body {
 }
 
 .lp-bar {
-  background: var(--lp-bar-fill);
-  color: var(--muted);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  background: var(--lp-chrome);
+  color: var(--primary-foreground);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
 .lp-enter {
@@ -708,16 +753,13 @@ body {
 
 /* Leftover ink / outline controls that predate the shared classes. */
 .lp-app :is(a, button).bg-neutral-900 {
-  border: 1px solid var(--primary-border);
+  border: 1px solid var(--lp-chrome-edge);
   border-radius: var(--lp-radius-sm);
-  background: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--primary) 72%, white) 0%,
-    var(--primary) 46%,
-    color-mix(in srgb, var(--primary) 86%, black) 100%
-  );
+  background: var(--lp-btn-fill);
   color: var(--primary-foreground);
-  box-shadow: var(--lp-gloss-elevated);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    0 1px 2px rgba(0, 0, 0, 0.2);
   font-weight: 700;
 }
 .lp-app :is(a, button).bg-neutral-900:hover {
@@ -2624,7 +2666,13 @@ body {
   .app-btn,
   .app-nav-active,
   .lp-tab-active,
-  .lp-avatar {
+  .lp-avatar,
+  .lp-table th,
+  .app-table th,
+  .lp-bar,
+  .app-topbar,
+  .app-bar,
+  .app-sidebar {
     color: black !important;
     border-color: #666 !important;
   }

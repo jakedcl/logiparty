@@ -1,12 +1,12 @@
 /**
  * Public product-tour data for /demo (no auth, no DB).
- * Keep names generic — show the product, not a niche brand story.
+ * Keep names generic — show the product blue, not a custom org brand.
  */
 
 export const DEMO_ORG = {
   name: "Northline Logistics",
   shortName: "Northline",
-  primary: "#1e3a5f",
+  primary: "#0b5cab",
   warehouse: "1200 Dock Rd, Brooklyn, NY",
 } as const;
 
