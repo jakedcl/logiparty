@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
 import { canAccessClientPortal } from "@/lib/auth/permissions";
-import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
+import { clientOnlyActor, db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import { jobs, type Job } from "@/lib/db/schema";
 import { getSessionClientCompany, requireSession } from "@/lib/org/context";
 
@@ -31,14 +31,17 @@ export async function listPortalJobs(orgId: string): Promise<Job[]> {
   const { session, company } = await requirePortalClient();
   if (session.user.orgId !== orgId) throw new Error("Forbidden");
 
-  return withOrgQuery<Job[]>(orgId, (database) =>
-    database
-      .select()
-      .from(jobs)
-      .where(
-        and(eq(jobs.orgId, orgId), eq(jobs.clientCompanyId, company.id))
-      )
-      .orderBy(desc(jobs.jobStart), desc(jobs.createdAt))
+  return withOrgQuery<Job[]>(
+    orgId,
+    (database) =>
+      database
+        .select()
+        .from(jobs)
+        .where(
+          and(eq(jobs.orgId, orgId), eq(jobs.clientCompanyId, company.id))
+        )
+        .orderBy(desc(jobs.jobStart), desc(jobs.createdAt)),
+    clientOnlyActor(session.user, company.id)
   );
 }
 
@@ -49,18 +52,21 @@ export async function getPortalJob(
   const { session, company } = await requirePortalClient();
   if (session.user.orgId !== orgId) throw new Error("Forbidden");
 
-  const rows = await withOrgQuery<Job[]>(orgId, (database) =>
-    database
-      .select()
-      .from(jobs)
-      .where(
-        and(
-          eq(jobs.id, jobId),
-          eq(jobs.orgId, orgId),
-          eq(jobs.clientCompanyId, company.id)
+  const rows = await withOrgQuery<Job[]>(
+    orgId,
+    (database) =>
+      database
+        .select()
+        .from(jobs)
+        .where(
+          and(
+            eq(jobs.id, jobId),
+            eq(jobs.orgId, orgId),
+            eq(jobs.clientCompanyId, company.id)
+          )
         )
-      )
-      .limit(1)
+        .limit(1),
+    clientOnlyActor(session.user, company.id)
   );
   return rows[0] ?? null;
 }
@@ -80,7 +86,9 @@ export async function requestJob(formData: FormData) {
 
   const id = randomUUID();
 
-  await withOrgQueries(session.user.orgId, (database) => [
+  await withOrgQueries(
+    session.user.orgId,
+    (database) => [
     database.insert(jobs).values({
       id,
       orgId: session.user.orgId,
@@ -109,7 +117,9 @@ export async function requestJob(formData: FormData) {
       isClientVisible: true,
       metadata: { status: "draft", clientCompanyId: company.id },
     }),
-  ]);
+  ],
+    clientOnlyActor(session.user, company.id)
+  );
 
   revalidatePath("/portal/jobs");
   revalidatePath("/dashboard/jobs");

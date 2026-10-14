@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
 import { canManageClientInventory } from "@/lib/auth/permissions";
-import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
+import { clientOnlyActor, db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import {
   clientCompanies,
   clientInventoryItems,
@@ -214,11 +214,17 @@ export async function listClientInventoryItems(
   if (companyId) {
     filters.push(eq(clientInventoryItems.clientCompanyId, companyId));
   }
-  return withOrgQuery<ClientInventoryItem[]>(orgId, (database) =>
-    database
-      .select()
-      .from(clientInventoryItems)
-      .where(and(...filters))
-      .orderBy(asc(clientInventoryItems.name))
+  const actor = session.user.isClient
+    ? clientOnlyActor(session.user, companyId)
+    : undefined;
+  return withOrgQuery<ClientInventoryItem[]>(
+    orgId,
+    (database) =>
+      database
+        .select()
+        .from(clientInventoryItems)
+        .where(and(...filters))
+        .orderBy(asc(clientInventoryItems.name)),
+    actor
   );
 }

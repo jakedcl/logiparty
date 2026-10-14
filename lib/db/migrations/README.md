@@ -31,6 +31,8 @@ npm run db:migrate:sql
 | `0020_job_status_denied.sql` | job_status enum + `denied` (reject portal draft) |
 | `0021_client_inventory_requests.sql` | portal inventory change requests (add/qty/remove) |
 | `0022_client_notes.sql` | client → tenant general notes (one-way, unread via `read_at`) |
+| `0023_drop_warehouses.sql` | drop unused warehouse columns |
+| `0024_client_isolation_rls.sql` | client-company RLS on top of org isolation |
 
 Then seed (optional):
 
