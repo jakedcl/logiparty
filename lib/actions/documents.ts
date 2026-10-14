@@ -10,7 +10,7 @@ import {
   canManageJobs,
   canUploadDocuments,
 } from "@/lib/auth/permissions";
-import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
+import { clientOnlyActor, db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import {
   documents,
   jobs,
@@ -32,6 +32,13 @@ async function assertCanAccessJob(orgId: string, jobId: string) {
   if (session.user.orgId !== orgId) throw new Error("Forbidden");
   if (!db) throw new Error("Database not configured");
 
+  const company = canAccessClientPortal(session.user)
+    ? await getSessionClientCompany(session)
+    : null;
+  const actor = company
+    ? clientOnlyActor(session.user, company.id)
+    : undefined;
+
   const jobRows = await withOrgQuery<(typeof jobs.$inferSelect)[]>(
     orgId,
     (database) =>
@@ -39,19 +46,19 @@ async function assertCanAccessJob(orgId: string, jobId: string) {
         .select()
         .from(jobs)
         .where(and(eq(jobs.id, jobId), eq(jobs.orgId, orgId)))
-        .limit(1)
+        .limit(1),
+    actor
   );
   const job = jobRows[0];
   if (!job) throw new Error("Job not found");
 
-  if (canManageJobs(session.user)) return { session, job };
+  if (canManageJobs(session.user)) return { session, job, actor: undefined };
 
   if (canAccessClientPortal(session.user)) {
-    const company = await getSessionClientCompany(session);
     if (!company || company.id !== job.clientCompanyId) {
       throw new Error("Forbidden");
     }
-    return { session, job };
+    return { session, job, actor };
   }
 
   throw new Error("Forbidden");
@@ -61,14 +68,17 @@ export async function listJobDocuments(
   orgId: string,
   jobId: string
 ): Promise<JobDocumentView[]> {
-  await assertCanAccessJob(orgId, jobId);
+  const { actor } = await assertCanAccessJob(orgId, jobId);
 
-  const rows = await withOrgQuery<Document[]>(orgId, (database) =>
-    database
-      .select()
-      .from(documents)
-      .where(and(eq(documents.jobId, jobId), eq(documents.orgId, orgId)))
-      .orderBy(asc(documents.createdAt))
+  const rows = await withOrgQuery<Document[]>(
+    orgId,
+    (database) =>
+      database
+        .select()
+        .from(documents)
+        .where(and(eq(documents.jobId, jobId), eq(documents.orgId, orgId)))
+        .orderBy(asc(documents.createdAt)),
+    actor
   );
 
   return Promise.all(
@@ -91,7 +101,7 @@ export async function uploadJobDocument(formData: FormData) {
   const jobId = formData.get("jobId") as string;
   if (!jobId) throw new Error("Missing job id");
 
-  const { job } = await assertCanAccessJob(session.user.orgId, jobId);
+  const { job, actor } = await assertCanAccessJob(session.user.orgId, jobId);
 
   const file = formData.get("file");
   if (!(file instanceof File)) throw new Error("Choose a file to upload");
@@ -134,7 +144,9 @@ export async function uploadJobDocument(formData: FormData) {
         clientCompanyId: job.clientCompanyId,
       },
     }),
-  ]);
+  ],
+    actor
+  );
 
   revalidatePath(`/dashboard/jobs/${jobId}`);
   revalidatePath(`/portal/jobs/${jobId}`);
@@ -148,20 +160,23 @@ export async function deleteJobDocument(formData: FormData) {
   const id = formData.get("id") as string;
   if (!jobId || !id) throw new Error("Missing document id");
 
-  await assertCanAccessJob(session.user.orgId, jobId);
+  const { actor } = await assertCanAccessJob(session.user.orgId, jobId);
 
-  const rows = await withOrgQuery<Document[]>(session.user.orgId, (database) =>
-    database
-      .select()
-      .from(documents)
-      .where(
-        and(
-          eq(documents.id, id),
-          eq(documents.jobId, jobId),
-          eq(documents.orgId, session.user.orgId)
+  const rows = await withOrgQuery<Document[]>(
+    session.user.orgId,
+    (database) =>
+      database
+        .select()
+        .from(documents)
+        .where(
+          and(
+            eq(documents.id, id),
+            eq(documents.jobId, jobId),
+            eq(documents.orgId, session.user.orgId)
+          )
         )
-      )
-      .limit(1)
+        .limit(1),
+    actor
   );
   const doc = rows[0];
   if (!doc) throw new Error("Document not found");
@@ -197,7 +212,9 @@ export async function deleteJobDocument(formData: FormData) {
       isClientVisible: true,
       metadata: { fileName: doc.fileName },
     }),
-  ]);
+  ],
+    actor
+  );
 
   revalidatePath(`/dashboard/jobs/${jobId}`);
   revalidatePath(`/portal/jobs/${jobId}`);

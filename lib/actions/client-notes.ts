@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
 import { canManageJobs } from "@/lib/auth/permissions";
-import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
+import { clientOnlyActor, db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import {
   clientCompanies,
   clientNotes,
@@ -111,17 +111,20 @@ export async function listPortalClientNotes(
   const { session, company } = await requireClientPortalCompany();
   if (session.user.orgId !== orgId) throw new Error("Forbidden");
 
-  const rows = await withOrgQuery<ClientNote[]>(orgId, (database) =>
-    database
-      .select()
-      .from(clientNotes)
-      .where(
-        and(
-          eq(clientNotes.orgId, orgId),
-          eq(clientNotes.clientCompanyId, company.id)
+  const rows = await withOrgQuery<ClientNote[]>(
+    orgId,
+    (database) =>
+      database
+        .select()
+        .from(clientNotes)
+        .where(
+          and(
+            eq(clientNotes.orgId, orgId),
+            eq(clientNotes.clientCompanyId, company.id)
+          )
         )
-      )
-      .orderBy(desc(clientNotes.createdAt))
+        .orderBy(desc(clientNotes.createdAt)),
+    clientOnlyActor(session.user, company.id)
   );
 
   return enrichNotes(orgId, rows);
@@ -151,7 +154,9 @@ export async function sendClientNote(formData: FormData) {
   const body = requireBody(formData.get("body"));
 
   const id = randomUUID();
-  await withOrgQueries(session.user.orgId, (database) => [
+  await withOrgQueries(
+    session.user.orgId,
+    (database) => [
     database.insert(clientNotes).values({
       id,
       orgId: session.user.orgId,
@@ -174,7 +179,9 @@ export async function sendClientNote(formData: FormData) {
       },
       isClientVisible: true,
     }),
-  ]);
+  ],
+    clientOnlyActor(session.user, company.id)
+  );
 
   revalidateNotePaths();
   redirect("/portal/notes");

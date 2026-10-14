@@ -10,9 +10,13 @@ async function main() {
   if (!url) throw new Error("DATABASE_URL required");
   const sql = neon(url);
 
-  const [a] = await sql`SELECT id, slug FROM organizations WHERE slug = 'nydac' LIMIT 1`;
+  const [a] = await sql`
+    SELECT id, slug FROM organizations
+    ORDER BY (slug = 'nydac') DESC, slug
+    LIMIT 1
+  `;
   if (!a) {
-    throw new Error("Need nydac org — run npm run db:seed");
+    throw new Error("Need at least one organization — run npm run db:seed");
   }
 
   const probeSlug = `rls-probe-${Date.now()}`;

@@ -6,7 +6,13 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
 import { canManageClientInventory } from "@/lib/auth/permissions";
-import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
+import {
+  clientOnlyActor,
+  db,
+  withOrgQueries,
+  withOrgQuery,
+  type OrgActor,
+} from "@/lib/db";
 import {
   clientCompanies,
   clientInventoryItems,
@@ -89,7 +95,8 @@ async function requireInventoryRequestReviewer() {
 
 async function enrichRequests(
   orgId: string,
-  rows: ClientInventoryRequest[]
+  rows: ClientInventoryRequest[],
+  actor?: OrgActor
 ): Promise<InventoryRequestView[]> {
   if (rows.length === 0) return [];
 
@@ -113,29 +120,35 @@ async function enrichRequests(
       })
       .from(users)
       .where(inArray(users.id, userIds)),
-    withOrgQuery<{ id: string; name: string }[]>(orgId, (database) =>
-      database
-        .select({ id: clientCompanies.id, name: clientCompanies.name })
-        .from(clientCompanies)
-        .where(
-          and(
-            eq(clientCompanies.orgId, orgId),
-            inArray(clientCompanies.id, companyIds)
-          )
-        )
+    withOrgQuery<{ id: string; name: string }[]>(
+      orgId,
+      (database) =>
+        database
+          .select({ id: clientCompanies.id, name: clientCompanies.name })
+          .from(clientCompanies)
+          .where(
+            and(
+              eq(clientCompanies.orgId, orgId),
+              inArray(clientCompanies.id, companyIds)
+            )
+          ),
+      actor
     ),
     itemIds.length === 0
       ? Promise.resolve([] as ClientInventoryItem[])
-      : withOrgQuery<ClientInventoryItem[]>(orgId, (database) =>
-          database
-            .select()
-            .from(clientInventoryItems)
-            .where(
-              and(
-                eq(clientInventoryItems.orgId, orgId),
-                inArray(clientInventoryItems.id, itemIds)
-              )
-            )
+      : withOrgQuery<ClientInventoryItem[]>(
+          orgId,
+          (database) =>
+            database
+              .select()
+              .from(clientInventoryItems)
+              .where(
+                and(
+                  eq(clientInventoryItems.orgId, orgId),
+                  inArray(clientInventoryItems.id, itemIds)
+                )
+              ),
+          actor
         ),
   ]);
 
@@ -198,20 +211,24 @@ export async function listPortalInventoryRequests(
   const { session, company } = await requireClientPortalCompany();
   if (session.user.orgId !== orgId) throw new Error("Forbidden");
 
-  const rows = await withOrgQuery<ClientInventoryRequest[]>(orgId, (database) =>
-    database
-      .select()
-      .from(clientInventoryRequests)
-      .where(
-        and(
-          eq(clientInventoryRequests.orgId, orgId),
-          eq(clientInventoryRequests.clientCompanyId, company.id)
+  const actor = clientOnlyActor(session.user, company.id);
+  const rows = await withOrgQuery<ClientInventoryRequest[]>(
+    orgId,
+    (database) =>
+      database
+        .select()
+        .from(clientInventoryRequests)
+        .where(
+          and(
+            eq(clientInventoryRequests.orgId, orgId),
+            eq(clientInventoryRequests.clientCompanyId, company.id)
+          )
         )
-      )
-      .orderBy(desc(clientInventoryRequests.createdAt))
+        .orderBy(desc(clientInventoryRequests.createdAt)),
+    actor
   );
 
-  return enrichRequests(orgId, rows);
+  return enrichRequests(orgId, rows, actor);
 }
 
 export async function listPendingInventoryRequests(
@@ -253,7 +270,10 @@ export async function requestInventoryAdd(formData: FormData) {
   if (!name) throw new Error("Name is required");
 
   const id = randomUUID();
-  await withOrgQueries(session.user.orgId, (database) => [
+  const actor = clientOnlyActor(session.user, company.id);
+  await withOrgQueries(
+    session.user.orgId,
+    (database) => [
     database.insert(clientInventoryRequests).values({
       id,
       orgId: session.user.orgId,
@@ -282,7 +302,9 @@ export async function requestInventoryAdd(formData: FormData) {
       },
       isClientVisible: true,
     }),
-  ]);
+  ],
+    actor
+  );
 
   revalidateInventoryPaths(company.id);
   redirect("/portal/inventory");
@@ -296,6 +318,7 @@ export async function requestInventoryQtyChange(formData: FormData) {
   const quantity = parseQuantity(formData.get("quantity"));
   const reason = requireReason(formData.get("reason"));
 
+  const actor = clientOnlyActor(session.user, company.id);
   const items = await withOrgQuery<ClientInventoryItem[]>(
     session.user.orgId,
     (database) =>
@@ -309,13 +332,16 @@ export async function requestInventoryQtyChange(formData: FormData) {
             eq(clientInventoryItems.clientCompanyId, company.id)
           )
         )
-        .limit(1)
+        .limit(1),
+    actor
   );
   const item = items[0];
   if (!item) throw new Error("Item not found");
 
   const id = randomUUID();
-  await withOrgQueries(session.user.orgId, (database) => [
+  await withOrgQueries(
+    session.user.orgId,
+    (database) => [
     database.insert(clientInventoryRequests).values({
       id,
       orgId: session.user.orgId,
@@ -344,7 +370,9 @@ export async function requestInventoryQtyChange(formData: FormData) {
       },
       isClientVisible: true,
     }),
-  ]);
+  ],
+    actor
+  );
 
   revalidateInventoryPaths(company.id);
   redirect("/portal/inventory");
@@ -357,6 +385,7 @@ export async function requestInventoryRemove(formData: FormData) {
   if (!itemId) throw new Error("Missing item id");
   const reason = requireReason(formData.get("reason"));
 
+  const actor = clientOnlyActor(session.user, company.id);
   const items = await withOrgQuery<ClientInventoryItem[]>(
     session.user.orgId,
     (database) =>
@@ -370,13 +399,16 @@ export async function requestInventoryRemove(formData: FormData) {
             eq(clientInventoryItems.clientCompanyId, company.id)
           )
         )
-        .limit(1)
+        .limit(1),
+    actor
   );
   const item = items[0];
   if (!item) throw new Error("Item not found");
 
   const id = randomUUID();
-  await withOrgQueries(session.user.orgId, (database) => [
+  await withOrgQueries(
+    session.user.orgId,
+    (database) => [
     database.insert(clientInventoryRequests).values({
       id,
       orgId: session.user.orgId,
@@ -404,7 +436,9 @@ export async function requestInventoryRemove(formData: FormData) {
       },
       isClientVisible: true,
     }),
-  ]);
+  ],
+    actor
+  );
 
   revalidateInventoryPaths(company.id);
   redirect("/portal/inventory");
