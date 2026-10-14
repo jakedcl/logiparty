@@ -31,8 +31,10 @@ The database is Postgres on Neon, accessed with Drizzle over the HTTP driver (`l
 - The migrations in `lib/db/migrations/` turn on RLS for most of the tenant tables, with policies that compare `org_id` to the `app.current_org_id` setting.
 - The connecting Neon role owns the tables and would bypass RLS, so migration `0009` creates a `logiparty_app` role without `BYPASSRLS`.
 - `withOrgQuery` and `withOrgQueries` in `lib/db/index.ts` run a batch of `SET LOCAL ROLE logiparty_app`, then `set_config('app.current_org_id', ...)`, then the actual queries in one transaction. That is why tenant queries go through these helpers. A plain `set_config` doesn't carry across separate HTTP calls.
+- Migration `0024` adds client-company isolation on top of that. A client-only session also sets `app.is_client`, `app.client_company_id`, and `app.current_user_id` in the same batch. Restrictive policies then limit that session to its own company's rows (`client_companies`, `jobs` and their child rows, `documents`, `client_inventory_items`, and read/insert on `client_inventory_requests`). `client_notes` and `availability_requests` are hidden from clients. Admin, manager, and staff sessions leave `app.is_client` false, so they still see the whole org. Who may write what stays in `lib/auth/permissions.ts`, not in SQL.
 - Some code uses the plain `db` client outside RLS, on purpose: login, looking up the org for a session, the Stripe webhook and the cron route, which all have to work across orgs.
 - `npm run db:verify-rls` and `npm run test:integration` check the policies.
+- Apply SQL with a filename: `npm run db:migrate:sql -- <file>`. The runner has no journal and re-runs every migration if you omit the name.
 
 Most mutations write an `activity_logs` row in the same transaction (`lib/activity/log.ts`).
 
