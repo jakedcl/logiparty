@@ -582,4 +582,3 @@ export async function denyInventoryRequest(formData: FormData) {
   revalidateInventoryPaths(existing.clientCompanyId);
 }
 
-export { typeLabel as inventoryRequestTypeLabel };
