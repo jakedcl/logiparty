@@ -24,7 +24,7 @@ function redirectToApex(request: NextRequest) {
   return NextResponse.redirect(new URL("/", apex));
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
   const orgSlug = getOrgSlugFromHost(host);
   const { pathname } = request.nextUrl;
@@ -55,7 +55,7 @@ export async function middleware(request: NextRequest) {
   });
 
   const requestHeaders = new Headers(request.headers);
-  // Only middleware may set tenant context (ignore client-supplied values).
+  // Only proxy may set tenant context (ignore client-supplied values).
   requestHeaders.delete("x-org-slug");
   // Prefer host slug; fall back to JWT orgSlug (authenticated routes must not
   // require the host to resolve an org when the session already has one).
