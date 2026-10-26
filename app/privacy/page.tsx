@@ -1,12 +1,15 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
+import { marketingMetadata } from "@/lib/marketing/metadata";
 
-export const metadata: Metadata = {
+export const metadata = marketingMetadata({
   title: "Privacy — Logiparty",
   description:
-    "How Logiparty handles account, lead, and operations data during our invite-only pilot.",
-};
+    "How Logiparty handles account, lead, and operations data during early access.",
+  path: "/privacy",
+});
+
+export const revalidate = 3600;
 
 const UPDATED = "August 25, 2026";
 
@@ -17,8 +20,8 @@ export default function PrivacyPage() {
         <p className="text-sm font-bold text-[var(--m-accent)]">Legal</p>
         <h1 className="m-section-title mt-2 text-2xl sm:text-3xl">Privacy</h1>
         <p className="mt-3 text-sm text-[var(--m-muted)]">
-          Last updated {UPDATED}. Soft-pilot policy — honest about what we
-          collect while we onboard invite-only customers.
+          Last updated {UPDATED}. Early-access policy — honest about what we
+          collect while we onboard customers by invitation.
         </p>
 
         <div className="m-legal-prose mt-10 space-y-8 text-[var(--m-muted)] leading-relaxed">

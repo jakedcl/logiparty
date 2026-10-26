@@ -8,11 +8,11 @@ A 3PL company (a "tenant" or org) gets a workspace at `{slug}.logiparty.com`. It
 
 ## Tenant routing
 
-`middleware.ts` runs on every request.
+`proxy.ts` (Next.js request proxy) runs on every request.
 
 1. `lib/org/subdomain.ts` turns the Host header into an org slug: `nydac.logiparty.com` and `nydac.localhost` both give `nydac`. The apex domain and `www` give no slug (that's the marketing site). Bare `localhost` uses `NEXT_PUBLIC_DEV_ORG_SLUG` if set.
 2. If the slug has no row in `organizations`, the request is redirected to the apex. If the database can't be reached, the check is skipped so real tenants keep working.
-3. It reads the session JWT. Only middleware sets the `x-org-slug` header (any client-supplied value is deleted first), falling back to the org slug in the JWT.
+3. It reads the session JWT. Only the proxy sets the `x-org-slug` header (any client-supplied value is deleted first), falling back to the org slug in the JWT.
 4. Anyone without a session is sent to `/login`, except for `/login`, `/invite/*`, `/api/auth`, `/api/health`, `/api/stripe/webhook`, the apex homepage, the legal pages and `/demo`.
 5. Users who are only clients are kept out of `/dashboard` and sent to `/portal`. Non-clients are kept out of `/portal`.
 

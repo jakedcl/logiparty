@@ -1,16 +1,19 @@
-import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { DemoTour } from "@/components/demo/demo-tour";
 import { MarketingRoot } from "@/components/marketing/marketing-root";
 import { absoluteRedirectUrl } from "@/lib/auth/redirect";
+import { marketingMetadata } from "@/lib/marketing/metadata";
 import { getOrgSlugFromHost } from "@/lib/org/subdomain";
 
-export const metadata: Metadata = {
+export const metadata = marketingMetadata({
   title: "Product demo — Logiparty",
   description:
     "Interactive walkthrough of jobs, inventory, fleet, crew, and the white-label client portal. No login required.",
-};
+  path: "/demo",
+});
+
+export const revalidate = 3600;
 
 function isBareLocalHost(host: string): boolean {
   const hostname = host.split(":")[0]?.toLowerCase() ?? "";
