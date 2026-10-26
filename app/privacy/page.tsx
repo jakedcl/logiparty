@@ -109,7 +109,7 @@ export default function PrivacyPage() {
             </h2>
             <p className="mt-3">
               To operate your workspace, authenticate users, reply to access
-              requests, improve reliability during the pilot, and contact you
+              requests, improve reliability during early access, and contact you
               about the service. We do not sell personal data.
             </p>
           </section>
@@ -119,7 +119,7 @@ export default function PrivacyPage() {
               Retention &amp; your choices
             </h2>
             <p className="mt-3">
-              Pilot orgs: we keep account and ops data while your workspace is
+              Early-access orgs: we keep account and ops data while your workspace is
               active. Lead form submissions stay until we close the loop or you
               ask us to delete them. Email{" "}
               <a
@@ -138,7 +138,7 @@ export default function PrivacyPage() {
               Changes
             </h2>
             <p className="mt-3">
-              As we leave soft pilot, we may publish a fuller policy. Material
+              As we move beyond early access, we may publish a fuller policy. Material
               changes will be reflected on this page with an updated date. See
               also our{" "}
               <Link

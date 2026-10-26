@@ -43,12 +43,12 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold tracking-tight text-[var(--m-fg)]">
-              Invite-only pilot
+              Early access (invitation only)
             </h2>
             <p className="mt-3">
               There is no self-serve signup. Requesting access on the marketing
               site does not guarantee an account. We may accept, decline, or
-              delay onboarding. Pilot features, uptime, and support are
+              delay onboarding. Early-access features, uptime, and support are
               best-effort — not a formal SLA.
             </p>
           </section>
