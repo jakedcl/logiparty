@@ -91,6 +91,45 @@ async function login(email: string) {
   return jar;
 }
 
+/** Failed credential sign-in must stay on the tenant host, not apex AUTH_URL. */
+async function assertFailedLoginStaysOnTenant() {
+  const jar = cookieJar();
+  const csrfRes = await fetch(`${BASE}/api/auth/csrf`, {
+    headers: { cookie: jar.header() },
+  });
+  jar.absorb(csrfRes);
+  const { csrfToken } = (await csrfRes.json()) as { csrfToken: string };
+  const tenantHost = new URL(BASE).host;
+  const loginRes = await fetch(`${BASE}/api/auth/callback/credentials`, {
+    method: "POST",
+    redirect: "manual",
+    headers: {
+      "content-type": "application/x-www-form-urlencoded",
+      cookie: jar.header(),
+    },
+    body: new URLSearchParams({
+      csrfToken,
+      email: "ed@test.test",
+      password: "intentionally-wrong-password",
+      orgSlug: "nydac",
+      callbackUrl: `${BASE}/login`,
+    }),
+  });
+  const location = loginRes.headers.get("location") ?? "";
+  if (!location) {
+    return { ok: false, note: `expected redirect, got HTTP ${loginRes.status}` };
+  }
+  const resolved = new URL(location, BASE);
+  const ok =
+    resolved.host === tenantHost && resolved.pathname.startsWith("/login");
+  return {
+    ok,
+    note: ok
+      ? "bad password redirects to tenant /login"
+      : `Location ${location} (expected ${tenantHost}/login…)`,
+  };
+}
+
 async function getHtml(jar: ReturnType<typeof cookieJar>, path: string) {
   const res = await fetch(`${BASE}${path}`, {
     headers: { cookie: jar.header() },
@@ -115,6 +154,9 @@ async function main() {
   const sql = neon(url);
   const { assertAssignmentFits } = await import("../lib/jobs/inventory-locks");
   const { maybePromoteJobToReady } = await import("../lib/jobs/auto-ready");
+
+  const failLogin = await assertFailedLoginStaysOnTenant();
+  mark("login-fail-tenant", failLogin.ok, failLogin.note);
 
   const [tenant] = await sql`SELECT id FROM organizations WHERE slug = 'nydac'`;
   const [rb] =

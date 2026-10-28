@@ -17,10 +17,10 @@
     "db:relink-admin": "tsx scripts/relink-personal-admin.ts",
     "db:migrate:sql": "tsx scripts/run-migrations.ts",
     "db:verify-rls": "tsx scripts/verify-catalog-rls.ts",
-    "test:integration": "tsx scripts/integration-tests.ts"
+    "test:integration": "tsx scripts/integration-tests.ts",
+    "test:role-walk": "tsx scripts/verification-role-walk.ts"
   },
   "dependencies": {
-    "@auth/drizzle-adapter": "^1.11.3",
     "@aws-sdk/client-s3": "^3.1156.0",
     "@aws-sdk/s3-request-presigner": "^3.1156.0",
     "@neondatabase/serverless": "^1.2.0",
@@ -38,14 +38,12 @@
     "pdf-lib": "^1.17.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "resend": "^6.35.0",
     "stripe": "^22.5.0",
     "tailwind-merge": "^3.7.0",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.3.3",
-    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.19.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",

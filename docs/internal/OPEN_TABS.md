@@ -3,7 +3,7 @@
 **Purpose:** Single source of truth for what's open, blocked, and done.  
 Update this when you finish or start an item. Pick **one** active item before starting a new one.
 
-*Last updated: 2026-09-13 (A20 marketing + /demo + northline seed).*
+*Last updated: 2026-10-28 (dead-code hygiene + commercial/search/reports shipped).*
 
 ---
 
@@ -11,7 +11,7 @@ Update this when you finish or start an item. Pick **one** active item before st
 
 | ID | Task | Owner | Notes |
 |----|------|-------|-------|
-| **A1** | Jake tests job flow locally | Jake | Automated: `npx tsx scripts/golden-path-walk.ts` → **29 passed, 0 failed** (2026-08-19). Still worth one manual click-through on prod. |
+| **A1** | Jake tests job flow locally | Jake | Automated: `npx tsx scripts/golden-path-walk.ts` (includes tenant failed-login redirect check). Still worth one manual click-through on prod. |
 
 ---
 
@@ -19,7 +19,6 @@ Update this when you finish or start an item. Pick **one** active item before st
 
 | ID | Task | Notes |
 |----|------|-------|
-| **A12** | Staff accept/deny **job assignments** | Separate from manager deny of portal drafts (done). `job_assignments` still has no accept status. Needs product decision + small schema before UI. |
 | **A18b** | Warehouses / item locations (optional) | Deferred — nice detail, not required. No schema/filter until Jake asks. |
 
 ---
@@ -30,7 +29,6 @@ Update this when you finish or start an item. Pick **one** active item before st
 |----|------|------------|
 | B1 | Prod smoke test + logo on login | Login + logo OK. Dashboard 500 fixed (env was on Neon `vercel-dev`). Remaining: full smoke after login |
 | B2 | First real paying customer | Jake tested app + A3 homepage live |
-| B3 | Resend invite emails | Resend account + domain verify |
 | B4 | M6 (Stripe, self-serve signup, custom domains) | **Stripe scaffold done** (keys TBD). Remaining: Jake adds Stripe keys + webhook; self-serve signup + custom domains still later. Neon `main` + `vercel-dev` both have `0019`–`0022`. **2026-08-20:** Production `DATABASE_URL` was wrongly on `vercel-dev` (`ep-orange-cake…`); corrected to `main` pooler (`ep-red-surf…-pooler`) to match `DATABASE_URL_UNPOOLED`. |
 
 ---
@@ -67,9 +65,11 @@ Update this when you finish or start an item. Pick **one** active item before st
 - [x] **B4 partial** Stripe billing scaffold (optional, no keys required) — Checkout + portal + webhook + Settings Billing; soft `billing_status`; keys TBD.
 - [x] **Nav shell** Staff dashboard — left sidebar + mobile drawer (`DashboardShell`); portal unchanged; run-sheet location bullets → `ul`.
 - [x] **NYDAC rich seed** — `seedNydacRich()` in `lib/db/seed.ts`: Monster Energy + Gotham Glow clients, fat catalogs, 5 fleet, 6 jobs across draft/upcoming/ready/completed with locations/crew/fleet/qty_loaded + activity. Crew spread: Tom/Rob/Paul/Jerome each on 5 jobs; Mike/Don lead multiple; ready jobs full LI+LO. Neon **dev** only.
-- [x] **Staff nav UX** — Primary: Dashboard, Jobs / My Jobs, **Notifications**, **Inventory** (Client/Equipment/Fleet tabs), Team, Clients, **Settings**. Moved **Availability → Settings / Time off**, **Activity → Settings / Activity**. Old `/dashboard/availability` + `/dashboard/activity` redirect. Notifications = manager draft requests (Accept/Deny) + staff assignments (view/link; staff accept/deny → **A12**). Portal unchanged.
+- [x] **Staff nav UX** — Primary: Dashboard, Jobs / My Jobs, **Notifications**, **Inventory** (Client/Equipment/Fleet tabs), Team, Clients, **Settings**. Moved **Availability → Settings / Time off**, **Activity → Settings / Activity**. Old `/dashboard/availability` + `/dashboard/activity` redirect. Notifications = manager draft requests (Accept/Deny) + staff assignment notices. Portal unchanged.
 - [x] **Account menu** — Click name+role in dashboard/portal top bar → **My Profile** + **Sign out** only. Settings hub lists **My Profile** above Time off. Profile: edit first/last name; email read-only; change password if `password_hash` set. Paths: `/dashboard/settings/profile`, `/portal/profile` (`/dashboard/profile` redirects to settings). Sidebar/drawer brand: logo stacked above org name.
-- [x] **Manager deny portal draft** — New job status `denied` (migration `0020`). Managers Accept / Deny on job detail + Notifications; client portal shows denied (not stuck pending). D5b; distinct from **A12** staff assignment accept/deny. Neon **dev** migrated; seed example Monster Rooftop Soft Ask.
+- [x] **Manager deny portal draft** — New job status `denied` (migration `0020`). Managers Accept / Deny on job detail + Notifications; client portal shows denied (not stuck pending). D5b. Neon **dev** migrated; seed example Monster Rooftop Soft Ask.
+- [x] **A12** Crew job assignments — **Decision:** no separate accept/deny workflow. Managers add crew to jobs; assigned staff appear on **My Jobs** automatically; crew can **remove themselves** from a slot (managers notified). Distinct from portal draft accept/deny and from manager assignment edits.
+- [x] **B3** Resend transactional email — Domain **`mail.logiparty.com`** verified in Resend; **`EMAIL_FROM`** + **`RESEND_API_KEY`** set on Vercel Production. **Needs live send test** (prod invite or lead notify) to close the loop.
 - [x] **Clients tab contacts** — `/dashboard/clients` lists each company with a dense Name/Email/Title table of `client_users` (seed Michaela POC + Dom Rep under Red Bull on nydac). Invite contact + Add company stays collapsed create-last; invite flow unchanged.
 - [x] **Portal jobs list-first** — `/portal/jobs` matches A6/A7: dense Your jobs table (name/date/status chips/View) first; **+ New request** collapsed at bottom; subtitle tracks status first. Draft accept/deny copy unchanged. Auth/company scope untouched.
 - [x] **A13** Portal inventory **requests** v1 — clients request add / qty change / remove with reason; managers Approve (apply to `client_inventory_items`) or Deny (+ optional note). Table `client_inventory_requests` + migration `0021`. Portal `/portal/inventory` list-first + collapsed + Request new item + Your requests. Staff: Notifications + Client inventory pending panel. Seed: 2 Red Bull pending samples (cooler qty + umbrella add). Neon **dev** migrated + seeded.
@@ -86,6 +86,10 @@ Update this when you finish or start an item. Pick **one** active item before st
 - [x] **A18 Inventory nested sidebar** — Inventory expands to Client | Equipment | Fleet in the staff sidebar (primary nav); `?tab=` deep-links kept; page segment tabs removed to avoid double chrome. PR #40.
 - [x] **RowActions portal** — shared `RowActionsMenu` portals ⋯ menus to `document.body` (fixed + flip-up) so `.lp-table-wrap` overflow cannot clip; Client/Equipment/portal inventory + QuietRemove. Org Settings: removed Email from name; invites use `organizations.name`.
 - [x] **A20** Marketing homepage product tour + public `/demo` guided walkthrough (static mocks, no login). Seed tenant **`northline`** (Summit Brands / Harbor Co.) for film/login; matches demo copy. Middleware allows `/demo` on apex.
+- [x] **Global search** — staff + portal command palette (`components/search/command-palette.tsx`, `/api/search`); ⌘K / mobile trigger in dashboard + portal shells.
+- [x] **Staff reports** — `/dashboard/reports` (jobs by status, upcoming load-ins, client activity); CSV export via `/api/reports/export`.
+- [x] **Quotes & invoicing v1** — migrations `0026`–`0027`; staff quotes/invoices + portal approve; commercial settings; see `docs/internal/QUOTES_INVOICES_PLAN.md` (shipped note) + `docs/SCHEMA.md`.
+- [x] **Tenant login errors** — failed credentials POST stays on tenant `/login?error=1` (`redirect: false` on `signIn`, not apex `AUTH_URL`).
 ---
 
 ## Current environments

@@ -129,32 +129,24 @@ export default async function LoginPage({
               "use server";
               const email = formData.get("email") as string;
               const password = formData.get("password") as string;
-              try {
-                const reqHeaders = await headers();
-                // Absolute URL keeps post-login on tenant subdomain (AUTH_URL is apex).
-                await signIn("credentials", {
-                  email,
-                  password,
-                  orgSlug,
-                  redirectTo: absoluteRedirectUrl(reqHeaders, "/"),
-                });
-              } catch (error) {
-                // Auth.js throws a redirect on success — rethrow so it isn't treated as failure.
-                if (
-                  typeof error === "object" &&
-                  error &&
-                  "digest" in error &&
-                  String((error as { digest?: string }).digest).startsWith(
-                    "NEXT_REDIRECT"
-                  )
-                ) {
-                  throw error;
-                }
-                const reqHeaders = await headers();
-                redirect(
-                  absoluteRedirectUrl(reqHeaders, "/login?error=1")
-                );
+              const reqHeaders = await headers();
+              // redirect: false — Auth.js otherwise sends relative /login to AUTH_URL (apex).
+              const result = await signIn("credentials", {
+                email,
+                password,
+                orgSlug,
+                redirect: false,
+              });
+              if (result?.error) {
+                redirect(absoluteRedirectUrl(reqHeaders, "/login?error=1"));
               }
+              const session = await auth();
+              if (!session?.user) {
+                redirect(absoluteRedirectUrl(reqHeaders, "/login?error=1"));
+              }
+              redirect(
+                absoluteRedirectUrl(reqHeaders, postAuthPath(session.user))
+              );
             }}
             className="space-y-4"
           >
