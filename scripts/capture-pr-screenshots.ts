@@ -63,24 +63,11 @@ async function main() {
   await page.getByRole("heading", { name: "Jobs by status" }).waitFor();
   await page.screenshot({ path: `${OUT}/reports.png` });
 
-  await login(context, "ed@test.test");
-  await page.goto(`${BASE}/dashboard/help`, { waitUntil: "networkidle" });
-  await page.getByRole("heading", { name: "Help" }).waitFor();
-  await page.screenshot({ path: `${OUT}/help.png` });
-
   await page.goto(`${BASE}/this-route-does-not-exist-qa`, {
     waitUntil: "networkidle",
   });
   await page.getByText("Page not found").waitFor();
   await page.screenshot({ path: `${OUT}/tenant-404.png` });
-
-  await login(context, "paul@test.test");
-  await page.goto(`${BASE}/dashboard/my-jobs`, { waitUntil: "networkidle" });
-  const jobLink = page.locator('a[href^="/dashboard/my-jobs/"]').first();
-  await jobLink.waitFor({ timeout: 15000 });
-  await jobLink.click();
-  await page.getByText("Your crew slots").waitFor({ timeout: 15000 });
-  await page.screenshot({ path: `${OUT}/crew-remove.png` });
 
   await browser.close();
   console.log(`saved screenshots under ${OUT}/`);

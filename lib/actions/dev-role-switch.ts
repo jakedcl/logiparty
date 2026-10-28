@@ -49,6 +49,6 @@ export async function switchDevPersona(formData: FormData): Promise<void> {
     ) {
       throw error;
     }
-    redirect("/login?error=1");
+    redirect(absoluteRedirectUrl(headersList, "/login?error=1"));
   }
 }

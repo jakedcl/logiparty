@@ -3,7 +3,7 @@
 Multi-tenant SaaS for 3PL companies (warehouse, fleet, crew for events and deliveries). Each org gets a subdomain workspace plus a white-label client portal. Live: logiparty.com (demo tenant: test.logiparty.com).
 
 ## Stack (from package.json)
-Next.js ^15.5 App Router, React ^19.2, Tailwind 4, shadcn/ui (cva, tailwind-merge), NextAuth 5 beta + Drizzle adapter, Drizzle ORM ^0.45 on Neon Postgres with RLS, Cloudflare R2 (AWS S3 SDK), Resend, Stripe (scaffolded, off without keys), zod 4. Deployed on Vercel.
+Next.js ^15.5 App Router, React ^19.2, Tailwind 4, shadcn/ui (cva, tailwind-merge), NextAuth 5 beta (JWT credentials), Drizzle ORM ^0.45 on Neon Postgres with RLS, Cloudflare R2 (AWS S3 SDK), Resend (HTTP API), Stripe (scaffolded, off without keys), zod 4. Deployed on Vercel.
 
 ## Layout
 - `app/` marketing site, `dashboard/` (staff), `portal/` (clients), `demo/`, `api/`, `(auth)`, `invite/`
@@ -32,3 +32,13 @@ Next.js ^15.5 App Router, React ^19.2, Tailwind 4, shadcn/ui (cva, tailwind-merg
 - No "Logiparty" branding in 3PL staff UI (white-label). Accounts are invite-only; staff see assigned jobs only; clients see their client_company only.
 - `thirdpartylogistics/` is a local legacy copy (not in git). Don't edit it.
 - Server Actions body limit is 20mb (`next.config.ts`), for document uploads.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

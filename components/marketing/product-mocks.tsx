@@ -24,7 +24,7 @@ export function MockJobs() {
   );
 }
 
-export function MockInventory() {
+function MockInventory() {
   return (
     <div className="m-mock m-mock-flush">
       <div className="m-mock-bar">
@@ -49,7 +49,7 @@ export function MockInventory() {
   );
 }
 
-export function MockPortal() {
+function MockPortal() {
   return (
     <div className="m-mock m-mock-flush">
       <div className="m-mock-bar m-mock-bar-brand">
@@ -74,7 +74,7 @@ export function MockPortal() {
   );
 }
 
-export function MockStaff() {
+function MockStaff() {
   return (
     <div className="m-mock m-mock-flush">
       <div className="m-mock-bar">

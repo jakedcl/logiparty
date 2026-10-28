@@ -5,7 +5,7 @@ Single list of large features so nothing gets lost between QA reports and OPEN_T
 
 | Priority | Feature | Why it matters for a real 3PL | Effort | Status |
 |----------|---------|------------------------------|--------|--------|
-| P2a | **Quotes & invoicing (remaining)** | Quote-to-cash is table stakes vs Current RMS / Rentman; pilots still invoice manually without it. | M–L | **partial** — quotes, portal approve, convert, invoices, Stripe link in PR #60; tax settings UI, email on send, revise/version UX, deposit invoices TBD |
+| P2a | **Quotes & invoicing (remaining)** | Quote-to-cash is table stakes vs Current RMS / Rentman; pilots still invoice manually without it. | M–L | **partial** — core quotes/invoices/portal approve on `main` (0026–0027); tax UI, send email, deposits, revise flow TBD |
 | P2b | **Accounting sync (QuickBooks / Xero)** | Bookkeepers re-key invoices without export; errors and delay month-end close. | L | planned |
 | P2c | **Serialized assets + barcode/QR scan-out & packing lists** | SKU/qty-only cannot trace one missing amp; scan-out is how warehouses trust the system. | L | planned |
 | P2d | **Subrentals & substitutes** | Shortages on big jobs require vendor gear or alternate SKU, not a phone call outside the app. | L | planned |

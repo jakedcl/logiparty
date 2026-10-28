@@ -2,10 +2,11 @@ import { headers } from "next/headers";
 import { eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { organizations } from "@/lib/db/schema";
+import { getOrgSlugFromHeaders as getOrgSlugFromHeadersSync } from "@/lib/org/subdomain";
 
 export async function getOrgSlugFromHeaders(): Promise<string | null> {
   const headersList = await headers();
-  return headersList.get("x-org-slug")?.trim() || null;
+  return getOrgSlugFromHeadersSync(headersList);
 }
 
 export async function getOrgBySlugFromHeaders() {

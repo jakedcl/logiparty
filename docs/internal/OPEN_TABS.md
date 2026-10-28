@@ -3,7 +3,7 @@
 **Purpose:** Single source of truth for what's open, blocked, and done.  
 Update this when you finish or start an item. Pick **one** active item before starting a new one.
 
-*Last updated: 2026-09-13 (A20 marketing + /demo + northline seed).*
+*Last updated: 2026-10-28 (dead-code hygiene + commercial/search/reports shipped).*
 
 ---
 
@@ -11,7 +11,7 @@ Update this when you finish or start an item. Pick **one** active item before st
 
 | ID | Task | Owner | Notes |
 |----|------|-------|-------|
-| **A1** | Jake tests job flow locally | Jake | Automated: `npx tsx scripts/golden-path-walk.ts` → **29 passed, 0 failed** (2026-08-19). Still worth one manual click-through on prod. |
+| **A1** | Jake tests job flow locally | Jake | Automated: `npx tsx scripts/golden-path-walk.ts` (includes tenant failed-login redirect check). Still worth one manual click-through on prod. |
 
 ---
 
@@ -86,6 +86,10 @@ Update this when you finish or start an item. Pick **one** active item before st
 - [x] **A18 Inventory nested sidebar** — Inventory expands to Client | Equipment | Fleet in the staff sidebar (primary nav); `?tab=` deep-links kept; page segment tabs removed to avoid double chrome. PR #40.
 - [x] **RowActions portal** — shared `RowActionsMenu` portals ⋯ menus to `document.body` (fixed + flip-up) so `.lp-table-wrap` overflow cannot clip; Client/Equipment/portal inventory + QuietRemove. Org Settings: removed Email from name; invites use `organizations.name`.
 - [x] **A20** Marketing homepage product tour + public `/demo` guided walkthrough (static mocks, no login). Seed tenant **`northline`** (Summit Brands / Harbor Co.) for film/login; matches demo copy. Middleware allows `/demo` on apex.
+- [x] **Global search** — staff + portal command palette (`components/search/command-palette.tsx`, `/api/search`); ⌘K / mobile trigger in dashboard + portal shells.
+- [x] **Staff reports** — `/dashboard/reports` (jobs by status, upcoming load-ins, client activity); CSV export via `/api/reports/export`.
+- [x] **Quotes & invoicing v1** — migrations `0026`–`0027`; staff quotes/invoices + portal approve; commercial settings; see `docs/internal/QUOTES_INVOICES_PLAN.md` (shipped note) + `docs/SCHEMA.md`.
+- [x] **Tenant login errors** — failed credentials POST stays on tenant `/login?error=1` (`redirect: false` on `signIn`, not apex `AUTH_URL`).
 ---
 
 ## Current environments

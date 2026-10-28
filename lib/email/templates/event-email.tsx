@@ -95,4 +95,3 @@ const button = {
   padding: "10px 16px",
 };
 
-export default EventEmail;
