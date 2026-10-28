@@ -2,6 +2,7 @@
 
 import { and, asc, desc, eq, ilike, inArray, or } from "drizzle-orm";
 import {
+  canManageCommercial,
   canManageJobs,
   canViewFleet,
   canViewMyJobs,
@@ -13,6 +14,8 @@ import {
   inventoryItems,
   jobAssignments,
   jobs,
+  invoices,
+  quotes,
   orgMemberships,
   users,
 } from "@/lib/db/schema";
@@ -48,6 +51,7 @@ export async function globalSearch(
 
   const pattern = `%${q}%`;
   const isManager = canManageJobs(session.user);
+  const canCommercial = canManageCommercial(session.user);
   const isStaff = canViewMyJobs(session.user);
   const tags = await getSessionStaffTags(session);
   const canFleet = canViewFleet(session.user);
@@ -105,6 +109,72 @@ export async function globalSearch(
           title: c.name,
           subtitle: "Client company",
           href: `/dashboard/clients`,
+        })),
+      });
+    }
+  }
+
+  if (canCommercial) {
+    const quoteRows = await withOrgQuery<
+      { id: string; quoteNumber: string; title: string; status: string }[]
+    >(orgId, (database) =>
+      database
+        .select({
+          id: quotes.id,
+          quoteNumber: quotes.quoteNumber,
+          title: quotes.title,
+          status: quotes.status,
+        })
+        .from(quotes)
+        .where(
+          and(
+            eq(quotes.orgId, orgId),
+            or(
+              ilike(quotes.quoteNumber, pattern),
+              ilike(quotes.title, pattern)
+            )
+          )
+        )
+        .limit(LIMIT)
+    );
+    if (quoteRows.length) {
+      groups.push({
+        label: "Quotes",
+        items: quoteRows.map((r) => ({
+          id: r.id,
+          title: r.quoteNumber,
+          subtitle: `${r.title} · ${r.status}`,
+          href: `/dashboard/quotes/${r.id}`,
+        })),
+      });
+    }
+
+    const invoiceRows = await withOrgQuery<
+      { id: string; invoiceNumber: string; status: string }[]
+    >(orgId, (database) =>
+      database
+        .select({
+          id: invoices.id,
+          invoiceNumber: invoices.invoiceNumber,
+          status: invoices.status,
+        })
+        .from(invoices)
+        .where(
+          and(
+            eq(invoices.orgId, orgId),
+            ilike(invoices.invoiceNumber, pattern)
+          )
+        )
+        .limit(LIMIT)
+    );
+    if (invoiceRows.length) {
+      groups.push({
+        label: "Invoices",
+        items: invoiceRows.map((r) => ({
+          id: r.id,
+          title: r.invoiceNumber,
+          subtitle: r.status,
+          href: `/dashboard/invoices/${r.id}`,
         })),
       });
     }

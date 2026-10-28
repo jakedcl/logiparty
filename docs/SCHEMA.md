@@ -231,7 +231,7 @@ Clients do **not** edit this catalog directly. They submit rows in `client_inven
 
 ## Commercial (quotes & invoicing)
 
-Migrations `0025_commercial_core.sql`, `0026_commercial_client_rls.sql`. See `docs/internal/QUOTES_INVOICES_PLAN.md`.
+Migrations `0025_search_notify.sql` (search + notify prefs), `0026_commercial_core.sql`, `0027_commercial_client_rls.sql`. See `docs/internal/QUOTES_INVOICES_PLAN.md`.
 
 Tables: `rate_cards`, `rate_card_lines`, `quotes`, `quote_lines`, `quote_versions`, `quote_client_responses`, `invoices`, `invoice_lines`, `invoice_payments`. Org columns: quote/invoice prefixes, numbering, tax defaults (`organizations`).
 

@@ -5,6 +5,7 @@ import {
   deleteQuoteLine,
   getQuoteDetail,
   getQuotePdfUrl,
+  reviseQuote,
   sendQuote,
   updateQuoteMeta,
   upsertQuoteLine,
@@ -51,6 +52,16 @@ export default async function QuoteDetailPage({ params }: Props) {
             <Button type="submit">Send to client</Button>
           </form>
         )}
+        {(quote.status === "sent" ||
+          quote.status === "declined" ||
+          quote.status === "expired") &&
+          !quote.jobId && (
+            <form action={reviseQuote.bind(null, orgId, id)}>
+              <Button type="submit" variant="secondary">
+                Revise (new version)
+              </Button>
+            </form>
+          )}
         {quote.status === "approved" && !quote.jobId && (
           <form action={convertQuoteToJob.bind(null, orgId, id)}>
             <Button type="submit">Convert to job</Button>

@@ -7,6 +7,10 @@ import {
   listRateCardLines,
 } from "@/lib/actions/rate-cards";
 import {
+  getOrgCommercialSettings,
+  updateOrgCommercialSettings,
+} from "@/lib/actions/commercial-settings";
+import {
   canManageCommercial,
   canManageCommercialSettings,
 } from "@/lib/auth/permissions";
@@ -20,6 +24,9 @@ export default async function CommercialSettingsPage() {
   const orgId = session.user.orgId;
   const lines = await listRateCardLines(orgId);
   const { equipment, fleet } = await listRateCardCatalogOptions(orgId);
+  const orgSettings = canManageCommercialSettings(session.user)
+    ? await getOrgCommercialSettings(orgId)
+    : null;
 
   return (
     <div className="space-y-8 max-w-2xl">
@@ -32,6 +39,87 @@ export default async function CommercialSettingsPage() {
           Default rates for equipment, labor, and fleet on quotes.
         </p>
       </div>
+
+      {orgSettings && (
+        <form
+          action={updateOrgCommercialSettings.bind(null, orgId)}
+          className="space-y-3 border border-[var(--border)] rounded-md p-4"
+        >
+          <h2 className="text-sm font-medium">Quote & invoice defaults</h2>
+          <div className="grid sm:grid-cols-2 gap-3">
+            <label className="text-sm">
+              Quote prefix
+              <input
+                name="quotePrefix"
+                defaultValue={orgSettings.quotePrefix}
+                className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="text-sm">
+              Invoice prefix
+              <input
+                name="invoicePrefix"
+                defaultValue={orgSettings.invoicePrefix}
+                className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="text-sm">
+              Tax rate (%)
+              <input
+                name="taxRatePercent"
+                defaultValue={(orgSettings.defaultTaxRateBps / 100).toFixed(2)}
+                className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="text-sm">
+              Tax label
+              <input
+                name="taxLabel"
+                defaultValue={orgSettings.taxLabel}
+                className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="text-sm">
+              Payment terms (days)
+              <input
+                name="paymentTermsDays"
+                type="number"
+                defaultValue={orgSettings.paymentTermsDays}
+                className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+              />
+            </label>
+            <label className="text-sm">
+              Quote valid (days)
+              <input
+                name="quoteValidDays"
+                type="number"
+                defaultValue={orgSettings.quoteValidDays}
+                className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+              />
+            </label>
+          </div>
+          <label className="text-sm block">
+            Tax ID (on PDF)
+            <input
+              name="taxId"
+              defaultValue={orgSettings.taxId ?? ""}
+              className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+            />
+          </label>
+          <label className="text-sm block">
+            PDF footer
+            <textarea
+              name="invoiceFooterText"
+              rows={2}
+              defaultValue={orgSettings.invoiceFooterText ?? ""}
+              className="mt-1 w-full border rounded-md px-3 py-2 text-sm"
+            />
+          </label>
+          <Button type="submit" variant="secondary">
+            Save org defaults
+          </Button>
+        </form>
+      )}
 
       {lines.length === 0 ? (
         <p className="text-sm text-neutral-500">No rate lines yet.</p>
@@ -116,8 +204,8 @@ export default async function CommercialSettingsPage() {
 
       {canManageCommercialSettings(session.user) && (
         <p className="text-xs text-neutral-500">
-          Tax rate and numbering: org admin fields ship in a follow-up — defaults
-          apply (0% tax until set in database).
+          Numbering sequences continue automatically after each new quote or
+          invoice.
         </p>
       )}
     </div>

@@ -24,6 +24,7 @@ import {
   type Invoice,
   type InvoiceLine,
 } from "@/lib/db/schema";
+import { emailInvoiceSent } from "@/lib/commercial/email-events";
 import { buildCommercialPdf, type PdfLine } from "@/lib/pdf/commercial-pdf";
 import {
   getCommercialDownloadUrl,
@@ -385,6 +386,15 @@ export async function sendInvoice(orgId: string, invoiceId: string) {
       isClientVisible: true,
     }),
   ]);
+
+  await emailInvoiceSent({
+    orgId,
+    orgName: org.name,
+    orgSlug: session.user.orgSlug ?? "",
+    clientCompanyId: invoice.clientCompanyId,
+    invoiceNumber: invoice.invoiceNumber,
+    invoiceId,
+  });
 
   revalidatePath("/dashboard/invoices");
   revalidatePath(`/dashboard/invoices/${invoiceId}`);

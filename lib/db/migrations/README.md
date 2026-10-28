@@ -33,6 +33,9 @@ npm run db:migrate:sql
 | `0022_client_notes.sql` | client → tenant general notes (one-way, unread via `read_at`) |
 | `0023_drop_warehouses.sql` | drop unused warehouse columns |
 | `0024_client_isolation_rls.sql` | client-company RLS on top of org isolation |
+| `0025_search_notify.sql` | global search + membership notify prefs (PR #61) |
+| `0026_commercial_core.sql` | quotes, invoices, rate cards, org commercial columns |
+| `0027_commercial_client_rls.sql` | commercial RLS for client portal |
 
 Then seed (optional):
 

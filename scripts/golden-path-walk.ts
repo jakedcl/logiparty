@@ -376,6 +376,15 @@ async function main() {
   const [done] = await sql`SELECT status FROM jobs WHERE id = ${jobId}`;
   mark("22", done.status === "completed", "Mike marked job completed");
 
+  // Rich seed keeps other upcoming/ready jobs on RB-BAR-01; complete them so step 23 is deterministic.
+  await sql`
+    UPDATE jobs SET status = 'completed', updated_at = NOW()
+    WHERE org_id = ${tenant.id}
+      AND client_company_id = ${rb.id}
+      AND status IN ('upcoming', 'ready', 'draft')
+      AND id != ${jobId}
+  `;
+
   const otherJob = randomUUID();
   await sql`
     INSERT INTO jobs (id, org_id, client_company_id, name, status, created_by)

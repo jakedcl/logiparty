@@ -1,6 +1,6 @@
 # Quotes, proposals & invoicing — design plan
 
-**Status:** Implemented on branch `lurk/quotes-invoices-plan-2da6` (PR #60). Migrations `0025`–`0026`.
+**Status:** Implemented on branch `lurk/quotes-invoices-plan-2da6` (PR #60). Migrations `0025_search_notify`, `0026_commercial_core`, `0027_commercial_client_rls` (after PR #61’s `0025`).
 **Priority:** P2 in [QA_REPORT_2026-10-28.md](./QA_REPORT_2026-10-28.md) — parity with **Current RMS**, **Rentman**, **Goodshuffle Pro** quote-to-cash.  
 **Depends on:** Stable `main` after in-flight work (roles refactor, Resend event email, crew self-removal, search, reports). Do not land migrations until that branch merges.
 

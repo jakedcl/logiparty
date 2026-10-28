@@ -29,12 +29,16 @@ import {
   type Quote,
   type QuoteLine,
 } from "@/lib/db/schema";
-import { buildCommercialPdf, type PdfLine } from "@/lib/pdf/commercial-pdf";
+import {
+  emailQuoteResponded,
+  emailQuoteSent,
+} from "@/lib/commercial/email-events";
 import {
   getCommercialDownloadUrl,
   isStorageConfigured,
   putCommercialPdf,
 } from "@/lib/storage/commercial";
+import { buildCommercialPdf, type PdfLine } from "@/lib/pdf/commercial-pdf";
 import {
   getSessionClientCompany,
   requireSession,
@@ -466,6 +470,16 @@ export async function sendQuote(orgId: string, quoteId: string) {
     }),
   ]);
 
+  await emailQuoteSent({
+    orgId,
+    orgName: org.name,
+    orgSlug: session.user.orgSlug ?? "",
+    clientCompanyId: quote.clientCompanyId,
+    quoteNumber: quote.quoteNumber,
+    title: quote.title,
+    quoteId,
+  });
+
   revalidatePath("/dashboard/quotes");
   revalidatePath(`/dashboard/quotes/${quoteId}`);
   revalidatePath("/portal/quotes");
@@ -539,10 +553,59 @@ export async function respondToQuote(
     actor
   );
 
+  const org = await loadOrgCommercial(orgId);
+  await emailQuoteResponded({
+    orgId,
+    orgName: org.name,
+    orgSlug: session.user.orgSlug ?? "",
+    quoteNumber: quote.quoteNumber,
+    title: quote.title,
+    quoteId,
+    approved: decision === "approved",
+    signerName,
+  });
+
   revalidatePath("/portal/quotes");
   revalidatePath(`/portal/quotes/${quoteId}`);
   revalidatePath("/dashboard/quotes");
   revalidatePath("/dashboard/notifications");
+}
+
+/** Pull a sent/declined/expired quote back to draft and bump version for a clean re-edit. */
+export async function reviseQuote(orgId: string, quoteId: string) {
+  const session = await requireCommercialManager();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
+
+  const [quote] = await withOrgQuery<Quote[]>(orgId, (database) =>
+    database
+      .select()
+      .from(quotes)
+      .where(and(eq(quotes.orgId, orgId), eq(quotes.id, quoteId)))
+      .limit(1)
+  );
+  if (!quote) throw new Error("Quote not found");
+  if (quote.jobId) throw new Error("Cannot revise a quote already linked to a job");
+  if (!["sent", "declined", "expired"].includes(quote.status)) {
+    throw new Error("Only sent, declined, or expired quotes can be revised");
+  }
+
+  await withOrgQuery(orgId, (database) =>
+    database
+      .update(quotes)
+      .set({
+        status: "draft",
+        version: quote.version + 1,
+        sentAt: null,
+        sentByUserId: null,
+        validUntil: null,
+        pdfStorageKey: null,
+        updatedAt: new Date(),
+      })
+      .where(eq(quotes.id, quoteId))
+  );
+
+  revalidatePath(`/dashboard/quotes/${quoteId}`);
+  revalidatePath("/dashboard/quotes");
 }
 
 export async function convertQuoteToJob(orgId: string, quoteId: string) {
