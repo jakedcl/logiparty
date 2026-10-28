@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { AppWindow } from "@/components/marketing/app-window";
 import { Button } from "@/components/ui/button";
@@ -8,12 +9,6 @@ import { ProductTour } from "@/components/marketing/product-tour";
 import { ProcessStepper } from "@/components/marketing/process-stepper";
 import { MarketingHeader } from "@/components/marketing/marketing-header";
 import { MarketingRoot } from "@/components/marketing/marketing-root";
-
-type WorkspaceCta = {
-  orgName: string;
-  href: string;
-  isClient: boolean;
-};
 
 const CAPABILITIES = [
   {
@@ -30,11 +25,14 @@ const CAPABILITIES = [
   },
 ] as const;
 
-export function MarketingHome({
-  workspace,
-}: {
-  workspace?: WorkspaceCta | null;
-}) {
+const SECURITY_POINTS = [
+  "Each 3PL workspace is isolated on its own subdomain with org-scoped data in Postgres.",
+  "Row-level security policies enforce tenant boundaries; the app connects as a non-bypass role.",
+  "Staff sign in with Auth.js (credentials + JWT sessions); passwords are bcrypt-hashed.",
+  "Job documents live in Cloudflare R2 and are served with short-lived signed URLs.",
+] as const;
+
+export function MarketingHome() {
   return (
     <MarketingRoot>
       <div className="m-bubbles" aria-hidden>
@@ -44,24 +42,21 @@ export function MarketingHome({
       </div>
 
       <MarketingHeader brandHref="#top" brandAnchor>
+        <a href="#about" className="m-nav-link hidden sm:inline">
+          Who it&apos;s for
+        </a>
         <a href="#product" className="m-nav-link hidden sm:inline">
           Product
         </a>
         <Link href="/demo" className="m-nav-link">
           Demo
         </Link>
-        <a href="#how" className="m-nav-link hidden sm:inline">
-          How it works
+        <Link href="/pricing" className="m-nav-link hidden sm:inline">
+          Pricing
+        </Link>
+        <a href="#request" className="m-nav-link-strong">
+          Request access
         </a>
-        {workspace ? (
-          <a href={workspace.href} className="m-nav-link-strong">
-            Open {workspace.orgName}
-          </a>
-        ) : (
-          <a href="#request" className="m-nav-link-strong">
-            Request access
-          </a>
-        )}
       </MarketingHeader>
 
       <main id="top" className="relative z-10 px-4 py-6 sm:px-6 lg:px-8">
@@ -78,35 +73,29 @@ export function MarketingHome({
                     <p className="m-hero-brand-tag">Event logistics workspace</p>
                   </div>
                 </div>
-                <h1 className="mt-4 text-lg font-semibold text-[var(--m-fg)] sm:text-xl">
-                  Ops software for 3PLs that run live events.
+                <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[var(--m-fg)] sm:text-4xl lg:text-[2.5rem] lg:leading-tight">
+                  Run sheets, locked inventory, and a client portal your 3PL
+                  actually owns.
                 </h1>
-                <p className="mt-3 max-w-xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
-                  Jobs, inventory, fleet, and a branded client portal — under
-                  your name, on your subdomain. Invite-only while we onboard
-                  carefully.
+                <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--m-muted)] sm:text-lg">
+                  One workspace for jobs, fleet, crew, and client-owned assets —
+                  white-labeled on{" "}
+                  <span className="font-medium text-[var(--m-fg)]">
+                    your-org.logiparty.com
+                  </span>
+                  . Walk through flows in{" "}
+                  <Link href="/demo" className="m-nav-link-strong">
+                    /demo
+                  </Link>{" "}
+                  with no login.
                 </p>
-                <div className="mt-5 flex flex-wrap items-center gap-2">
-                  {workspace ? (
-                    <Button asChild className="px-4 py-2 text-sm">
-                      <a href={workspace.href}>
-                        Go to {workspace.isClient ? "portal" : "dashboard"}
-                      </a>
-                    </Button>
-                  ) : (
-                    <Button asChild className="px-4 py-2 text-sm">
-                      <Link href="/demo">Try the demo</Link>
-                    </Button>
-                  )}
-                  {workspace ? (
-                    <Button asChild variant="outline" className="px-4 py-2 text-sm">
-                      <Link href="/demo">Product tour</Link>
-                    </Button>
-                  ) : (
-                    <Button asChild variant="outline" className="px-4 py-2 text-sm">
-                      <a href="#request">Request access</a>
-                    </Button>
-                  )}
+                <div className="mt-6 flex flex-wrap items-center gap-2">
+                  <Button asChild className="px-4 py-2.5 text-sm">
+                    <Link href="/demo">Try the demo</Link>
+                  </Button>
+                  <Button asChild variant="outline" className="px-4 py-2.5 text-sm">
+                    <a href="#request">Request access</a>
+                  </Button>
                 </div>
               </div>
               <div className="m-hero-window-stack">
@@ -124,6 +113,39 @@ export function MarketingHome({
                   <MockJobs />
                 </AppWindow>
               </div>
+            </div>
+          </section>
+
+          <section id="about" className="m-panel m-rise m-rise-1 p-5 sm:p-6">
+            <h2 className="m-section-title">Who it&apos;s for</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
+              Logiparty is built for third-party logistics companies that warehouse,
+              transport, and crew live events — festivals, tours, corporate
+              activations, and venue deliveries. You run the warehouse-to-venue loop;
+              your clients need a branded portal without seeing your internal
+              spreadsheets.
+            </p>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
+              We onboard teams through early access (not open signup) so each org
+              gets catalogs, roles, and branding configured before go-live.
+            </p>
+          </section>
+
+          <section id="screenshot" className="m-panel m-rise m-rise-1 p-5 sm:p-6">
+            <h2 className="m-section-title">In the app</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
+              Staff work jobs, inventory, and fleet from the dashboard; clients use
+              the portal on the same subdomain with your logo and color.
+            </p>
+            <div className="mt-5 overflow-hidden rounded-xl border border-[var(--m-border)] shadow-sm">
+              <Image
+                src="/marketing/app-screenshot.png"
+                alt="Logiparty marketing site and jobs dashboard"
+                width={1440}
+                height={900}
+                className="h-auto w-full"
+                priority
+              />
             </div>
           </section>
 
@@ -173,6 +195,18 @@ export function MarketingHome({
             </AppWindow>
           </section>
 
+          <section id="security" className="m-panel m-rise m-rise-2 p-5 sm:p-6">
+            <h2 className="m-section-title">Security &amp; isolation</h2>
+            <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
+              {SECURITY_POINTS.map((point) => (
+                <li key={point} className="flex gap-2">
+                  <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--m-accent)]" />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+
           <section id="how" className="m-panel m-rise m-rise-3 p-5 sm:p-6">
             <h2 className="m-section-title">How it works</h2>
             <h3 className="mt-3 mb-4 text-base font-semibold sm:text-lg">
@@ -186,8 +220,8 @@ export function MarketingHome({
               <div>
                 <h2 className="m-section-title">Request access</h2>
                 <p className="mt-3 text-sm leading-relaxed text-[var(--m-muted)]">
-                  No self-serve signup. Tell us about your 3PL — we hand-onboard
-                  orgs that fit. Prefer email?{" "}
+                  Tell us about your 3PL and we&apos;ll follow up for early
+                  access onboarding. Prefer email?{" "}
                   <a
                     href="mailto:hello@logiparty.com"
                     className="m-nav-link-strong"
@@ -196,10 +230,10 @@ export function MarketingHome({
                   </a>
                 </p>
                 <p className="mt-4 text-sm text-[var(--m-muted)] leading-relaxed">
-                  Existing customers sign in at{" "}
-                  <span className="font-medium text-[var(--m-fg)]">
-                    your-org.logiparty.com
-                  </span>
+                  Already onboarded?{" "}
+                  <Link href="/login" className="m-nav-link-strong">
+                    Sign in with your org subdomain
+                  </Link>
                   . Want a look first?{" "}
                   <Link href="/demo" className="m-nav-link-strong">
                     Open the demo
@@ -227,11 +261,11 @@ export function MarketingHome({
             <Link href="/demo" className="m-nav-link">
               Demo
             </Link>
+            <Link href="/pricing" className="m-nav-link">
+              Pricing
+            </Link>
             <a href="#request" className="m-nav-link">
               Request access
-            </a>
-            <a href="#product" className="m-nav-link">
-              Product
             </a>
             <Link href="/privacy" className="m-nav-link">
               Privacy

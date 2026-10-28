@@ -24,6 +24,39 @@ function redirectToApex(request: NextRequest) {
   return NextResponse.redirect(new URL("/", apex));
 }
 
+function isMetadataPath(pathname: string): boolean {
+  return (
+    pathname === "/robots.txt" ||
+    pathname === "/sitemap.xml" ||
+    pathname === "/og.png"
+  );
+}
+
+/** Public marketing routes on apex (unknown paths fall through to app 404). */
+function isApexPublicPath(pathname: string): boolean {
+  return (
+    pathname === "/" ||
+    pathname === "/pricing" ||
+    pathname === "/login" ||
+    pathname === "/privacy" ||
+    pathname === "/terms" ||
+    pathname === "/demo" ||
+    pathname.startsWith("/demo/") ||
+    isMetadataPath(pathname)
+  );
+}
+
+function isProtectedAppRoute(pathname: string): boolean {
+  return (
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/portal") ||
+    (pathname.startsWith("/api/") &&
+      !pathname.startsWith("/api/auth") &&
+      pathname !== "/api/health" &&
+      pathname !== "/api/stripe/webhook")
+  );
+}
+
 export async function proxy(request: NextRequest) {
   const host = request.headers.get("host") ?? "";
   const orgSlug = getOrgSlugFromHost(host);
@@ -71,30 +104,36 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/api/auth") ||
     pathname === "/api/health" ||
     pathname === "/api/stripe/webhook";
-  // Apex marketing homepage (A3) — public when host has no org slug.
-  const isApexMarketing = !orgSlug && pathname === "/";
-  // Soft-pilot legal pages — public on apex (and harmless if hit elsewhere).
-  const isLegalPage = pathname === "/privacy" || pathname === "/terms";
-  // Public product tour (static mocks — no auth). Apex only in practice;
-  // allowing the path elsewhere is harmless (page redirects tenants away).
   const isDemoPage = pathname === "/demo" || pathname.startsWith("/demo/");
 
-  if (
-    !token &&
-    !isAuthPage &&
-    !isInvitePage &&
-    !isPublicApi &&
-    !isApexMarketing &&
-    !isLegalPage &&
-    !isDemoPage
-  ) {
+  if (!token && !isInvitePage && !isPublicApi && !isMetadataPath(pathname)) {
+    if (orgSlug) {
+      if (!isAuthPage && !isDemoPage) {
+        return redirectPath(request, "/login");
+      }
+    } else if (isProtectedAppRoute(pathname)) {
+      return redirectPath(request, "/login");
+    } else if (!isApexPublicPath(pathname)) {
+      // Unknown apex path — allow through so Next.js serves not-found.
+    }
+  }
+
+  if (orgSlug && pathname === "/") {
+    if (token) {
+      const isClient = token.isClient === true;
+      return redirectPath(request, isClient ? "/portal" : "/dashboard");
+    }
     return redirectPath(request, "/login");
+  }
+
+  if (orgSlug && pathname === "/my-jobs") {
+    return redirectPath(request, "/dashboard/my-jobs");
   }
 
   if (token && isAuthPage) {
     const isClient = token.isClient === true;
-    // On apex, leave /login alone for the "use your subdomain" message unless
-    // they somehow have a session cookie here — then send them to the tenant.
+    // On apex, leave /login alone for the org picker unless they have a session
+    // cookie here — then send them to the tenant.
     if (orgSlug) {
       return redirectPath(request, isClient ? "/portal" : "/dashboard");
     }

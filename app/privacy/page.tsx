@@ -1,12 +1,15 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
+import { marketingMetadata } from "@/lib/marketing/metadata";
 
-export const metadata: Metadata = {
+export const metadata = marketingMetadata({
   title: "Privacy — Logiparty",
   description:
-    "How Logiparty handles account, lead, and operations data during our invite-only pilot.",
-};
+    "How Logiparty handles account, lead, and operations data during early access.",
+  path: "/privacy",
+});
+
+export const revalidate = 3600;
 
 const UPDATED = "August 25, 2026";
 
@@ -17,8 +20,8 @@ export default function PrivacyPage() {
         <p className="text-sm font-bold text-[var(--m-accent)]">Legal</p>
         <h1 className="m-section-title mt-2 text-2xl sm:text-3xl">Privacy</h1>
         <p className="mt-3 text-sm text-[var(--m-muted)]">
-          Last updated {UPDATED}. Soft-pilot policy — honest about what we
-          collect while we onboard invite-only customers.
+          Last updated {UPDATED}. Early-access policy — honest about what we
+          collect while we onboard customers by invitation.
         </p>
 
         <div className="m-legal-prose mt-10 space-y-8 text-[var(--m-muted)] leading-relaxed">
@@ -106,7 +109,7 @@ export default function PrivacyPage() {
             </h2>
             <p className="mt-3">
               To operate your workspace, authenticate users, reply to access
-              requests, improve reliability during the pilot, and contact you
+              requests, improve reliability during early access, and contact you
               about the service. We do not sell personal data.
             </p>
           </section>
@@ -116,7 +119,7 @@ export default function PrivacyPage() {
               Retention &amp; your choices
             </h2>
             <p className="mt-3">
-              Pilot orgs: we keep account and ops data while your workspace is
+              Early-access orgs: we keep account and ops data while your workspace is
               active. Lead form submissions stay until we close the loop or you
               ask us to delete them. Email{" "}
               <a
@@ -135,7 +138,7 @@ export default function PrivacyPage() {
               Changes
             </h2>
             <p className="mt-3">
-              As we leave soft pilot, we may publish a fuller policy. Material
+              As we move beyond early access, we may publish a fuller policy. Material
               changes will be reflected on this page with an updated date. See
               also our{" "}
               <Link

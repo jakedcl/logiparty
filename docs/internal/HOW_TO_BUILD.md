@@ -2,9 +2,9 @@
 
 Methodical build playbook. **One ticket per session.**
 
-**Read first:** this file → [APP_CONTEXT.md](APP_CONTEXT.md) → [docs/SCHEMA.md](docs/SCHEMA.md)
+**Read first:** this file → [APP_CONTEXT.md](APP_CONTEXT.md) → [SCHEMA.md](../SCHEMA.md)
 
-**Track progress:** [docs/PROGRESS.md](docs/PROGRESS.md)
+**Track progress:** [PROGRESS.md](PROGRESS.md)
 
 ---
 
@@ -73,7 +73,7 @@ M0 Foundation
 - [ ] Two seed orgs; user in org A cannot read org B data
 - [ ] Login works on subdomain (local: see README hosts/`*.localhost` notes)
 - [ ] `lib/auth/permissions.ts` skeleton exists
-- [ ] `docs/PROGRESS.md` tickets M0-1…M0-8 checked
+- [ ] `PROGRESS.md` tickets M0-1…M0-8 checked
 
 ---
 
@@ -140,7 +140,7 @@ M0 Foundation
 
 ### M3 DoD
 
-- [ ] [docs/GOLDEN_PATH.md](docs/GOLDEN_PATH.md) steps 1–11 pass on internal app only
+- [ ] [GOLDEN_PATH.md](../GOLDEN_PATH.md) steps 1–11 pass on internal app only
 - [ ] Second job cannot load same units while first job holds lock
 
 ---
@@ -159,7 +159,7 @@ M0 Foundation
 
 ### M4 DoD
 
-- [ ] Full [docs/GOLDEN_PATH.md](docs/GOLDEN_PATH.md) passes
+- [ ] Full [GOLDEN_PATH.md](../GOLDEN_PATH.md) passes
 
 ---
 

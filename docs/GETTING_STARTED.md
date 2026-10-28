@@ -143,7 +143,7 @@ Without this, tenant subdomains will not resolve (SSL/connect errors).
 |----------|-------|
 | `DATABASE_URL` | Neon **main** branch pooled URL — must differ from local dev after you split branches |
 | `AUTH_SECRET` | `openssl rand -base64 32` |
-| `AUTH_URL` | `https://logiparty.com` (apex — **not** a tenant subdomain; see OPEN_TABS A2) |
+| `AUTH_URL` | `https://logiparty.com` (apex — **not** a tenant subdomain; see internal OPEN_TABS A2) |
 | `AUTH_TRUST_HOST` | `true` (required so login works on `*.logiparty.com`) |
 | `NEXT_PUBLIC_ROOT_DOMAIN` | `logiparty.com` |
 | `NEXT_PUBLIC_DEV_ORG_SLUG` | **Local only** — do not set in Production |
@@ -189,4 +189,4 @@ npm run test:integration       # RLS / RBAC smoke tests
 
 ## Next build work
 
-MVP + optional Stripe scaffold are in. Remaining M6 (self-serve signup, custom domains) waits until Jake asks. Track in [docs/PROGRESS.md](PROGRESS.md) and [HOW_TO_BUILD.md](../HOW_TO_BUILD.md).
+MVP + optional Stripe scaffold are in. Remaining M6 (self-serve signup, custom domains) waits until Jake asks. Track in [docs/internal/PROGRESS.md](internal/PROGRESS.md) and [docs/internal/HOW_TO_BUILD.md](internal/HOW_TO_BUILD.md).

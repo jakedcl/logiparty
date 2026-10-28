@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -6,13 +7,34 @@ import { auth, signIn } from "@/lib/auth";
 import { absoluteRedirectUrl, postAuthPath } from "@/lib/auth/redirect";
 import { db } from "@/lib/db";
 import { organizations } from "@/lib/db/schema";
+import { marketingMetadata } from "@/lib/marketing/metadata";
 import { getOrgSlugFromHeaders } from "@/lib/org/subdomain";
 import { OrgTheme } from "@/components/layout/org-theme";
+import { TenantLoginPicker } from "@/components/marketing/tenant-login-picker";
 import { Button } from "@/components/ui/button";
 import {
   FALLBACK_PRIMARY_COLOR,
   resolvePrimaryColor,
 } from "@/lib/theme/primary-color";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const headersList = await headers();
+  const orgSlug = getOrgSlugFromHeaders(headersList);
+
+  if (!orgSlug) {
+    return marketingMetadata({
+      title: "Sign in — Logiparty",
+      description:
+        "Sign in to your Logiparty workspace on your organization subdomain.",
+      path: "/login",
+    });
+  }
+
+  return {
+    title: "Sign in",
+    description: "Sign in to your organization workspace",
+  };
+}
 
 export default async function LoginPage({
   searchParams,
@@ -36,21 +58,17 @@ export default async function LoginPage({
         <div className="lp-surface lp-enter w-full max-w-sm p-6">
           <h1 className="lp-page-title mb-2">Sign in</h1>
           <p className="lp-page-sub">
-            Open your organization subdomain to sign in (for example{" "}
-            <code className="rounded bg-[var(--surface-hover)] px-1 text-xs">
-              your-org.logiparty.com
-            </code>
-            , or locally{" "}
-            <code className="rounded bg-[var(--surface-hover)] px-1 text-xs">
-              your-org.localhost:3000
-            </code>
-            ).
+            Logiparty runs on your organization subdomain. Enter your org slug to
+            continue.
           </p>
+          {params.error ? (
+            <p className="mb-4 text-sm font-bold text-[var(--danger)]">
+              Invalid email or password.
+            </p>
+          ) : null}
+          <TenantLoginPicker />
           <p className="mt-6 text-sm text-[var(--muted)]">
-            <Link
-              href="/"
-              className="app-link"
-            >
+            <Link href="/" className="app-link">
               ← Back to Logiparty
             </Link>
           </p>
@@ -132,7 +150,10 @@ export default async function LoginPage({
                 ) {
                   throw error;
                 }
-                redirect("/login?error=1");
+                const reqHeaders = await headers();
+                redirect(
+                  absoluteRedirectUrl(reqHeaders, "/login?error=1")
+                );
               }
             }}
             className="space-y-4"

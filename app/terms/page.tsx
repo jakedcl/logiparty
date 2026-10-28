@@ -1,12 +1,15 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
+import { marketingMetadata } from "@/lib/marketing/metadata";
 
-export const metadata: Metadata = {
+export const metadata = marketingMetadata({
   title: "Terms — Logiparty",
   description:
-    "Soft-pilot terms for invite-only access to Logiparty during early customer onboarding.",
-};
+    "Early-access terms for invitation-only Logiparty workspaces during onboarding.",
+  path: "/terms",
+});
+
+export const revalidate = 3600;
 
 const UPDATED = "August 25, 2026";
 
@@ -17,8 +20,8 @@ export default function TermsPage() {
         <p className="text-sm font-bold text-[var(--m-accent)]">Legal</p>
         <h1 className="m-section-title mt-2 text-2xl sm:text-3xl">Terms</h1>
         <p className="mt-3 text-sm text-[var(--m-muted)]">
-          Last updated {UPDATED}. Soft-pilot terms — invite-only access while we
-          onboard carefully.
+          Last updated {UPDATED}. Early-access terms — invitation-only workspaces
+          while we onboard carefully.
         </p>
 
         <div className="m-legal-prose mt-10 space-y-8 text-[var(--m-muted)] leading-relaxed">
@@ -40,12 +43,12 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-lg font-semibold tracking-tight text-[var(--m-fg)]">
-              Invite-only pilot
+              Early access (invitation only)
             </h2>
             <p className="mt-3">
               There is no self-serve signup. Requesting access on the marketing
               site does not guarantee an account. We may accept, decline, or
-              delay onboarding. Pilot features, uptime, and support are
+              delay onboarding. Early-access features, uptime, and support are
               best-effort — not a formal SLA.
             </p>
           </section>
