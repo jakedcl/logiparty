@@ -61,6 +61,11 @@ export default async function LoginPage({
             Logiparty runs on your organization subdomain. Enter your org slug to
             continue.
           </p>
+          {params.error ? (
+            <p className="mb-4 text-sm font-bold text-[var(--danger)]">
+              Invalid email or password.
+            </p>
+          ) : null}
           <TenantLoginPicker />
           <p className="mt-6 text-sm text-[var(--muted)]">
             <Link href="/" className="app-link">
@@ -145,7 +150,10 @@ export default async function LoginPage({
                 ) {
                   throw error;
                 }
-                redirect("/login?error=1");
+                const reqHeaders = await headers();
+                redirect(
+                  absoluteRedirectUrl(reqHeaders, "/login?error=1")
+                );
               }
             }}
             className="space-y-4"
