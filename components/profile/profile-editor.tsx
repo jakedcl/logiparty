@@ -88,8 +88,8 @@ export function ProfileEditor({ profile }: { profile: Profile }) {
             </div>
             <div>
               <p className="text-sm font-medium mb-1">Email</p>
-              <p className="text-sm text-neutral-600">{profile.email}</p>
-              <p className="text-xs text-neutral-400 mt-0.5">
+              <p className="text-sm text-[var(--muted)]">{profile.email}</p>
+              <p className="mt-0.5 text-xs text-[var(--faint)]">
                 Email can’t be changed here.
               </p>
             </div>
@@ -102,11 +102,13 @@ export function ProfileEditor({ profile }: { profile: Profile }) {
       />
 
       {profile.hasPassword ? (
-        <section className="border-t border-neutral-200 pt-6">
+        <section className="border-t border-[var(--border-subtle)] pt-6">
           <div className="flex items-center justify-between gap-3 mb-3">
             <div>
-              <h2 className="text-sm font-medium text-neutral-900">Password</h2>
-              <p className="text-xs text-neutral-500 mt-0.5">
+              <h2 className="text-sm font-medium text-[var(--foreground)]">
+                Password
+              </h2>
+              <p className="mt-0.5 text-xs text-[var(--muted)]">
                 Change the password you use to sign in.
               </p>
             </div>
@@ -211,9 +213,11 @@ export function ProfileEditor({ profile }: { profile: Profile }) {
         </section>
       ) : null}
 
-      <section className="border-t border-neutral-200 pt-6">
-        <h2 className="text-sm font-medium text-neutral-900">Email notifications</h2>
-        <p className="text-xs text-neutral-500 mt-0.5 mb-3">
+      <section className="border-t border-[var(--border-subtle)] pt-6">
+        <h2 className="text-sm font-medium text-[var(--foreground)]">
+          Email notifications
+        </h2>
+        <p className="mt-0.5 mb-3 text-xs text-[var(--muted)]">
           Assignments, invites, and manager alerts. In-app notifications stay on.
         </p>
         <form

@@ -16,6 +16,7 @@ import {
   orgMemberships,
   users,
 } from "@/lib/db/schema";
+import { jobStatusLabel } from "@/lib/jobs/status-display";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
 export type SearchResultGroup = {
@@ -78,7 +79,7 @@ export async function globalSearch(
         items: jobRows.map((r) => ({
           id: r.id,
           title: r.name,
-          subtitle: `${r.clientName ?? "Client"} · ${r.status}`,
+          subtitle: `${r.clientName ?? "Client"} · ${jobStatusLabel(r.status)}`,
           href: `/dashboard/jobs/${r.id}`,
         })),
       });
@@ -148,7 +149,7 @@ export async function globalSearch(
           items: jobRows.map((r) => ({
             id: r.id,
             title: r.name,
-            subtitle: r.status,
+            subtitle: jobStatusLabel(r.status),
             href: `/dashboard/my-jobs/${r.id}`,
           })),
         });
@@ -180,7 +181,7 @@ export async function globalSearch(
     );
     if (skus.length) {
       groups.push({
-        label: "Equipment",
+        label: "Inventory",
         items: skus.map((r) => ({
           id: r.id,
           title: r.sku,
@@ -256,7 +257,7 @@ export async function globalSearch(
     );
     if (vehicles.length) {
       groups.push({
-        label: "Fleet",
+        label: "Vehicles",
         items: vehicles.map((v) => ({
           id: v.id,
           title: v.name,
@@ -318,7 +319,7 @@ export async function portalGlobalSearch(
       items: jobRows.map((r) => ({
         id: r.id,
         title: r.name,
-        subtitle: r.status,
+        subtitle: jobStatusLabel(r.status),
         href: `/portal/jobs/${r.id}`,
       })),
     },

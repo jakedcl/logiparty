@@ -1,4 +1,8 @@
 import { removeMyJobAssignment } from "@/lib/actions/job-crew";
+import {
+  assignmentPhaseLabel,
+  assignmentRoleLabel,
+} from "@/lib/format/assignment";
 import { Button } from "@/components/ui/button";
 
 type Row = { id: string; phase: string; assignedRole: string };
@@ -31,7 +35,8 @@ export function CrewSelfRemoveForms({
           <input type="hidden" name="id" value={row.id} />
           <input type="hidden" name="jobId" value={jobId} />
           <p className="text-sm font-medium text-[var(--foreground)]">
-            {row.phase} · {row.assignedRole}
+            {assignmentPhaseLabel(row.phase)} ·{" "}
+            {assignmentRoleLabel(row.assignedRole)}
           </p>
           <label className="block text-xs font-medium text-[var(--muted)]">
             Reason (optional)

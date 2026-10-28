@@ -46,17 +46,12 @@ async function main() {
   if (page.url().includes("/login")) {
     throw new Error("Login failed — still on login page");
   }
-  await page.getByRole("button", { name: /Search jobs/i }).click();
-  const input = page.getByRole("dialog", { name: "Search" }).getByPlaceholder("Search…");
+  await page.getByRole("button", { name: /Open search/i }).click();
+  const dialog = page.getByRole("dialog", { name: "Search" });
+  const input = dialog.getByPlaceholder("Search jobs, clients, inventory…");
   await input.waitFor({ timeout: 15000 });
   await input.fill("Red Bull");
-  await page.waitForFunction(
-    () => {
-      const dialog = document.querySelector('[role="dialog"]');
-      return dialog?.textContent?.includes("Red Bull") ?? false;
-    },
-    { timeout: 10000 }
-  );
+  await dialog.getByText("Jobs", { exact: true }).waitFor({ timeout: 10000 });
   await page.screenshot({
     path: "docs/internal/screenshots/search.png",
   });

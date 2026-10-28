@@ -462,6 +462,13 @@ async function main() {
 
   const failed = results.filter((r) => !r.ok && !r.note.startsWith("SKIP"));
   const skipped = results.filter((r) => r.note.startsWith("SKIP"));
+
+  await sql`
+    DELETE FROM jobs
+    WHERE org_id = ${tenant.id}
+      AND name IN ('Lock release check', 'Overlap A', 'Overlap B')
+  `;
+
   console.log(
     `\n${results.filter((r) => r.ok).length} passed, ${failed.length} failed, ${skipped.length} skipped`
   );
