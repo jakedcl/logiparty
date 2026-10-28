@@ -13,12 +13,19 @@ import {
   clientNotes,
   jobAssignments,
   jobs,
+  quotes,
 } from "@/lib/db/schema";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
 export type NotificationItem = {
   id: string;
-  kind: "draft_request" | "inventory_request" | "client_note" | "assignment";
+  kind:
+    | "draft_request"
+    | "inventory_request"
+    | "client_note"
+    | "assignment"
+    | "quote_pending"
+    | "quote_response";
   title: string;
   detail: string;
   href: string;
@@ -140,6 +147,80 @@ export async function listNotifications(
         bodyPreview: preview,
       });
     }
+
+    const pendingQuotes = await withOrgQuery<
+      {
+        id: string;
+        title: string;
+        quoteNumber: string;
+        sentAt: Date | null;
+      }[]
+    >(orgId, (database) =>
+      database
+        .select({
+          id: quotes.id,
+          title: quotes.title,
+          quoteNumber: quotes.quoteNumber,
+          sentAt: quotes.sentAt,
+        })
+        .from(quotes)
+        .where(and(eq(quotes.orgId, orgId), eq(quotes.status, "sent")))
+        .orderBy(desc(quotes.sentAt))
+        .limit(LIMIT)
+    );
+
+    for (const row of pendingQuotes) {
+      items.push({
+        id: `quote-pending:${row.id}`,
+        kind: "quote_pending",
+        title: "Quote awaiting client",
+        detail: `${row.quoteNumber} · ${row.title}`,
+        href: `/dashboard/quotes/${row.id}`,
+        createdAt: row.sentAt ?? new Date(),
+      });
+    }
+
+    const recentQuoteResponses = await withOrgQuery<
+      {
+        id: string;
+        title: string;
+        quoteNumber: string;
+        status: string;
+        updatedAt: Date;
+      }[]
+    >(orgId, (database) =>
+      database
+        .select({
+          id: quotes.id,
+          title: quotes.title,
+          quoteNumber: quotes.quoteNumber,
+          status: quotes.status,
+          updatedAt: quotes.updatedAt,
+        })
+        .from(quotes)
+        .where(
+          and(
+            eq(quotes.orgId, orgId),
+            inArray(quotes.status, ["approved", "declined"])
+          )
+        )
+        .orderBy(desc(quotes.updatedAt))
+        .limit(10)
+    );
+
+    for (const row of recentQuoteResponses) {
+      const since = Date.now() - row.updatedAt.getTime();
+      if (since > 7 * 24 * 60 * 60 * 1000) continue;
+      items.push({
+        id: `quote-res:${row.id}:${row.status}`,
+        kind: "quote_response",
+        title:
+          row.status === "approved" ? "Quote approved" : "Quote declined",
+        detail: `${row.quoteNumber} · ${row.title}`,
+        href: `/dashboard/quotes/${row.id}`,
+        createdAt: row.updatedAt,
+      });
+    }
   }
 
   if (canInventory) {
@@ -241,6 +322,75 @@ export async function listNotifications(
         detail: `${row.jobName} · ${row.clientName ?? "Client"} · ${row.jobStatus}`,
         href: `/dashboard/my-jobs/${row.jobId}`,
         createdAt: row.createdAt,
+      });
+    }
+
+    const pendingQuotes = await withOrgQuery<
+      { id: string; title: string; quoteNumber: string; createdAt: Date }[]
+    >(orgId, (database) =>
+      database
+        .select({
+          id: quotes.id,
+          title: quotes.title,
+          quoteNumber: quotes.quoteNumber,
+          createdAt: quotes.sentAt,
+        })
+        .from(quotes)
+        .where(and(eq(quotes.orgId, orgId), eq(quotes.status, "sent")))
+        .orderBy(desc(quotes.sentAt))
+        .limit(LIMIT)
+    );
+
+    for (const row of pendingQuotes) {
+      items.push({
+        id: `quote-pending:${row.id}`,
+        kind: "quote_pending",
+        title: "Quote awaiting client",
+        detail: `${row.quoteNumber} · ${row.title}`,
+        href: `/dashboard/quotes/${row.id}`,
+        createdAt: row.createdAt ?? new Date(),
+      });
+    }
+
+    const recentQuoteResponses = await withOrgQuery<
+      {
+        id: string;
+        title: string;
+        quoteNumber: string;
+        status: string;
+        updatedAt: Date;
+      }[]
+    >(orgId, (database) =>
+      database
+        .select({
+          id: quotes.id,
+          title: quotes.title,
+          quoteNumber: quotes.quoteNumber,
+          status: quotes.status,
+          updatedAt: quotes.updatedAt,
+        })
+        .from(quotes)
+        .where(
+          and(
+            eq(quotes.orgId, orgId),
+            inArray(quotes.status, ["approved", "declined"])
+          )
+        )
+        .orderBy(desc(quotes.updatedAt))
+        .limit(10)
+    );
+
+    for (const row of recentQuoteResponses) {
+      const since = Date.now() - row.updatedAt.getTime();
+      if (since > 7 * 24 * 60 * 60 * 1000) continue;
+      items.push({
+        id: `quote-res:${row.id}:${row.status}`,
+        kind: "quote_response",
+        title:
+          row.status === "approved" ? "Quote approved" : "Quote declined",
+        detail: `${row.quoteNumber} · ${row.title}`,
+        href: `/dashboard/quotes/${row.id}`,
+        createdAt: row.updatedAt,
       });
     }
   }

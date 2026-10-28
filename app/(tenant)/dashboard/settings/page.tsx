@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { BillingPanel } from "@/components/settings/billing-panel";
 import { OrgSettingsEditor } from "@/components/settings/org-settings-editor";
 import {
+  canManageCommercial,
   canManageBilling,
   canManageJobs,
   canManageOrgSettings,
@@ -68,6 +69,16 @@ export default async function SettingsPage({
               {canReviewAvailability(session.user)
                 ? "Request PTO and approve or deny pending requests"
                 : "Request time off"}
+            </span>
+          </Link>
+        ) : null}
+        {canManageCommercial(session.user) ? (
+          <Link href="/dashboard/settings/commercial">
+            <span className="font-semibold text-[var(--foreground)]">
+              Pricing
+            </span>
+            <span className="mt-0.5 block text-xs text-[var(--muted)]">
+              Rate cards for quotes
             </span>
           </Link>
         ) : null}

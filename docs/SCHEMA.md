@@ -18,6 +18,10 @@ availability_status: 'Pending' | 'Approved' | 'Denied'
 uploader_role: 'manager' | 'client'
 inventory_request_type: 'add' | 'qty_change' | 'remove'
 inventory_request_status: 'pending' | 'approved' | 'denied'
+quote_status: 'draft' | 'sent' | 'approved' | 'declined' | 'expired' | 'void'
+invoice_status: 'draft' | 'sent' | 'partially_paid' | 'paid' | 'void' | 'overdue'
+commercial_line_kind: 'equipment' | 'labor' | 'fleet' | 'fee' | 'discount' | 'tax' | 'deposit' | 'custom' | 'damage_loss' | 'adjustment'
+rate_unit: 'each' | 'day' | 'hour' | 'flat' | 'percent'
 ```
 
 *Client notes have no enum — unread = `read_at IS NULL`.*
@@ -39,7 +43,11 @@ Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`,
 | email_from_name | text | Legacy / unused by UI — outbound mail uses `name` (`email_from_name ?? name` fallback in mailer) |
 | stripe_customer_id | text | Nullable — Stripe Customer for org billing |
 | stripe_subscription_id | text | Nullable — Stripe Subscription id |
-| billing_status | text | Nullable soft gate: `none` \| `active` \| `past_due` \| `canceled` (no hard lockout in pilot) |
+| billing_status | text | Nullable soft gate |
+| quote_prefix, invoice_prefix, next_quote_number, next_invoice_number | text/int | Commercial numbering |
+| default_tax_rate_bps, tax_label, tax_id | int/text | Quote/invoice tax |
+| payment_terms_days, quote_valid_days | int | Defaults |
+| invoice_footer_text | text | PDF footer |
 | created_at | timestamptz | |
 
 ### `users`
@@ -216,6 +224,16 @@ Clients do **not** edit this catalog directly. They submit rows in `client_inven
 | created_by | uuid FK → users | |
 | created_at | timestamptz | |
 | updated_at | timestamptz | |
+| quote_id | uuid FK → quotes | Nullable — linked commercial quote |
+| quote_version | int | Nullable |
+
+---
+
+## Commercial (quotes & invoicing)
+
+Migrations `0025_commercial_core.sql`, `0026_commercial_client_rls.sql`. See `docs/internal/QUOTES_INVOICES_PLAN.md`.
+
+Tables: `rate_cards`, `rate_card_lines`, `quotes`, `quote_lines`, `quote_versions`, `quote_client_responses`, `invoices`, `invoice_lines`, `invoice_payments`. Org columns: quote/invoice prefixes, numbering, tax defaults (`organizations`).
 
 ### `job_locations`
 | Column | Type | Notes |

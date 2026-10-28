@@ -113,3 +113,17 @@ export function canSubmitAvailability(m: SessionMembership): boolean {
 export function canReviewAvailability(m: SessionMembership): boolean {
   return m.isOrgAdmin || m.isManager;
 }
+
+/** Quotes, rate cards, invoices — managers/org admins only (staff must not see pricing). */
+export function canManageCommercial(m: SessionMembership): boolean {
+  return m.isOrgAdmin || m.isManager;
+}
+
+/** Org quote/invoice numbering and tax defaults. */
+export function canManageCommercialSettings(m: SessionMembership): boolean {
+  return m.isOrgAdmin;
+}
+
+export function canRespondToQuotes(m: SessionMembership): boolean {
+  return m.isClient;
+}

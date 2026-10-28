@@ -8,6 +8,7 @@ import { neon } from "@neondatabase/serverless";
 import {
   canAccessClientPortal,
   canAccessInternalDashboard,
+  canManageCommercial,
   canManageJobs,
   canSubmitAvailability,
   canUploadDocuments,
@@ -391,6 +392,68 @@ async function verifyClientIsolation(sql: Neon) {
   }
 }
 
+async function verifyQuoteClientRls(sql: Neon) {
+  const stamp = Date.now();
+  const [org] = (await sql`
+    INSERT INTO organizations (slug, name, primary_color, email_from_name)
+    VALUES (${`quote-rls-${stamp}`}, 'Quote RLS', '#000000', 'Q')
+    RETURNING id
+  `) as { id: string }[];
+  const [coA] = (await sql`
+    INSERT INTO client_companies (org_id, name) VALUES (${org.id}, 'Co A') RETURNING id
+  `) as { id: string }[];
+  const [coB] = (await sql`
+    INSERT INTO client_companies (org_id, name) VALUES (${org.id}, 'Co B') RETURNING id
+  `) as { id: string }[];
+
+  const [quoteA] = (await sql`
+    INSERT INTO quotes (org_id, client_company_id, quote_number, title, status)
+    VALUES (${org.id}, ${coA.id}, ${`Q-${stamp}-A`}, 'Quote A', 'sent')
+    RETURNING id
+  `) as { id: string }[];
+  await sql`
+    INSERT INTO quotes (org_id, client_company_id, quote_number, title, status)
+    VALUES (${org.id}, ${coB.id}, ${`Q-${stamp}-B`}, 'Quote B', 'sent')
+  `;
+  await sql`
+    INSERT INTO quotes (org_id, client_company_id, quote_number, title, status)
+    VALUES (${org.id}, ${coA.id}, ${`Q-${stamp}-draft`}, 'Draft A', 'draft')
+  `;
+
+  try {
+    const clientASees = await countVisible(
+      sql,
+      org.id,
+      true,
+      coA.id,
+      sql`SELECT id FROM quotes WHERE org_id = ${org.id}`
+    );
+    assert(clientASees === 1, "Client A should see only their sent quote");
+
+    const clientASeesDraft = await countVisible(
+      sql,
+      org.id,
+      true,
+      coA.id,
+      sql`SELECT id FROM quotes WHERE id = ${quoteA.id} AND status = 'draft'`
+    );
+    assert(clientASeesDraft === 0, "Client must not see draft quotes");
+
+    const clientSeesRates = await countVisible(
+      sql,
+      org.id,
+      true,
+      coA.id,
+      sql`SELECT id FROM rate_cards WHERE org_id = ${org.id}`
+    );
+    assert(clientSeesRates === 0, "Client must not see rate cards");
+
+    console.log("OK: quote client isolation + rate card hide");
+  } finally {
+    await sql`DELETE FROM organizations WHERE id = ${org.id}`;
+  }
+}
+
 function verifyRbacMatrix() {
   const manager = {
     isOrgAdmin: false,
@@ -412,6 +475,8 @@ function verifyRbacMatrix() {
   };
 
   assert(canManageJobs(manager), "Manager should manage jobs");
+  assert(canManageCommercial(manager), "Manager should manage commercial");
+  assert(!canManageCommercial(staff), "Staff must not see pricing/commercial");
   assert(!canManageJobs(staff), "Staff should not manage jobs");
   assert(canViewMyJobs(staff), "Staff should view my jobs");
   assert(!canViewMyJobs(manager), "Manager-only should not use my jobs");
@@ -459,6 +524,7 @@ async function main() {
     await verifyCatalogRls(sql, testOrg, probeOrg);
     await verifyJobsRls(sql, testOrg, probeOrg);
     await verifyClientIsolation(sql);
+    await verifyQuoteClientRls(sql);
     console.log("All integration checks passed.");
   } finally {
     await sql`DELETE FROM organizations WHERE id = ${probeOrg.id}`;

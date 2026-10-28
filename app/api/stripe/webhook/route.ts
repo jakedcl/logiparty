@@ -2,7 +2,7 @@ import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { db } from "@/lib/db";
-import { organizations } from "@/lib/db/schema";
+import { invoicePayments, invoices, organizations } from "@/lib/db/schema";
 import {
   getStripe,
   isStripeWebhookConfigured,
@@ -79,6 +79,50 @@ export async function POST(request: Request) {
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   if (!db) return;
+
+  if (session.mode === "payment") {
+    const orgId = session.metadata?.orgId ?? null;
+    const invoiceId = session.metadata?.invoiceId ?? null;
+    if (!orgId || !invoiceId) {
+      console.warn("[stripe webhook] payment checkout missing metadata");
+      return;
+    }
+    const amount = session.amount_total ?? 0;
+    if (amount <= 0) return;
+
+    const [existing] = await db
+      .select({ amountPaidCents: invoices.amountPaidCents, totalCents: invoices.totalCents })
+      .from(invoices)
+      .where(eq(invoices.id, invoiceId))
+      .limit(1);
+    if (!existing) return;
+
+    const newPaid = existing.amountPaidCents + amount;
+    const status =
+      newPaid >= existing.totalCents ? "paid" : "partially_paid";
+
+    await db.insert(invoicePayments).values({
+      orgId,
+      invoiceId,
+      amountCents: amount,
+      method: "stripe",
+      stripePaymentIntentId:
+        typeof session.payment_intent === "string"
+          ? session.payment_intent
+          : session.payment_intent?.id ?? null,
+    });
+    await db
+      .update(invoices)
+      .set({
+        amountPaidCents: newPaid,
+        status,
+        paidAt: status === "paid" ? new Date() : null,
+        updatedAt: new Date(),
+      })
+      .where(eq(invoices.id, invoiceId));
+    return;
+  }
+
   if (session.mode !== "subscription") return;
 
   const orgId =

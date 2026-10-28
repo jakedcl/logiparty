@@ -62,7 +62,11 @@ export function InternalShell({
   if (showManager) {
     navItems.push({ href: "/dashboard", label: "Dashboard" });
   }
-  if (showJobs) navItems.push({ href: "/dashboard/jobs", label: "Jobs" });
+  if (showJobs) {
+    navItems.push({ href: "/dashboard/quotes", label: "Quotes" });
+    navItems.push({ href: "/dashboard/invoices", label: "Invoices" });
+    navItems.push({ href: "/dashboard/jobs", label: "Jobs" });
+  }
   if (showMyJobs) navItems.push({ href: "/dashboard/my-jobs", label: "My Jobs" });
   if (showNotifications) {
     navItems.push({ href: "/dashboard/notifications", label: "Notifications" });
