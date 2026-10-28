@@ -63,6 +63,7 @@ Staff capability tags (string slugs): `driver`, `warehouse`, `forklift`, `lead`,
 | is_manager | boolean | If true, manager permissions |
 | is_org_admin | boolean | If true, org admin permissions |
 | is_client | boolean | If true, portal only |
+| notify_email | boolean | Email notifications (default true) |
 | created_at | timestamptz | |
 
 *Note: A user can be `is_manager` and `is_staff` together. Crew picker includes only `is_staff = true`.*

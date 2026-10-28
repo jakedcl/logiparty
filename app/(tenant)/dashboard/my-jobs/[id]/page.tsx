@@ -16,6 +16,7 @@ import {
 } from "@/lib/db/schema";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 import { formatJobDateTime } from "@/lib/format/date";
+import { CrewSelfRemoveForms } from "@/components/my-jobs/crew-self-remove";
 import { Button } from "@/components/ui/button";
 
 function fmt(d: Date | null | undefined): string {
@@ -28,7 +29,7 @@ export default async function MyJobDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const session = await requireSession();
-  if (!canViewMyJobs(session.user)) redirect("/dashboard");
+  if (!canViewMyJobs(session.user)) redirect("/dashboard/my-jobs");
 
   const { id } = await params;
   const [job, tags] = await Promise.all([
@@ -159,6 +160,7 @@ export default async function MyJobDetailPage({
           </ul>
         )}
       </section>
+      <CrewSelfRemoveForms jobId={id} rows={job.myAssignmentRows} />
     </div>
   );
 }

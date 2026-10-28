@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/view-edit";
 import {
   changeOwnPassword,
+  updateNotifyEmail,
   updateProfileName,
 } from "@/lib/actions/profile";
 import { Button } from "@/components/ui/button";
@@ -17,6 +18,7 @@ type Profile = {
   firstName: string | null;
   lastName: string | null;
   hasPassword: boolean;
+  notifyEmail: boolean;
 };
 
 function displayName(p: Profile) {
@@ -208,6 +210,30 @@ export function ProfileEditor({ profile }: { profile: Profile }) {
           ) : null}
         </section>
       ) : null}
+
+      <section className="border-t border-neutral-200 pt-6">
+        <h2 className="text-sm font-medium text-neutral-900">Email notifications</h2>
+        <p className="text-xs text-neutral-500 mt-0.5 mb-3">
+          Assignments, invites, and manager alerts. In-app notifications stay on.
+        </p>
+        <form
+          action={async (formData) => {
+            await updateNotifyEmail(formData);
+          }}
+        >
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              name="notifyEmail"
+              defaultChecked={profile.notifyEmail}
+            />
+            Send email for this organization
+          </label>
+          <Button type="submit" variant="outline" size="sm" className="mt-3">
+            Save preference
+          </Button>
+        </form>
+      </section>
     </div>
   );
 }

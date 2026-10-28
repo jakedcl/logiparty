@@ -33,8 +33,9 @@ export function BillingPanel({
       >
         <h2 className="text-lg font-medium">Billing</h2>
         <p className="text-sm text-neutral-500">
-          Billing isn’t configured yet. When Stripe keys are added to the
-          environment, you can subscribe and manage payment methods here.
+          Billing is not connected yet. When your operator enables Stripe, you
+          can subscribe and manage payment methods here — nothing is charged
+          during the pilot.
         </p>
       </section>
     );

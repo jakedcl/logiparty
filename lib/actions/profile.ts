@@ -1,11 +1,11 @@
 "use server";
 
 import bcrypt from "bcryptjs";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { unstable_update } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { orgMemberships, users } from "@/lib/db/schema";
 import { requireSession } from "@/lib/org/context";
 
 export type ProfileActionResult =
@@ -37,7 +37,39 @@ export async function getOwnProfile() {
     firstName: user.firstName,
     lastName: user.lastName,
     hasPassword: Boolean(user.passwordHash),
+    notifyEmail: await getNotifyEmailPref(session.user.orgId, session.user.id),
   };
+}
+
+async function getNotifyEmailPref(orgId: string, userId: string) {
+  if (!db) return true;
+  const [mem] = await db
+    .select({ notifyEmail: orgMemberships.notifyEmail })
+    .from(orgMemberships)
+    .where(
+      and(eq(orgMemberships.orgId, orgId), eq(orgMemberships.userId, userId))
+    )
+    .limit(1);
+  return mem?.notifyEmail ?? true;
+}
+
+export async function updateNotifyEmail(
+  formData: FormData
+): Promise<ProfileActionResult> {
+  const session = await requireSession();
+  if (!db) return { ok: false, error: "Database not configured" };
+  const enabled = formData.get("notifyEmail") === "on";
+  await db
+    .update(orgMemberships)
+    .set({ notifyEmail: enabled })
+    .where(
+      and(
+        eq(orgMemberships.orgId, session.user.orgId),
+        eq(orgMemberships.userId, session.user.id)
+      )
+    );
+  revalidatePath("/dashboard/settings/profile");
+  return { ok: true };
 }
 
 export async function updateProfileName(

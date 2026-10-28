@@ -3,8 +3,10 @@
 import { randomUUID } from "crypto";
 import { and, asc, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
-import { canManageJobs } from "@/lib/auth/permissions";
+import { notifyManagers, notifyUser } from "@/lib/email/notify";
+import { canManageJobs, canViewMyJobs } from "@/lib/auth/permissions";
 import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import {
   ASSIGNMENT_PHASES,
@@ -137,9 +139,28 @@ export async function listJobAssignments(
   orgId: string,
   jobId: string
 ): Promise<JobAssignmentView[]> {
-  const session = await requireJobsAccess();
+  const session = await requireSession();
+  const manager = canManageJobs(session.user);
+  if (!manager && !canViewMyJobs(session.user)) throw new Error("Forbidden");
   if (session.user.orgId !== orgId) throw new Error("Forbidden");
-  await getJobOrThrow(orgId, jobId);
+  if (manager) {
+    await getJobOrThrow(orgId, jobId);
+  } else {
+    const mine = await withOrgQuery<{ id: string }[]>(orgId, (database) =>
+      database
+        .select({ id: jobAssignments.id })
+        .from(jobAssignments)
+        .where(
+          and(
+            eq(jobAssignments.jobId, jobId),
+            eq(jobAssignments.orgId, orgId),
+            eq(jobAssignments.userId, session.user.id)
+          )
+        )
+        .limit(1)
+    );
+    if (!mine[0]) throw new Error("Forbidden");
+  }
 
   const rows = await withOrgQuery<JobAssignment[]>(orgId, (database) =>
     database
@@ -237,7 +258,90 @@ export async function addJobAssignment(formData: FormData) {
     actorUserId: session.user.id,
   });
 
+  const job = await getJobOrThrow(session.user.orgId, jobId);
+  void notifyUser({
+    orgId: session.user.orgId,
+    orgName: session.user.orgName ?? "Operations",
+    orgSlug: session.user.orgSlug,
+    userId,
+    subject: `Crew assignment · ${job.name}`,
+    headline: "You’re on the crew",
+    body: `You were assigned to ${job.name} (${phase} · ${assignedRole}).`,
+    path: `/dashboard/my-jobs/${jobId}`,
+  }).catch((err) => console.error("[email]", err));
+
   revalidatePath(`/dashboard/jobs/${jobId}`);
+  revalidatePath(`/dashboard/my-jobs/${jobId}`);
+  revalidatePath("/dashboard/notifications");
+}
+
+export async function removeMyJobAssignment(formData: FormData) {
+  const session = await requireSession();
+  if (!canViewMyJobs(session.user)) throw new Error("Forbidden");
+  if (!db) throw new Error("Database not configured");
+
+  const id = formData.get("id") as string;
+  const jobId = formData.get("jobId") as string;
+  const reason = String(formData.get("reason") ?? "").trim() || null;
+  if (!id || !jobId) throw new Error("Missing assignment");
+
+  const rows = await withOrgQuery<
+    (typeof jobAssignments.$inferSelect)[]
+  >(session.user.orgId, (database) =>
+    database
+      .select()
+      .from(jobAssignments)
+      .where(
+        and(
+          eq(jobAssignments.id, id),
+          eq(jobAssignments.jobId, jobId),
+          eq(jobAssignments.orgId, session.user.orgId),
+          eq(jobAssignments.userId, session.user.id)
+        )
+      )
+      .limit(1)
+  );
+  const row = rows[0];
+  if (!row) throw new Error("Assignment not found");
+
+  const job = await getJobOrThrow(session.user.orgId, jobId);
+  const actorLabel =
+    session.user.name?.trim() || session.user.email || "Crew member";
+
+  await withOrgQueries(session.user.orgId, (database) => [
+    database
+      .delete(jobAssignments)
+      .where(
+        and(
+          eq(jobAssignments.id, id),
+          eq(jobAssignments.orgId, session.user.orgId)
+        )
+      ),
+    activityLogInsert(database, {
+      orgId: session.user.orgId,
+      userId: session.user.id,
+      jobId,
+      action: `${actorLabel} removed themselves from crew (${row.phase} · ${row.assignedRole})`,
+      entityType: "job_assignment",
+      entityId: id,
+      metadata: { reason, phase: row.phase, assignedRole: row.assignedRole },
+    }),
+  ]);
+
+  void notifyManagers({
+    orgId: session.user.orgId,
+    orgName: session.user.orgName ?? "Operations",
+    orgSlug: session.user.orgSlug,
+    subject: `Crew slot open · ${job.name}`,
+    headline: "Crew member stepped off a job",
+    body: `${actorLabel} removed themselves from ${job.name} (${row.phase} · ${row.assignedRole}).${reason ? `\nReason: ${reason}` : ""}`,
+    path: `/dashboard/jobs/${jobId}`,
+  }).catch((err) => console.error("[email]", err));
+
+  revalidatePath(`/dashboard/jobs/${jobId}`);
+  revalidatePath(`/dashboard/my-jobs/${jobId}`);
+  revalidatePath("/dashboard/notifications");
+  redirect(`/dashboard/my-jobs/${jobId}`);
 }
 
 export async function deleteJobAssignment(formData: FormData) {
