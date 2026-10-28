@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { PortalShell } from "@/components/layout/portal-shell";
 import { canAccessClientPortal } from "@/lib/auth/permissions";
 import {
@@ -7,6 +9,17 @@ import {
   requireSession,
 } from "@/lib/org/context";
 import { resolvePrimaryColor } from "@/lib/theme/primary-color";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const session = await auth();
+  const orgName = session?.user?.orgName?.trim() || "Client portal";
+  return {
+    title: {
+      absolute: orgName,
+    },
+    description: `${orgName} client portal`,
+  };
+}
 
 export default async function PortalLayout({
   children,
