@@ -126,6 +126,10 @@ export async function proxy(request: NextRequest) {
     return redirectPath(request, "/login");
   }
 
+  if (orgSlug && pathname === "/my-jobs") {
+    return redirectPath(request, "/dashboard/my-jobs");
+  }
+
   if (token && isAuthPage) {
     const isClient = token.isClient === true;
     // On apex, leave /login alone for the org picker unless they have a session
