@@ -43,7 +43,7 @@ export default async function QuoteDetailPage({ params }: Props) {
             {clientName} · v{quote.version}
           </p>
         </div>
-        <StatusBadge status={quote.status} />
+        <StatusBadge status={quote.status} kind="quote" />
       </div>
 
       <div className="flex flex-wrap gap-2">

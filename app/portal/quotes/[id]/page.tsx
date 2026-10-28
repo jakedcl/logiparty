@@ -30,7 +30,7 @@ export default async function PortalQuoteDetailPage({ params }: Props) {
         <p className="text-xs font-mono text-neutral-500">{quote.quoteNumber}</p>
         <h1 className="text-2xl font-semibold">{quote.title}</h1>
         <div className="mt-2">
-          <StatusBadge status={quote.status} />
+          <StatusBadge status={quote.status} kind="quote" />
         </div>
       </div>
 

@@ -53,7 +53,7 @@ export default async function QuotesPage() {
                     {q.clientName ?? "—"}
                   </td>
                   <td className="py-2 px-3">
-                    <StatusBadge status={q.status} />
+                    <StatusBadge status={q.status} kind="quote" />
                   </td>
                   <td className="py-2 px-3 text-right">
                     <Link

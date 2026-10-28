@@ -20,6 +20,10 @@ import {
   users,
 } from "@/lib/db/schema";
 import { jobStatusLabel } from "@/lib/jobs/status-display";
+import {
+  invoiceStatusLabel,
+  quoteStatusLabel,
+} from "@/lib/commercial/status-display";
 import { getSessionStaffTags, requireSession } from "@/lib/org/context";
 
 export type SearchResultGroup = {
@@ -143,7 +147,7 @@ export async function globalSearch(
         items: quoteRows.map((r) => ({
           id: r.id,
           title: r.quoteNumber,
-          subtitle: `${r.title} · ${r.status}`,
+          subtitle: `${r.title} · ${quoteStatusLabel(r.status)}`,
           href: `/dashboard/quotes/${r.id}`,
         })),
       });
@@ -173,7 +177,7 @@ export async function globalSearch(
         items: invoiceRows.map((r) => ({
           id: r.id,
           title: r.invoiceNumber,
-          subtitle: r.status,
+          subtitle: invoiceStatusLabel(r.status),
           href: `/dashboard/invoices/${r.id}`,
         })),
       });

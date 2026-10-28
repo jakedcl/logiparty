@@ -34,7 +34,7 @@ export default async function InvoiceDetailPage({ params }: Props) {
           {invoice.invoiceNumber}
         </p>
         <h1 className="text-2xl font-semibold">Invoice</h1>
-        <StatusBadge status={invoice.status} />
+        <StatusBadge status={invoice.status} kind="invoice" />
       </div>
 
       <div className="flex flex-wrap gap-2">

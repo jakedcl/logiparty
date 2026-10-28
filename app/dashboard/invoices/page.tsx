@@ -40,7 +40,7 @@ export default async function InvoicesPage() {
                 <td className="py-2 font-mono text-xs">{inv.invoiceNumber}</td>
                 <td className="py-2">{inv.clientName}</td>
                 <td className="py-2">
-                  <StatusBadge status={inv.status} />
+                  <StatusBadge status={inv.status} kind="invoice" />
                 </td>
                 <td className="py-2 text-right">
                   {formatCents(inv.totalCents)}

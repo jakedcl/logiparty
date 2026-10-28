@@ -24,7 +24,7 @@ export default async function PortalInvoicesPage() {
                 <p className="text-sm">{formatCents(inv.totalCents)}</p>
               </div>
               <div className="text-right space-y-1">
-                <StatusBadge status={inv.status} />
+                <StatusBadge status={inv.status} kind="invoice" />
                 {inv.stripePaymentLinkUrl && (
                   <a
                     href={inv.stripePaymentLinkUrl}

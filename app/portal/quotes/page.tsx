@@ -33,7 +33,7 @@ export default async function PortalQuotesPage() {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <StatusBadge status={q.status} />
+                <StatusBadge status={q.status} kind="quote" />
                 <Link href={`/portal/quotes/${q.id}`} className="lp-link-quiet">
                   View
                 </Link>
