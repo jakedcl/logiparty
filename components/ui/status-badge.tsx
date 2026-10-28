@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { jobStatusLabel } from "@/lib/jobs/status-display";
 
 const JOB_STATUS: Record<string, string> = {
   draft: "lp-status-draft",
@@ -47,7 +48,7 @@ export function StatusBadge({
 }: Props) {
   return (
     <span className={cn("lp-status", classesFor(status, kind), className)}>
-      {children ?? status}
+      {children ?? jobStatusLabel(status)}
     </span>
   );
 }

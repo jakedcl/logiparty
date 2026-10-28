@@ -7,6 +7,7 @@ import {
   getOrgSlugFromHost,
   portFromHost,
 } from "@/lib/org/subdomain";
+import { staffOnlyDashboardRedirect } from "@/lib/auth/staff-access";
 
 /** Same-host redirect — never bounce to AUTH_URL apex. */
 function redirectPath(request: NextRequest, path: string) {
@@ -46,14 +47,20 @@ function isApexPublicPath(pathname: string): boolean {
   );
 }
 
+function isPublicApiPath(pathname: string): boolean {
+  return (
+    pathname.startsWith("/api/auth") ||
+    pathname.startsWith("/api/cron/") ||
+    pathname === "/api/health" ||
+    pathname === "/api/stripe/webhook"
+  );
+}
+
 function isProtectedAppRoute(pathname: string): boolean {
   return (
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/portal") ||
-    (pathname.startsWith("/api/") &&
-      !pathname.startsWith("/api/auth") &&
-      pathname !== "/api/health" &&
-      pathname !== "/api/stripe/webhook")
+    (pathname.startsWith("/api/") && !isPublicApiPath(pathname))
   );
 }
 
@@ -100,10 +107,7 @@ export async function proxy(request: NextRequest) {
 
   const isAuthPage = pathname === "/login";
   const isInvitePage = pathname.startsWith("/invite/");
-  const isPublicApi =
-    pathname.startsWith("/api/auth") ||
-    pathname === "/api/health" ||
-    pathname === "/api/stripe/webhook";
+  const isPublicApi = isPublicApiPath(pathname);
   const isDemoPage = pathname === "/demo" || pathname.startsWith("/demo/");
 
   if (!token && !isInvitePage && !isPublicApi && !isMetadataPath(pathname)) {
@@ -148,6 +152,20 @@ export async function proxy(request: NextRequest) {
       // Clients only — avoid dashboard↔portal ping-pong when flags are missing.
       if (token.isClient === true) {
         return redirectPath(request, "/portal");
+      }
+    }
+
+    const staffOnly =
+      token.isStaff === true &&
+      token.isManager !== true &&
+      token.isOrgAdmin !== true;
+    if (staffOnly) {
+      if (pathname === "/dashboard") {
+        return redirectPath(request, "/dashboard/my-jobs");
+      }
+      const redirectTo = staffOnlyDashboardRedirect(pathname);
+      if (redirectTo) {
+        return redirectPath(request, redirectTo);
       }
     }
   }

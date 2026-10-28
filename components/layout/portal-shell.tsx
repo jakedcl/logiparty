@@ -4,6 +4,7 @@ import { absoluteRedirectUrl } from "@/lib/auth/redirect";
 import type { Session } from "next-auth";
 import { DevRoleSwitchPanel } from "@/components/dev/dev-role-switch-panel";
 import { OrgTheme } from "@/components/layout/org-theme";
+import { PortalGlobalSearch } from "@/components/search/portal-global-search";
 import { PortalNav } from "@/components/layout/portal-nav";
 import { SessionIdentity } from "@/components/layout/session-identity";
 import { WindowToolbar } from "@/components/ui/window-chrome";
@@ -41,7 +42,7 @@ export function PortalShell({
           <div className="flex min-w-0 items-center gap-2.5">
             {logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="" className="h-8 w-auto max-w-[120px]" />
+              <img src={logoUrl} alt={orgName} className="h-8 w-auto max-w-[120px]" />
             ) : null}
             <div className="min-w-0">
               <p className="truncate text-lg font-semibold tracking-tight text-[var(--lp-fg)]">
@@ -54,7 +55,8 @@ export function PortalShell({
               ) : null}
             </div>
           </div>
-          <div className="flex shrink-0 items-center">
+          <div className="flex shrink-0 items-center gap-2">
+            <PortalGlobalSearch />
             <SessionIdentity
               name={session.user.name}
               email={session.user.email}

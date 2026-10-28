@@ -5,6 +5,7 @@ import { and, asc, desc, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
+import { notifyManagers } from "@/lib/email/notify";
 import { canManageClientInventory } from "@/lib/auth/permissions";
 import {
   clientOnlyActor,
@@ -307,6 +308,15 @@ export async function requestInventoryAdd(formData: FormData) {
   );
 
   revalidateInventoryPaths(company.id);
+  void notifyManagers({
+    orgId: session.user.orgId,
+    orgName: session.user.orgName ?? "Operations",
+    orgSlug: session.user.orgSlug,
+    subject: `Inventory request · ${name}`,
+    headline: "Client inventory change request",
+    body: `${company.name} requested a new item (${sku} · ${name}).`,
+    path: "/dashboard/notifications",
+  }).catch((err) => console.error("[email]", err));
   redirect("/portal/inventory");
 }
 

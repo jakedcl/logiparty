@@ -13,14 +13,14 @@ A 3PL company (a "tenant" or org) gets a workspace at `{slug}.logiparty.com`. It
 1. `lib/org/subdomain.ts` turns the Host header into an org slug: `nydac.logiparty.com` and `nydac.localhost` both give `nydac`. The apex domain and `www` give no slug (that's the marketing site). Bare `localhost` uses `NEXT_PUBLIC_DEV_ORG_SLUG` if set.
 2. If the slug has no row in `organizations`, the request is redirected to the apex. If the database can't be reached, the check is skipped so real tenants keep working.
 3. It reads the session JWT. Only the proxy sets the `x-org-slug` header (any client-supplied value is deleted first), falling back to the org slug in the JWT.
-4. Anyone without a session is sent to `/login`, except for `/login`, `/invite/*`, `/api/auth`, `/api/health`, `/api/stripe/webhook`, the apex homepage, the legal pages and `/demo`.
+4. Anyone without a session is sent to `/login`, except for `/login`, `/invite/*`, public API routes (`/api/auth`, `/api/health`, `/api/stripe/webhook`, **`/api/cron/*`** — cron routes still require `Authorization: Bearer CRON_SECRET` in the handler), the apex homepage, the legal pages and `/demo`.
 5. Users who are only clients are kept out of `/dashboard` and sent to `/portal`. Non-clients are kept out of `/portal`.
 
 ## Auth and roles
 
 Login is NextAuth v5 with a credentials provider (`lib/auth/config.ts`). It needs email, password and org slug, and checks the password hash with bcrypt and that the user has a membership in that org. Sessions are JWTs that last 7 days and carry the org id, slug and the four role flags: org admin, manager, staff and client. There is a simple in-memory login throttle (8 attempts per 15 minutes per org and email), which is per serverless instance, so it's best effort.
 
-`lib/auth/permissions.ts` is the list of who can do what. Managers include org admins. Staff can also carry capability tags (driver, warehouse and so on), and the `warehouse` tag lets staff manage inventory and record loaded quantities. Server actions in `lib/actions/` check these before doing anything.
+`lib/auth/permissions.ts` is the list of who can do what. Managers include org admins. **Crew-only staff** (staff flag without manager/org admin) are limited to My Jobs, Notifications, inventory views their tags allow, Settings, and Help — the proxy redirects other `/dashboard` paths to `/dashboard/my-jobs`. Staff can also carry capability tags (driver, warehouse and so on), and the `warehouse` tag lets staff manage inventory and record loaded quantities. Server actions in `lib/actions/` check these before doing anything.
 
 New users only arrive by invite. Invites carry a random token and expire after 7 days (`lib/actions/invites.ts`).
 
@@ -47,14 +47,14 @@ The interesting rules live in `lib/jobs/`.
 - **Vehicles** (`fleet-locks.ts`): a vehicle locked on another job can't be assigned.
 - **Crew** (`availability-blocks.ts`): staff with approved time off overlapping the job's window are left out of the list of people you can assign.
 - **Auto-ready** (`auto-ready.ts`): an `upcoming` job is promoted to `ready` once it has at least one load-in crew assignment, one load-out assignment, one vehicle, and every assigned inventory line is fully loaded (`quantity_loaded` at least `quantity_assigned`). It never demotes a job. The check runs after job, crew, inventory and fleet changes.
-- `/api/cron/auto-ready` runs the same check over every org's upcoming jobs as a catch-up. There is no schedule for it in this repo (no `vercel.json`), so it only runs if something calls it. If `CRON_SECRET` is set it requires `Authorization: Bearer <secret>`. If it isn't set, the route is open to any caller.
+- `/api/cron/auto-ready` runs the same check over every org's upcoming jobs as a catch-up. **`vercel.json`** schedules it daily at **09:00 UTC** on Vercel (`Authorization: Bearer <CRON_SECRET>`). If `CRON_SECRET` is set it requires that header on every call. On production, if `CRON_SECRET` is missing, the route returns **503** (fail closed).
 
 ## Integrations
 
 Each of these is optional and the app degrades quietly when its keys are missing.
 
 - **Cloudflare R2** (`lib/storage/r2.ts`): job documents are stored under a storage key, and downloads are 10-minute signed URLs. Uploads must be a PDF or an image, at most 20 MB.
-- **Resend** (`lib/email/`): invite emails (without a key the invite link is printed to the server log instead), and a notification when someone submits the "request access" form on the marketing page (stored in `marketing_leads`).
+- **Resend** (`lib/email/`): tenant-branded transactional mail (React Email templates). The **From** address comes from **`EMAIL_FROM`** (verified domain, e.g. `notifications@mail.logiparty.com`); tenant sends use **`{orgName} <that-address>`**. Apex marketing lead notify uses the **Logiparty** display name with the same address. Legacy **`RESEND_FROM_EMAIL`** is only a fallback if `EMAIL_FROM` is unset. Without `RESEND_API_KEY`, links are logged and the app continues. Per-user **`notify_email`** on `org_memberships` opts out of email.
 - **Stripe** (`lib/stripe.ts`, `app/api/stripe/webhook`): a subscription scaffold. The webhook verifies the signature and handles `checkout.session.completed`, `customer.subscription.updated` and `customer.subscription.deleted`, which update the org's `billingStatus`. Nothing is locked when billing is unpaid.
 - **Dev role switcher** (`lib/dev/role-switch.ts`): a local convenience for switching personas. It is refused when `VERCEL_ENV` is `production`.
 
@@ -69,9 +69,10 @@ Names only. See `.env.example`.
 | `NEXT_PUBLIC_ROOT_DOMAIN` | Root domain for subdomain routing |
 | `NEXT_PUBLIC_DEV_ORG_SLUG` | Local only. Makes bare localhost act as a tenant |
 | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME` | Document storage |
-| `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `LEADS_NOTIFY_EMAIL` | Email |
+| `RESEND_API_KEY`, `LEADS_NOTIFY_EMAIL` | Email |
+| `EMAIL_FROM` | Verified send address (`Name <email>`). Tenants: `{orgName} <email>`; marketing: Logiparty + same email. `RESEND_FROM_EMAIL` legacy fallback only |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID` | Billing scaffold |
-| `CRON_SECRET` | Guards the auto-ready route |
+| `CRON_SECRET` | Bearer secret for `/api/cron/*` (proxy allows unauthenticated reach; route returns 401 without header) |
 | `ALLOW_DEV_ROLE_SWITCH` | Local only |
 
 ## More detail
@@ -81,6 +82,6 @@ The schema, decision log and setup steps have their own pages in this folder: `S
 ## Known limits
 
 - Rate limiting for login is in memory, so it doesn't hold across serverless instances.
-- The auto-ready cron isn't scheduled anywhere in the repo.
+- The auto-ready cron is scheduled in `vercel.json` (09:00 UTC daily); set `CRON_SECRET` in Vercel.
 - Accounts are created by invite or by the seed script. There is no public signup.
 - There is no realtime layer. Nothing in the code pushes updates to open pages.

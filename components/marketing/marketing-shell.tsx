@@ -13,12 +13,6 @@ export function MarketingShell({
 }) {
   return (
     <MarketingRoot>
-      <div className="m-bubbles" aria-hidden>
-        <span className="m-bubble m-bubble-a" />
-        <span className="m-bubble m-bubble-b" />
-        <span className="m-bubble m-bubble-c" />
-      </div>
-
       <MarketingHeader navClassName="flex items-center gap-4 text-sm">
         <Link href="/demo" className="m-nav-link">
           Demo

@@ -5,6 +5,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
+import { notifyManagers } from "@/lib/email/notify";
 import { canAccessClientPortal } from "@/lib/auth/permissions";
 import { clientOnlyActor, db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import { jobs, type Job } from "@/lib/db/schema";
@@ -123,5 +124,14 @@ export async function requestJob(formData: FormData) {
 
   revalidatePath("/portal/jobs");
   revalidatePath("/dashboard/jobs");
+  void notifyManagers({
+    orgId: session.user.orgId,
+    orgName: session.user.orgName ?? "Operations",
+    orgSlug: session.user.orgSlug,
+    subject: `New job request · ${name}`,
+    headline: "Client submitted a job request",
+    body: `${company.name} requested "${name}". Review it in Notifications or Jobs.`,
+    path: `/dashboard/jobs/${id}`,
+  }).catch((err) => console.error("[email]", err));
   redirect(`/portal/jobs/${id}`);
 }

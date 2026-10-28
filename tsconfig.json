@@ -37,6 +37,9 @@
   ],
   "exclude": [
     "node_modules",
-    "thirdpartylogistics"
+    "thirdpartylogistics",
+    "scripts/capture-search-screenshot.ts",
+    "scripts/capture-tenant-404-screenshot.ts",
+    "scripts/capture-pr-screenshots.ts"
   ]
 }

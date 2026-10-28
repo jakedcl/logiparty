@@ -27,6 +27,8 @@ type Props = {
   logoUrl?: string | null;
   primaryColor?: string;
   navItems: DashboardNavItem[];
+  /** Optional center header slot (e.g. search). */
+  headerExtra?: React.ReactNode;
   /** Name/role control (dropdown with profile + sign out) */
   accountMenu: React.ReactNode;
   children: React.ReactNode;
@@ -83,7 +85,7 @@ function Brand({
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={logoUrl}
-            alt=""
+            alt={orgName}
             className="h-7 w-auto max-w-[100px] shrink-0"
           />
         ) : null}
@@ -106,7 +108,7 @@ function Brand({
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={logoUrl}
-            alt=""
+            alt={orgName}
             className="h-8 w-auto max-w-[140px] shrink-0"
           />
         </div>
@@ -272,6 +274,7 @@ export function DashboardShell({
   logoUrl,
   primaryColor = FALLBACK_PRIMARY_COLOR,
   navItems,
+  headerExtra,
   accountMenu,
   children,
 }: Props) {
@@ -359,8 +362,10 @@ export function DashboardShell({
             </button>
             <Brand orgName={orgName} logoUrl={logoUrl} inline />
           </div>
-          <div className="hidden lg:block" />
-          <div className="flex shrink-0 items-center">{accountMenu}</div>
+          <div className="flex min-w-0 flex-1 items-center justify-center gap-2 px-1 sm:px-2">
+            {headerExtra}
+          </div>
+          <div className="flex shrink-0 items-center gap-2">{accountMenu}</div>
         </header>
 
         <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-6 md:py-8">

@@ -90,6 +90,7 @@ export async function getMyJob(
       clientCompanyName: string;
       myPhases: string[];
       myRoles: string[];
+      myAssignmentRows: { id: string; phase: string; assignedRole: string }[];
     })
   | null
 > {
@@ -97,10 +98,11 @@ export async function getMyJob(
   if (session.user.orgId !== orgId) throw new Error("Forbidden");
 
   const myAssignments = await withOrgQuery<
-    { phase: string; assignedRole: string }[]
+    { id: string; phase: string; assignedRole: string }[]
   >(orgId, (database) =>
     database
       .select({
+        id: jobAssignments.id,
         phase: jobAssignments.phase,
         assignedRole: jobAssignments.assignedRole,
       })
@@ -145,6 +147,7 @@ export async function getMyJob(
     clientCompanyName: companies[0]?.name ?? "Client",
     myPhases: myAssignments.map((a) => a.phase),
     myRoles: myAssignments.map((a) => a.assignedRole),
+    myAssignmentRows: myAssignments,
   };
 }
 

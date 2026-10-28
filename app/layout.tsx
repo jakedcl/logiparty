@@ -1,15 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { marketingFont } from "@/components/marketing/fonts";
-import { getMarketingOrigin, MARKETING_DESCRIPTION } from "@/lib/marketing/site";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(getMarketingOrigin()),
-  title: {
-    default: "Logiparty",
-    template: "%s — Logiparty",
-  },
-  description: MARKETING_DESCRIPTION,
+  title: "Operations",
+  description: "Operations workspace",
 };
 
 export const viewport: Viewport = {

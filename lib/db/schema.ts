@@ -98,6 +98,7 @@ export const orgMemberships = pgTable(
     isManager: boolean("is_manager").notNull().default(false),
     isStaff: boolean("is_staff").notNull().default(false),
     isClient: boolean("is_client").notNull().default(false),
+    notifyEmail: boolean("notify_email").notNull().default(true),
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

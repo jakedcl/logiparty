@@ -39,6 +39,11 @@ export function canViewMyJobs(m: SessionMembership): boolean {
   return m.isStaff;
 }
 
+/** Managers and org admins — full jobs list, clients, team, reports, dashboard home. */
+export function canViewManagerDashboard(m: SessionMembership): boolean {
+  return m.isOrgAdmin || m.isManager;
+}
+
 export function canAccessInternalDashboard(m: SessionMembership): boolean {
   return m.isOrgAdmin || m.isManager || m.isStaff;
 }

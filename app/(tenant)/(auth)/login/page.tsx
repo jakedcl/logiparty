@@ -110,7 +110,7 @@ export default async function LoginPage({
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={org.logoUrl}
-                alt=""
+                alt={org?.name ?? "Organization"}
                 className="h-11 w-auto max-w-[180px]"
               />
             ) : null}

@@ -29,12 +29,13 @@ export function BillingPanel({
     return (
       <section
         id="billing"
-        className="space-y-2 border-t border-neutral-200 pt-6"
+        className="space-y-2 border-t border-[var(--border-subtle)] pt-6"
       >
         <h2 className="text-lg font-medium">Billing</h2>
-        <p className="text-sm text-neutral-500">
-          Billing isn’t configured yet. When Stripe keys are added to the
-          environment, you can subscribe and manage payment methods here.
+        <p className="text-sm text-[var(--muted)]">
+          Billing is not connected yet. When your operator enables Stripe, you
+          can subscribe and manage payment methods here — nothing is charged
+          during the pilot.
         </p>
       </section>
     );
@@ -45,7 +46,7 @@ export function BillingPanel({
   return (
     <section
       id="billing"
-      className="space-y-3 border-t border-neutral-200 pt-6"
+      className="space-y-3 border-t border-[var(--border-subtle)] pt-6"
     >
       <div>
         <h2 className="text-lg font-medium">Billing</h2>
@@ -56,7 +57,7 @@ export function BillingPanel({
       </div>
       <p className="text-sm">
         Status:{" "}
-        <span className="font-medium text-neutral-900">{label}</span>
+        <span className="font-medium text-[var(--foreground)]">{label}</span>
       </p>
       <div className="flex flex-wrap gap-2">
         {!isActive && (

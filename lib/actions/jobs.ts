@@ -5,6 +5,7 @@ import { and, asc, desc, eq, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
+import { notifyClientCompanyUsers } from "@/lib/email/notify";
 import { canManageJobs } from "@/lib/auth/permissions";
 import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import { maybePromoteJobToReady } from "@/lib/jobs/auto-ready";
@@ -256,6 +257,16 @@ export async function acceptDraftJob(formData: FormData) {
   revalidatePath("/dashboard/notifications");
   revalidatePath("/portal/jobs");
   revalidatePath(`/portal/jobs/${id}`);
+  void notifyClientCompanyUsers({
+    orgId: session.user.orgId,
+    orgName: session.user.orgName ?? "Operations",
+    orgSlug: session.user.orgSlug,
+    clientCompanyId: job.clientCompanyId,
+    subject: `Job approved · ${job.name}`,
+    headline: "Your job request was approved",
+    body: `${job.name} is now upcoming. Your team will continue planning load-in and crew.`,
+    path: `/portal/jobs/${id}`,
+  }).catch((err) => console.error("[email]", err));
   redirect(`/dashboard/jobs/${id}`);
 }
 
@@ -293,6 +304,16 @@ export async function denyDraftJob(formData: FormData) {
   revalidatePath("/dashboard/notifications");
   revalidatePath("/portal/jobs");
   revalidatePath(`/portal/jobs/${id}`);
+  void notifyClientCompanyUsers({
+    orgId: session.user.orgId,
+    orgName: session.user.orgName ?? "Operations",
+    orgSlug: session.user.orgSlug,
+    clientCompanyId: job.clientCompanyId,
+    subject: `Job update · ${job.name}`,
+    headline: "Your job request was not approved",
+    body: `${job.name} was declined. Open the portal for status details or submit a revised request.`,
+    path: `/portal/jobs/${id}`,
+  }).catch((err) => console.error("[email]", err));
   redirect(`/dashboard/jobs/${id}`);
 }
 
