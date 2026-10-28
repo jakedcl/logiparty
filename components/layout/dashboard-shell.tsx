@@ -362,10 +362,7 @@ export function DashboardShell({
             </button>
             <Brand orgName={orgName} logoUrl={logoUrl} inline />
           </div>
-          <div className="hidden min-w-0 flex-1 justify-center lg:flex">
-            {headerExtra}
-          </div>
-          <div className="flex min-w-0 flex-1 items-center gap-2 lg:hidden">
+          <div className="flex min-w-0 flex-1 items-center justify-center gap-2 px-1 sm:px-2">
             {headerExtra}
           </div>
           <div className="flex shrink-0 items-center gap-2">{accountMenu}</div>

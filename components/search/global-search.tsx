@@ -1,31 +1,60 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import type { Session } from "next-auth";
-import {
-  globalSearch,
-  type SearchResultGroup,
-} from "@/lib/actions/global-search";
+import type { SearchResultGroup } from "@/lib/actions/global-search";
 import { cn } from "@/lib/utils";
 
-type Props = {
-  session: Session;
-  staffTags: string[];
-};
+async function fetchSearch(
+  q: string,
+  scope?: "portal"
+): Promise<SearchResultGroup[]> {
+  const params = new URLSearchParams({ q });
+  if (scope) params.set("scope", scope);
+  const res = await fetch(`/api/search?${params.toString()}`, {
+    credentials: "same-origin",
+  });
+  if (!res.ok) {
+    const body = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(body.error ?? `Search failed (${res.status})`);
+  }
+  const ct = res.headers.get("content-type") ?? "";
+  if (!ct.includes("application/json")) {
+    throw new Error("Search unavailable — try signing in again.");
+  }
+  const data = (await res.json()) as { groups: SearchResultGroup[] };
+  return data.groups ?? [];
+}
 
-export function GlobalSearch({ session }: Props) {
-  const orgId = session.user.orgId;
+type Props = Record<string, never>;
+
+export function GlobalSearch(_props: Props) {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [groups, setGroups] = useState<SearchResultGroup[]>([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [pending, startTransition] = useTransition();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
-  const flat = groups.flatMap((g) => g.items);
+  const flat = useMemo(
+    () => groups.flatMap((g) => g.items),
+    [groups]
+  );
+
+  const flatIndexByKey = useMemo(() => {
+    const map = new Map<string, number>();
+    let i = 0;
+    for (const g of groups) {
+      for (const item of g.items) {
+        map.set(`${g.label}:${item.id}:${item.href}`, i);
+        i += 1;
+      }
+    }
+    return map;
+  }, [groups]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -40,29 +69,49 @@ export function GlobalSearch({ session }: Props) {
   }, []);
 
   useEffect(() => {
-    if (open) {
-      const t = window.setTimeout(() => inputRef.current?.focus(), 0);
-      return () => window.clearTimeout(t);
+    if (!open) {
+      setQuery("");
+      setGroups([]);
+      setActiveIndex(0);
+      setError(null);
+      return;
     }
-    setQuery("");
-    setGroups([]);
-    setActiveIndex(0);
+    const t = window.setTimeout(() => inputRef.current?.focus(), 0);
+    return () => window.clearTimeout(t);
   }, [open]);
 
   useEffect(() => {
-    if (query.trim().length < 2) {
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
       setGroups([]);
+      setLoading(false);
+      setError(null);
       return;
     }
+    let cancelled = false;
     const handle = window.setTimeout(() => {
-      startTransition(async () => {
-        const next = await globalSearch(orgId, query);
-        setGroups(next);
-        setActiveIndex(0);
-      });
-    }, 180);
-    return () => window.clearTimeout(handle);
-  }, [query, orgId]);
+      setLoading(true);
+      setError(null);
+      fetchSearch(trimmed)
+        .then((next) => {
+          if (cancelled) return;
+          setGroups(next);
+          setActiveIndex(0);
+        })
+        .catch((e) => {
+          if (cancelled) return;
+          setGroups([]);
+          setError(e instanceof Error ? e.message : "Search failed");
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    }, 200);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(handle);
+    };
+  }, [query]);
 
   const go = useCallback(
     (href: string) => {
@@ -92,8 +141,6 @@ export function GlobalSearch({ session }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, flat, activeIndex, go]);
 
-  let itemOffset = 0;
-
   return (
     <>
       <button
@@ -117,12 +164,12 @@ export function GlobalSearch({ session }: Props) {
 
       {open ? (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center bg-[var(--foreground)]/40 p-4 pt-[12vh]"
+          className="fixed inset-0 z-50 flex items-start justify-center bg-black/40 p-4 pt-[12vh]"
           role="presentation"
           onClick={() => setOpen(false)}
         >
           <div
-            className="w-full max-w-lg overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--surface)] shadow-xl"
+            className="w-full max-w-lg overflow-hidden rounded-lg border border-neutral-200 bg-white text-neutral-900 shadow-xl"
             role="dialog"
             aria-modal="true"
             aria-label="Search"
@@ -133,57 +180,54 @@ export function GlobalSearch({ session }: Props) {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search…"
-              className="w-full border-b border-[var(--border-subtle)] bg-transparent px-4 py-3 text-sm outline-none"
+              className="w-full border-b border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-900 outline-none"
             />
             <div className="max-h-[50vh] overflow-y-auto p-2">
               {query.trim().length < 2 ? (
-                <p className="px-2 py-4 text-sm text-[var(--muted)]">
+                <p className="px-2 py-4 text-sm text-neutral-500">
                   Type at least 2 characters.
                 </p>
-              ) : pending ? (
-                <p className="px-2 py-4 text-sm text-[var(--muted)]">Searching…</p>
+              ) : loading ? (
+                <p className="px-2 py-4 text-sm text-neutral-500">Searching…</p>
+              ) : error ? (
+                <p className="px-2 py-4 text-sm text-red-600">{error}</p>
               ) : groups.length === 0 ? (
-                <p className="px-2 py-4 text-sm text-[var(--muted)]">
-                  No results.
-                </p>
+                <p className="px-2 py-4 text-sm text-neutral-500">No results.</p>
               ) : (
-                groups.map((group) => {
-                  const start = itemOffset;
-                  itemOffset += group.items.length;
-                  return (
-                    <div key={group.label} className="mb-2">
-                      <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--muted)]">
-                        {group.label}
-                      </p>
-                      <ul>
-                        {group.items.map((item, idx) => {
-                          const flatIdx = start + idx;
-                          const active = flatIdx === activeIndex;
-                          return (
-                            <li key={item.id + item.href}>
-                              <Link
-                                href={item.href}
-                                className={cn(
-                                  "block rounded-md px-3 py-2 text-left",
-                                  active && "bg-[var(--surface-hover)]"
-                                )}
-                                onMouseEnter={() => setActiveIndex(flatIdx)}
-                                onClick={() => setOpen(false)}
-                              >
-                                <span className="block text-sm font-medium text-[var(--foreground)]">
-                                  {item.title}
-                                </span>
-                                <span className="block text-xs text-[var(--muted)]">
-                                  {item.subtitle}
-                                </span>
-                              </Link>
-                            </li>
-                          );
-                        })}
-                      </ul>
-                    </div>
-                  );
-                })
+                groups.map((group) => (
+                  <div key={group.label} className="mb-2">
+                    <p className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-neutral-500">
+                      {group.label}
+                    </p>
+                    <ul>
+                      {group.items.map((item) => {
+                        const key = `${group.label}:${item.id}:${item.href}`;
+                        const flatIdx = flatIndexByKey.get(key) ?? 0;
+                        const active = flatIdx === activeIndex;
+                        return (
+                          <li key={key}>
+                            <Link
+                              href={item.href}
+                              className={cn(
+                                "block rounded-md px-3 py-2 text-left",
+                                active && "bg-neutral-100"
+                              )}
+                              onMouseEnter={() => setActiveIndex(flatIdx)}
+                              onClick={() => setOpen(false)}
+                            >
+                              <span className="block text-sm font-medium text-neutral-900">
+                                {item.title}
+                              </span>
+                              <span className="block text-xs text-neutral-500">
+                                {item.subtitle}
+                              </span>
+                            </Link>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))
               )}
             </div>
           </div>

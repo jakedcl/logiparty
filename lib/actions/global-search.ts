@@ -1,6 +1,6 @@
 "use server";
 
-import { and, asc, eq, ilike, inArray, or, sql } from "drizzle-orm";
+import { and, asc, desc, eq, ilike, inArray, or } from "drizzle-orm";
 import {
   canManageJobs,
   canViewFleet,
@@ -45,7 +45,7 @@ export async function globalSearch(
   const q = normalizeQuery(rawQuery);
   if (q.length < 2) return [];
 
-  const pattern = `%${q.replace(/[%_\\]/g, "\\$&")}%`;
+  const pattern = `%${q}%`;
   const isManager = canManageJobs(session.user);
   const isStaff = canViewMyJobs(session.user);
   const tags = await getSessionStaffTags(session);
@@ -69,7 +69,7 @@ export async function globalSearch(
         .where(
           and(eq(jobs.orgId, orgId), ilike(jobs.name, pattern))
         )
-        .orderBy(sql`${jobs.updatedAt} DESC`)
+        .orderBy(desc(jobs.updatedAt))
         .limit(LIMIT)
     );
     if (jobRows.length) {
@@ -285,7 +285,7 @@ export async function portalGlobalSearch(
   const company = await getSessionClientCompany(session);
   if (!company) return [];
 
-  const pattern = `%${q.replace(/[%_\\]/g, "\\$&")}%`;
+  const pattern = `%${q}%`;
   const { clientOnlyActor } = await import("@/lib/db");
 
   const jobRows = await withOrgQuery<

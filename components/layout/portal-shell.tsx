@@ -4,6 +4,7 @@ import { absoluteRedirectUrl } from "@/lib/auth/redirect";
 import type { Session } from "next-auth";
 import { DevRoleSwitchPanel } from "@/components/dev/dev-role-switch-panel";
 import { OrgTheme } from "@/components/layout/org-theme";
+import { PortalGlobalSearch } from "@/components/search/portal-global-search";
 import { PortalNav } from "@/components/layout/portal-nav";
 import { SessionIdentity } from "@/components/layout/session-identity";
 import { WindowToolbar } from "@/components/ui/window-chrome";
@@ -54,7 +55,8 @@ export function PortalShell({
               ) : null}
             </div>
           </div>
-          <div className="flex shrink-0 items-center">
+          <div className="flex shrink-0 items-center gap-2">
+            <PortalGlobalSearch />
             <SessionIdentity
               name={session.user.name}
               email={session.user.email}

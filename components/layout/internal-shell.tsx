@@ -114,7 +114,7 @@ export function InternalShell({
         logoUrl={logoUrl}
         primaryColor={primaryColor}
         navItems={navItems}
-        headerExtra={<GlobalSearch session={session} staffTags={staffTags} />}
+        headerExtra={<GlobalSearch />}
         accountMenu={
           <SessionIdentity
             name={session.user.name}

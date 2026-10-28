@@ -60,7 +60,19 @@ async function main() {
     const statements = splitStatements(content);
     console.log(`Running ${file} (${statements.length} statements)...`);
     for (const statement of statements) {
-      await sql.query(statement.endsWith(";") ? statement : `${statement};`);
+      try {
+        await sql.query(statement.endsWith(";") ? statement : `${statement};`);
+      } catch (e) {
+        const code =
+          e && typeof e === "object" && "code" in e
+            ? String((e as { code: string }).code)
+            : "";
+        if (code === "42710" || code === "42P07") {
+          console.log(`  skip (already exists): ${code}`);
+          continue;
+        }
+        throw e;
+      }
     }
   }
   console.log("Migrations complete.");
