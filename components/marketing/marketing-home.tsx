@@ -35,12 +35,6 @@ const SECURITY_POINTS = [
 export function MarketingHome() {
   return (
     <MarketingRoot>
-      <div className="m-bubbles" aria-hidden>
-        <span className="m-bubble m-bubble-a" />
-        <span className="m-bubble m-bubble-b" />
-        <span className="m-bubble m-bubble-c" />
-      </div>
-
       <MarketingHeader brandHref="#top" brandAnchor>
         <a href="#about" className="m-nav-link hidden sm:inline">
           Who it&apos;s for
