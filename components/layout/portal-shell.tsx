@@ -41,7 +41,7 @@ export function PortalShell({
           <div className="flex min-w-0 items-center gap-2.5">
             {logoUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={logoUrl} alt="" className="h-8 w-auto max-w-[120px]" />
+              <img src={logoUrl} alt={orgName} className="h-8 w-auto max-w-[120px]" />
             ) : null}
             <div className="min-w-0">
               <p className="truncate text-lg font-semibold tracking-tight text-[var(--lp-fg)]">

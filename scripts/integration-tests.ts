@@ -70,12 +70,16 @@ async function verifyJobsRls(
   orgA: { id: string; slug: string },
   orgB: { id: string; slug: string }
 ) {
-  const companies = await sql`
+  let companies = await sql`
     SELECT id FROM client_companies WHERE org_id = ${orgA.id} LIMIT 1
   `;
   if (companies.length === 0) {
-    console.log("SKIP: jobs RLS (no client company on test — run db:seed)");
-    return;
+    const inserted = await sql`
+      INSERT INTO client_companies (org_id, name)
+      VALUES (${orgA.id}, 'Integration Test Co')
+      RETURNING id
+    `;
+    companies = inserted;
   }
 
   const marker = `integration-job-${Date.now()}`;

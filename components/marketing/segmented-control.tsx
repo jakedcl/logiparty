@@ -37,7 +37,7 @@ export function SegmentedControl({
 
   return (
     <div className={cn("m-seg-wrap", className)}>
-      <div className="m-seg" role="tablist" aria-label={ariaLabel}>
+      <div className="m-seg" role="navigation" aria-label={ariaLabel}>
         {!reduceMotion ? (
           <motion.span
             className="m-seg-thumb"
@@ -57,8 +57,6 @@ export function SegmentedControl({
                 key={seg.id}
                 href={seg.href}
                 scroll={seg.scroll}
-                role="tab"
-                aria-selected={selected}
                 className={itemClass(selected)}
                 aria-current={selected ? "page" : undefined}
               >

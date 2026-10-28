@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { MarketingShell } from "@/components/marketing/marketing-shell";
 
-export default function NotFound() {
+export default function MarketingNotFound() {
   return (
     <MarketingShell>
       <p className="text-sm font-bold text-[var(--m-accent)]">404</p>
