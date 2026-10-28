@@ -1,4 +1,6 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { canAccessInternalDashboard } from "@/lib/auth/permissions";
 import { InternalShell } from "@/components/layout/internal-shell";
 import {
@@ -7,6 +9,18 @@ import {
   requireSession,
 } from "@/lib/org/context";
 import { resolvePrimaryColor } from "@/lib/theme/primary-color";
+
+/** White-label: no Logiparty in document title or description. */
+export async function generateMetadata(): Promise<Metadata> {
+  const session = await auth();
+  const orgName = session?.user?.orgName?.trim() || "Operations";
+  return {
+    title: {
+      absolute: orgName,
+    },
+    description: `${orgName} operations workspace`,
+  };
+}
 
 export default async function DashboardLayout({
   children,
