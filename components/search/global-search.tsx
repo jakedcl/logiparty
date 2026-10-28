@@ -27,9 +27,7 @@ async function fetchSearch(
   return data.groups ?? [];
 }
 
-type Props = Record<string, never>;
-
-export function GlobalSearch(_props: Props) {
+export function GlobalSearch() {
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [groups, setGroups] = useState<SearchResultGroup[]>([]);
