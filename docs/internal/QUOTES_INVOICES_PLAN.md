@@ -1,6 +1,6 @@
 # Quotes, proposals & invoicing — design plan
 
-**Status:** Design only (no schema or app code in this PR).  
+**Status:** Implemented on branch `lurk/quotes-invoices-plan-2da6` (PR #60). Migrations `0025`–`0026`.
 **Priority:** P2 in [QA_REPORT_2026-10-28.md](./QA_REPORT_2026-10-28.md) — parity with **Current RMS**, **Rentman**, **Goodshuffle Pro** quote-to-cash.  
 **Depends on:** Stable `main` after in-flight work (roles refactor, Resend event email, crew self-removal, search, reports). Do not land migrations until that branch merges.
 
