@@ -13,7 +13,7 @@ A 3PL company (a "tenant" or org) gets a workspace at `{slug}.logiparty.com`. It
 1. `lib/org/subdomain.ts` turns the Host header into an org slug: `nydac.logiparty.com` and `nydac.localhost` both give `nydac`. The apex domain and `www` give no slug (that's the marketing site). Bare `localhost` uses `NEXT_PUBLIC_DEV_ORG_SLUG` if set.
 2. If the slug has no row in `organizations`, the request is redirected to the apex. If the database can't be reached, the check is skipped so real tenants keep working.
 3. It reads the session JWT. Only the proxy sets the `x-org-slug` header (any client-supplied value is deleted first), falling back to the org slug in the JWT.
-4. Anyone without a session is sent to `/login`, except for `/login`, `/invite/*`, `/api/auth`, `/api/health`, `/api/stripe/webhook`, the apex homepage, the legal pages and `/demo`.
+4. Anyone without a session is sent to `/login`, except for `/login`, `/invite/*`, public API routes (`/api/auth`, `/api/health`, `/api/stripe/webhook`, **`/api/cron/*`** — cron routes still require `Authorization: Bearer CRON_SECRET` in the handler), the apex homepage, the legal pages and `/demo`.
 5. Users who are only clients are kept out of `/dashboard` and sent to `/portal`. Non-clients are kept out of `/portal`.
 
 ## Auth and roles
@@ -54,7 +54,7 @@ The interesting rules live in `lib/jobs/`.
 Each of these is optional and the app degrades quietly when its keys are missing.
 
 - **Cloudflare R2** (`lib/storage/r2.ts`): job documents are stored under a storage key, and downloads are 10-minute signed URLs. Uploads must be a PDF or an image, at most 20 MB.
-- **Resend** (`lib/email/`): tenant-branded transactional mail (React Email templates). Invites, manager alerts (portal job requests, inventory requests, crew stepping off a job), and client updates (draft approved/denied, crew assignments). Set `RESEND_API_KEY` and `EMAIL_FROM` (or legacy `RESEND_FROM_EMAIL`). Without a key, links are logged and the app continues. Per-user **`notify_email`** on `org_memberships` opts out of email (in-app notifications unchanged).
+- **Resend** (`lib/email/`): tenant-branded transactional mail (React Email templates). The **From** address comes from **`EMAIL_FROM`** (verified domain, e.g. `notifications@mail.logiparty.com`); tenant sends use **`{orgName} <that-address>`**. Apex marketing lead notify uses the **Logiparty** display name with the same address. Legacy **`RESEND_FROM_EMAIL`** is only a fallback if `EMAIL_FROM` is unset. Without `RESEND_API_KEY`, links are logged and the app continues. Per-user **`notify_email`** on `org_memberships` opts out of email.
 - **Stripe** (`lib/stripe.ts`, `app/api/stripe/webhook`): a subscription scaffold. The webhook verifies the signature and handles `checkout.session.completed`, `customer.subscription.updated` and `customer.subscription.deleted`, which update the org's `billingStatus`. Nothing is locked when billing is unpaid.
 - **Dev role switcher** (`lib/dev/role-switch.ts`): a local convenience for switching personas. It is refused when `VERCEL_ENV` is `production`.
 
@@ -69,11 +69,10 @@ Names only. See `.env.example`.
 | `NEXT_PUBLIC_ROOT_DOMAIN` | Root domain for subdomain routing |
 | `NEXT_PUBLIC_DEV_ORG_SLUG` | Local only. Makes bare localhost act as a tenant |
 | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME` | Document storage |
-| `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, `LEADS_NOTIFY_EMAIL` | Email |
+| `RESEND_API_KEY`, `LEADS_NOTIFY_EMAIL` | Email |
+| `EMAIL_FROM` | Verified send address (`Name <email>`). Tenants: `{orgName} <email>`; marketing: Logiparty + same email. `RESEND_FROM_EMAIL` legacy fallback only |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID` | Billing scaffold |
-| `CRON_SECRET` | Guards the auto-ready route (Vercel Cron sends `Authorization: Bearer …`) |
-| `EMAIL_FROM` | From address for tenant transactional mail (e.g. `NYDAC Ops <mail@logiparty.com>`) |
-| `RESEND_API_KEY` | Resend API key for invites and event email |
+| `CRON_SECRET` | Bearer secret for `/api/cron/*` (proxy allows unauthenticated reach; route returns 401 without header) |
 | `ALLOW_DEV_ROLE_SWITCH` | Local only |
 
 ## More detail

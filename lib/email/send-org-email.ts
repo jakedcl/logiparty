@@ -1,5 +1,6 @@
 import { render } from "@react-email/render";
 import { EventEmail } from "@/lib/email/templates/event-email";
+import { tenantFromHeader } from "@/lib/email/from";
 
 export type SendOrgEmailParams = {
   to: string | string[];
@@ -10,15 +11,6 @@ export type SendOrgEmailParams = {
   actionLabel?: string;
   actionUrl?: string;
 };
-
-function emailFrom(orgName: string): string {
-  const configured = process.env.EMAIL_FROM?.trim();
-  if (configured) return configured;
-  const legacy = process.env.RESEND_FROM_EMAIL?.trim();
-  if (legacy) return legacy;
-  const display = orgName.trim() || "Operations";
-  return `${display} <onboarding@resend.dev>`;
-}
 
 export async function sendOrgEmail(params: SendOrgEmailParams) {
   const apiKey = process.env.RESEND_API_KEY;
@@ -47,7 +39,7 @@ export async function sendOrgEmail(params: SendOrgEmailParams) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: emailFrom(params.orgName),
+      from: tenantFromHeader(params.orgName),
       to: toList,
       subject: params.subject,
       html,

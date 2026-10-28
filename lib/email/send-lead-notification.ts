@@ -1,3 +1,5 @@
+import { marketingFromHeader } from "@/lib/email/from";
+
 type LeadEmailParams = {
   name: string;
   email: string;
@@ -8,11 +10,8 @@ type LeadEmailParams = {
 /** Notify Jake when someone requests access. No-op without RESEND + notify email. */
 export async function sendLeadNotification(params: LeadEmailParams) {
   const apiKey = process.env.RESEND_API_KEY;
-  const notifyTo =
-    process.env.LEADS_NOTIFY_EMAIL?.trim() ||
-    process.env.RESEND_FROM_EMAIL?.trim();
-  const from =
-    process.env.RESEND_FROM_EMAIL ?? "Logiparty <onboarding@resend.dev>";
+  const notifyTo = process.env.LEADS_NOTIFY_EMAIL?.trim();
+  const from = marketingFromHeader();
 
   if (!apiKey || !notifyTo) {
     console.log(
