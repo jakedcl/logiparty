@@ -48,7 +48,20 @@ function HighlightedText({ text, query }: { text: string; query: string }) {
   );
 }
 
-function Kbd({ children }: { children: React.ReactNode }) {
+function Kbd({
+  children,
+  variant = "panel",
+}: {
+  children: React.ReactNode;
+  variant?: "chrome" | "panel";
+}) {
+  if (variant === "chrome") {
+    return (
+      <kbd className="shrink-0 rounded border border-[color-mix(in_srgb,var(--primary-foreground)_45%,transparent)] bg-[color-mix(in_srgb,var(--primary-foreground)_18%,transparent)] px-1.5 py-0.5 text-[10px] font-semibold leading-none text-[var(--primary-foreground)] shadow-none">
+        {children}
+      </kbd>
+    );
+  }
   return (
     <kbd className="rounded border border-[var(--border-subtle)] bg-[var(--surface)] px-1.5 py-0.5 text-[10px] font-medium text-[var(--muted)] shadow-sm">
       {children}
@@ -213,7 +226,7 @@ export function CommandPaletteSearch({
         <span className="min-w-0 flex-1 truncate opacity-90">
           {triggerPlaceholder}
         </span>
-        <Kbd>{modKey}K</Kbd>
+        <Kbd variant="chrome">{modKey}K</Kbd>
       </button>
       {compactTrigger ? null : (
         <button

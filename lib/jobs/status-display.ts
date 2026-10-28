@@ -30,20 +30,20 @@ export function sortJobStatusCounts<T extends { status: string }>(
   );
 }
 
-/** Tailwind / token classes for report bar fills (matches status badge hues). */
+/** Solid fills for report bars (readable at a glance on a neutral track). */
 export function jobStatusBarClass(status: string): string {
   const key = status.toLowerCase();
   switch (key) {
     case "draft":
-      return "bg-gradient-to-b from-[#fff6c8] to-[#f0d56a]";
+      return "bg-[#c9a227]";
     case "upcoming":
-      return "bg-gradient-to-b from-white to-[color-mix(in_srgb,var(--info)_18%,white)] border border-[color-mix(in_srgb,var(--info)_45%,white)]";
+      return "bg-[#2563eb]";
     case "ready":
-      return "bg-gradient-to-b from-white to-[color-mix(in_srgb,var(--success)_16%,white)] border border-[color-mix(in_srgb,var(--success)_40%,white)]";
+      return "bg-[#16a34a]";
     case "completed":
-      return "bg-gradient-to-b from-[#f7f7f7] to-[#e4e4e4] border border-[var(--lp-line-strong)]";
+      return "bg-[#475569]";
     case "denied":
-      return "bg-gradient-to-b from-white to-[color-mix(in_srgb,var(--danger)_14%,white)] border border-[color-mix(in_srgb,var(--danger)_40%,white)]";
+      return "bg-[#dc2626]";
     default:
       return "bg-[var(--primary)]";
   }
