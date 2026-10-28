@@ -7,6 +7,7 @@ import {
   getOrgSlugFromHost,
   portFromHost,
 } from "@/lib/org/subdomain";
+import { staffOnlyDashboardRedirect } from "@/lib/auth/staff-access";
 
 /** Same-host redirect — never bounce to AUTH_URL apex. */
 function redirectPath(request: NextRequest, path: string) {
@@ -148,6 +149,20 @@ export async function proxy(request: NextRequest) {
       // Clients only — avoid dashboard↔portal ping-pong when flags are missing.
       if (token.isClient === true) {
         return redirectPath(request, "/portal");
+      }
+    }
+
+    const staffOnly =
+      token.isStaff === true &&
+      token.isManager !== true &&
+      token.isOrgAdmin !== true;
+    if (staffOnly) {
+      if (pathname === "/dashboard") {
+        return redirectPath(request, "/dashboard/my-jobs");
+      }
+      const redirectTo = staffOnlyDashboardRedirect(pathname);
+      if (redirectTo) {
+        return redirectPath(request, redirectTo);
       }
     }
   }

@@ -15,7 +15,9 @@ import {
   canInviteUsers,
   canViewFleet,
   canViewMyJobs,
+  canViewManagerDashboard,
 } from "@/lib/auth/permissions";
+import { GlobalSearch } from "@/components/search/global-search";
 import { inventoryHref } from "@/lib/inventory/hub";
 import { FALLBACK_PRIMARY_COLOR } from "@/lib/theme/primary-color";
 
@@ -51,13 +53,15 @@ export function InternalShell({
   const showEquipment = canManageOrgInventory(session.user, staffTags);
   const showFleet = canViewFleet(session.user);
   const showInventory = showClientInventory || showEquipment || showFleet;
+  const showManager = canViewManagerDashboard(session.user);
   const showJobs = canManageJobs(session.user);
   const showMyJobs = canViewMyJobs(session.user);
   const showNotifications = showJobs || showMyJobs;
 
-  const navItems: DashboardNavItem[] = [
-    { href: "/dashboard", label: "Dashboard" },
-  ];
+  const navItems: DashboardNavItem[] = [];
+  if (showManager) {
+    navItems.push({ href: "/dashboard", label: "Dashboard" });
+  }
   if (showJobs) navItems.push({ href: "/dashboard/jobs", label: "Jobs" });
   if (showMyJobs) navItems.push({ href: "/dashboard/my-jobs", label: "My Jobs" });
   if (showNotifications) {
@@ -96,8 +100,12 @@ export function InternalShell({
     navItems.push({ href: "/dashboard/team", label: "Team" });
     navItems.push({ href: "/dashboard/clients", label: "Clients" });
   }
+  if (showManager) {
+    navItems.push({ href: "/dashboard/reports", label: "Reports" });
+  }
   // My Profile lives under Settings — always show the hub
   navItems.push({ href: "/dashboard/settings", label: "Settings" });
+  navItems.push({ href: "/dashboard/help", label: "Help" });
 
   return (
     <>
@@ -106,6 +114,7 @@ export function InternalShell({
         logoUrl={logoUrl}
         primaryColor={primaryColor}
         navItems={navItems}
+        headerExtra={<GlobalSearch session={session} staffTags={staffTags} />}
         accountMenu={
           <SessionIdentity
             name={session.user.name}
