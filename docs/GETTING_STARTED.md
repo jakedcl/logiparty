@@ -185,6 +185,15 @@ npm run db:relink-admin        # re-link personal email as nydac admin
 npm run test:integration       # RLS / RBAC smoke tests
 ```
 
+With the dev server running and a seeded DB:
+
+```bash
+BASE_URL=http://nydac.localhost:3000 npx tsx scripts/golden-path-walk.ts
+BASE_URL=http://nydac.localhost:3000 npm run test:role-walk
+```
+
+`golden-path-walk` exercises the full job loop; `test:role-walk` is a lighter per-role HTTP QA pass (nav, search, RBAC redirects).
+
 ---
 
 ## Next build work
