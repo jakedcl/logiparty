@@ -2,6 +2,7 @@ import {
   boolean,
   integer,
   jsonb,
+  numeric,
   pgEnum,
   pgTable,
   primaryKey,
@@ -9,6 +10,7 @@ import {
   timestamp,
   unique,
   uuid,
+  date,
 } from "drizzle-orm/pg-core";
 
 export const jobStatusEnum = pgEnum("job_status", [
@@ -55,6 +57,45 @@ export const inventoryRequestStatusEnum = pgEnum("inventory_request_status", [
   "denied",
 ]);
 
+export const quoteStatusEnum = pgEnum("quote_status", [
+  "draft",
+  "sent",
+  "approved",
+  "declined",
+  "expired",
+  "void",
+]);
+
+export const invoiceStatusEnum = pgEnum("invoice_status", [
+  "draft",
+  "sent",
+  "partially_paid",
+  "paid",
+  "void",
+  "overdue",
+]);
+
+export const commercialLineKindEnum = pgEnum("commercial_line_kind", [
+  "equipment",
+  "labor",
+  "fleet",
+  "fee",
+  "discount",
+  "tax",
+  "deposit",
+  "custom",
+  "damage_loss",
+  "adjustment",
+]);
+
+export const rateUnitEnum = pgEnum("rate_unit", [
+  "each",
+  "day",
+  "hour",
+  "flat",
+  "percent",
+]);
+
 export const organizations = pgTable("organizations", {
   id: uuid("id").primaryKey().defaultRandom(),
   slug: text("slug").notNull().unique(),
@@ -68,6 +109,16 @@ export const organizations = pgTable("organizations", {
   stripeSubscriptionId: text("stripe_subscription_id"),
   /** Soft status: none | active | past_due | canceled — no hard lockout in pilot. */
   billingStatus: text("billing_status"),
+  quotePrefix: text("quote_prefix").notNull().default("Q"),
+  invoicePrefix: text("invoice_prefix").notNull().default("INV"),
+  nextQuoteNumber: integer("next_quote_number").notNull().default(1),
+  nextInvoiceNumber: integer("next_invoice_number").notNull().default(1),
+  defaultTaxRateBps: integer("default_tax_rate_bps").notNull().default(0),
+  taxLabel: text("tax_label").notNull().default("Sales tax"),
+  taxId: text("tax_id"),
+  paymentTermsDays: integer("payment_terms_days").notNull().default(30),
+  quoteValidDays: integer("quote_valid_days").notNull().default(14),
+  invoiceFooterText: text("invoice_footer_text"),
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
@@ -341,9 +392,248 @@ export const jobs = pgTable("jobs", {
   createdAt: timestamp("created_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
+  quoteId: uuid("quote_id"),
+  quoteVersion: integer("quote_version"),
   updatedAt: timestamp("updated_at", { withTimezone: true })
     .notNull()
     .defaultNow(),
+});
+
+export const rateCards = pgTable("rate_cards", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  name: text("name").notNull().default("Default"),
+  isDefault: boolean("is_default").notNull().default(true),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const rateCardLines = pgTable("rate_card_lines", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  rateCardId: uuid("rate_card_id")
+    .notNull()
+    .references(() => rateCards.id, { onDelete: "cascade" }),
+  kind: text("kind").notNull(),
+  inventoryItemId: uuid("inventory_item_id").references(() => inventoryItems.id, {
+    onDelete: "set null",
+  }),
+  fleetVehicleId: uuid("fleet_vehicle_id").references(() => fleetVehicles.id, {
+    onDelete: "set null",
+  }),
+  laborRole: text("labor_role"),
+  description: text("description").notNull(),
+  unit: rateUnitEnum("unit").notNull().default("each"),
+  unitPriceCents: integer("unit_price_cents").notNull().default(0),
+  minQty: integer("min_qty").notNull().default(1),
+  isActive: boolean("is_active").notNull().default(true),
+  clientCompanyId: uuid("client_company_id").references(
+    () => clientCompanies.id,
+    { onDelete: "cascade" }
+  ),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
+export const quotes = pgTable(
+  "quotes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    clientCompanyId: uuid("client_company_id")
+      .notNull()
+      .references(() => clientCompanies.id, { onDelete: "restrict" }),
+    quoteNumber: text("quote_number").notNull(),
+    status: quoteStatusEnum("status").notNull().default("draft"),
+    version: integer("version").notNull().default(1),
+    title: text("title").notNull(),
+    eventStart: timestamp("event_start", { withTimezone: true }),
+    eventEnd: timestamp("event_end", { withTimezone: true }),
+    validUntil: timestamp("valid_until", { withTimezone: true }),
+    currency: text("currency").notNull().default("USD"),
+    subtotalCents: integer("subtotal_cents").notNull().default(0),
+    taxCents: integer("tax_cents").notNull().default(0),
+    totalCents: integer("total_cents").notNull().default(0),
+    depositCents: integer("deposit_cents"),
+    notesInternal: text("notes_internal"),
+    notesClient: text("notes_client"),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    sentByUserId: uuid("sent_by_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    jobId: uuid("job_id").references(() => jobs.id, { onDelete: "set null" }),
+    pdfStorageKey: text("pdf_storage_key"),
+    createdBy: uuid("created_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique().on(t.orgId, t.quoteNumber)]
+);
+
+export const quoteLines = pgTable("quote_lines", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  quoteId: uuid("quote_id")
+    .notNull()
+    .references(() => quotes.id, { onDelete: "cascade" }),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  sortOrder: integer("sort_order").notNull().default(0),
+  kind: commercialLineKindEnum("kind").notNull().default("custom"),
+  description: text("description").notNull(),
+  quantity: numeric("quantity", { precision: 12, scale: 4 }).notNull().default("1"),
+  unit: rateUnitEnum("unit").notNull().default("each"),
+  unitPriceCents: integer("unit_price_cents").notNull().default(0),
+  lineTotalCents: integer("line_total_cents").notNull().default(0),
+  taxable: boolean("taxable").notNull().default(true),
+  sourceRateCardLineId: uuid("source_rate_card_line_id").references(
+    () => rateCardLines.id,
+    { onDelete: "set null" }
+  ),
+  inventoryItemId: uuid("inventory_item_id").references(() => inventoryItems.id, {
+    onDelete: "set null",
+  }),
+  fleetVehicleId: uuid("fleet_vehicle_id").references(() => fleetVehicles.id, {
+    onDelete: "set null",
+  }),
+});
+
+export const quoteVersions = pgTable(
+  "quote_versions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    quoteId: uuid("quote_id")
+      .notNull()
+      .references(() => quotes.id, { onDelete: "cascade" }),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    version: integer("version").notNull(),
+    snapshotJson: jsonb("snapshot_json").notNull(),
+    pdfStorageKey: text("pdf_storage_key"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique().on(t.quoteId, t.version)]
+);
+
+export const quoteClientResponses = pgTable(
+  "quote_client_responses",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    quoteId: uuid("quote_id")
+      .notNull()
+      .references(() => quotes.id, { onDelete: "cascade" }),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    quoteVersion: integer("quote_version").notNull(),
+    decision: text("decision").notNull(),
+    signerName: text("signer_name").notNull(),
+    respondedByUserId: uuid("responded_by_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    respondedAt: timestamp("responded_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    declineReason: text("decline_reason"),
+  },
+  (t) => [unique().on(t.quoteId, t.quoteVersion)]
+);
+
+export const invoices = pgTable(
+  "invoices",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    orgId: uuid("org_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    clientCompanyId: uuid("client_company_id")
+      .notNull()
+      .references(() => clientCompanies.id, { onDelete: "restrict" }),
+    jobId: uuid("job_id").references(() => jobs.id, { onDelete: "set null" }),
+    quoteId: uuid("quote_id").references(() => quotes.id, { onDelete: "set null" }),
+    invoiceNumber: text("invoice_number").notNull(),
+    status: invoiceStatusEnum("status").notNull().default("draft"),
+    issueDate: date("issue_date").notNull().defaultNow(),
+    dueDate: date("due_date").notNull(),
+    currency: text("currency").notNull().default("USD"),
+    subtotalCents: integer("subtotal_cents").notNull().default(0),
+    taxCents: integer("tax_cents").notNull().default(0),
+    totalCents: integer("total_cents").notNull().default(0),
+    amountPaidCents: integer("amount_paid_cents").notNull().default(0),
+    notesClient: text("notes_client"),
+    notesInternal: text("notes_internal"),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    stripePaymentLinkId: text("stripe_payment_link_id"),
+    stripePaymentLinkUrl: text("stripe_payment_link_url"),
+    pdfStorageKey: text("pdf_storage_key"),
+    createdBy: uuid("created_by").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [unique().on(t.orgId, t.invoiceNumber)]
+);
+
+export const invoiceLines = pgTable("invoice_lines", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  invoiceId: uuid("invoice_id")
+    .notNull()
+    .references(() => invoices.id, { onDelete: "cascade" }),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  sortOrder: integer("sort_order").notNull().default(0),
+  kind: commercialLineKindEnum("kind").notNull().default("custom"),
+  description: text("description").notNull(),
+  quantity: numeric("quantity", { precision: 12, scale: 4 }).notNull().default("1"),
+  unit: rateUnitEnum("unit").notNull().default("each"),
+  unitPriceCents: integer("unit_price_cents").notNull().default(0),
+  lineTotalCents: integer("line_total_cents").notNull().default(0),
+  taxable: boolean("taxable").notNull().default(true),
+  jobInventoryLineId: uuid("job_inventory_line_id").references(
+    () => jobInventoryLines.id,
+    { onDelete: "set null" }
+  ),
+});
+
+export const invoicePayments = pgTable("invoice_payments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  invoiceId: uuid("invoice_id")
+    .notNull()
+    .references(() => invoices.id, { onDelete: "cascade" }),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  amountCents: integer("amount_cents").notNull(),
+  method: text("method").notNull(),
+  stripePaymentIntentId: text("stripe_payment_intent_id"),
+  recordedByUserId: uuid("recorded_by_user_id").references(() => users.id, {
+    onDelete: "set null",
+  }),
+  paidAt: timestamp("paid_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
 export const jobLocations = pgTable(
@@ -494,6 +784,19 @@ export type JobAssignment = typeof jobAssignments.$inferSelect;
 export type Document = typeof documents.$inferSelect;
 export type AvailabilityRequest = typeof availabilityRequests.$inferSelect;
 export type MarketingLead = typeof marketingLeads.$inferSelect;
+export type RateCard = typeof rateCards.$inferSelect;
+export type RateCardLine = typeof rateCardLines.$inferSelect;
+export type Quote = typeof quotes.$inferSelect;
+export type QuoteLine = typeof quoteLines.$inferSelect;
+export type QuoteVersion = typeof quoteVersions.$inferSelect;
+export type QuoteClientResponse = typeof quoteClientResponses.$inferSelect;
+export type Invoice = typeof invoices.$inferSelect;
+export type InvoiceLine = typeof invoiceLines.$inferSelect;
+export type InvoicePayment = typeof invoicePayments.$inferSelect;
+export type QuoteStatus = (typeof quoteStatusEnum.enumValues)[number];
+export type InvoiceStatus = (typeof invoiceStatusEnum.enumValues)[number];
+export type CommercialLineKind = (typeof commercialLineKindEnum.enumValues)[number];
+export type RateUnit = (typeof rateUnitEnum.enumValues)[number];
 export type JobStatus = (typeof jobStatusEnum.enumValues)[number];
 export type JobInventoryItemType =
   (typeof jobInventoryItemTypeEnum.enumValues)[number];

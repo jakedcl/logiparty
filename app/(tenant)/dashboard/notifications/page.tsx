@@ -24,7 +24,13 @@ function fmt(d: Date): string {
 }
 
 function kindLabel(
-  kind: "draft_request" | "inventory_request" | "client_note" | "assignment"
+  kind:
+    | "draft_request"
+    | "inventory_request"
+    | "client_note"
+    | "assignment"
+    | "quote_pending"
+    | "quote_response"
 ): string {
   switch (kind) {
     case "draft_request":
@@ -35,6 +41,10 @@ function kindLabel(
       return "Note";
     case "assignment":
       return "Assignment";
+    case "quote_pending":
+      return "Quote";
+    case "quote_response":
+      return "Quote";
   }
 }
 

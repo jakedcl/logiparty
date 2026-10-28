@@ -5,7 +5,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Briefcase,
+  FileText,
   Package,
+  Receipt,
   Search,
   Truck,
   UserRound,
@@ -20,6 +22,8 @@ const GROUP_ICONS: Record<string, LucideIcon> = {
   "My jobs": Briefcase,
   "Your jobs": Briefcase,
   Clients: Users,
+  Quotes: FileText,
+  Invoices: Receipt,
   Inventory: Package,
   Equipment: Package,
   Crew: UserRound,

@@ -1617,6 +1617,135 @@ async function seedNydacRich(sql: Sql, passwordHash: string) {
   console.log("  nydac rich: clients + inventory + fleet + 6 jobs seeded");
 }
 
+async function seedNydacCommercial(sql: Sql) {
+  await sql`
+    INSERT INTO rate_cards (org_id, name, is_default)
+    SELECT o.id, 'Default', true
+    FROM organizations o
+    WHERE o.slug = 'nydac'
+      AND NOT EXISTS (
+        SELECT 1 FROM rate_cards rc WHERE rc.org_id = o.id AND rc.is_default
+      )
+  `;
+
+  await sql`
+    INSERT INTO rate_card_lines (
+      org_id, rate_card_id, kind, description, unit, unit_price_cents
+    )
+    SELECT o.id, rc.id, 'equipment', 'Bar cooler — day rate', 'day', 7500
+    FROM organizations o
+    JOIN rate_cards rc ON rc.org_id = o.id AND rc.is_default
+    WHERE o.slug = 'nydac'
+      AND NOT EXISTS (
+        SELECT 1 FROM rate_card_lines l
+        WHERE l.org_id = o.id AND l.description = 'Bar cooler — day rate'
+      )
+  `;
+
+  await sql`
+    INSERT INTO rate_card_lines (
+      org_id, rate_card_id, kind, description, unit, unit_price_cents
+    )
+    SELECT o.id, rc.id, 'labor', 'Load-in crew — hour', 'hour', 6500
+    FROM organizations o
+    JOIN rate_cards rc ON rc.org_id = o.id AND rc.is_default
+    WHERE o.slug = 'nydac'
+      AND NOT EXISTS (
+        SELECT 1 FROM rate_card_lines l
+        WHERE l.org_id = o.id AND l.description = 'Load-in crew — hour'
+      )
+  `;
+
+  await sql`
+    INSERT INTO quotes (
+      org_id, client_company_id, quote_number, title, status, version,
+      subtotal_cents, tax_cents, total_cents, sent_at, valid_until
+    )
+    SELECT o.id, c.id, 'Q-2026-9001', 'Red Bull rooftop activation', 'sent', 1,
+      150000, 13125, 163125, now(), now() + interval '14 days'
+    FROM organizations o
+    JOIN client_companies c ON c.org_id = o.id AND c.name = 'Red Bull'
+    WHERE o.slug = 'nydac'
+      AND NOT EXISTS (
+        SELECT 1 FROM quotes q WHERE q.org_id = o.id AND q.quote_number = 'Q-2026-9001'
+      )
+  `;
+
+  await sql`
+    INSERT INTO quote_lines (
+      quote_id, org_id, sort_order, kind, description, quantity,
+      unit, unit_price_cents, line_total_cents
+    )
+    SELECT q.id, q.org_id, 0, 'equipment', 'Bar build + coolers', 2, 'day', 75000, 150000
+    FROM quotes q
+    JOIN organizations o ON o.id = q.org_id
+    WHERE o.slug = 'nydac' AND q.quote_number = 'Q-2026-9001'
+      AND NOT EXISTS (
+        SELECT 1 FROM quote_lines l WHERE l.quote_id = q.id
+      )
+  `;
+
+  await sql`
+    INSERT INTO quotes (
+      org_id, client_company_id, quote_number, title, status, version,
+      subtotal_cents, tax_cents, total_cents
+    )
+    SELECT o.id, c.id, 'Q-2026-9002', 'Monster stage build', 'approved', 1,
+      220000, 19250, 239250
+    FROM organizations o
+    JOIN client_companies c ON c.org_id = o.id AND c.name = 'Monster Energy'
+    WHERE o.slug = 'nydac'
+      AND NOT EXISTS (
+        SELECT 1 FROM quotes q WHERE q.org_id = o.id AND q.quote_number = 'Q-2026-9002'
+      )
+  `;
+
+  await sql`
+    INSERT INTO jobs (
+      org_id, client_company_id, name, status, quote_id, quote_version
+    )
+    SELECT o.id, c.id, 'Monster stage build', 'draft', q.id, q.version
+    FROM organizations o
+    JOIN client_companies c ON c.org_id = o.id AND c.name = 'Monster Energy'
+    JOIN quotes q ON q.org_id = o.id AND q.quote_number = 'Q-2026-9002'
+    WHERE o.slug = 'nydac'
+      AND q.job_id IS NULL
+      AND NOT EXISTS (
+        SELECT 1 FROM jobs j WHERE j.org_id = o.id AND j.name = 'Monster stage build'
+          AND j.quote_id = q.id
+      )
+  `;
+
+  await sql`
+    UPDATE quotes q
+    SET job_id = j.id
+    FROM jobs j, organizations o
+    WHERE j.quote_id = q.id AND j.org_id = q.org_id
+      AND o.id = q.org_id AND o.slug = 'nydac'
+      AND q.quote_number = 'Q-2026-9002'
+      AND q.job_id IS NULL
+  `;
+
+  await sql`
+    INSERT INTO invoices (
+      org_id, client_company_id, job_id, quote_id, invoice_number, status,
+      due_date, subtotal_cents, tax_cents, total_cents, sent_at
+    )
+    SELECT o.id, c.id, j.id, q.id, 'INV-2026-9001', 'sent',
+      (current_date + 30), 220000, 19250, 239250, now()
+    FROM organizations o
+    JOIN client_companies c ON c.org_id = o.id AND c.name = 'Monster Energy'
+    JOIN quotes q ON q.org_id = o.id AND q.quote_number = 'Q-2026-9002'
+    JOIN jobs j ON j.id = q.job_id
+    WHERE o.slug = 'nydac'
+      AND NOT EXISTS (
+        SELECT 1 FROM invoices i WHERE i.org_id = o.id AND i.invoice_number = 'INV-2026-9001'
+      )
+  `;
+
+  console.log("  nydac commercial: rate cards + sample quotes/invoice");
+}
+
 async function seed() {
   loadEnvLocal();
   const url = process.env.DATABASE_URL;
@@ -1639,6 +1768,7 @@ async function seed() {
   }
 
   await seedNydacRich(sql, passwordHash);
+  await seedNydacCommercial(sql);
   await seedNorthlineRich(sql, passwordHash);
 
   console.log(`

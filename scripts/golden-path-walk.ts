@@ -376,6 +376,15 @@ async function main() {
   const [done] = await sql`SELECT status FROM jobs WHERE id = ${jobId}`;
   mark("22", done.status === "completed", "Mike marked job completed");
 
+  // Rich seed keeps other upcoming/ready jobs on RB-BAR-01; complete them so step 23 is deterministic.
+  await sql`
+    UPDATE jobs SET status = 'completed', updated_at = NOW()
+    WHERE org_id = ${tenant.id}
+      AND client_company_id = ${rb.id}
+      AND status IN ('upcoming', 'ready', 'draft')
+      AND id != ${jobId}
+  `;
+
   const otherJob = randomUUID();
   await sql`
     INSERT INTO jobs (id, org_id, client_company_id, name, status, created_by)
@@ -400,6 +409,74 @@ async function main() {
     activity.html.includes("Accepted job request") &&
       activity.html.includes("Assigned crew"),
     "Activity log shows accept + crew actions"
+  );
+
+  const quoteId = randomUUID();
+  const quoteNum = `GP-Q-${Date.now()}`;
+  await sql`
+    INSERT INTO quotes (
+      id, org_id, client_company_id, quote_number, title, status, version,
+      subtotal_cents, tax_cents, total_cents, sent_at
+    )
+    VALUES (
+      ${quoteId}, ${tenant.id}, ${rb.id}, ${quoteNum}, 'Golden path quote', 'sent', 1,
+      10000, 0, 10000, now()
+    )
+  `;
+  await sql`
+    INSERT INTO quote_lines (
+      quote_id, org_id, sort_order, kind, description, quantity,
+      unit_price_cents, line_total_cents
+    )
+    VALUES (
+      ${quoteId}, ${tenant.id}, 0, 'custom', 'Test line', 1, 10000, 10000
+    )
+  `;
+  const michaelaQuote = await getHtml(michaela, `/portal/quotes/${quoteId}`);
+  mark(
+    "25",
+    michaelaQuote.status === 200 &&
+      michaelaQuote.html.includes("Golden path quote") &&
+      michaelaQuote.html.includes("Approve quote"),
+    "Client sees sent quote in portal"
+  );
+
+  await sql`
+    INSERT INTO quote_client_responses (
+      quote_id, org_id, quote_version, decision, signer_name, responded_by_user_id
+    )
+    VALUES (${quoteId}, ${tenant.id}, 1, 'approved', 'Michaela Client', ${michaelaUser.id})
+  `;
+  await sql`UPDATE quotes SET status = 'approved' WHERE id = ${quoteId}`;
+
+  const convertJobId = randomUUID();
+  await sql`
+    INSERT INTO jobs (
+      id, org_id, client_company_id, name, status, quote_id, quote_version, created_by
+    )
+    VALUES (
+      ${convertJobId}, ${tenant.id}, ${rb.id}, 'Golden path quote', 'draft',
+      ${quoteId}, 1, ${mikeUser.id}
+    )
+  `;
+  await sql`UPDATE quotes SET job_id = ${convertJobId} WHERE id = ${quoteId}`;
+
+  const linked = await getHtml(mike, `/dashboard/jobs/${convertJobId}`);
+  mark(
+    "26",
+    linked.status === 200 &&
+      linked.html.includes("Linked quote") &&
+      linked.html.includes("Golden path quote"),
+    "Approved quote converted to job with link"
+  );
+
+  const staffQuotes = await getHtml(paulJar, "/dashboard/quotes");
+  mark(
+    "27",
+    staffQuotes.status === 307 ||
+      staffQuotes.status === 403 ||
+      !staffQuotes.html.includes(quoteNum),
+    "Staff cannot access quotes/pricing UI"
   );
 
   const otherJobPage = await getHtml(paulJar, `/dashboard/jobs/${otherJob}`);

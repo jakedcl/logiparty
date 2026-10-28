@@ -9,7 +9,8 @@ import { JobPanel } from "@/components/jobs/job-panel";
 import { QuietRemove } from "@/components/jobs/quiet-remove";
 import { JobSummaryEditor } from "@/components/jobs/job-summary-editor";
 import { Button } from "@/components/ui/button";
-import { canManageJobs, canUploadDocuments } from "@/lib/auth/permissions";
+import { createInvoiceFromJob } from "@/lib/actions/invoices";
+import { canManageCommercial, canManageJobs, canUploadDocuments } from "@/lib/auth/permissions";
 import {
   addJobInventoryLine,
   listAssignableClientInventory,
@@ -136,6 +137,17 @@ export default async function JobDetailPage({
             </div>
             <p className="text-sm text-neutral-500 mt-1">
               {companyName}
+              {job.quoteId ? (
+                <>
+                  {" · "}
+                  <Link
+                    href={`/dashboard/quotes/${job.quoteId}`}
+                    className="lp-link-quiet"
+                  >
+                    Linked quote
+                  </Link>
+                </>
+              ) : null}
               {jobLeadLabel ? (
                 <>
                   {" "}
@@ -145,9 +157,18 @@ export default async function JobDetailPage({
               ) : null}
             </p>
           </div>
-          <Button asChild variant="outline" className="shrink-0">
-            <Link href={`/dashboard/jobs/${job.id}/print`}>Print run sheet</Link>
-          </Button>
+          <div className="flex flex-wrap gap-2 shrink-0">
+            {canManageCommercial(session.user) && (
+              <form action={createInvoiceFromJob.bind(null, session.user.orgId, id)}>
+                <Button type="submit" variant="secondary">
+                  Create invoice
+                </Button>
+              </form>
+            )}
+            <Button asChild variant="outline">
+              <Link href={`/dashboard/jobs/${job.id}/print`}>Print run sheet</Link>
+            </Button>
+          </div>
         </div>
       </div>
 

@@ -6,15 +6,21 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { id: "home", href: "/portal", label: "Home" },
+  { id: "quotes", href: "/portal/quotes", label: "Quotes" },
   { id: "jobs", href: "/portal/jobs", label: "Jobs" },
   { id: "inventory", href: "/portal/inventory", label: "Inventory" },
+  { id: "invoices", href: "/portal/invoices", label: "Invoices" },
   { id: "notes", href: "/portal/notes", label: "Notes" },
 ] as const;
 
 /** Same capsule as the landing product demo (Jobs / Inventory / Portal / Staff). */
 export function PortalNav({ className }: { className?: string }) {
   const pathname = usePathname();
-  const value = pathname.startsWith("/portal/jobs")
+  const value = pathname.startsWith("/portal/quotes")
+    ? "quotes"
+    : pathname.startsWith("/portal/invoices")
+      ? "invoices"
+      : pathname.startsWith("/portal/jobs")
     ? "jobs"
     : pathname.startsWith("/portal/inventory")
       ? "inventory"
