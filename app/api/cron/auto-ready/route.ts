@@ -10,6 +10,9 @@ import { maybePromoteJobToReady } from "@/lib/jobs/auto-ready";
  */
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
+  if (process.env.VERCEL_ENV === "production" && !secret) {
+    return NextResponse.json({ error: "Cron not configured" }, { status: 503 });
+  }
   if (secret) {
     const auth = request.headers.get("authorization");
     if (auth !== `Bearer ${secret}`) {
