@@ -28,7 +28,7 @@ Live at [logiparty.com](https://logiparty.com). A demo tenant login is at [test.
 
 ## Stack
 
-Next.js 15 (App Router), React 19, Tailwind CSS 4, shadcn/ui, NextAuth v5, Drizzle ORM on Neon Postgres with row-level security, Cloudflare R2, Resend, deployed on Vercel.
+Next.js 16 (App Router), React 19, Tailwind CSS 4, shadcn/ui, NextAuth v5, Drizzle ORM on Neon Postgres with row-level security, Cloudflare R2, Resend, deployed on Vercel.
 
 ## Running it locally
 
