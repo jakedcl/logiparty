@@ -17,14 +17,14 @@ Live at [logiparty.com](https://logiparty.com). A demo tenant login is at [test.
 - White-label settings per org: name, logo, primary color and email from-name.
 - Stripe billing is scaffolded (checkout, portal, webhook) but off unless the keys are set.
 
-## Architecture highlights
+## How it works
 
-- **Subdomain tenancy** — `{slug}.logiparty.com` resolves to an organization; the apex hosts marketing and shared auth entry (`proxy.ts`).
-- **Postgres RLS** — tenant tables are isolated with `app.current_org_id`; the app role does not bypass RLS (`lib/db/index.ts`, migrations through `0009`).
-- **Auth.js sessions** — credentials login scoped by org slug; JWT carries role flags used in server actions and route guards.
-- **Job locks** — upcoming/ready jobs reserve inventory quantities and fleet until load-out ends.
-- **R2 documents** — uploads go to Cloudflare R2; downloads use short-lived signed URLs, not public buckets.
-- **Deploy** — Next.js on Vercel, Neon Postgres, optional Resend and Stripe.
+- Each 3PL gets a subdomain. `{slug}.logiparty.com` loads that organization, and the main domain has the marketing site and shared sign-in (`proxy.ts`).
+- Tenant data is kept apart with Postgres row-level security on `app.current_org_id`. The app's database role can't skip it. See `lib/db/index.ts` and the migrations in `lib/db/migrations/` (0000 to 0027 right now).
+- Sign-in uses Auth.js with email and password, scoped to the org's subdomain. The session carries the user's role, which server actions and pages check.
+- Upcoming and ready jobs hold their inventory and trucks until load-out ends.
+- Uploaded documents go to Cloudflare R2. Downloads use short-lived signed links, and the buckets aren't public.
+- It runs on Vercel with Neon Postgres. Resend and Stripe are optional.
 
 ## Stack
 
