@@ -109,7 +109,7 @@ Update this when you finish or start an item. Pick **one** active item before st
 | **NYDAC manager** | `mike@test.test` / `password123` |
 | **Test OrgAdmin** | `boss@playground.test` / `password123` |
 | **Axis OrgAdmin** | `jordan@axis.test` / `password123` |
-| **Jake admin** | `jakedcl73@gmail.com` (your password) — linked to **nydac** |
+| **Jake admin** | the admin account (your password) — linked to **nydac** |
 | **AUTH_URL (correct)** | `https://logiparty.com` |
 | **NEXT_PUBLIC_ROOT_DOMAIN** | `logiparty.com` |
 | **NEXT_PUBLIC_DEV_ORG_SLUG** | Prefer **unset** locally → `localhost:3000` = marketing, `nydac.localhost:3000` = app. Only set `nydac` if you want bare localhost = tenant. Never set in Production. |

@@ -66,7 +66,7 @@ NYDAC also has a **rich warehouse seed** (multi-client inventory, fleet, 6 jobs 
 
 Emails are **globally unique** — do not reuse cast emails across orgs.
 
-**Your personal account:** `jakedcl73@gmail.com` is linked as NYDAC org admin on the current database. Use your existing password (not `password123`). Re-run anytime:
+**The admin account** is linked as NYDAC org admin on the current database. Use your existing password (not `password123`). Re-run anytime:
 
 ```bash
 npm run db:relink-admin
@@ -96,7 +96,7 @@ If you ran `npm run db:reset-seed -- --confirm` earlier:
 | Removed | Kept |
 |---------|------|
 | `nydac` + `test` + `axis` orgs (and legacy `demo`/acme if present) and all their jobs, catalogs, fleet | Other orgs (if any) |
-| Seed test accounts (nydac + playground + axis casts; also legacy `admin@demo.test`) | Personal accounts like `jakedcl73@gmail.com` |
+| Seed test accounts (nydac + playground + axis casts; also legacy `admin@demo.test`) | Personal accounts like the admin account |
 | Client companies under seed orgs | — |
 
 **Current state (after `npm run db:seed` on Neon `dev`):** **`nydac`** + **`test`** + **`axis`** exist, catalogs re-seeded, all three casts present. Personal admin re-linked to nydac.
