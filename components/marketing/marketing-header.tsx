@@ -3,8 +3,7 @@ import { cn } from "@/lib/utils";
 import { Wordmark } from "@/components/ui/wordmark";
 
 /**
- * The landing header: blue gloss bar + Logiparty wordmark.
- * Demo and secondary pages use this so the wordmark cannot drift.
+ * Apex marketing header — restrained bar + Logiparty logo lockup.
  */
 export function MarketingHeader({
   brandHref = "/",

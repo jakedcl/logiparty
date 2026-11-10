@@ -9,7 +9,7 @@
 */
 
 :root {
-  /* Typography — PT Sans via next/font on <html> (--font-marketing). */
+  /* Typography — IBM Plex Sans via next/font on <html> (--font-marketing). */
   --font-marketing-fallback: "Lucida Grande", "Lucida Sans Unicode", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-sans: var(--font-marketing), var(--font-marketing-fallback);
 
@@ -843,7 +843,7 @@ body {
   }
 }
 
-/* —— Marketing (apex logiparty.com) — 2010s enterprise + early-iPhone gloss —— */
+/* —— Marketing (apex logiparty.com) — restrained SaaS chrome —— */
 .marketing {
   --m-bg: var(--lp-bg);
   --m-fg: var(--lp-fg);
@@ -852,12 +852,12 @@ body {
   --m-accent-ink: #ffffff;
   --m-line: var(--lp-line);
   --m-panel: var(--surface);
-  --m-header: var(--lp-header);
+  --m-header: #ffffff;
   --m-bar: var(--lp-bar);
   --m-radius: var(--lp-radius-lg);
   --m-gloss: var(--lp-gloss-elevated);
   position: relative;
-  background: #f0f2f5;
+  background: #f4f5f7;
   color: var(--m-fg);
   overflow-x: clip;
   --m-font: var(--font-marketing), var(--font-marketing-fallback);
@@ -866,32 +866,20 @@ body {
 }
 
 .m-header {
-  position: relative;
+  position: sticky;
+  top: 0;
   z-index: 10;
-  background: linear-gradient(
-    to bottom,
-    #6eb0ef 0%,
-    #3a8ad4 48%,
-    #2470b8 52%,
-    #1a5fa0 100%
-  );
-  border-bottom: 1px solid #0f4a82;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    0 1px 3px rgba(0, 0, 0, 0.18);
+  background: var(--m-header);
+  border-bottom: 1px solid var(--m-line);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
-.m-brand {
-  font-family: var(--m-font);
-  font-size: 1.0625rem;
-  font-weight: 700;
-  color: #ffffff;
+.m-brand-lockup:hover span {
+  color: var(--m-accent);
+}
+
+.m-brand-lockup:hover {
   text-decoration: none;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-}
-
-.m-brand:hover {
-  text-decoration: underline;
 }
 
 /* Body / panel links — plain blue, readable on light panels */
@@ -931,36 +919,30 @@ body {
   filter: none;
 }
 
-/* Header only — white text + glossy pill CTA on blue chrome */
 .m-header .m-nav-link {
-  color: #ffffff;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.35);
+  color: var(--m-muted);
+  text-shadow: none;
 }
 
 .m-header .m-nav-link:hover {
-  color: #ffffff;
+  color: var(--m-fg);
 }
 
 .m-header .m-nav-link-strong {
-  color: #ffffff;
+  color: var(--m-accent-ink);
   text-decoration: none;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-  padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.45);
-  background: linear-gradient(
-    to bottom,
-    rgba(255, 255, 255, 0.35) 0%,
-    rgba(255, 255, 255, 0.08) 48%,
-    rgba(0, 0, 0, 0.08) 52%,
-    rgba(0, 0, 0, 0.12) 100%
-  );
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  text-shadow: none;
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--lp-radius-md);
+  border: 1px solid var(--primary-border);
+  background: var(--lp-accent);
+  box-shadow: var(--lp-gloss-inset);
 }
 
 .m-header .m-nav-link-strong:hover {
   text-decoration: none;
-  filter: brightness(1.08);
+  background: #084a8a;
+  border-color: #063d72;
 }
 
 .m-panel {
@@ -992,47 +974,19 @@ body {
   gap: 0.85rem;
 }
 
-.m-hero-brand-mark {
-  display: grid;
-  place-items: center;
-  width: 3.25rem;
-  height: 3.25rem;
-  border-radius: 14px;
-  font-size: 0.95rem;
-  font-weight: 800;
-  letter-spacing: -0.04em;
-  color: #ffffff;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.35);
-  border: 1px solid #084a8a;
-  background: linear-gradient(
-    145deg,
-    #9fd4ff 0%,
-    #3a8ad4 42%,
-    #0b6cc0 58%,
-    #063d72 100%
-  );
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    inset 0 -3px 8px rgba(0, 40, 90, 0.35),
-    0 4px 14px rgba(11, 92, 171, 0.35);
-}
-
 .m-hero-brand-name {
   margin: 0;
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  color: var(--m-accent);
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.85);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--m-fg);
 }
 
 .m-hero-brand-tag {
   margin: 0.15rem 0 0;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-size: 0.8125rem;
+  font-weight: 400;
   color: var(--m-muted);
 }
 

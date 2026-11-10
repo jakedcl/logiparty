@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 148 24" fill="none" aria-hidden="true">
+  <rect width="24" height="24" x="0" y="0" rx="5" fill="#0B5CAB"/>
+  <path fill="#fff" d="M7 6.5h3.25v11H7V6.5Zm3.25 7.75H17V17h-6.75v-2.75Z"/>
+  <text x="30" y="17.5" fill="#1A1A1A" font-family="IBM Plex Sans, Helvetica Neue, Helvetica, Arial, sans-serif" font-size="17" font-weight="700" letter-spacing="-0.3">Logiparty</text>
+</svg>

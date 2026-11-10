@@ -7,6 +7,8 @@ import { LeadForm } from "@/components/marketing/lead-form";
 import { MockJobs } from "@/components/marketing/product-mocks";
 import { ProductTour } from "@/components/marketing/product-tour";
 import { ProcessStepper } from "@/components/marketing/process-stepper";
+import { LogipartyMark } from "@/components/brand/logiparty-mark";
+import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { MarketingHeader } from "@/components/marketing/marketing-header";
 import { MarketingRoot } from "@/components/marketing/marketing-root";
 
@@ -22,6 +24,10 @@ const CAPABILITIES = [
   {
     title: "White-label portal",
     body: "Clients request jobs and see their inventory on your subdomain, with your logo and color. Your crew never sees Logiparty.",
+  },
+  {
+    title: "Cmd-K search",
+    body: "Jump to jobs, clients, inventory, and fleet from anywhere in the staff app — no digging through nested menus.",
   },
 ] as const;
 
@@ -59,17 +65,17 @@ export function MarketingHome() {
             <div className="m-hero-split">
               <div>
                 <div className="m-hero-brand">
-                  <span className="m-hero-brand-mark" aria-hidden>
-                    LP
-                  </span>
+                  <LogipartyMark size={52} />
                   <div>
                     <p className="m-hero-brand-name">Logiparty</p>
-                    <p className="m-hero-brand-tag">Event logistics workspace</p>
+                    <p className="m-hero-brand-tag">
+                      Operations software for event-logistics 3PLs
+                    </p>
                   </div>
                 </div>
                 <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[var(--m-fg)] sm:text-4xl lg:text-[2.5rem] lg:leading-tight">
-                  Run sheets, locked inventory, and a client portal your 3PL
-                  actually owns.
+                  Run sheets, locked inventory, and a client portal your team
+                  white-labels end to end.
                 </h1>
                 <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--m-muted)] sm:text-lg">
                   One workspace for jobs, fleet, crew, and client-owned assets —
@@ -128,18 +134,39 @@ export function MarketingHome() {
           <section id="screenshot" className="m-panel m-rise m-rise-1 p-5 sm:p-6">
             <h2 className="m-section-title">In the app</h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
-              Staff work jobs, inventory, and fleet from the dashboard; clients use
-              the portal on the same subdomain with your logo and color.
+              Staff run jobs, inventory, fleet, crew, quotes, and reports from the
+              dashboard. Cmd-K jumps to any record. Clients use the portal on the
+              same subdomain with your logo and color — not a separate product skin.
             </p>
-            <div className="mt-5 overflow-hidden rounded-xl border border-[var(--m-border)] shadow-sm">
-              <Image
-                src="/marketing/app-screenshot.png"
-                alt="Logiparty marketing site and jobs dashboard"
-                width={1440}
-                height={900}
-                className="h-auto w-full"
-                priority
-              />
+            <div className="mt-5 grid gap-4 sm:grid-cols-2">
+              <div className="overflow-hidden rounded-xl border border-[var(--m-line)] shadow-sm sm:col-span-2">
+                <Image
+                  src="/marketing/app-screenshot.png"
+                  alt="Staff jobs dashboard with status filters and load windows"
+                  width={1440}
+                  height={900}
+                  className="h-auto w-full"
+                  priority
+                />
+              </div>
+              <div className="overflow-hidden rounded-xl border border-[var(--m-line)] shadow-sm">
+                <Image
+                  src="/marketing/reports.png"
+                  alt="Operations reports with export filters"
+                  width={1440}
+                  height={900}
+                  className="h-auto w-full"
+                />
+              </div>
+              <div className="overflow-hidden rounded-xl border border-[var(--m-line)] shadow-sm">
+                <Image
+                  src="/marketing/search.png"
+                  alt="Cmd-K search results across jobs and inventory"
+                  width={1440}
+                  height={900}
+                  className="h-auto w-full"
+                />
+              </div>
             </div>
           </section>
 
@@ -243,42 +270,7 @@ export function MarketingHome() {
         </div>
       </main>
 
-      <footer className="m-footer mt-4 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto flex max-w-5xl flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="text-sm font-bold text-[var(--m-accent)]">Logiparty</p>
-            <p className="mt-1 max-w-sm text-xs text-[var(--m-muted)]">
-              Multi-tenant ops for event logistics 3PLs.
-            </p>
-          </div>
-          <nav className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--m-muted)]">
-            <Link href="/demo" className="m-nav-link">
-              Demo
-            </Link>
-            <Link href="/pricing" className="m-nav-link">
-              Pricing
-            </Link>
-            <a href="#request" className="m-nav-link">
-              Request access
-            </a>
-            <Link href="/privacy" className="m-nav-link">
-              Privacy
-            </Link>
-            <Link href="/terms" className="m-nav-link">
-              Terms
-            </Link>
-            <Link href="/login" className="m-nav-link">
-              Sign in
-            </Link>
-            <a href="mailto:hello@logiparty.com" className="m-nav-link">
-              hello@logiparty.com
-            </a>
-          </nav>
-        </div>
-        <p className="mx-auto mt-5 max-w-5xl text-xs text-[var(--m-muted)]">
-          © {new Date().getFullYear()} Logiparty
-        </p>
-      </footer>
+      <MarketingFooter />
     </MarketingRoot>
   );
 }

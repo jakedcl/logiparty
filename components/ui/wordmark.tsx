@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { LogipartyLogo } from "@/components/brand/logiparty-logo";
 
 /** Landing header wordmark. One mark for the site header and the demo. */
 export function Wordmark({
@@ -9,16 +9,5 @@ export function Wordmark({
   /** In-page hash (`#top`) instead of a route. */
   anchor?: boolean;
 }) {
-  if (anchor) {
-    return (
-      <a href={href} className="m-brand">
-        Logiparty
-      </a>
-    );
-  }
-  return (
-    <Link href={href} className="m-brand">
-      Logiparty
-    </Link>
-  );
+  return <LogipartyLogo href={href} anchor={anchor} className="m-brand-lockup" />;
 }
