@@ -1,7 +1,7 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { MarketingHeader } from "@/components/marketing/marketing-header";
+import { MarketingNavLinks } from "@/components/marketing/marketing-nav";
 import { MarketingRoot } from "@/components/marketing/marketing-root";
 
 /** Shared apex marketing chrome (header + footer) for legal / secondary pages. */
@@ -14,13 +14,8 @@ export function MarketingShell({
 }) {
   return (
     <MarketingRoot>
-      <MarketingHeader navClassName="flex items-center gap-4 text-sm">
-        <Link href="/demo" className="m-nav-link">
-          Demo
-        </Link>
-        <Link href="/#request" className="m-nav-link-strong">
-          Request access
-        </Link>
+      <MarketingHeader>
+        <MarketingNavLinks className="flex items-center gap-4 text-sm" />
       </MarketingHeader>
 
       <main className="relative z-10 px-4 py-6 sm:px-6 lg:px-8">

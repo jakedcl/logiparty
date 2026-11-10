@@ -1,4 +1,6 @@
+import { render } from "@react-email/render";
 import { marketingFromHeader } from "@/lib/email/from";
+import { LogipartyLeadEmail } from "@/lib/email/templates/logiparty-lead";
 
 type LeadEmailParams = {
   name: string;
@@ -24,6 +26,14 @@ export async function sendLeadNotification(params: LeadEmailParams) {
 
   const company = params.company?.trim() || "(not provided)";
   const message = params.message?.trim() || "(none)";
+  const html = await render(
+    LogipartyLeadEmail({
+      name: params.name,
+      email: params.email,
+      company,
+      message,
+    })
+  );
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -36,10 +46,7 @@ export async function sendLeadNotification(params: LeadEmailParams) {
       to: notifyTo,
       reply_to: params.email,
       subject: `Logiparty access request — ${params.name}`,
-      html: `<p><strong>${escapeHtml(params.name)}</strong> requested access.</p>
-<p>Email: ${escapeHtml(params.email)}<br/>Company: ${escapeHtml(company)}</p>
-<p>Message:</p>
-<p>${escapeHtml(message).replace(/\n/g, "<br/>")}</p>`,
+      html,
     }),
   });
 
@@ -51,10 +58,3 @@ export async function sendLeadNotification(params: LeadEmailParams) {
   return { ok: true, emailed: true };
 }
 
-function escapeHtml(s: string) {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}

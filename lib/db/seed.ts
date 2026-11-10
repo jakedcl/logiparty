@@ -16,7 +16,7 @@ import { existsSync, readFileSync } from "fs";
 import { join } from "path";
 import { neon } from "@neondatabase/serverless";
 import bcrypt from "bcryptjs";
-import { seedNorthlineRich } from "./seed-northline";
+import { seedNorthlineCommercial, seedNorthlineRich } from "./seed-northline";
 
 function loadEnvLocal() {
   const path = join(process.cwd(), ".env.local");
@@ -1770,6 +1770,7 @@ async function seed() {
   await seedNydacRich(sql, passwordHash);
   await seedNydacCommercial(sql);
   await seedNorthlineRich(sql, passwordHash);
+  await seedNorthlineCommercial(sql);
 
   console.log(`
 Seed complete. Password for all accounts: password123

@@ -32,7 +32,7 @@ export const DEMO_JOBS: readonly DemoJob[] = [
     name: "Outdoor Patio Activation",
     client: "Summit Brands",
     status: "draft",
-    when: "Sat, Oct 4, 2026",
+    when: "Sat, Nov 15, 2026",
     poc: "Alex Chen",
   },
   {
@@ -40,7 +40,7 @@ export const DEMO_JOBS: readonly DemoJob[] = [
     name: "Campus Pop-Up",
     client: "Summit Brands",
     status: "upcoming",
-    when: "Wed, Sep 24, 2026",
+    when: "Wed, Nov 12, 2026",
     poc: "Alex Chen",
   },
   {
@@ -48,7 +48,7 @@ export const DEMO_JOBS: readonly DemoJob[] = [
     name: "Waterfront Festival",
     client: "Summit Brands",
     status: "ready",
-    when: "Fri, Sep 19, 2026",
+    when: "Fri, Nov 14, 2026",
     poc: "Jordan Lee",
   },
   {
@@ -56,7 +56,7 @@ export const DEMO_JOBS: readonly DemoJob[] = [
     name: "Showroom Load-In",
     client: "Harbor Co.",
     status: "ready",
-    when: "Sun, Sep 21, 2026",
+    when: "Sun, Nov 16, 2026",
     poc: "Sam Rivera",
   },
   {
@@ -64,7 +64,7 @@ export const DEMO_JOBS: readonly DemoJob[] = [
     name: "Trade Show Wrap",
     client: "Summit Brands",
     status: "completed",
-    when: "Mon, Sep 1, 2026",
+    when: "Mon, Nov 3, 2026",
     poc: "Alex Chen",
   },
 ] as const;
