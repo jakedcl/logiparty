@@ -168,7 +168,7 @@ export function DemoTour() {
     <div className="lp-app flex min-h-0 flex-1 flex-col">
       <MarketingHeader className="relative z-50 shrink-0">
         <span className="m-nav-link hidden sm:inline">
-          Sample tour · not live data
+          Northline sample data · not your org
         </span>
         {!finished ? (
           <span className="m-nav-link tabular-nums">
@@ -266,7 +266,7 @@ export function DemoTour() {
             className="lp-surface fixed left-1/2 top-1/2 z-40 w-[min(92vw,360px)] -translate-x-1/2 -translate-y-1/2 p-6 text-center"
           >
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--primary)]">
-              Stage → load → return
+              Request → job → load-out → invoice
             </p>
             <h2
               id="demo-done-title"

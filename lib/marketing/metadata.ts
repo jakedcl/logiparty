@@ -16,7 +16,6 @@ export function marketingMetadata({
 }: MarketingMetadataOptions): Metadata {
   const origin = getMarketingOrigin();
   const url = `${origin}${path === "/" ? "" : path}`;
-  const ogImage = `${origin}/og.png`;
 
   return {
     title: { absolute: title },
@@ -29,13 +28,11 @@ export function marketingMetadata({
       siteName: "Logiparty",
       title,
       description,
-      images: [{ url: ogImage, width: 1200, height: 630, alt: "Logiparty dashboard" }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: [ogImage],
     },
     robots: noIndex ? { index: false, follow: false } : { index: true, follow: true },
   };

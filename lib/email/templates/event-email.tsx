@@ -64,7 +64,7 @@ const wrapper = {
 const brand = {
   fontSize: "13px",
   fontWeight: "700",
-  color: "#1e3a5f",
+  color: "#0B5CAB",
   margin: "0 0 16px",
 };
 
@@ -86,7 +86,7 @@ const paragraph = {
 const btnWrap = { margin: "8px 0 0" };
 
 const button = {
-  backgroundColor: "#1e3a5f",
+  backgroundColor: "#0B5CAB",
   borderRadius: "6px",
   color: "#fff",
   fontSize: "14px",

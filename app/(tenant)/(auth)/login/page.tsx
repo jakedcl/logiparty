@@ -8,8 +8,11 @@ import { absoluteRedirectUrl, postAuthPath } from "@/lib/auth/redirect";
 import { db } from "@/lib/db";
 import { organizations } from "@/lib/db/schema";
 import { marketingMetadata } from "@/lib/marketing/metadata";
+import { getMarketingOrigin } from "@/lib/marketing/site";
 import { getOrgSlugFromHeaders } from "@/lib/org/subdomain";
 import { OrgTheme } from "@/components/layout/org-theme";
+import { LogipartyLogo } from "@/components/brand/logiparty-logo";
+import { MarketingRoot } from "@/components/marketing/marketing-root";
 import { TenantLoginPicker } from "@/components/marketing/tenant-login-picker";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,12 +25,31 @@ export async function generateMetadata(): Promise<Metadata> {
   const orgSlug = getOrgSlugFromHeaders(headersList);
 
   if (!orgSlug) {
-    return marketingMetadata({
+    const meta = marketingMetadata({
       title: "Sign in — Logiparty",
       description:
         "Sign in to your Logiparty workspace on your organization subdomain.",
       path: "/login",
     });
+    const og = `${getMarketingOrigin()}/og.png`;
+    return {
+      ...meta,
+      openGraph: {
+        ...meta.openGraph,
+        images: [
+          {
+            url: og,
+            width: 1200,
+            height: 630,
+            alt: "Logiparty — event logistics operations for 3PLs",
+          },
+        ],
+      },
+      twitter: {
+        ...meta.twitter,
+        images: [og],
+      },
+    };
   }
 
   return {
@@ -54,26 +76,39 @@ export default async function LoginPage({
 
   if (!orgSlug) {
     return (
-      <div className="flex min-h-screen items-center justify-center p-4">
-        <div className="lp-surface lp-enter w-full max-w-sm p-6">
-          <h1 className="lp-page-title mb-2">Sign in</h1>
-          <p className="lp-page-sub">
-            Logiparty runs on your organization subdomain. Enter your org slug to
-            continue.
-          </p>
-          {params.error ? (
-            <p className="mb-4 text-sm font-bold text-[var(--danger)]">
-              Invalid email or password.
+      <MarketingRoot>
+        <div className="flex min-h-screen flex-col items-center justify-center px-4 py-10">
+          <div className="lp-surface lp-enter w-full max-w-md p-6 sm:p-7">
+            <div className="mb-6">
+              <LogipartyLogo href="/" markSize={32} />
+            </div>
+            <h1 className="lp-page-title mb-2">Sign in to your workspace</h1>
+            <p className="lp-page-sub">
+              Logiparty runs on your organization subdomain — for example{" "}
+              <span className="font-medium text-[var(--foreground)]">
+                your-org.logiparty.com
+              </span>
+              . Enter your org slug to continue.
             </p>
-          ) : null}
-          <TenantLoginPicker />
-          <p className="mt-6 text-sm text-[var(--muted)]">
-            <Link href="/" className="app-link">
-              ← Back to Logiparty
-            </Link>
-          </p>
+            {params.error ? (
+              <p className="mb-4 text-sm font-bold text-[var(--danger)]">
+                Invalid email or password.
+              </p>
+            ) : null}
+            <TenantLoginPicker />
+            <p className="mt-6 text-sm text-[var(--muted)]">
+              No account yet?{" "}
+              <Link href="/#request" className="app-link">
+                Request access
+              </Link>
+              {" · "}
+              <Link href="/" className="app-link">
+                Back to home
+              </Link>
+            </p>
+          </div>
         </div>
-      </div>
+      </MarketingRoot>
     );
   }
 

@@ -485,3 +485,110 @@ export async function seedNorthlineRich(sql: Sql, passwordHash: string) {
 
   console.log("  northline rich: Summit + Harbor, catalogs, 5 jobs, inbox seeded");
 }
+
+/** Sample quotes + invoice for marketing screenshots (Summit Brands / Waterfront Festival). */
+export async function seedNorthlineCommercial(sql: Sql) {
+  await sql`
+    INSERT INTO rate_cards (org_id, name, is_default)
+    SELECT o.id, 'Northline standard', true
+    FROM organizations o
+    WHERE o.slug = ${SLUG}
+      AND NOT EXISTS (
+        SELECT 1 FROM rate_cards rc WHERE rc.org_id = o.id AND rc.is_default
+      )
+  `;
+
+  await sql`
+    INSERT INTO rate_card_lines (
+      org_id, rate_card_id, kind, description, unit, unit_price_cents
+    )
+    SELECT o.id, rc.id, 'equipment', 'Festival kit — day rate', 'day', 85000
+    FROM organizations o
+    JOIN rate_cards rc ON rc.org_id = o.id AND rc.is_default
+    WHERE o.slug = ${SLUG}
+      AND NOT EXISTS (
+        SELECT 1 FROM rate_card_lines l
+        WHERE l.org_id = o.id AND l.description = 'Festival kit — day rate'
+      )
+  `;
+
+  await sql`
+    INSERT INTO quotes (
+      org_id, client_company_id, quote_number, title, status, version,
+      subtotal_cents, tax_cents, total_cents, sent_at, valid_until
+    )
+    SELECT o.id, c.id, 'NL-Q-2401', 'Waterfront Festival — full kit', 'approved', 1,
+      420000, 36750, 456750, now() - interval '3 days', now() + interval '11 days'
+    FROM organizations o
+    JOIN client_companies c ON c.org_id = o.id AND c.name = 'Summit Brands'
+    WHERE o.slug = ${SLUG}
+      AND NOT EXISTS (
+        SELECT 1 FROM quotes q WHERE q.org_id = o.id AND q.quote_number = 'NL-Q-2401'
+      )
+  `;
+
+  await sql`
+    INSERT INTO quote_lines (
+      quote_id, org_id, sort_order, kind, description, quantity,
+      unit, unit_price_cents, line_total_cents
+    )
+    SELECT q.id, q.org_id, 0, 'equipment', 'Bars, coolers, lounge — 3-day window', 3, 'day', 85000, 255000
+    FROM quotes q
+    JOIN organizations o ON o.id = q.org_id
+    WHERE o.slug = ${SLUG} AND q.quote_number = 'NL-Q-2401'
+      AND NOT EXISTS (SELECT 1 FROM quote_lines l WHERE l.quote_id = q.id)
+  `;
+
+  await sql`
+    INSERT INTO quote_lines (
+      quote_id, org_id, sort_order, kind, description, quantity,
+      unit, unit_price_cents, line_total_cents
+    )
+    SELECT q.id, q.org_id, 1, 'labor', 'Load-in / load-out crew', 18, 'hour', 6500, 117000
+    FROM quotes q
+    JOIN organizations o ON o.id = q.org_id
+    WHERE o.slug = ${SLUG} AND q.quote_number = 'NL-Q-2401'
+      AND NOT EXISTS (
+        SELECT 1 FROM quote_lines l WHERE l.quote_id = q.id AND l.sort_order = 1
+      )
+  `;
+
+  await sql`
+    UPDATE quotes q
+    SET job_id = j.id, subtotal_cents = 372000, tax_cents = 32550, total_cents = 404550
+    FROM jobs j, organizations o
+    WHERE j.org_id = q.org_id AND j.name = 'Waterfront Festival'
+      AND o.id = q.org_id AND o.slug = ${SLUG}
+      AND q.quote_number = 'NL-Q-2401'
+      AND q.job_id IS NULL
+  `;
+
+  await sql`
+    UPDATE quotes q
+    SET job_id = j.id
+    FROM jobs j, organizations o
+    WHERE j.org_id = q.org_id AND j.name = 'Waterfront Festival'
+      AND o.id = q.org_id AND o.slug = ${SLUG}
+      AND q.quote_number = 'NL-Q-2401'
+  `;
+
+  await sql`
+    INSERT INTO invoices (
+      org_id, client_company_id, job_id, quote_id, invoice_number, status,
+      due_date, subtotal_cents, tax_cents, total_cents, sent_at
+    )
+    SELECT o.id, c.id, j.id, q.id, 'NL-INV-2401', 'sent',
+      (current_date + interval '28 days'), 372000, 32550, 404550,
+      now() - interval '1 day'
+    FROM organizations o
+    JOIN client_companies c ON c.org_id = o.id AND c.name = 'Summit Brands'
+    JOIN jobs j ON j.org_id = o.id AND j.name = 'Waterfront Festival'
+    JOIN quotes q ON q.org_id = o.id AND q.quote_number = 'NL-Q-2401'
+    WHERE o.slug = ${SLUG}
+      AND NOT EXISTS (
+        SELECT 1 FROM invoices i WHERE i.org_id = o.id AND i.invoice_number = 'NL-INV-2401'
+      )
+  `;
+
+  console.log("  northline commercial: quote + invoice on Waterfront Festival");
+}

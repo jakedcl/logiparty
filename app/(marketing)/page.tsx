@@ -2,7 +2,7 @@ import { MarketingHome } from "@/components/marketing/marketing-home";
 import { marketingMetadata } from "@/lib/marketing/metadata";
 
 export const metadata = marketingMetadata({
-  title: "Logiparty — Ops software for event logistics 3PLs",
+  title: "Logiparty — Operations software for event-logistics 3PLs",
   path: "/",
 });
 

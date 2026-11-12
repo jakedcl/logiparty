@@ -1,27 +1,50 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { AppWindow } from "@/components/marketing/app-window";
-import { TourMock, type MockKind } from "@/components/marketing/product-mocks";
 import { SegmentedControl } from "@/components/marketing/segmented-control";
 import { Button } from "@/components/ui/button";
 
 const SEGMENTS = [
-  { id: "jobs", label: "Jobs", title: "Jobs", body: "Statuses, calendar, and a run sheet with locations, loads, trucks, and crew." },
-  { id: "inventory", label: "Inventory", title: "Inventory & fleet", body: "Client gear, your equipment, and vehicles — locked to the job while it’s live." },
-  { id: "portal", label: "Portal", title: "Client portal", body: "Branded requests, docs, and inventory asks. Company-scoped. Invite-only." },
-  { id: "staff", label: "Staff", title: "Staff on the dock", body: "My Jobs only. Loaded vs assigned. Print the run sheet from a phone." },
+  {
+    id: "jobs",
+    label: "Jobs",
+    title: "Jobs",
+    body: "Statuses, calendar, and a run sheet with locations, loads, trucks, and crew.",
+    image: "/marketing/jobs-list.png",
+    alt: "Jobs list with filters and load windows",
+  },
+  {
+    id: "inventory",
+    label: "Inventory",
+    title: "Inventory & fleet",
+    body: "Client gear, your equipment, and vehicles — locked to the job while it’s live.",
+    image: "/marketing/inventory.png",
+    alt: "Inventory catalogs for client and org equipment",
+  },
+  {
+    id: "portal",
+    label: "Portal",
+    title: "Client portal",
+    body: "Branded requests, docs, and inventory asks. Company-scoped. Invite-only.",
+    image: "/marketing/portal.png",
+    alt: "White-label client portal jobs view",
+  },
+  {
+    id: "staff",
+    label: "Staff",
+    title: "Staff on the dock",
+    body: "My Jobs only. Loaded vs assigned. Print the run sheet from a phone.",
+    image: "/marketing/my-jobs.png",
+    alt: "My Jobs list for assigned crew",
+  },
 ] as const;
 
 export function ProductTour() {
   const [active, setActive] = useState<string>("jobs");
   const current = SEGMENTS.find((s) => s.id === active) ?? SEGMENTS[0];
-  const reduceMotion = useReducedMotion();
-  const panelTransition = reduceMotion
-    ? { duration: 0 }
-    : { duration: 0.38, ease: [0.22, 1, 0.36, 1] as const };
 
   return (
     <div className="m-tour-block">
@@ -29,8 +52,8 @@ export function ProductTour() {
         <div className="max-w-xl">
           <h2 className="m-section-title">Product demo</h2>
           <p className="mt-3 text-sm leading-relaxed text-[var(--m-muted)]">
-            Walk the product — no login. Flip the segments, then open the full
-            interactive tour.
+            Same Northline Logistics sample data as the screenshots above. Flip
+            segments, then open the full step-by-step tour.
           </p>
         </div>
         <Button asChild className="px-4 py-2 text-sm">
@@ -47,66 +70,22 @@ export function ProductTour() {
         />
       </div>
 
-      <AppWindow
-        title={current.title}
-        inset
-        toolbar={
-          <AnimatePresence mode="wait" initial={false}>
-            <motion.p
-              key={active}
-              className="m-window-caption text-[var(--m-muted)]"
-              initial={reduceMotion ? false : { opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduceMotion ? undefined : { opacity: 0, y: -4 }}
-              transition={panelTransition}
-            >
-              {current.body}
-            </motion.p>
-          </AnimatePresence>
-        }
-      >
-        <div className="m-tour-split">
-          <nav className="m-tour-sidebar" aria-label="Demo sections">
-            {SEGMENTS.map((seg) => {
-              const selected = seg.id === active;
-              return (
-                <button
-                  key={seg.id}
-                  type="button"
-                  className={`m-tour-sidebar-item${selected ? " m-tour-sidebar-item-active" : ""}`}
-                  onClick={() => setActive(seg.id)}
-                  aria-current={selected ? "true" : undefined}
-                >
-                  <span className="m-tour-sidebar-dot" aria-hidden />
-                  {seg.label}
-                </button>
-              );
-            })}
-          </nav>
-          <div className="m-tour-stage">
-            <AnimatePresence mode="wait" initial={false}>
-              <motion.div
-                key={active}
-                initial={
-                  reduceMotion ? false : { opacity: 0, x: 28, filter: "blur(6px)" }
-                }
-                animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
-                exit={
-                  reduceMotion ? undefined : { opacity: 0, x: -20, filter: "blur(4px)" }
-                }
-                transition={panelTransition}
-              >
-                <Link
-                  href="/demo"
-                  className="m-tour-window-link"
-                  aria-label={`Open demo — ${current.title}`}
-                >
-                  <TourMock kind={current.id as MockKind} />
-                </Link>
-              </motion.div>
-            </AnimatePresence>
-          </div>
-        </div>
+      <AppWindow title={current.title} inset>
+        <p className="m-window-caption mb-3 text-[var(--m-muted)]">{current.body}</p>
+        <Link
+          href="/demo"
+          className="m-tour-window-link block overflow-hidden rounded-md border border-[var(--m-line)]"
+          aria-label={`Open demo — ${current.title}`}
+        >
+          <Image
+            src={current.image}
+            alt={current.alt}
+            width={1200}
+            height={750}
+            className="h-auto w-full"
+            sizes="(max-width: 768px) 100vw, 900px"
+          />
+        </Link>
       </AppWindow>
     </div>
   );

@@ -3,7 +3,7 @@ import { getMarketingOrigin } from "@/lib/marketing/site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const origin = getMarketingOrigin();
-  const lastModified = new Date("2026-10-26");
+  const lastModified = new Date("2026-11-10");
 
   return [
     { url: origin, lastModified, changeFrequency: "weekly", priority: 1 },

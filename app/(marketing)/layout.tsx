@@ -8,6 +8,10 @@ export const metadata: Metadata = {
     template: "%s — Logiparty",
   },
   description: MARKETING_DESCRIPTION,
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+    apple: [{ url: "/brand/icon-192.png", sizes: "192x192", type: "image/png" }],
+  },
 };
 
 export default function MarketingLayout({
