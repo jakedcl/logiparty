@@ -33,3 +33,19 @@ export function loginAllowed(orgSlug: string, email: string): boolean {
 export function clearLoginAttempts(orgSlug: string, email: string) {
   buckets.delete(`${orgSlug.toLowerCase()}:${email.toLowerCase()}`);
 }
+
+const RESET_MAX_ATTEMPTS = 5;
+
+export function passwordResetAllowed(orgSlug: string, email: string): boolean {
+  const now = Date.now();
+  prune(now);
+  const key = `reset:${orgSlug.toLowerCase()}:${email.toLowerCase()}`;
+  const existing = buckets.get(key);
+  if (!existing || existing.resetAt <= now) {
+    buckets.set(key, { count: 1, resetAt: now + WINDOW_MS });
+    return true;
+  }
+  if (existing.count >= RESET_MAX_ATTEMPTS) return false;
+  existing.count += 1;
+  return true;
+}
