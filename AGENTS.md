@@ -30,6 +30,7 @@ Next.js ^15.5 App Router, React ^19.2, Tailwind 4, shadcn/ui (cva, tailwind-merg
 - Tenancy, RLS, job locks: `docs/how-it-works.md`
 - Open work: `docs/internal/OPEN_TABS.md`; ambiguous cases: `docs/DECISIONS.md`
 - Build playbook: `docs/internal/HOW_TO_BUILD.md` → `docs/internal/APP_CONTEXT.md`
+- Manual QA / production smoke: `docs/internal/HOW_TO_TEST.md`
 
 ## Gotchas
 - RLS policies key on `app.current_org_id`; app connects as `logiparty_app` (no BYPASSRLS, migration 0009). Plain `db` client is used outside RLS only on purpose (login, org lookup, Stripe webhook, cron).

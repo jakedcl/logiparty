@@ -225,6 +225,22 @@ export const invites = pgTable("invites", {
     .defaultNow(),
 });
 
+export const passwordResetTokens = pgTable("password_reset_tokens", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id")
+    .notNull()
+    .references(() => organizations.id, { onDelete: "cascade" }),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  token: text("token").notNull().unique(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  usedAt: timestamp("used_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true })
+    .notNull()
+    .defaultNow(),
+});
+
 /** Client-owned assets stored in the 3PL warehouse */
 export const clientInventoryItems = pgTable("client_inventory_items", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -768,6 +784,7 @@ export type User = typeof users.$inferSelect;
 export type OrgMembership = typeof orgMemberships.$inferSelect;
 export type ClientCompany = typeof clientCompanies.$inferSelect;
 export type Invite = typeof invites.$inferSelect;
+export type PasswordResetToken = typeof passwordResetTokens.$inferSelect;
 export type InventoryItem = typeof inventoryItems.$inferSelect;
 export type ClientInventoryItem = typeof clientInventoryItems.$inferSelect;
 export type ClientInventoryRequest =

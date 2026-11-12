@@ -39,6 +39,61 @@ function assert(condition: boolean, message: string) {
   if (!condition) throw new Error(message);
 }
 
+function isSafeLocalDatabaseUrl(url: string): boolean {
+  const lower = url.toLowerCase();
+  if (lower.includes("neon.tech")) return false;
+  if (lower.includes("vercel-storage") || lower.includes("vercel.app")) {
+    return false;
+  }
+  return true;
+}
+
+async function verifyPasswordResetLifecycle(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  sql: any,
+  org: { id: string; slug: string }
+) {
+  const email = `reset-integration-${Date.now()}@test.test`;
+  const passwordHash = "$2a$10$integration.placeholder.hash.not.used.for.login";
+  const [user] = (await sql`
+    INSERT INTO users (email, password_hash, first_name, last_name)
+    VALUES (${email}, ${passwordHash}, 'Reset', 'Test')
+    RETURNING id
+  `) as { id: string }[];
+
+  await sql`
+    INSERT INTO org_memberships (org_id, user_id, is_staff)
+    VALUES (${org.id}, ${user.id}, true)
+  `;
+
+  const token = `integration-reset-${Date.now()}`;
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+  const [row] = (await sql`
+    INSERT INTO password_reset_tokens (org_id, user_id, token, expires_at)
+    VALUES (${org.id}, ${user.id}, ${token}, ${expiresAt}::timestamptz)
+    RETURNING id
+  `) as { id: string }[];
+
+  const active = (await sql`
+    SELECT used_at FROM password_reset_tokens WHERE id = ${row.id}
+  `) as { used_at: string | null }[];
+  assert(active[0].used_at == null, "Reset token should start unused");
+
+  await sql`
+    UPDATE password_reset_tokens
+    SET used_at = NOW()
+    WHERE id = ${row.id}
+  `;
+
+  const spent = (await sql`
+    SELECT used_at FROM password_reset_tokens WHERE id = ${row.id}
+  `) as { used_at: string | null }[];
+  assert(spent[0].used_at != null, "Reset token should record used_at");
+
+  await sql`DELETE FROM users WHERE id = ${user.id}`;
+  console.log("OK: password reset token lifecycle");
+}
+
 async function verifyCatalogRls(
   // neon() generic vs transaction helper — keep this script simple
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -501,6 +556,12 @@ async function main() {
     console.log("SKIP: database RLS checks (DATABASE_URL not set)");
     return;
   }
+  if (!isSafeLocalDatabaseUrl(url)) {
+    console.log(
+      "SKIP: database RLS checks (DATABASE_URL is not a safe local URL)"
+    );
+    return;
+  }
 
   const sql = neon(url);
   const orgs = (await sql`
@@ -525,6 +586,7 @@ async function main() {
     await verifyJobsRls(sql, testOrg, probeOrg);
     await verifyClientIsolation(sql);
     await verifyQuoteClientRls(sql);
+    await verifyPasswordResetLifecycle(sql, testOrg);
     console.log("All integration checks passed.");
   } finally {
     await sql`DELETE FROM organizations WHERE id = ${probeOrg.id}`;

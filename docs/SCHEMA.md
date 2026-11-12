@@ -296,6 +296,17 @@ Tables: `rate_cards`, `rate_card_lines`, `quotes`, `quote_lines`, `quote_version
 | accepted_at | timestamptz | Nullable |
 | created_at | timestamptz | |
 
+### `password_reset_tokens`
+| Column | Type | Notes |
+|--------|------|-------|
+| id | uuid PK | |
+| org_id | uuid FK | Tenant workspace |
+| user_id | uuid FK → users | |
+| token | text UNIQUE | Single-use link segment |
+| expires_at | timestamptz | Default TTL 1 hour |
+| used_at | timestamptz | Nullable; set when password updated |
+| created_at | timestamptz | |
+
 ---
 
 ## Documents

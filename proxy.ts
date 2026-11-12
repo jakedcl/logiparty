@@ -105,12 +105,20 @@ export async function proxy(request: NextRequest) {
     requestHeaders.set("x-org-slug", tenantSlug);
   }
 
-  const isAuthPage = pathname === "/login";
+  const isAuthPage =
+    pathname === "/login" ||
+    pathname === "/forgot-password" ||
+    pathname.startsWith("/reset-password/");
   const isInvitePage = pathname.startsWith("/invite/");
   const isPublicApi = isPublicApiPath(pathname);
   const isDemoPage = pathname === "/demo" || pathname.startsWith("/demo/");
 
-  if (!token && !isInvitePage && !isPublicApi && !isMetadataPath(pathname)) {
+  const isResetFlow =
+    isInvitePage ||
+    pathname === "/forgot-password" ||
+    pathname.startsWith("/reset-password/");
+
+  if (!token && !isResetFlow && !isPublicApi && !isMetadataPath(pathname)) {
     if (orgSlug) {
       if (!isAuthPage && !isDemoPage) {
         return redirectPath(request, "/login");
@@ -134,7 +142,7 @@ export async function proxy(request: NextRequest) {
     return redirectPath(request, "/dashboard/my-jobs");
   }
 
-  if (token && isAuthPage) {
+  if (token && isAuthPage && pathname === "/login") {
     const isClient = token.isClient === true;
     // On apex, leave /login alone for the org picker unless they have a session
     // cookie here — then send them to the tenant.
