@@ -1,4 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
-  <rect width="32" height="32" rx="7" fill="#0B5CAB"/>
-  <path fill="#fff" d="M9 8.5h4.5v15H9V8.5Zm4.5 10.5H23v4.5h-9.5V19Z"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 70" fill="none"><title>Logiparty</title><style>.l{stroke:#343BEE}@media(prefers-color-scheme:dark){.l{stroke:#FFFFFF}}</style><g transform="translate(0 3)" stroke-width="10" stroke-linejoin="round"><path class="l" d="M10 7V38a8 8 0 0 0 8 8h8"/><path stroke="#F16A4B" d="M36 59V10h10a14 14 0 0 1 0 28H36"/></g></svg>
