@@ -190,7 +190,8 @@ export async function addInvoiceLine(
   invoiceId: string,
   formData: FormData
 ) {
-  await requireCommercial();
+  const session = await requireCommercial();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   const description = String(formData.get("description") ?? "").trim();
   if (!description) throw new Error("Description is required");
   const kind = String(formData.get("kind") ?? "custom").trim();
@@ -257,6 +258,7 @@ async function recalcInvoice(orgId: string, invoiceId: string) {
 
 export async function sendInvoice(orgId: string, invoiceId: string) {
   const session = await requireCommercial();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   await recalcInvoice(orgId, invoiceId);
 
   const invoiceRows = await withOrgQuery<(typeof invoices.$inferSelect)[]>(
@@ -403,6 +405,7 @@ export async function sendInvoice(orgId: string, invoiceId: string) {
 
 export async function listPortalInvoices(orgId: string): Promise<Invoice[]> {
   const session = await requireSession();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   if (!session.user.isClient) throw new Error("Forbidden");
   const company = await getSessionClientCompany(session);
   if (!company) throw new Error("No client company");
@@ -440,7 +443,8 @@ export async function getInvoiceDetail(
   invoice: typeof invoices.$inferSelect | undefined;
   lines: (typeof invoiceLines.$inferSelect)[];
 }> {
-  await requireCommercial();
+  const session = await requireCommercial();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   const invoiceRows = await withOrgQuery<(typeof invoices.$inferSelect)[]>(
     orgId,
     (database) =>
@@ -467,6 +471,7 @@ export async function recordManualPayment(
   formData: FormData
 ) {
   const session = await requireCommercial();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   const amountCents = parseDollarsToCents(String(formData.get("amount") ?? "0"));
   await withOrgQueries(orgId, (database) => [
     database.insert(invoicePayments).values({
@@ -490,6 +495,7 @@ export async function recordManualPayment(
 
 export async function getInvoicePdfUrl(orgId: string, invoiceId: string) {
   const session = await requireSession();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   const isManager = canManageCommercial(session.user);
   let actor;
   if (session.user.isClient && !isManager) {

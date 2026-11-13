@@ -769,7 +769,8 @@ export async function deleteQuoteLine(
   quoteId: string,
   lineId: string
 ) {
-  await requireCommercialManager();
+  const session = await requireCommercialManager();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   await withOrgQuery(orgId, (database) =>
     database
       .delete(quoteLines)
@@ -784,7 +785,8 @@ export async function updateQuoteMeta(
   quoteId: string,
   formData: FormData
 ) {
-  await requireCommercialManager();
+  const session = await requireCommercialManager();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   const depositRaw = String(formData.get("deposit") ?? "").trim();
   const depositCents = depositRaw ? parseDollarsToCents(depositRaw) : null;
 

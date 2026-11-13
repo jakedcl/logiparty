@@ -105,7 +105,8 @@ export async function listJobs(orgId: string): Promise<Job[]> {
 export async function listJobLeadCandidates(orgId: string): Promise<
   { userId: string; label: string }[]
 > {
-  await requireJobsAccess();
+  const session = await requireJobsAccess();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   if (!db) return [];
 
   const rows = await db
