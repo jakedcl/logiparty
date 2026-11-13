@@ -32,31 +32,26 @@ Internal reference for marketing, metadata, and apex-only surfaces. **Tenant wor
 5. **Quotes, invoices, reports** — Commercial docs and exports without bolting on a second tool.
 6. **Cmd-K search** — Jump to jobs, clients, and gear from anywhere in the staff app.
 
-## Logo
+## Approved identity — Handoff (2026-11-13)
 
-**Wordmark:** “Logiparty” in the brand sans, weight 700, tight tracking (-0.02em). Used on apex marketing, `/login` slug picker, and help-style surfaces only.
+Jake selected direction A: the two-color LP mark, lowercase outlined wordmark, cobalt and coral, ink and warm-white surfaces.
 
-**Compact mark:** Rounded square (4px radius at 24px) in **accent blue**, white **abstract “L”** built from two bars (vertical stem + horizontal base) — reads as dock / runway, works at **16px**. Pair with wordmark in headers; mark alone for favicons and app icons.
-
-**Files:** `public/brand/logiparty-mark.svg`, `public/brand/logiparty-wordmark.svg`; React: `components/brand/logiparty-logo.tsx`.
-
-**Themes:** `light` = accent mark on light backgrounds; `dark` = white wordmark on accent header (deprecated — header is light); `on-accent` = white mark + wordmark on `--lp-accent` fills only.
+- **Mark:** Custom L and P paths, without an app-tile container. Use the two-color version on light surfaces; white L + coral P on dark surfaces; ink-only for monochrome reproduction.
+- **Wordmark:** The approved lowercase lettering is outlined vector artwork. Do not replace it with browser-rendered text or require an installed font.
+- **Shared source:** `lib/brand/identity.ts` defines colors and paths. `components/brand/logiparty-artwork.tsx` renders the same shapes for the header, footer, apex workspace picker, generated icons, and social images. Tenant workspace logos remain their organization's own.
+- **Exports:** `public/brand/logiparty-mark.svg`, `logiparty-wordmark.svg`, `logiparty-wordmark-reversed.svg`, `logiparty-mark-mono.svg`; PNG install icons and `public/favicon.svg`.
+- **Regenerate:** `node --import tsx scripts/generate-brand-assets.ts` regenerates static SVG/PNG exports and `public/og.png` from the shared artwork. No extra dependencies or font downloads are required.
 
 ## Color palette
 
-| Role | Hex | Usage | Contrast notes |
-|------|-----|--------|----------------|
-| **Accent (primary)** | `#0B5CAB` | CTAs, links on light panels, mark fill | 4.6:1 on white (AA) |
-| **Accent hover** | `#084A8A` | Hover on accent text/buttons | 7:1 on white |
-| **Foreground** | `#1A1A1A` | Headings, body on light | 12.6:1 on white |
-| **Muted** | `#3F4650` | Secondary text on white | 7.5:1 on white |
-| **Subtle** | `#556274` | Tertiary / captions | 4.6:1 on white (AA) |
-| **Border** | `#AEB6BF` | Panels, dividers | 3:1 against white (UI non-text) |
-| **Canvas** | `#F4F5F7` | Marketing page background | — |
-| **Surface** | `#FFFFFF` | Cards, panels | — |
-| **Danger** | `#B91C1C` | Errors | 4.5:1 on white |
+| Role | Hex | Use |
+|------|-----|-----|
+| Cobalt | `#343BEE` | Primary mark, public actions and links; white text contrast 6.99:1 |
+| Coral | `#F16A4B` | P in the mark and graphic accents |
+| Ink | `#172131` | Wordmark and primary type; 14.54:1 against paper |
+| Paper | `#F3F3EF` | Warm public canvas and install-icon background |
 
-Tenant `--primary` replaces accent inside `.lp-app` only; marketing tokens stay Logiparty blue.
+Public styling is scoped to marketing surfaces. Tenant `--primary` colors and daily operations styling are not replaced by the public brand palette.
 
 ## Typography
 
