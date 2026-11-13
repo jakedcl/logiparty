@@ -83,7 +83,8 @@ export async function listCrewCandidates(
   orgId: string,
   jobId?: string
 ): Promise<CrewCandidate[]> {
-  await requireJobsAccess();
+  const session = await requireJobsAccess();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   if (!db) return [];
 
   let blocked = new Set<string>();

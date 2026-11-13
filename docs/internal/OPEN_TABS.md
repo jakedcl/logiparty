@@ -3,7 +3,7 @@
 **Purpose:** Single source of truth for what's open, blocked, and done.  
 Update this when you finish or start an item. Pick **one** active item before starting a new one.
 
-*Last updated: 2026-10-28 (dead-code hygiene + commercial/search/reports shipped).*
+*Last updated: 2026-11-13 (tenant-action security fixes prepared locally).*
 
 ---
 
@@ -11,7 +11,7 @@ Update this when you finish or start an item. Pick **one** active item before st
 
 | ID | Task | Owner | Notes |
 |----|------|-------|-------|
-| **A1** | Jake tests job flow locally | Jake | Automated: `npx tsx scripts/golden-path-walk.ts` (includes tenant failed-login redirect check). Still worth one manual click-through on prod. |
+| **SEC1** | Tenant-action boundaries and safe team data | Codex / Jake | Implemented on `fix/tenant-action-boundaries`; local regression suite passes. Awaiting authenticated preview verification before calling this shipped. See `SECURITY_PASS_2026-11-13.md`. |
 
 ---
 
@@ -27,6 +27,7 @@ Update this when you finish or start an item. Pick **one** active item before st
 
 | ID | Task | Blocked by |
 |----|------|------------|
+| A1 | Jake tests job flow locally | Existing manual QA remains pending: `npx tsx scripts/golden-path-walk.ts` plus a production click-through after the security preview is verified. |
 | B1 | Prod smoke test + logo on login | Login + logo OK. Dashboard 500 fixed (env was on Neon `vercel-dev`). Remaining: full smoke after login |
 | B2 | First real paying customer | Jake tested app + A3 homepage live |
 | B4 | M6 (Stripe, self-serve signup, custom domains) | **Stripe scaffold done** (keys TBD). Remaining: Jake adds Stripe keys + webhook; self-serve signup + custom domains still later. Neon `main` + `vercel-dev` both have `0019`–`0022`. **2026-08-20:** Production `DATABASE_URL` was wrongly on `vercel-dev` (`ep-orange-cake…`); corrected to `main` pooler (`ep-red-surf…-pooler`) to match `DATABASE_URL_UNPOOLED`. |

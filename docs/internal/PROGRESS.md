@@ -1,5 +1,15 @@
 # PROGRESS.md — Ticket tracker
 
+## SEC1 — Tenant-action boundaries (2026-11-13)
+
+- [x] Safe team-user projection; authenticated and organization-checked list actions
+- [x] Missing tenant checks on job pickers and commercial actions
+- [x] Membership ownership check and batched capability-tag replacement
+- [x] Local regression tests (75 total pass; original code fails 26 new cases)
+- [ ] Authenticated preview / database verification and publication
+
+Details and remaining review findings: [SECURITY_PASS_2026-11-13.md](SECURITY_PASS_2026-11-13.md).
+
 **Current milestone:** M5 complete. Active work = go-live / ops in [OPEN_TABS.md](OPEN_TABS.md) (M6 Stripe keys + Resend still optional).
 
 ---

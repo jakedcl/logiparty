@@ -88,7 +88,8 @@ export async function listAssignableFleetVehicles(
   orgId: string,
   jobId: string
 ): Promise<FleetVehicle[]> {
-  await requireJobsAccess();
+  const session = await requireJobsAccess();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   await getJobOrThrow(orgId, jobId);
 
   const [vehicles, assigned] = await Promise.all([

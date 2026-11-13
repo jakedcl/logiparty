@@ -45,35 +45,71 @@ export async function updateStaffTags(formData: FormData) {
   const membershipId = formData.get("membershipId") as string;
   if (!membershipId) throw new Error("Missing membership");
 
+  const [membership] = await db
+    .select({ id: orgMemberships.id })
+    .from(orgMemberships)
+    .where(
+      and(
+        eq(orgMemberships.id, membershipId),
+        eq(orgMemberships.orgId, session.user.orgId)
+      )
+    )
+    .limit(1);
+  if (!membership) throw new Error("Forbidden");
+
   const selected = STAFF_TAGS.filter(
     (tag) => formData.get(`tag-${tag}`) === "on"
   );
 
-  await db
+  const deleteTags = db
     .delete(staffCapabilityTags)
-    .where(eq(staffCapabilityTags.membershipId, membershipId));
+    .where(eq(staffCapabilityTags.membershipId, membership.id));
 
   if (selected.length > 0) {
-    await db.insert(staffCapabilityTags).values(
-      selected.map((tag) => ({ membershipId, tag }))
-    );
+    await db.batch([
+      deleteTags,
+      db.insert(staffCapabilityTags).values(
+        selected.map((tag) => ({ membershipId: membership.id, tag }))
+      ),
+    ]);
+  } else {
+    await deleteTags;
   }
 
   revalidatePath("/dashboard/team");
 }
 
 export async function listTeamMembers(orgId: string) {
+  const session = await requireSession();
+  if (!canInviteUsers(session.user) || session.user.orgId !== orgId) {
+    throw new Error("Forbidden");
+  }
   if (!db) return [];
   const rows = await db
     .select({
       membership: orgMemberships,
-      user: users,
+      user: {
+        id: users.id,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        email: users.email,
+      },
     })
     .from(orgMemberships)
     .innerJoin(users, eq(orgMemberships.userId, users.id))
     .where(eq(orgMemberships.orgId, orgId));
 
-  const tags = await db.select().from(staffCapabilityTags);
+  const tags = await db
+    .select({
+      membershipId: staffCapabilityTags.membershipId,
+      tag: staffCapabilityTags.tag,
+    })
+    .from(staffCapabilityTags)
+    .innerJoin(
+      orgMemberships,
+      eq(staffCapabilityTags.membershipId, orgMemberships.id)
+    )
+    .where(eq(orgMemberships.orgId, session.user.orgId));
   const tagsByMembership = new Map<string, string[]>();
   for (const t of tags) {
     const list = tagsByMembership.get(t.membershipId) ?? [];
