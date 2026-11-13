@@ -192,3 +192,11 @@
 - [ ] Review and release of the independent public-site PR
 
 See [PUBLIC_SITE_PASS_2026-11-13.md](PUBLIC_SITE_PASS_2026-11-13.md).
+
+
+## BRAND1 — Approved Handoff identity
+
+- [x] Approved LP mark and outlined wordmark integrated
+- [x] Public palette, favicon/install icons, and social images
+- [x] Local desktop/mobile and image-route verification
+- [ ] Branding PR review and release (based on PR #76)

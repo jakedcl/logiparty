@@ -149,3 +149,8 @@ Extra portal logins (still `password123`): `sara@monster.nydac.test`, `maya@goth
 ## MKT1 — Separate public-site PR (2026-11-13)
 
 Public presentation, pricing/access copy, and demo usability are implemented and locally browser-verified on `improve/public-site-clarity`. This work is independent of SEC1 / PR #75 and does not include its security changes. Review and deployment status belong to the separate PR. See [PUBLIC_SITE_PASS_2026-11-13.md](PUBLIC_SITE_PASS_2026-11-13.md).
+
+
+## BRAND1 — Approved Handoff identity
+
+Direction A is implemented on `brand/handoff-identity`, based on PR #76. Header, icons, public palette, and social assets use shared outlined vector artwork. See [HANDOFF_IDENTITY_2026-11-13.md](HANDOFF_IDENTITY_2026-11-13.md) for checks and branch order.

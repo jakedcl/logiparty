@@ -848,7 +848,7 @@ body {
   --m-bg: var(--lp-bg);
   --m-fg: var(--lp-fg);
   --m-muted: var(--lp-muted);
-  --m-accent: var(--lp-accent);
+  --m-accent: #343bee;
   --m-accent-ink: #ffffff;
   --m-line: var(--lp-line);
   --m-panel: var(--surface);
@@ -2627,10 +2627,10 @@ body {
 /* Public-site presentation. Tenant workspaces and the guided app tour retain
    their existing product styling. */
 .marketing:not(.demo-app) {
-  --m-bg: #f5f7fa;
-  --m-fg: #162c46;
-  --m-muted: #4b5c6e;
-  --m-line: #d5dee8;
+  --m-bg: #f3f3ef;
+  --m-fg: #172131;
+  --m-muted: #515b68;
+  --m-line: #d7dcd9;
   background: var(--m-bg);
 }
 
@@ -2698,7 +2698,7 @@ body {
 }
 
 .marketing:not(.demo-app) :is(.lp-btn, .m-header .m-nav-link-strong):hover {
-  background: #084a8a;
+  background: #282dbc;
   filter: none;
 }
 
@@ -2718,7 +2718,7 @@ body {
 }
 
 .marketing:not(.demo-app) .lp-btn-quiet:hover {
-  background: #edf3f9;
+  background: #eeedfa;
   filter: none;
 }
 
@@ -2730,7 +2730,7 @@ body {
 .m-inquiry {
   min-width: 0;
   padding: 1.5rem;
-  background: #f5f8fc;
+  background: #f8f8f4;
   border: 1px solid var(--m-line);
   border-radius: 10px;
 }
@@ -2754,11 +2754,11 @@ body {
 
 .marketing:not(.demo-app) .m-input:focus {
   border-color: var(--m-accent);
-  box-shadow: 0 0 0 3px rgb(11 92 171 / 12%);
+  box-shadow: 0 0 0 3px rgb(52 59 238 / 12%);
 }
 
 .marketing:not(.demo-app) .m-footer {
-  background: #edf2f7;
+  background: #ecece6;
   box-shadow: none;
 }
 
@@ -2766,6 +2766,22 @@ body {
   .marketing:not(.demo-app) :is(.lp-btn, .lp-btn-quiet, .m-header .m-nav-link-strong) {
     transition: none;
   }
+}
+
+.marketing .m-header .m-nav-link-strong {
+  background: #343bee;
+  border-color: #343bee;
+  color: #fff;
+}
+
+.marketing .m-header .m-nav-link-strong:hover {
+  background: #282dbc;
+  border-color: #282dbc;
+  color: #fff;
+}
+
+.marketing > .m-header .m-brand-lockup {
+  flex-shrink: 0;
 }
 
 @media print {

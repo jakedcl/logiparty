@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { BRAND } from "@/lib/brand/identity";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -8,8 +9,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Run sheets, inventory locks, fleet, crew, and a white-label client portal for event-logistics 3PLs.",
     start_url: "/",
     display: "standalone",
-    background_color: "#F4F5F7",
-    theme_color: "#0B5CAB",
+    background_color: BRAND.paper,
+    theme_color: BRAND.cobalt,
     icons: [
       {
         src: "/favicon.svg",
