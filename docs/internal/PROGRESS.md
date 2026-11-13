@@ -181,3 +181,14 @@
 - [x] **A18a** Inventory hub tabs (2026-08-20); **A18b** warehouses deferred; Client hero + Add-above-table polish
 - [x] **RowActions portal + email from name** — ⋯ menus via body portal; Org Settings drops Email from name; mail uses display name (2026-08-20)
 - [x] **A20** Marketing product tour + `/demo` walkthrough + `northline` seed (2026-09-13)
+
+
+### MKT1 — Public-site clarity (2026-11-13)
+
+- [x] Simpler homepage and scoped public styling
+- [x] Customer-facing pricing, onboarding, access form, and workspace picker
+- [x] Consistent sample dates and keyboard/focus fixes in the guided tour
+- [x] Desktop/mobile public browser QA; full mobile tour
+- [ ] Review and release of the independent public-site PR
+
+See [PUBLIC_SITE_PASS_2026-11-13.md](PUBLIC_SITE_PASS_2026-11-13.md).

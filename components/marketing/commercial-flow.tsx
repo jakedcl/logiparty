@@ -12,8 +12,8 @@ const STEPS = [
     body: "Assign inventory, fleet, and crew. Load-in and load-out windows live on one job — locks engage when it goes live.",
   },
   {
-    id: "loadout",
-    label: "Load-out",
+    id: "dispatch",
+    label: "Dispatch",
     title: "Execute and load",
     body: "Warehouse marks loaded quantities. Drivers and crew see assigned work only. Documents attach to the job.",
   },
