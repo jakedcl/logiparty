@@ -144,3 +144,8 @@ Extra portal logins (still `password123`): `sara@monster.nydac.test`, `maya@goth
 1. **One active item at a time.**
 2. **Always update this file** in the same PR as the work.
 3. **PROGRESS.md** = milestone tickets; **OPEN_TABS.md** = current queue.
+
+
+## MKT1 — Separate public-site PR (2026-11-13)
+
+Public presentation, pricing/access copy, and demo usability are implemented and locally browser-verified on `improve/public-site-clarity`. This work is independent of SEC1 / PR #75 and does not include its security changes. Review and deployment status belong to the separate PR. See [PUBLIC_SITE_PASS_2026-11-13.md](PUBLIC_SITE_PASS_2026-11-13.md).
