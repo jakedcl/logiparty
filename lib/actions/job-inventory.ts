@@ -123,7 +123,8 @@ export async function listAssignableClientInventory(
   orgId: string,
   clientCompanyId: string
 ): Promise<ClientInventoryItem[]> {
-  await requireJobsAccess();
+  const session = await requireJobsAccess();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   return withOrgQuery<ClientInventoryItem[]>(orgId, (database) =>
     database
       .select()
@@ -141,7 +142,8 @@ export async function listAssignableClientInventory(
 export async function listAssignableOrgInventory(
   orgId: string
 ): Promise<InventoryItem[]> {
-  await requireJobsAccess();
+  const session = await requireJobsAccess();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   return withOrgQuery<InventoryItem[]>(orgId, (database) =>
     database
       .select()

@@ -8,6 +8,10 @@ import { canInviteUsers } from "@/lib/auth/permissions";
 import { requireSession } from "@/lib/org/context";
 
 export async function listClientCompaniesWithContacts(orgId: string) {
+  const session = await requireSession();
+  if (!canInviteUsers(session.user) || session.user.orgId !== orgId) {
+    throw new Error("Forbidden");
+  }
   if (!db) return [];
 
   const companies = await db

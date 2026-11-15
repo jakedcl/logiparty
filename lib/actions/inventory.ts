@@ -138,7 +138,8 @@ export async function deleteOrgInventoryItem(formData: FormData) {
 export async function listOrgInventoryItems(
   orgId: string
 ): Promise<InventoryItem[]> {
-  if (!db) return [];
+  const session = await requireInventoryAccess();
+  if (session.user.orgId !== orgId) throw new Error("Forbidden");
   return withOrgQuery<InventoryItem[]>(orgId, (database) =>
     database
       .select()
