@@ -1,17 +1,18 @@
 type JobPanelProps = {
+  id?: string;
   title: string;
   count?: number;
   children: React.ReactNode;
 };
 
-/** Named section on the job detail page (no card chrome). */
-export function JobPanel({ title, count, children }: JobPanelProps) {
+/** Named section on the job detail page. */
+export function JobPanel({ id, title, count, children }: JobPanelProps) {
   return (
-    <section className="min-w-0 space-y-3">
-      <h2 className="text-sm font-semibold text-neutral-900 tracking-tight">
+    <section id={id} aria-labelledby={id ? `${id}-title` : undefined} className="lp-job-panel min-w-0 space-y-4">
+      <h2 id={id ? `${id}-title` : undefined} className="lp-section-title">
         {title}
-        {count != null && count > 0 ? (
-          <span className="ml-1.5 font-normal text-neutral-400">{count}</span>
+        {count != null ? (
+          <span className="lp-section-meta">{count}</span>
         ) : null}
       </h2>
       {children}

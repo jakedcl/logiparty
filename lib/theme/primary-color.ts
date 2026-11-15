@@ -1,8 +1,9 @@
-/** Default accent — early-iPhone blue. Orgs override this via OrgTheme. */
+/** Default workspace accent. Orgs override this via OrgTheme. */
 export const FALLBACK_PRIMARY_COLOR = "#0b5cab";
 
 const HEX = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/;
 const PAPER = "#ffffff";
+const WORKSPACE_CANVAS = "#f5f6f8";
 /** Landing body ink. Pale brands use this instead of the old navy. */
 const INK = "#1a1a1a";
 
@@ -58,7 +59,8 @@ export function primaryForeground(primary: string): string {
   const onInk = contrast(primary, INK);
   if (onPaper >= 4.5) return PAPER;
   if (onInk >= 4.5) return INK;
-  return onPaper >= onInk ? PAPER : INK;
+  // Some middle tones fall between white and soft ink; black clears AA there.
+  return "#000000";
 }
 
 /** Darken the brand until a 1px edge clears 3:1 on a white panel. */
@@ -66,6 +68,16 @@ export function primaryBorder(primary: string): string {
   let color = primary;
   for (let i = 0; i < 8; i++) {
     if (contrast(color, PAPER) >= 3) return color;
+    color = mix(color, "#000000", 0.8);
+  }
+  return color;
+}
+
+/** A readable link color on white and the light workspace canvas. */
+export function primaryText(primary: string): string {
+  let color = primary;
+  for (let i = 0; i < 8; i++) {
+    if (contrast(color, WORKSPACE_CANVAS) >= 4.5) return color;
     color = mix(color, "#000000", 0.8);
   }
   return color;
@@ -82,6 +94,7 @@ export function tenantThemeStyle(
     "--primary": primary,
     "--primary-foreground": foreground,
     "--primary-border": border,
+    "--primary-text": primaryText(primary),
     "--ring": primary,
     "--color-primary": primary,
     "--color-primary-foreground": foreground,

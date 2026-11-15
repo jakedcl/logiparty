@@ -2624,6 +2624,141 @@ body {
   }
 }
 
+/* Workspace presentation: neutral surfaces with the tenant's own accent. */
+.lp-app {
+  --background: var(--lp-bg);
+  --background-subtle: var(--lp-canvas);
+  --foreground: var(--lp-fg);
+  --muted: var(--lp-muted);
+  --border: var(--lp-line-strong);
+  --border-subtle: var(--lp-line);
+  --divider: var(--lp-line);
+  --sidebar-fg: var(--lp-fg);
+  --sidebar-muted: var(--lp-muted);
+  --lp-bg: #f5f6f8;
+  --lp-fg: #202631;
+  --lp-muted: #525c6b;
+  --lp-line: #dce1e8;
+  --lp-line-strong: #8893a3;
+  --lp-bar: #f4f6f8;
+  --lp-panel-fill: #fff;
+  --lp-canvas: #f5f6f8;
+  --lp-gloss-panel: none;
+  --lp-gloss-elevated: none;
+  --lp-gloss-inset: none;
+  --lp-gloss-bar: none;
+  --lp-gloss-pressed: none;
+  --lp-btn-fill: var(--primary);
+  --lp-chrome-edge: var(--primary-border);
+  --surface-hover: #f0f3f7;
+  --sidebar: #fff;
+  --sidebar-hover: #f0f3f7;
+  --subtle: #596474;
+  --faint: #606b7a;
+  background: var(--lp-canvas);
+  color: var(--lp-fg);
+}
+.lp-app .app-sidebar { background: var(--sidebar); box-shadow: none; }
+.lp-app :is(.app-topbar, .app-bar, .lp-window-head) {
+  --foreground: var(--lp-fg);
+  --muted: var(--lp-muted);
+  --subtle: #596474;
+  --sidebar-fg: var(--lp-fg);
+  --sidebar-muted: var(--lp-muted);
+  --lp-line: #dce1e8;
+  --border-subtle: var(--lp-line);
+  background: #fff;
+  color: var(--lp-fg);
+  border-color: var(--lp-line);
+  box-shadow: none;
+}
+.lp-app .app-nav-active {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-color: var(--primary-border);
+  border-radius: 0.375rem;
+  box-shadow: none;
+}
+.lp-app :is(.lp-btn, .lp-btn-quiet, .lp-btn-ghost, .lp-btn-ink, .lp-btn-danger, .app-btn, .app-btn-primary) {
+  border-radius: 0.375rem;
+  min-height: 2.25rem;
+  font-weight: 600;
+  text-shadow: none;
+  box-shadow: none;
+}
+.lp-app :is(.lp-btn, .app-btn, .app-btn-primary)::after { display: none; }
+.lp-app :is(.lp-btn, .app-btn, .app-btn-primary) { background: var(--primary); }
+.lp-app .lp-btn-quiet { background: #fff; }
+.lp-app .lp-btn-ink { background: var(--lp-fg); }
+.lp-app .lp-btn-danger { background: var(--danger); }
+.lp-app :is(.lp-input, .app-input),
+.lp-app :where(input, textarea, select):not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="hidden"]):not([type="submit"]):not([type="button"]):not(.border-transparent) {
+  background: #fff;
+  box-shadow: none;
+}
+.lp-app :is(a, button, input, textarea, select, summary):focus-visible {
+  outline: 2px solid var(--primary-border);
+  outline-offset: 3px;
+}
+.lp-app .app-link, .lp-app .lp-link-quiet:hover { color: var(--primary-text, var(--primary)); }
+.lp-app .lp-page-title { font-size: clamp(1.5rem, 2.5vw, 1.875rem); line-height: 1.2; }
+.lp-app :is(.lp-section-title, .app-section-label) { font-size: 0.9375rem; letter-spacing: -0.01em; }
+.lp-app :is(.lp-table-wrap, .app-table-wrap) { margin-inline: 0; }
+.lp-app :is(.lp-table, .app-table) th {
+  background: #f4f6f8;
+  color: var(--lp-muted);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.75rem;
+  padding-block: 0.7rem;
+  box-shadow: none;
+}
+.lp-app :is(.lp-table, .app-table) td { padding-block: 0.75rem; }
+.lp-app :is(.lp-table, .app-table) tbody tr:nth-child(even) { background: transparent; }
+.lp-app :is(.lp-table, .app-table) tbody tr:hover { background: var(--surface-hover); }
+.lp-app .lp-status { padding: 0.2rem 0.5rem; box-shadow: none; letter-spacing: 0; }
+.lp-app :is(.lp-status-draft, .lp-status-pending) { background: #fff8df; }
+.lp-app .lp-status-upcoming { background: var(--info-soft); }
+.lp-app :is(.lp-status-ready, .lp-status-approved) { background: var(--success-soft); }
+.lp-app .lp-status-completed { background: #f1f3f5; }
+.lp-app .lp-status-denied { background: var(--danger-soft); }
+.lp-app .lp-tabs { background: #edf0f4; border-color: var(--lp-line); border-radius: 0.5rem; box-shadow: none; }
+.lp-app .lp-tab { border-radius: 0.375rem; font-weight: 600; }
+.lp-app .lp-tab-active { background: var(--primary); border-color: var(--primary-border); box-shadow: none; }
+.lp-app .m-seg { border-color: var(--lp-line-strong); border-radius: 0.5rem; background: #fff; box-shadow: none; }
+.lp-app .m-seg-thumb { display: none; }
+.lp-app .m-seg-item { color: var(--muted); text-shadow: none; letter-spacing: 0; border-right-color: var(--lp-line); }
+.lp-app .m-seg-item-active { color: var(--primary-foreground); background: var(--primary); box-shadow: none; }
+.lp-metric-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.75rem; }
+.lp-metric {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid var(--lp-line);
+  border-radius: var(--lp-radius-lg);
+  background: #fff;
+}
+.lp-metric dt { font-size: 0.8125rem; font-weight: 500; color: var(--muted); }
+.lp-metric dd { margin: 0.5rem 0 0; }
+.lp-metric-value { display: block; font-size: 1.75rem; font-weight: 600; line-height: 1.15; letter-spacing: -0.04em; }
+.lp-metric-detail { display: block; margin-top: 0.375rem; font-size: 0.75rem; line-height: 1.4; color: var(--muted); }
+.lp-loading-progress { display: block; width: 100%; height: 0.3rem; margin-top: 0.75rem; accent-color: var(--primary-border); border: 0; border-radius: 1rem; overflow: hidden; background: var(--lp-line); }
+.lp-loading-progress::-webkit-progress-bar { background: var(--lp-line); }
+.lp-loading-progress::-webkit-progress-value { background: var(--primary-border); }
+.lp-loading-progress::-moz-progress-bar { background: var(--primary-border); }
+.lp-job-panel { padding: 1.25rem; border: 1px solid var(--lp-line); border-radius: var(--lp-radius-lg); background: #fff; scroll-margin-top: 5rem; }
+.lp-job-sections { display: flex; flex-wrap: wrap; gap: 0.375rem; }
+.lp-job-sections a { padding: 0.5rem 0.75rem; font-size: 0.8125rem; font-weight: 500; color: var(--muted); border: 1px solid var(--lp-line); border-radius: 0.375rem; background: #fff; text-decoration: none; }
+.lp-job-sections a:hover { color: var(--foreground); border-color: var(--lp-line-strong); }
+.lp-skip-link { position: fixed; top: 0.5rem; left: 0.5rem; z-index: 60; transform: translateY(-200%); background: #fff; color: var(--lp-fg); border: 1px solid var(--primary-border); border-radius: 0.375rem; padding: 0.75rem 1rem; }
+.lp-skip-link:focus { transform: translateY(0); }
+@media (min-width: 640px) {
+  .lp-metric-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .lp-metric-grid-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 639px) {
+  .lp-metric-grid-three .lp-metric:first-child { grid-column: 1 / -1; }
+}
+
 /* Public-site presentation. Tenant workspaces and the guided app tour retain
    their existing product styling. */
 .marketing:not(.demo-app) {

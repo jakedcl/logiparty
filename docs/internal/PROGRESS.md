@@ -210,3 +210,14 @@ See [PUBLIC_SITE_PASS_2026-11-13.md](PUBLIC_SITE_PASS_2026-11-13.md).
 - [x] Public palette, favicon/install icons, and social images
 - [x] Local desktop/mobile and image-route verification
 - [ ] Branding PR review and release (based on PR #76)
+
+
+## APP1 — Workspace usability (2026-11-15)
+
+- [x] Tenant-scoped workspace presentation and dashboard overview
+- [x] Job preparation progress and section navigation
+- [x] Mobile drawer keyboard/focus behavior and tenant-color contrast
+- [x] Local desktop/mobile component QA, guided tour, and unit checks
+- [ ] Draft PR review, safe authenticated workflow check, and release
+
+See [WORKSPACE_USABILITY_2026-11-15.md](WORKSPACE_USABILITY_2026-11-15.md). Based on branding PR #77; no production data changes.

@@ -155,3 +155,14 @@ Public presentation, pricing/access copy, and demo usability are implemented and
 ## BRAND1 — Approved Handoff identity
 
 Direction A is implemented on `brand/handoff-identity`, based on PR #76. Header, icons, public palette, and social assets use shared outlined vector artwork. See [HANDOFF_IDENTITY_2026-11-13.md](HANDOFF_IDENTITY_2026-11-13.md) for checks and branch order.
+
+
+## APP1 — Workspace usability (2026-11-15)
+
+- [x] Tenant-scoped workspace presentation and dashboard overview
+- [x] Job preparation progress and section navigation
+- [x] Mobile drawer keyboard/focus behavior and tenant-color contrast
+- [x] Local desktop/mobile component QA, guided tour, and unit checks
+- [ ] Draft PR review, safe authenticated workflow check, and release
+
+See [WORKSPACE_USABILITY_2026-11-15.md](WORKSPACE_USABILITY_2026-11-15.md). Based on branding PR #77; no production data changes.
