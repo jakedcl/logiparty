@@ -1,3 +1,4 @@
+import { WorkspaceOverview } from "@/components/layout/workspace-overview";
 import Link from "next/link";
 import { listJobClientCompanies, listJobs } from "@/lib/actions/jobs";
 import { listMyJobs } from "@/lib/actions/my-jobs";
@@ -78,7 +79,7 @@ export default async function DashboardPage() {
   const orgName = session.user.orgName;
 
   const [notifications, managerJobs, companies, myJobs] = await Promise.all([
-    listNotifications(session.user.orgId).catch(() => []),
+    listNotifications(session.user.orgId).catch(() => null),
     isManager ? listJobs(session.user.orgId) : Promise.resolve([] as Job[]),
     isManager
       ? listJobClientCompanies(session.user.orgId)
@@ -127,7 +128,8 @@ export default async function DashboardPage() {
     upcomingEmpty = "No assigned jobs yet.";
   }
 
-  const needs = notifications.slice(0, NEEDS_LIMIT);
+  const allActive = (isManager ? managerJobs : myJobs).filter((job) => job.status === "upcoming" || job.status === "ready");
+  const needs = notifications?.slice(0, NEEDS_LIMIT) ?? [];
   const roleLine = isManager
     ? "Review requests, keep jobs moving, and stay ahead of the floor."
     : "Your assigned jobs and time off — what’s next for you.";
@@ -180,12 +182,18 @@ export default async function DashboardPage() {
         }
       />
 
+      <WorkspaceOverview
+        attentionCount={notifications?.length ?? null}
+        activeCount={allActive.length}
+        readyCount={allActive.filter((job) => job.status === "ready").length}
+      />
+
       <section className="space-y-3">
         <div className="flex items-baseline justify-between gap-2">
           <h2 className="lp-section-title">
             Needs attention
             {needs.length > 0 ? (
-              <span className="lp-section-meta">({notifications.length})</span>
+              <span className="lp-section-meta">({notifications?.length})</span>
             ) : null}
           </h2>
           <Link href="/dashboard/notifications" className="lp-link-quiet">
@@ -193,7 +201,11 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        {needs.length === 0 ? (
+        {notifications === null ? (
+          <p className="app-empty" role="status">
+            We couldn’t load your inbox. Open Notifications to try again.
+          </p>
+        ) : needs.length === 0 ? (
           <p className="py-4 text-sm text-[var(--muted)]">Nothing pending.</p>
         ) : (
           <div className="lp-table-wrap">

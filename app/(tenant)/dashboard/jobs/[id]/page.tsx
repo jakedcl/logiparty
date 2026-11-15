@@ -1,3 +1,4 @@
+import { JobProgress } from "@/components/jobs/job-progress";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { InventorySourceToggle } from "@/components/jobs/inventory-source-toggle";
@@ -172,6 +173,18 @@ export default async function JobDetailPage({
         </div>
       </div>
 
+      <JobProgress
+        inventoryLines={inventoryLines}
+        fleetCount={fleetAssignments.length}
+        loadInCrewCount={crewAssignments.filter((assignment) => assignment.phase === "LoadIn").length}
+        loadOutCrewCount={crewAssignments.filter((assignment) => assignment.phase === "LoadOut").length}
+      />
+      <nav className="lp-job-sections" aria-label="Job sections">
+        {["Summary", "Locations", "Inventory", "Fleet", "Crew", "Documents"].map((section) => (
+          <a key={section} href={`#job-${section.toLowerCase()}`}>{section}</a>
+        ))}
+      </nav>
+
       {job.status === "draft" ? (
         <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-3 text-sm text-amber-950 space-y-2">
           <p className="font-medium">Client request — draft</p>
@@ -229,8 +242,8 @@ export default async function JobDetailPage({
         </div>
       ) : null}
 
-      <div className="grid gap-x-10 gap-y-8 lg:grid-cols-2">
-        <JobPanel title="Summary">
+      <div className="grid gap-5 lg:grid-cols-2">
+        <JobPanel id="job-summary" title="Summary">
           <JobSummaryEditor
             job={{
               id: job.id,
@@ -255,7 +268,7 @@ export default async function JobDetailPage({
           />
         </JobPanel>
 
-        <JobPanel title="Locations" count={locations.length}>
+        <JobPanel id="job-locations" title="Locations" count={locations.length}>
           {locations.length === 0 ? (
             <p className="text-sm text-neutral-500">No locations yet.</p>
           ) : (
@@ -290,7 +303,7 @@ export default async function JobDetailPage({
           )}
         </JobPanel>
 
-        <JobPanel title="Inventory" count={inventoryLines.length}>
+        <JobPanel id="job-inventory" title="Inventory" count={inventoryLines.length}>
           <InventorySourceToggle jobId={job.id} source={inventorySource} />
 
           {inventoryLines.length === 0 ? (
@@ -367,7 +380,7 @@ export default async function JobDetailPage({
           </CollapsibleAdd>
         </JobPanel>
 
-        <JobPanel title="Fleet" count={fleetAssignments.length}>
+        <JobPanel id="job-fleet" title="Fleet" count={fleetAssignments.length}>
           {fleetAssignments.length === 0 ? (
             <p className="text-sm text-neutral-500">No vehicles assigned yet.</p>
           ) : (
@@ -444,7 +457,7 @@ export default async function JobDetailPage({
           </CollapsibleAdd>
         </JobPanel>
 
-        <JobPanel title="Crew" count={crewAssignments.length}>
+        <JobPanel id="job-crew" title="Crew" count={crewAssignments.length}>
           {crewAssignments.length === 0 ? (
             <p className="text-sm text-neutral-500">No crew assigned yet.</p>
           ) : (
@@ -557,7 +570,7 @@ export default async function JobDetailPage({
           </CollapsibleAdd>
         </JobPanel>
 
-        <JobPanel title="Documents" count={jobDocuments.length}>
+        <JobPanel id="job-documents" title="Documents" count={jobDocuments.length}>
           <JobDocuments
             jobId={job.id}
             documents={jobDocuments}

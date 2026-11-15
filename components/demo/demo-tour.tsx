@@ -46,44 +46,48 @@ function measureHighlight(key: string): Rect | null {
 
 function popupStyle(
   rect: Rect,
-  placement: DemoPopupPlacement = "bottom"
+  placement: DemoPopupPlacement = "bottom",
+  height = 200
 ): React.CSSProperties {
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  const maxLeft = Math.max(12, vw - POPUP_W - 12);
+  const width = Math.min(POPUP_W, vw - 24);
+  const maxLeft = Math.max(12, vw - width - 12);
+  const maxTop = Math.max(12, vh - height - 12);
+  const clampTop = (top: number) => Math.max(12, Math.min(top, maxTop));
 
   if (placement === "right") {
     return {
-      top: Math.min(Math.max(12, rect.top), vh - 180),
+      top: clampTop(rect.top),
       left: Math.min(rect.left + rect.width + GAP, maxLeft),
-      width: POPUP_W,
+      width,
     };
   }
   if (placement === "left") {
     return {
-      top: Math.min(Math.max(12, rect.top), vh - 180),
-      left: Math.max(12, rect.left - POPUP_W - GAP),
-      width: POPUP_W,
+      top: clampTop(rect.top),
+      left: Math.max(12, rect.left - width - GAP),
+      width,
     };
   }
   if (placement === "top") {
     return {
-      top: Math.max(12, rect.top - GAP - 140),
+      top: clampTop(rect.top - GAP - height),
       left: Math.min(
-        Math.max(12, rect.left + rect.width / 2 - POPUP_W / 2),
+        Math.max(12, rect.left + rect.width / 2 - width / 2),
         maxLeft
       ),
-      width: POPUP_W,
+      width,
     };
   }
   // bottom
   return {
-    top: Math.min(rect.top + rect.height + GAP, vh - 160),
+    top: clampTop(rect.top + rect.height + GAP),
     left: Math.min(
-      Math.max(12, rect.left + rect.width / 2 - POPUP_W / 2),
+      Math.max(12, rect.left + rect.width / 2 - width / 2),
       maxLeft
     ),
-    width: POPUP_W,
+    width,
   };
 }
 
@@ -104,6 +108,8 @@ function caretClass(placement: DemoPopupPlacement = "bottom"): string {
 export function DemoTour() {
   const router = useRouter();
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
+  const [popupHeight, setPopupHeight] = useState(200);
   const [index, setIndex] = useState(0);
   const [finished, setFinished] = useState(false);
   const [rect, setRect] = useState<Rect | null>(null);
@@ -176,6 +182,15 @@ export function DemoTour() {
   }, [finished, next, prev, router]);
 
   const popupVisible = rect !== null;
+  useLayoutEffect(() => {
+    const popup = popupRef.current;
+    if (!popup || finished) return;
+    const measure = () => setPopupHeight(Math.ceil(popup.getBoundingClientRect().height));
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(popup);
+    return () => observer.disconnect();
+  }, [popupVisible, finished]);
   useEffect(() => {
     if (popupVisible || finished) headingRef.current?.focus({ preventScroll: true });
   }, [index, finished, popupVisible]);
@@ -228,11 +243,12 @@ export function DemoTour() {
         {/* In-app popup anchored to the highlight */}
         {!finished && rect ? (
           <div
+            ref={popupRef}
             role="dialog"
             aria-labelledby="demo-pop-title"
             aria-describedby="demo-pop-body"
             className="demo-popup lp-surface fixed z-40 p-4 transition-[top,left] duration-300 ease-out"
-            style={popupStyle(rect, step.placement)}
+            style={popupStyle(rect, step.placement, popupHeight)}
           >
             <span className={caretClass(step.placement)} aria-hidden />
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--subtle)]">

@@ -51,7 +51,7 @@ export default async function JobsPage({
     <div className="space-y-8">
       <PageHeader
         title="Jobs"
-        description="Create and manage jobs. Statuses: draft → upcoming → ready → completed (or draft → denied)."
+        description="Plan upcoming work, review client requests, and keep each run sheet up to date."
         actions={
           <>
             {companies.length > 0 ? (

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { OrgTheme } from "@/components/layout/org-theme";
 import { cn } from "@/lib/utils";
@@ -280,6 +280,7 @@ export function DashboardShell({
 }: Props) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const drawerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     setDrawerOpen(false);
@@ -287,22 +288,47 @@ export function DashboardShell({
 
   useEffect(() => {
     if (!drawerOpen) return;
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusable = () => Array.from(drawerRef.current?.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), [tabindex="0"]'
+    ) ?? []).filter((element) => element.getClientRects().length > 0);
+    focusable()[0]?.focus();
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setDrawerOpen(false);
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setDrawerOpen(false);
+      }
+      if (e.key !== "Tab") return;
+      const elements = focusable();
+      const first = elements[0];
+      const last = elements.at(-1);
+      if (e.shiftKey && (document.activeElement === first || !drawerRef.current?.contains(document.activeElement))) {
+        e.preventDefault();
+        last?.focus();
+      } else if (!e.shiftKey && (document.activeElement === last || !drawerRef.current?.contains(document.activeElement))) {
+        e.preventDefault();
+        first?.focus();
+      }
     };
+    const desktop = window.matchMedia("(min-width: 1024px)");
+    const closeOnDesktop = () => { if (desktop.matches) setDrawerOpen(false); };
+    desktop.addEventListener("change", closeOnDesktop);
     document.addEventListener("keydown", onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
+      desktop.removeEventListener("change", closeOnDesktop);
+      if (previousFocus?.isConnected) previousFocus.focus();
     };
   }, [drawerOpen]);
 
   return (
     <OrgTheme primaryColor={primaryColor}>
-      {/* Desktop sidebar — gloss metal, brand pill for the active item */}
-      <aside className="app-sidebar no-print fixed inset-y-0 left-0 z-30 hidden w-56 flex-col bg-[var(--sidebar)] lg:flex">
+      <a href="#workspace-main" className="lp-skip-link">Skip to content</a>
+      {/* Tenant identity remains the workspace brand. */}
+      <aside inert={drawerOpen} className="app-sidebar no-print fixed inset-y-0 left-0 z-30 hidden w-56 flex-col bg-[var(--sidebar)] lg:flex">
         <div className="border-b border-[var(--lp-line)] px-4 py-5">
           <Brand orgName={orgName} logoUrl={logoUrl} onInk />
         </div>
@@ -317,10 +343,13 @@ export function DashboardShell({
           <button
             type="button"
             className="absolute inset-0 bg-[var(--foreground)]/50"
-            aria-label="Close menu"
+            tabIndex={-1}
+            aria-hidden="true"
             onClick={() => setDrawerOpen(false)}
           />
           <aside
+            ref={drawerRef}
+            id="workspace-navigation"
             className="app-sidebar absolute inset-y-0 left-0 flex w-[min(18rem,85vw)] flex-col"
             role="dialog"
             aria-modal="true"
@@ -348,7 +377,7 @@ export function DashboardShell({
         </div>
       ) : null}
 
-      <div className="lg:pl-56">
+      <div className="lg:pl-56" inert={drawerOpen}>
         <header className="app-topbar no-print sticky top-0 z-20 flex h-12 items-center justify-between gap-3 border-b border-[var(--border-subtle)] px-3 sm:px-5">
           <div className="flex min-w-0 items-center gap-2 lg:hidden">
             <button
@@ -356,6 +385,7 @@ export function DashboardShell({
               className="shrink-0 rounded-md p-2 text-[var(--muted)] hover:bg-[var(--surface-hover)] hover:text-[var(--foreground)]"
               aria-label="Open menu"
               aria-expanded={drawerOpen}
+              aria-controls="workspace-navigation"
               onClick={() => setDrawerOpen(true)}
             >
               <Menu className="h-5 w-5" strokeWidth={1.75} />
@@ -368,7 +398,7 @@ export function DashboardShell({
           <div className="flex shrink-0 items-center gap-2">{accountMenu}</div>
         </header>
 
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-6 md:py-8">
+        <main id="workspace-main" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 py-6 md:px-6 md:py-8">
           {children}
         </main>
       </div>

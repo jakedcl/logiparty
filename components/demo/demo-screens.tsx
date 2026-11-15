@@ -1,5 +1,7 @@
 "use client";
 
+import { JobProgress } from "@/components/jobs/job-progress";
+import { WorkspaceOverview } from "@/components/layout/workspace-overview";
 import { SegmentedControl } from "@/components/marketing/segmented-control";
 import { navPillClass } from "@/components/ui/nav-pill";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -256,6 +258,13 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
       >
         <h2 className="lp-page-title text-lg">Good morning, Morgan</h2>
         <p className="lp-page-sub text-xs">{DEMO_ORG.name}</p>
+        <div className="mt-5">
+          <WorkspaceOverview
+            attentionCount={DEMO_NEEDS.length}
+            activeCount={DEMO_JOBS.filter((job) => job.status === "upcoming" || job.status === "ready").length}
+            readyCount={DEMO_JOBS.filter((job) => job.status === "ready").length}
+          />
+        </div>
         <div className="mt-5 grid gap-5 lg:grid-cols-2">
           <div data-demo-hl="needs">
             <p className="lp-section-title mb-2">Needs attention</p>
@@ -331,6 +340,14 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
         <p className="lp-page-sub text-xs">
           {DEMO_FEATURED_JOB.client} · {DEMO_FEATURED_JOB.when} · POC {DEMO_FEATURED_JOB.poc}
         </p>
+        <div className="mt-5">
+          <JobProgress
+            inventoryLines={DEMO_JOB_LINES.map((line) => ({ quantityAssigned: line.assigned, quantityLoaded: line.loaded }))}
+            fleetCount={2}
+            loadInCrewCount={DEMO_CREW.filter((crew) => crew.phase === "Load-in").length}
+            loadOutCrewCount={DEMO_CREW.filter((crew) => crew.phase === "Load-out").length}
+          />
+        </div>
         <div className="mt-4">
           <Tabs
             hlKey="tabs"
@@ -376,7 +393,7 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
           <div>
             <p className="lp-section-title mb-2">Crew</p>
             <ul className="lp-list text-xs">
-              {DEMO_CREW.slice(0, 4).map((c) => (
+              {DEMO_CREW.map((c) => (
                 <li key={`${c.name}-${c.phase}`}>
                   {c.name}{" "}
                   <span className="text-[var(--subtle)]">
