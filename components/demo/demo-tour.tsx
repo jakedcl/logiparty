@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useRef,
   useState,
 } from "react";
 import { DemoScreen } from "@/components/demo/demo-screens";
@@ -100,6 +102,8 @@ function caretClass(placement: DemoPopupPlacement = "bottom"): string {
 }
 
 export function DemoTour() {
+  const router = useRouter();
+  const headingRef = useRef<HTMLHeadingElement>(null);
   const [index, setIndex] = useState(0);
   const [finished, setFinished] = useState(false);
   const [rect, setRect] = useState<Rect | null>(null);
@@ -149,20 +153,32 @@ export function DemoTour() {
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === "ArrowRight" || e.key === "Enter") {
+      if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey || e.repeat) return;
+      if (e.key === "Escape") {
         e.preventDefault();
-        if (finished) return;
+        router.push("/");
+        return;
+      }
+      const target = e.target instanceof HTMLElement ? e.target : null;
+      // Preserve native keyboard activation, typing, and tab controls.
+      // In particular, Enter on Exit or Request access must follow that link.
+      if (finished || target?.closest("a, button, input, textarea, select, [contenteditable], [role=tab]")) return;
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
         next();
       } else if (e.key === "ArrowLeft") {
         e.preventDefault();
         prev();
-      } else if (e.key === "Escape") {
-        // stay in demo — exit is the link
       }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [finished, next, prev]);
+  }, [finished, next, prev, router]);
+
+  const popupVisible = rect !== null;
+  useEffect(() => {
+    if (popupVisible || finished) headingRef.current?.focus({ preventScroll: true });
+  }, [index, finished, popupVisible]);
 
   return (
     <div className="lp-app flex min-h-0 flex-1 flex-col">
@@ -214,6 +230,7 @@ export function DemoTour() {
           <div
             role="dialog"
             aria-labelledby="demo-pop-title"
+            aria-describedby="demo-pop-body"
             className="demo-popup lp-surface fixed z-40 p-4 transition-[top,left] duration-300 ease-out"
             style={popupStyle(rect, step.placement)}
           >
@@ -223,11 +240,13 @@ export function DemoTour() {
             </p>
             <h2
               id="demo-pop-title"
+              ref={headingRef}
+              tabIndex={-1}
               className="mt-1.5 text-sm font-semibold tracking-tight"
             >
               {step.title}
             </h2>
-            <p className="mt-1.5 text-xs leading-relaxed text-[var(--muted)]">
+            <p id="demo-pop-body" className="mt-1.5 text-xs leading-relaxed text-[var(--muted)]">
               {step.body}
             </p>
             <div className="mt-3.5 flex items-center gap-2">
@@ -266,16 +285,18 @@ export function DemoTour() {
             className="lp-surface fixed left-1/2 top-1/2 z-40 w-[min(92vw,360px)] -translate-x-1/2 -translate-y-1/2 p-6 text-center"
           >
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[var(--primary)]">
-              Request → job → load-out → invoice
+              Your team · Your clients · One workspace
             </p>
             <h2
               id="demo-done-title"
+              ref={headingRef}
+              tabIndex={-1}
               className="mt-3 text-lg font-semibold tracking-tight"
             >
-              That’s the loop
+              See how it fits your operation
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-[var(--muted)]">
-              Inventory and fleet unlock after load-out. Ready to talk?
+              You’ve seen the sample workspace. Tell us about your jobs, clients, and team to discuss early access.
             </p>
             <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
               <Button

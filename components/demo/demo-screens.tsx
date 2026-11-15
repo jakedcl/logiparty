@@ -9,6 +9,7 @@ import {
   DEMO_CLIENTS,
   DEMO_CREW,
   DEMO_FLEET,
+  DEMO_FEATURED_JOB,
   DEMO_INVENTORY_CLIENT,
   DEMO_INVENTORY_ORG,
   DEMO_JOB_LINES,
@@ -324,11 +325,11 @@ export function DemoScreen({ screen }: { screen: DemoScreenId }) {
         activeNav="Jobs"
       >
         <div className="flex flex-wrap items-center gap-2">
-          <h2 className="lp-page-title text-lg">Waterfront Festival</h2>
+          <h2 className="lp-page-title text-lg">{DEMO_FEATURED_JOB.name}</h2>
           <StatusBadge status="ready" kind="job" />
         </div>
         <p className="lp-page-sub text-xs">
-          Summit Brands · Fri, Sep 19, 2026 · POC Jordan Lee
+          {DEMO_FEATURED_JOB.client} · {DEMO_FEATURED_JOB.when} · POC {DEMO_FEATURED_JOB.poc}
         </p>
         <div className="mt-4">
           <Tabs

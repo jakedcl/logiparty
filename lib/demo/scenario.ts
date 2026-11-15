@@ -22,17 +22,18 @@ export type DemoJob = {
   name: string;
   client: string;
   status: DemoJobStatus;
+  date: string;
   when: string;
   poc: string;
 };
 
-export const DEMO_JOBS: readonly DemoJob[] = [
+const SAMPLE_JOBS: readonly Omit<DemoJob, "when">[] = [
   {
     id: "j-draft",
     name: "Outdoor Patio Activation",
     client: "Summit Brands",
     status: "draft",
-    when: "Sat, Nov 15, 2026",
+    date: "2026-11-15",
     poc: "Alex Chen",
   },
   {
@@ -40,7 +41,7 @@ export const DEMO_JOBS: readonly DemoJob[] = [
     name: "Campus Pop-Up",
     client: "Summit Brands",
     status: "upcoming",
-    when: "Wed, Nov 12, 2026",
+    date: "2026-11-12",
     poc: "Alex Chen",
   },
   {
@@ -48,7 +49,7 @@ export const DEMO_JOBS: readonly DemoJob[] = [
     name: "Waterfront Festival",
     client: "Summit Brands",
     status: "ready",
-    when: "Fri, Nov 14, 2026",
+    date: "2026-11-14",
     poc: "Jordan Lee",
   },
   {
@@ -56,7 +57,7 @@ export const DEMO_JOBS: readonly DemoJob[] = [
     name: "Showroom Load-In",
     client: "Harbor Co.",
     status: "ready",
-    when: "Sun, Nov 16, 2026",
+    date: "2026-11-16",
     poc: "Sam Rivera",
   },
   {
@@ -64,10 +65,21 @@ export const DEMO_JOBS: readonly DemoJob[] = [
     name: "Trade Show Wrap",
     client: "Summit Brands",
     status: "completed",
-    when: "Mon, Nov 3, 2026",
+    date: "2026-11-03",
     poc: "Alex Chen",
   },
 ] as const;
+
+// A fixed sample scenario makes server/client output deterministic. All date
+// labels, including weekdays, come from the same ISO dates in UTC.
+const dateFormatter = new Intl.DateTimeFormat("en-US", {
+  weekday: "short", month: "short", day: "numeric", year: "numeric", timeZone: "UTC",
+});
+export const DEMO_JOBS: readonly DemoJob[] = SAMPLE_JOBS.map((job) => ({
+  ...job,
+  when: dateFormatter.format(new Date(`${job.date}T12:00:00Z`)),
+}));
+export const DEMO_FEATURED_JOB = DEMO_JOBS.find((job) => job.id === "j-ready")!;
 
 export const DEMO_NEEDS = [
   {

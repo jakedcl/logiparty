@@ -6,7 +6,7 @@ export function MarketingNavLinks({
   className?: string;
 }) {
   return (
-    <nav className={className}>
+    <div className={className}>
       <Link href="/#about" className="m-nav-link hidden sm:inline">
         Who it&apos;s for
       </Link>
@@ -25,6 +25,6 @@ export function MarketingNavLinks({
       <Link href="/#request" className="m-nav-link-strong">
         Request access
       </Link>
-    </nav>
+    </div>
   );
 }

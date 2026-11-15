@@ -109,3 +109,8 @@ Tenant `--primary` replaces accent inside `.lp-app` only; marketing tokens stay 
 
 - Primary CTA: **Request access** (`#request` + `LeadForm` → existing marketing lead action).
 - Secondary: `hello@logiparty.com`, **Sign in** (`/login` slug picker), **Demo** (`/demo`).
+
+
+## Public-site clarity pass (2026-11-13)
+
+The public homepage leads with “Keep every event job moving.” and describes the connected warehouse-to-venue workflow. The public site uses flat blue actions, light neutral surfaces, and restrained borders, scoped in CSS to `.marketing:not(.demo-app)`. The guided app tour and tenant workspaces retain product styling. The homepage uses three core views (job detail, inventory, client portal), with a supported onboarding section. Keep pricing and access-request copy customer-facing; do not expose billing implementation details or disabled checkout steps. Sample dates in the guided tour derive from fixed ISO dates in `lib/demo/scenario.ts`.

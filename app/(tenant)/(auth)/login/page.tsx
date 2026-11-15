@@ -84,11 +84,11 @@ export default async function LoginPage({
             </div>
             <h1 className="lp-page-title mb-2">Sign in to your workspace</h1>
             <p className="lp-page-sub">
-              Logiparty runs on your organization subdomain — for example{" "}
+              Your team has its own workspace — for example{" "}
               <span className="font-medium text-[var(--foreground)]">
                 your-org.logiparty.com
               </span>
-              . Enter your org slug to continue.
+              . Enter your workspace name to continue.
             </p>
             {params.error ? (
               <p className="mb-4 text-sm font-bold text-[var(--danger)]">

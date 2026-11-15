@@ -7,9 +7,9 @@ import { marketingMetadata } from "@/lib/marketing/metadata";
 import { getOrgSlugFromHost } from "@/lib/org/subdomain";
 
 export const metadata = marketingMetadata({
-  title: "Product demo — Logiparty",
+  title: "Guided product tour — Logiparty",
   description:
-    "Interactive walkthrough of jobs, inventory, fleet, crew, and the white-label client portal. No login required.",
+    "Guided walkthrough of jobs, inventory, fleet, crew, and the white-label client portal. No login required.",
   path: "/demo",
 });
 

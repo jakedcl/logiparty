@@ -2624,6 +2624,150 @@ body {
   }
 }
 
+/* Public-site presentation. Tenant workspaces and the guided app tour retain
+   their existing product styling. */
+.marketing:not(.demo-app) {
+  --m-bg: #f5f7fa;
+  --m-fg: #162c46;
+  --m-muted: #4b5c6e;
+  --m-line: #d5dee8;
+  background: var(--m-bg);
+}
+
+.marketing:not(.demo-app) .m-header {
+  gap: 1rem;
+  box-shadow: none;
+}
+
+.marketing:not(.demo-app) :is(.m-panel, .m-hero) {
+  background: #fff;
+  border-color: var(--m-line);
+  border-radius: 12px;
+  box-shadow: none;
+}
+
+.marketing:not(.demo-app) .m-section-title {
+  border: 0;
+  padding-bottom: 0;
+  font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+}
+
+.m-eyebrow {
+  color: var(--m-accent);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+
+.m-hero-title {
+  color: var(--m-fg);
+  font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1.06;
+  text-wrap: balance;
+}
+
+.m-product-preview {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--m-line);
+  border-radius: 10px;
+  background: #f7f9fc;
+  box-shadow: 0 14px 32px -16px rgb(22 44 70 / 25%);
+}
+
+.marketing:not(.demo-app) :is(.lp-btn, .lp-btn-quiet, .m-header .m-nav-link-strong) {
+  min-height: 44px;
+  border-radius: 7px;
+  font-weight: 600;
+  text-shadow: none;
+  box-shadow: none;
+  transition: background-color 150ms ease;
+}
+
+.marketing:not(.demo-app) :is(.lp-btn, .m-header .m-nav-link-strong) {
+  background: var(--m-accent);
+  color: #fff;
+  border-color: var(--m-accent);
+}
+
+.marketing:not(.demo-app) :is(.lp-btn, .m-header .m-nav-link-strong):hover {
+  background: #084a8a;
+  filter: none;
+}
+
+.marketing:not(.demo-app) .m-header .m-nav-link-strong {
+  display: inline-flex;
+  align-items: center;
+}
+
+.marketing:not(.demo-app) .lp-btn::after {
+  content: none;
+}
+
+.marketing:not(.demo-app) .lp-btn-quiet {
+  background: #fff;
+  color: var(--m-fg);
+  border-color: var(--m-line);
+}
+
+.marketing:not(.demo-app) .lp-btn-quiet:hover {
+  background: #edf3f9;
+  filter: none;
+}
+
+.marketing:not(.demo-app) :focus-visible {
+  outline: 2px solid var(--m-accent);
+  outline-offset: 3px;
+}
+
+.m-inquiry {
+  min-width: 0;
+  padding: 1.5rem;
+  background: #f5f8fc;
+  border: 1px solid var(--m-line);
+  border-radius: 10px;
+}
+
+.m-inquiry-fields {
+  min-width: 0;
+  margin: 0 0 1.25rem;
+  padding: 0;
+  border: 0;
+}
+
+.m-inquiry-fields:disabled {
+  opacity: 0.65;
+}
+
+.marketing:not(.demo-app) .m-input {
+  background: #fff;
+  box-shadow: none;
+  font-size: 1rem;
+}
+
+.marketing:not(.demo-app) .m-input:focus {
+  border-color: var(--m-accent);
+  box-shadow: 0 0 0 3px rgb(11 92 171 / 12%);
+}
+
+.marketing:not(.demo-app) .m-footer {
+  background: #edf2f7;
+  box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marketing:not(.demo-app) :is(.lp-btn, .lp-btn-quiet, .m-header .m-nav-link-strong) {
+    transition: none;
+  }
+}
+
 @media print {
   .no-print {
     display: none !important;

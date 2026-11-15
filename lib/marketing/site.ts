@@ -13,4 +13,4 @@ export function getMarketingOrigin(): string {
 }
 
 export const MARKETING_DESCRIPTION =
-  "Run sheets, inventory locks, fleet, crew, and a white-label client portal for live-event logistics 3PLs.";
+  "Plan client inventory, trucks, crew, and load windows in one workspace built for event-logistics teams.";

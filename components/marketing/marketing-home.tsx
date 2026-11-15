@@ -1,9 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { LogipartyMark } from "@/components/brand/logiparty-mark";
-import { AppWindow } from "@/components/marketing/app-window";
 import { Button } from "@/components/ui/button";
-import { ComparePane } from "@/components/marketing/compare-pane";
 import { CommercialFlow } from "@/components/marketing/commercial-flow";
 import { FeatureShowcase } from "@/components/marketing/feature-showcase";
 import { LeadForm } from "@/components/marketing/lead-form";
@@ -12,14 +9,18 @@ import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { MarketingHeader } from "@/components/marketing/marketing-header";
 import { MarketingNavLinks } from "@/components/marketing/marketing-nav";
 import { MarketingRoot } from "@/components/marketing/marketing-root";
-import { ProcessStepper } from "@/components/marketing/process-stepper";
-import { ProductTour } from "@/components/marketing/product-tour";
 
 const SECURITY_POINTS = [
-  "Each 3PL workspace is isolated on its own subdomain with org-scoped data in Postgres.",
-  "Row-level security enforces tenant boundaries; the app connects as a non-bypass role.",
-  "Staff sessions use Auth.js credentials with bcrypt-hashed passwords.",
-  "Job documents are served from Cloudflare R2 with short-lived signed URLs.",
+  "Separate workspaces for each logistics company.",
+  "Role-based access for managers, crew, and client contacts.",
+  "Client access scoped to their own company’s jobs and inventory.",
+  "Private document storage with time-limited download links.",
+] as const;
+
+const ONBOARDING = [
+  { title: "Talk through your operation", body: "Tell us about your clients, stored gear, and how a typical job runs." },
+  { title: "Set up your workspace", body: "We work with you on catalogs, roles, client contacts, and your branding." },
+  { title: "Walk through your first job", body: "Review the workflow with your team before you start using it day to day." },
 ] as const;
 
 export function MarketingHome() {
@@ -29,55 +30,43 @@ export function MarketingHome() {
         <MarketingNavLinks />
       </MarketingHeader>
 
-      <main id="top" className="relative z-10 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl space-y-6">
-          <section className="m-hero p-5 sm:p-7">
+      <main id="top" className="relative z-10 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+        <div className="mx-auto max-w-6xl space-y-8 sm:space-y-12">
+          <section className="m-hero p-6 sm:p-10 lg:p-12">
             <div className="m-hero-split">
               <div>
-                <div className="m-hero-brand">
-                  <LogipartyMark size={52} />
-                  <div>
-                    <p className="m-hero-brand-name">Logiparty</p>
-                    <p className="m-hero-brand-tag">
-                      Operations software for event-logistics 3PLs
-                    </p>
-                  </div>
-                </div>
-                <h1 className="mt-4 text-3xl font-semibold tracking-tight text-[var(--m-fg)] sm:text-4xl lg:text-[2.5rem] lg:leading-tight">
-                  Run sheets, locked inventory, fleet, crew, and a client portal
-                  your team white-labels end to end.
+                <p className="m-eyebrow">Operations software for event-logistics 3PLs</p>
+                <h1 className="m-hero-title mt-4">
+                  Keep every event job moving.
                 </h1>
-                <p className="mt-4 max-w-xl text-base leading-relaxed text-[var(--m-muted)] sm:text-lg">
-                  Built for the warehouse-to-venue loop on{" "}
-                  <span className="font-medium text-[var(--m-fg)]">
-                    your-org.logiparty.com
-                  </span>
-                  . Walk through Northline Logistics sample data in{" "}
-                  <Link href="/demo" className="m-nav-link-strong">
-                    /demo
-                  </Link>{" "}
-                  — no login.
+                <p className="mt-5 max-w-xl text-base leading-relaxed text-[var(--m-muted)] sm:text-lg">
+                  Plan client inventory, trucks, crew, and load windows in one
+                  workspace. Give clients a portal that feels like your business.
                 </p>
-                <div className="mt-6 flex flex-wrap items-center gap-2">
-                  <Button asChild className="px-4 py-2.5 text-sm">
-                    <Link href="/demo">Try the demo</Link>
-                  </Button>
-                  <Button asChild variant="outline" className="px-4 py-2.5 text-sm">
+                <div className="mt-7 flex flex-wrap items-center gap-3">
+                  <Button asChild className="px-5 py-3 text-sm">
                     <a href="#request">Request access</a>
                   </Button>
+                  <Button asChild variant="outline" className="px-5 py-3 text-sm">
+                    <Link href="/demo">Take a guided tour <span aria-hidden>→</span></Link>
+                  </Button>
                 </div>
+                <p className="mt-4 text-xs leading-relaxed text-[var(--m-muted)]">
+                  Early access · Hands-on onboarding · No login needed for the tour
+                </p>
               </div>
-              <HeroScreenshotWindow />
+              <HeroProductPreview />
             </div>
           </section>
 
           <section id="about" className="m-panel m-rise m-rise-1 p-5 sm:p-6">
-            <h2 className="m-section-title">Who it&apos;s for</h2>
+            <p className="m-eyebrow mb-3">Built around the job</p>
+            <h2 className="m-section-title">From warehouse to venue, together.</h2>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
               Third-party logistics companies that warehouse, transport, and crew
               live events — festivals, tours, corporate activations, and venue
-              deliveries. You need jobs, locks, and a branded client portal without
-              a generic WMS or a spreadsheet patchwork.
+              deliveries. Keep the run sheet, reserved gear, assigned people, and
+              client updates connected as plans change.
             </p>
             <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
               Early access is invite-only: we configure roles, catalogs, subdomain
@@ -88,33 +77,20 @@ export function MarketingHome() {
           <section className="m-panel m-rise m-rise-1 p-5 sm:p-6">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <h2 className="m-section-title">Product</h2>
+                <p className="m-eyebrow mb-3">One connected workspace</p>
+                <h2 className="m-section-title">The details your next job depends on.</h2>
                 <p className="mt-2 max-w-xl text-sm leading-relaxed text-[var(--m-muted)]">
-                  Screenshots below are from the staff app and client portal —
-                  Northline Logistics sample tenant, not a mock illustration.
+                  See the staff workspace and client portal below, using sample
+                  data from Northline Logistics.
                 </p>
               </div>
               <Link href="/demo" className="m-nav-link-strong text-sm">
-                Open interactive demo →
+                Explore the guided tour →
               </Link>
             </div>
             <div className="mt-6">
               <FeatureShowcase />
             </div>
-          </section>
-
-          <section id="tour" className="m-panel m-rise m-rise-1 p-5 sm:p-6">
-            <ProductTour />
-          </section>
-
-          <section id="problem" className="m-panel m-rise m-rise-2 p-5 sm:p-6">
-            <h2 className="m-section-title">The gap</h2>
-            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
-              Spreadsheets lose the run sheet when load-out moves. Group chats
-              don&apos;t lock inventory. Generic WMS tools weren&apos;t built for
-              festival load-in windows.
-            </p>
-            <ComparePane />
           </section>
 
           <section id="how" className="m-panel m-rise m-rise-2 p-5 sm:p-6">
@@ -125,18 +101,30 @@ export function MarketingHome() {
             <div className="mt-5">
               <CommercialFlow />
             </div>
-            <h3 className="mt-8 text-sm font-semibold text-[var(--m-fg)]">
-              On the warehouse floor
-            </h3>
-            <div className="mt-3">
-              <ProcessStepper />
-            </div>
+          </section>
+
+          <section id="onboarding" className="m-panel p-5 sm:p-8">
+            <p className="m-eyebrow mb-3">A supported start</p>
+            <h2 className="m-section-title">Set up for the way you work.</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
+              Early access includes a conversation and hands-on setup. We work
+              with your team on the details before your workspace goes live.
+            </p>
+            <ol className="mt-7 grid gap-6 sm:grid-cols-3">
+              {ONBOARDING.map((step, index) => (
+                <li key={step.title}>
+                  <p className="m-eyebrow">0{index + 1}</p>
+                  <h3 className="mt-2 font-semibold">{step.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-[var(--m-muted)]">{step.body}</p>
+                </li>
+              ))}
+            </ol>
           </section>
 
           <MarketingFaq />
 
           <section id="security" className="m-panel m-rise m-rise-2 p-5 sm:p-6">
-            <h2 className="m-section-title">Security &amp; isolation</h2>
+            <h2 className="m-section-title">Access that fits your team</h2>
             <ul className="mt-4 space-y-3 text-sm leading-relaxed text-[var(--m-muted)] sm:text-base">
               {SECURITY_POINTS.map((point) => (
                 <li key={point} className="flex gap-2">
@@ -164,18 +152,16 @@ export function MarketingHome() {
                 <p className="mt-4 text-sm text-[var(--m-muted)] leading-relaxed">
                   Already onboarded?{" "}
                   <Link href="/login" className="m-nav-link-strong">
-                    Sign in with your org slug
+                    Find your workspace
                   </Link>
                   . Want a look first?{" "}
                   <Link href="/demo" className="m-nav-link-strong">
-                    Open the demo
+                    Take the guided tour
                   </Link>
                   .
                 </p>
               </div>
-              <AppWindow title="Access request" className="m-access-window">
-                <LeadForm />
-              </AppWindow>
+              <LeadForm />
             </div>
           </section>
         </div>
@@ -186,25 +172,22 @@ export function MarketingHome() {
   );
 }
 
-function HeroScreenshotWindow() {
+function HeroProductPreview() {
   return (
-    <div className="m-hero-window-stack">
-      <AppWindow
-        title="Northline Logistics — Jobs"
-        inset
-        className="m-hero-window-front"
-      >
-        <div className="overflow-hidden rounded-md border border-[var(--m-line)]">
-          <Image
-            src="/marketing/jobs-list.png"
-            alt="Jobs list with status filters and load windows"
-            width={1200}
-            height={750}
-            className="h-auto w-full"
-            priority
-          />
-        </div>
-      </AppWindow>
-    </div>
+    <figure className="m-product-preview">
+      <figcaption className="flex items-center justify-between gap-4 border-b border-[var(--m-line)] px-4 py-3 text-xs text-[var(--m-muted)]">
+        <span className="font-semibold text-[var(--m-fg)]">Northline Logistics</span>
+        <span>Sample workspace</span>
+      </figcaption>
+      <Image
+        src="/marketing/jobs-list.png"
+        alt="Northline Logistics jobs list showing statuses and load windows"
+        width={1200}
+        height={750}
+        className="h-auto w-full"
+        sizes="(min-width: 1024px) 560px, (min-width: 900px) 50vw, 100vw"
+        priority
+      />
+    </figure>
   );
 }

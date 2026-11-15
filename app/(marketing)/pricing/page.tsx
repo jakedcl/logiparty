@@ -5,7 +5,7 @@ import { marketingMetadata } from "@/lib/marketing/metadata";
 export const metadata = marketingMetadata({
   title: "Pricing — Logiparty",
   description:
-    "Logiparty is invite-only early access. We quote per 3PL based on team size, job volume, and portal scope — not self-serve checkout.",
+    "Early-access pricing scoped to your team, job volume, and client portal. Talk through your operation and onboarding with us.",
   path: "/pricing",
 });
 
@@ -16,8 +16,8 @@ const INCLUDED = [
   "Staff dashboard — jobs, inventory, fleet, crew, notifications, reports",
   "White-label client portal with your logo and primary color",
   "Inventory and fleet locks on live jobs",
-  "Document storage with signed URLs",
-  "Activity history, Cmd-K search, quotes and invoices scaffolding",
+  "Private job documents and time-limited download links",
+  "Activity history, search, and CSV reporting",
 ] as const;
 
 const ONBOARDING = [
@@ -34,9 +34,9 @@ export default function PricingPage() {
         Quoted for your operation
       </h1>
       <p className="mt-3 text-sm leading-relaxed text-[var(--m-muted)]">
-        Logiparty is in early access. There is no public price table and no
-        self-serve signup — we scope each 3PL on a short call, then send a quote
-        for your team size, typical job volume, and portal needs.
+        Logiparty is in early access, with hands-on onboarding for each team.
+        Tell us about your team size, typical job volume, and client portal
+        needs. We’ll discuss the scope and send a quote before you commit.
       </p>
 
       <div className="mt-8 grid gap-6 sm:grid-cols-2">
@@ -65,9 +65,10 @@ export default function PricingPage() {
       </div>
 
       <p className="mt-8 text-sm leading-relaxed text-[var(--m-muted)]">
-        <span className="font-semibold text-[var(--m-fg)]">Billing:</span> Stripe
-        subscription plumbing exists in the codebase and is enabled when your
-        contract is signed — not before.
+        <span className="font-semibold text-[var(--m-fg)]">What happens next?</span>{" "}
+        We review your request, talk through your workflow, and agree on the
+        setup and price together. Requesting access does not start a subscription.
+        Quote and invoice requirements can be discussed during onboarding.
       </p>
 
       <div className="mt-10 flex flex-wrap gap-3">
@@ -75,7 +76,7 @@ export default function PricingPage() {
           Request access
         </Link>
         <Link href="/demo" className="m-nav-link text-sm">
-          Try the demo
+          Take the guided tour
         </Link>
         <Link href="/#faq" className="m-nav-link text-sm">
           Read FAQ

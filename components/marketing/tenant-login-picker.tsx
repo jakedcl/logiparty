@@ -26,7 +26,7 @@ export function TenantLoginPicker() {
     >
       <div>
         <label htmlFor="org-slug" className="app-label mb-1.5 block">
-          Organization slug
+          Workspace name
         </label>
         <div className="flex gap-2">
           <input
@@ -34,20 +34,19 @@ export function TenantLoginPicker() {
             name="org-slug"
             type="text"
             autoComplete="organization"
-            placeholder="your-org"
+            placeholder="your-company"
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
             className="lp-input min-w-0 flex-1"
+            required
+            aria-describedby="workspace-hint"
           />
           <span className="hidden self-center text-xs text-[var(--muted)] sm:inline">
             .logiparty.com
           </span>
         </div>
-        <p className="mt-2 text-xs text-[var(--muted)]">
-          Local dev: use{" "}
-          <code className="rounded bg-[var(--surface-hover)] px-1">
-            your-org.localhost:3000
-          </code>
+        <p id="workspace-hint" className="mt-2 text-xs text-[var(--muted)]">
+          Use the name before .logiparty.com in your invitation. Need help? Email hello@logiparty.com.
         </p>
       </div>
       <Button type="submit" className="w-full py-2.5">
