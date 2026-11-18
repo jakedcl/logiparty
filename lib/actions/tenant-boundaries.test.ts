@@ -48,6 +48,9 @@ function loadActions(
     "@/lib/auth/permissions": permissions,
     "@/lib/db/schema": schema,
     "@/lib/commercial/money": money,
+    "@/lib/commercial/apply-payment": {
+      applyInvoicePayment: async () => { throw queryReached; },
+    },
     "@/lib/org/context": {
       requireSession: async () => {
         if (!user) throw new Error("Unauthorized");

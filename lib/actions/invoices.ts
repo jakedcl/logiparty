@@ -11,12 +11,12 @@ import {
   lineTotalFromQtyPrice,
   parseDollarsToCents,
 } from "@/lib/commercial/money";
+import { applyInvoicePayment } from "@/lib/commercial/apply-payment";
 import { formatDocumentNumber } from "@/lib/commercial/numbering";
 import { clientOnlyActor, withOrgQueries, withOrgQuery } from "@/lib/db";
 import {
   clientCompanies,
   invoiceLines,
-  invoicePayments,
   invoices,
   jobs,
   organizations,
@@ -473,23 +473,13 @@ export async function recordManualPayment(
   const session = await requireCommercial();
   if (session.user.orgId !== orgId) throw new Error("Forbidden");
   const amountCents = parseDollarsToCents(String(formData.get("amount") ?? "0"));
-  await withOrgQueries(orgId, (database) => [
-    database.insert(invoicePayments).values({
-      orgId,
-      invoiceId,
-      amountCents,
-      method: "other",
-      recordedByUserId: session.user.id,
-    }),
-    database
-      .update(invoices)
-      .set({
-        amountPaidCents: sql`${invoices.amountPaidCents} + ${amountCents}`,
-        status: "paid",
-        paidAt: new Date(),
-      })
-      .where(eq(invoices.id, invoiceId)),
-  ]);
+  await applyInvoicePayment({
+    orgId,
+    invoiceId,
+    amountCents,
+    method: "other",
+    recordedByUserId: session.user.id,
+  });
   revalidatePath(`/dashboard/invoices/${invoiceId}`);
 }
 
