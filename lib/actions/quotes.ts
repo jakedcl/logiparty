@@ -15,7 +15,7 @@ import {
   lineTotalFromQtyPrice,
   parseDollarsToCents,
 } from "@/lib/commercial/money";
-import { formatDocumentNumber } from "@/lib/commercial/numbering";
+import { allocateDocumentNumber } from "@/lib/commercial/allocate-number";
 import { clientOnlyActor, db, withOrgQueries, withOrgQuery } from "@/lib/db";
 import {
   clientCompanies,
@@ -320,17 +320,9 @@ export async function createQuote(orgId: string, formData: FormData) {
   if (!title) throw new Error("Title is required");
   if (!clientCompanyId) throw new Error("Client is required");
 
-  const org = await loadOrgCommercial(orgId);
-  const quoteNumber = formatDocumentNumber(
-    org.quotePrefix,
-    org.nextQuoteNumber
-  );
+  const quoteNumber = await allocateDocumentNumber(orgId, "quote");
 
   const results = await withOrgQueries(orgId, (database) => [
-    database
-      .update(organizations)
-      .set({ nextQuoteNumber: sql`${organizations.nextQuoteNumber} + 1` })
-      .where(eq(organizations.id, orgId)),
     database
       .insert(quotes)
       .values({
@@ -343,7 +335,7 @@ export async function createQuote(orgId: string, formData: FormData) {
       })
       .returning(),
   ]);
-  const created = (results[1] as Quote[])[0];
+  const created = (results[0] as Quote[])[0];
 
   redirect(`/dashboard/quotes/${created.id}`);
 }

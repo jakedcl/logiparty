@@ -11,7 +11,7 @@ import {
   lineTotalFromQtyPrice,
   parseDollarsToCents,
 } from "@/lib/commercial/money";
-import { formatDocumentNumber } from "@/lib/commercial/numbering";
+import { allocateDocumentNumber } from "@/lib/commercial/allocate-number";
 import { clientOnlyActor, withOrgQueries, withOrgQuery } from "@/lib/db";
 import {
   clientCompanies,
@@ -109,10 +109,6 @@ export async function createInvoiceFromJob(orgId: string, jobId: string) {
   const org = orgRows[0];
   if (!org) throw new Error("Org not found");
 
-  const invoiceNumber = formatDocumentNumber(
-    org.invoicePrefix,
-    org.nextInvoiceNumber
-  );
   const due = new Date();
   due.setDate(due.getDate() + org.paymentTermsDays);
 
@@ -152,15 +148,10 @@ export async function createInvoiceFromJob(orgId: string, jobId: string) {
     defaultTaxRateBps: org.defaultTaxRateBps,
   });
 
-  await withOrgQuery(orgId, (database) =>
-    database
-      .update(organizations)
-      .set({
-        nextInvoiceNumber: sql`${organizations.nextInvoiceNumber} + 1`,
-      })
-      .where(eq(organizations.id, orgId))
-  );
-  await withOrgQuery(orgId, (database) =>
+  // Allocate the number atomically, then write the invoice and its lines in a
+  // single transaction so a failure cannot leave an invoice without lines.
+  const invoiceNumber = await allocateDocumentNumber(orgId, "invoice");
+  await withOrgQueries(orgId, (database) => [
     database.insert(invoices).values({
       id: invoiceId,
       orgId,
@@ -174,13 +165,11 @@ export async function createInvoiceFromJob(orgId: string, jobId: string) {
       taxCents: totals.taxCents,
       totalCents: totals.totalCents,
       createdBy: session.user.id,
-    })
-  );
-  if (lineValues.length > 0) {
-    await withOrgQuery(orgId, (database) =>
-      database.insert(invoiceLines).values(lineValues)
-    );
-  }
+    }),
+    ...(lineValues.length > 0
+      ? [database.insert(invoiceLines).values(lineValues)]
+      : []),
+  ]);
 
   redirect(`/dashboard/invoices/${invoiceId}`);
 }
