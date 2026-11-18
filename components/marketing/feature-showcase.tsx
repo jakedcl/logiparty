@@ -5,22 +5,22 @@ export const MARKETING_FEATURES = [
     id: "job-detail",
     title: "One job. Every moving part.",
     body: "Loaded quantities, fleet assignments, and crew phases stay on the job — not in a side spreadsheet.",
-    image: "/marketing/job-detail.png",
-    alt: "Job detail with inventory, fleet, and crew assignments",
+    image: "/marketing/job-detail.webp",
+    alt: "Waterfront Festival job detail showing loaded inventory, fleet, and crew counts, with tabs for summary, locations, inventory, fleet, crew, and documents",
   },
   {
     id: "inventory",
     title: "Know which gear is committed.",
     body: "Client gear, your equipment, and fleet live in separate catalogs. Live jobs reserve client assets until load-out ends.",
-    image: "/marketing/inventory.png",
-    alt: "Client inventory catalog with quantities",
+    image: "/marketing/inventory.webp",
+    alt: "Client inventory catalog for Summit Brands listing SKUs, items, and quantities",
   },
   {
     id: "portal",
     title: "Your clients. Your brand.",
     body: "Clients request jobs, browse stored inventory, and upload docs on your subdomain with your logo.",
-    image: "/marketing/portal.png",
-    alt: "Client portal jobs list under Northline Logistics branding",
+    image: "/marketing/portal.webp",
+    alt: "Client portal under Northline Logistics branding listing Summit Brands jobs with draft, upcoming, ready, and completed statuses",
   },
 ] as const;
 
@@ -41,8 +41,8 @@ export function FeatureShowcase() {
             <Image
               src={feature.image}
               alt={feature.alt}
-              width={1440}
-              height={900}
+              width={1024}
+              height={640}
               className="h-auto w-full"
               sizes="(max-width: 768px) 100vw, 50vw"
             />
