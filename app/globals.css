@@ -868,7 +868,8 @@ body {
 .m-header {
   position: sticky;
   top: 0;
-  z-index: 10;
+  /* Must outrank page content (main is `relative z-10` and comes later in the DOM). */
+  z-index: 40;
   background: var(--m-header);
   border-bottom: 1px solid var(--m-line);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
