@@ -1,11 +1,11 @@
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import bcrypt from "bcryptjs";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { orgMemberships, organizations, users } from "@/lib/db/schema";
 import { authRedirectCallback } from "@/lib/auth/redirect";
 import { clearLoginAttempts, loginAllowed } from "@/lib/auth/rate-limit";
+import { verifyPassword } from "@/lib/auth/credentials";
 
 const isProd = process.env.NODE_ENV === "production";
 
@@ -28,22 +28,23 @@ export const authConfig = {
 
         if (!loginAllowed(orgSlug, email)) return null;
 
-        const [org] = await db
-          .select()
-          .from(organizations)
-          .where(eq(organizations.slug, orgSlug))
-          .limit(1);
-        if (!org) return null;
+        const [[org], [user]] = await Promise.all([
+          db
+            .select()
+            .from(organizations)
+            .where(eq(organizations.slug, orgSlug))
+            .limit(1),
+          db
+            .select()
+            .from(users)
+            .where(eq(users.email, email.toLowerCase()))
+            .limit(1),
+        ]);
 
-        const [user] = await db
-          .select()
-          .from(users)
-          .where(eq(users.email, email.toLowerCase()))
-          .limit(1);
-        if (!user?.passwordHash) return null;
-
-        const valid = await bcrypt.compare(password, user.passwordHash);
-        if (!valid) return null;
+        // Always pay for one bcrypt comparison, even for unknown orgs/users,
+        // so response time does not reveal which accounts exist.
+        const passwordOk = await verifyPassword(user?.passwordHash, password);
+        if (!org || !user || !passwordOk) return null;
 
         const [mem] = await db
           .select()
