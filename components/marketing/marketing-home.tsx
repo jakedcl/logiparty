@@ -180,10 +180,10 @@ function HeroProductPreview() {
         <span>Sample workspace</span>
       </figcaption>
       <Image
-        src="/marketing/jobs-list.png"
-        alt="Northline Logistics jobs list showing statuses and load windows"
-        width={1200}
-        height={750}
+        src="/marketing/dashboard.webp"
+        alt="Northline Logistics staff dashboard with active and ready job counts and a needs-attention list"
+        width={1024}
+        height={640}
         className="h-auto w-full"
         sizes="(min-width: 1024px) 560px, (min-width: 900px) 50vw, 100vw"
         priority

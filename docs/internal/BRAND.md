@@ -78,7 +78,7 @@ Public styling is scoped to marketing surfaces. Tenant `--primary` colors and da
 
 ## Imagery
 
-- **Product UI only** on marketing — screenshots or in-code mocks that match the real app (`components/marketing/product-mocks`, `public/marketing/*.png`). Source refreshes from `docs/internal/screenshots/` when UI changes.
+- **Product UI only** on marketing — real screenshots of the `northline` seed org (`public/marketing/*.webp`, 1024x640 viewport captured at 2x, light theme, no dev overlays). Retake them whenever the staff or portal UI changes; the old in-code mock components were removed.
 - **No stock people, no abstract 3D illustrations, no fake dashboards.**
 - **Alt text** describes what’s on screen (e.g. “Jobs list with status filters and load-out dates”).
 - **Tenant logos** in demos use seed assets only — never imply real customers.
