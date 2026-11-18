@@ -148,8 +148,8 @@ Details and remaining review findings: [SECURITY_PASS_2026-11-13.md](SECURITY_PA
 ### Cloudflare R2 (file uploads)
 - [x] Cloudflare MCP authenticated (account: **logiparty**, ID `6b261c181f1d1d1d46b7b88ef9522fb1`)
 - [x] **Enable R2** in dashboard (required first — API returns `10042 NotEntitled` until subscribed)
-- [x] Create R2 bucket `logiparty-docs`
-- [x] Create R2 API token (Object Read & Write, scoped to `logiparty-docs`)
+- [x] Create R2 bucket
+- [x] Create R2 API token (Object Read & Write, scoped to that bucket)
 - [x] Paste `R2_ACCESS_KEY_ID` + `R2_SECRET_ACCESS_KEY` into `.env.local` (account ID + bucket name already set)
 - [x] Test: upload a PDF from the client portal job detail page (automated smoke: portal upload UI enabled + `putJobObject` write/delete OK)
 - [x] Test: Mike sees the document on the internal job detail (`scripts/r2-morgan-smoke.ts`)
