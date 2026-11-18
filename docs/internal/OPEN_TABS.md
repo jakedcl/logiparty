@@ -30,14 +30,14 @@ Update this when you finish or start an item. Pick **one** active item before st
 | A1 | Jake tests job flow locally | Existing manual QA remains pending: `npx tsx scripts/golden-path-walk.ts` plus a production click-through after the security preview is verified. |
 | B1 | Prod smoke test + logo on login | Login + logo OK. Dashboard 500 fixed (env was on Neon `vercel-dev`). Remaining: full smoke after login |
 | B2 | First real paying customer | Jake tested app + A3 homepage live |
-| B4 | M6 (Stripe, self-serve signup, custom domains) | **Stripe scaffold done** (keys TBD). Remaining: Jake adds Stripe keys + webhook; self-serve signup + custom domains still later. Neon `main` + `vercel-dev` both have `0019`–`0022`. **2026-08-20:** Production `DATABASE_URL` was wrongly on `vercel-dev` (`ep-orange-cake…`); corrected to `main` pooler (`ep-red-surf…-pooler`) to match `DATABASE_URL_UNPOOLED`. |
+| B4 | M6 (Stripe, self-serve signup, custom domains) | **Stripe scaffold done** (keys TBD). Remaining: Jake adds Stripe keys + webhook; self-serve signup + custom domains still later. Neon `main` + `vercel-dev` both have `0019`–`0022`. **2026-08-20:** Production `DATABASE_URL` was wrongly on `vercel-dev`; corrected to `main` pooler (the pooler host) to match `DATABASE_URL_UNPOOLED`. |
 
 ---
 
 ## Done (reference — don't reopen unless broken)
 
 - [x] M0–M5 MVP built and merged
-- [x] R2 file uploads (bucket `logiparty-docs`)
+- [x] R2 file uploads (the R2 bucket)
 - [x] Domain `logiparty.com` on Vercel
 - [x] Wildcard `*.logiparty.com`
 - [x] Login subdomain fix (middleware `x-org-slug`)
@@ -46,7 +46,7 @@ Update this when you finish or start an item. Pick **one** active item before st
 - [x] Tools catalog deprecated → **Our inventory** (Option A)
 - [x] Cloudflare MCP connected
 - [x] **A2** Fix Vercel Production env + login redirect loop — Jake confirmed login works on prod (`test.logiparty.com`, 2026-08-20). Env checklist + `secureCookie: true` for `__Secure-authjs.session-token` in middleware.
-- [x] **A5** Neon `dev` branch — local `.env.local` `DATABASE_URL` → pooled `dev` (`ep-lucky-water-aphwec7q-pooler…`); Vercel Production stays on Neon `main`. Fork had schema + seed data; no reset of `main`. Only run `db:reset-seed` against `dev`.
+- [x] **A5** Neon `dev` branch — local `.env.local` `DATABASE_URL` → pooled `dev`; Vercel Production stays on Neon `main`. Fork had schema + seed data; no reset of `main`. Only run `db:reset-seed` against `dev`.
 - [x] Removed **`demo`** org from seed (and Devon / `admin@demo.test`). Seed creates **`nydac` + `test` + `axis`**. Reset still cleans legacy `demo` / acme + orphaned users.
 - [x] **A3** Marketing / leads homepage at apex `logiparty.com` — invite-only “Request access” form → `marketing_leads` (+ optional Resend notify). Tenant `{slug}.logiparty.com` unchanged. Follow-up: **A4** unknown subdomain → homepage.
 - [x] **A3b** Marketing homepage polish (2026-08-25) — problem → product → how it works → request; brand-first hero; enterprise-calm CSS (no fake logos). Files: `components/marketing/*`, `app/globals.css` marketing block, `app/page.tsx` metadata.
@@ -106,10 +106,10 @@ Update this when you finish or start an item. Pick **one** active item before st
 | **Local Northline** | http://northline.localhost:3000 (film seed · matches `/demo`) |
 | **Public demo** | http://localhost:3000/demo (works with or without `NEXT_PUBLIC_DEV_ORG_SLUG`) · prod `https://logiparty.com/demo` |
 | **Seed orgs** | `nydac` · `test` · `axis` · `northline` |
-| **NYDAC OrgAdmin** | `ed@test.test` / `password123` |
-| **NYDAC manager** | `mike@test.test` / `password123` |
-| **Test OrgAdmin** | `boss@playground.test` / `password123` |
-| **Axis OrgAdmin** | `jordan@axis.test` / `password123` |
+| **NYDAC OrgAdmin** | `ed@test.test` / seed password |
+| **NYDAC manager** | `mike@test.test` / seed password |
+| **Test OrgAdmin** | `boss@playground.test` / seed password |
+| **Axis OrgAdmin** | `jordan@axis.test` / seed password |
 | **Jake admin** | the admin account (your password) — linked to **nydac** |
 | **AUTH_URL (correct)** | `https://logiparty.com` |
 | **NEXT_PUBLIC_ROOT_DOMAIN** | `logiparty.com` |
@@ -117,7 +117,7 @@ Update this when you finish or start an item. Pick **one** active item before st
 | **Do NOT set in prod** | `NEXT_PUBLIC_DEV_ORG_SLUG`, `ALLOW_DEV_ROLE_SWITCH` |
 | **Neon branches** | Production = **`main`**; local = **`dev`** (never reset-seed on main) |
 
-### Seed cheat sheet (Neon `dev` — password `password123`)
+### Seed cheat sheet (Neon `dev` — shared seed password, see `lib/db/seed.ts`)
 
 | Org | Local host | OrgAdmin | Manager | Client POC |
 |-----|------------|----------|---------|------------|
@@ -136,7 +136,7 @@ Update this when you finish or start an item. Pick **one** active item before st
 | ready | Red Bull Brooklyn Mirage · Gotham Glow Fashion Week |
 | completed | Red Bull Pier 17 Wrap |
 
-Extra portal logins (still `password123`): `sara@monster.nydac.test`, `maya@gothamglow.test`. Dev panel client button stays Michaela (Red Bull).
+Extra portal logins (same seed password): `sara@monster.nydac.test`, `maya@gothamglow.test`. Dev panel client button stays Michaela (Red Bull).
 
 ---
 

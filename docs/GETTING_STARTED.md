@@ -7,7 +7,7 @@ One page to go from zero → local dev → production. Read this first.
 ## Quick start (local)
 
 ```bash
-cd /Users/jakedcl/Dev/logiparty
+cd logiparty
 npm install
 npm run db:migrate:sql   # first time only
 npm run db:seed          # nydac + test + axis orgs + golden-path users
@@ -25,7 +25,7 @@ Add to `/etc/hosts` if you haven't:
 Copy `.env.example` → `.env.local` and fill `DATABASE_URL`, `AUTH_SECRET`, etc.
 Set `NEXT_PUBLIC_DEV_ORG_SLUG=nydac` as the primary local tenant (or leave unset and use `*.localhost`).
 
-### Test logins (password `password123`)
+### Test logins (shared seed password: see `lib/db/seed.ts`)
 
 **NYDAC** — New York Design and Construction (`http://nydac.localhost:3000`)
 
@@ -66,7 +66,7 @@ NYDAC also has a **rich warehouse seed** (multi-client inventory, fleet, 6 jobs 
 
 Emails are **globally unique** — do not reuse cast emails across orgs.
 
-**The admin account** is linked as NYDAC org admin on the current database. Use your existing password (not `password123`). Re-run anytime:
+**The admin account** is linked as NYDAC org admin on the current database. Use your existing password (not the seed password). Re-run anytime:
 
 ```bash
 npm run db:relink-admin
@@ -111,8 +111,8 @@ If you ran `npm run db:reset-seed -- --confirm` earlier:
 
 | Env | Neon branch | Where `DATABASE_URL` lives |
 |-----|-------------|----------------------------|
-| **Local** | `dev` (pooled host `ep-lucky-water-aphwec7q-pooler…`) | `.env.local` only — never commit |
-| **Production** | `main` (pooled host `ep-red-surf-apcicxpa-pooler…`) | Vercel **Production** env only |
+| **Local** | `dev` (pooled connection string) | `.env.local` only — never commit |
+| **Production** | `main` (pooled connection string) | Vercel **Production** env only |
 
 Done (A5, 2026-08-20): Neon project **logiparty** has branch `dev` forked from `main`. Local `.env.local` points at `dev`. Vercel Production stays on `main`.
 

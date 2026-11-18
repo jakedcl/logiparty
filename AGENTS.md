@@ -3,7 +3,7 @@
 Multi-tenant SaaS for 3PL companies (warehouse, fleet, crew for events and deliveries). Each org gets a subdomain workspace plus a white-label client portal. Live: logiparty.com (demo tenant: test.logiparty.com).
 
 ## Stack (from package.json)
-Next.js ^15.5 App Router, React ^19.2, Tailwind 4, shadcn/ui (cva, tailwind-merge), NextAuth 5 beta (JWT credentials), Drizzle ORM ^0.45 on Neon Postgres with RLS, Cloudflare R2 (AWS S3 SDK), Resend (HTTP API), Stripe (scaffolded, off without keys), zod 4. Deployed on Vercel.
+Next.js ^16.4 App Router, React ^19.3, Tailwind 4, shadcn/ui (cva, tailwind-merge), NextAuth 5 beta (JWT credentials), Drizzle ORM ^0.45 on Neon Postgres with RLS, Cloudflare R2 (AWS S3 SDK), Resend (HTTP API), Stripe (scaffolded, off without keys), zod 4. Deployed on Vercel.
 
 ## Layout
 - `app/` marketing site, `dashboard/` (staff), `portal/` (clients), `demo/`, `api/`, `(auth)`, `invite/`
