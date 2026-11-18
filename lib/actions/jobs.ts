@@ -8,6 +8,7 @@ import { activityLogInsert } from "@/lib/activity/log";
 import { notifyClientCompanyUsers } from "@/lib/email/notify";
 import { canManageJobs } from "@/lib/auth/permissions";
 import { db, withOrgQueries, withOrgQuery } from "@/lib/db";
+import { assertJobCanHoldLocks, startsHoldingLocks } from "@/lib/jobs/activation";
 import { maybePromoteJobToReady } from "@/lib/jobs/auto-ready";
 import {
   clientCompanies,
@@ -186,6 +187,14 @@ export async function updateJob(formData: FormData) {
 
   const fields = jobFieldsFromForm(formData);
 
+  // Draft/denied/completed jobs hold no locks, so availability must be
+  // re-checked at the moment a job starts holding them.
+  const current = await getJob(session.user.orgId, id);
+  if (!current) throw new Error("Job not found");
+  if (startsHoldingLocks(current.status, fields.status)) {
+    await assertJobCanHoldLocks({ orgId: session.user.orgId, jobId: id });
+  }
+
   await withOrgQueries(session.user.orgId, (database) => [
     database
       .update(jobs)
@@ -228,6 +237,8 @@ export async function acceptDraftJob(formData: FormData) {
   if (job.status !== "draft") {
     throw new Error("Only draft requests can be accepted");
   }
+
+  await assertJobCanHoldLocks({ orgId: session.user.orgId, jobId: id });
 
   await withOrgQueries(session.user.orgId, (database) => [
     database
