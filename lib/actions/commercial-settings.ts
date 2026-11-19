@@ -1,12 +1,10 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { findOrganization, updateOrganization } from "@/lib/org/organization";
 import { revalidatePath } from "next/cache";
 import {
   canManageCommercialSettings,
 } from "@/lib/auth/permissions";
-import { withOrgQuery } from "@/lib/db";
-import { organizations } from "@/lib/db/schema";
 import { requireSession } from "@/lib/org/context";
 
 async function requireOrgAdmin(orgId: string) {
@@ -31,16 +29,7 @@ export async function getOrgCommercialSettings(
   orgId: string
 ): Promise<OrgCommercialSettings | null> {
   await requireOrgAdmin(orgId);
-  const rows = await withOrgQuery<(typeof organizations.$inferSelect)[]>(
-    orgId,
-    (database) =>
-      database
-        .select()
-        .from(organizations)
-        .where(eq(organizations.id, orgId))
-        .limit(1)
-  );
-  const org = rows[0];
+  const org = await findOrganization(orgId);
   if (!org) return null;
   return {
     quotePrefix: org.quotePrefix,
@@ -81,21 +70,16 @@ export async function updateOrgCommercialSettings(
   const invoiceFooterText =
     String(formData.get("invoiceFooterText") ?? "").trim() || null;
 
-  await withOrgQuery(orgId, (database) =>
-    database
-      .update(organizations)
-      .set({
-        quotePrefix,
-        invoicePrefix,
-        defaultTaxRateBps,
-        taxLabel,
-        taxId,
-        paymentTermsDays,
-        quoteValidDays,
-        invoiceFooterText,
-      })
-      .where(eq(organizations.id, orgId))
-  );
+  await updateOrganization(orgId, {
+    quotePrefix,
+    invoicePrefix,
+    defaultTaxRateBps,
+    taxLabel,
+    taxId,
+    paymentTermsDays,
+    quoteValidDays,
+    invoiceFooterText,
+  });
 
   revalidatePath("/dashboard/settings/commercial");
 }
