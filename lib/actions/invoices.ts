@@ -1,6 +1,6 @@
 "use server";
 
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { activityLogInsert } from "@/lib/activity/log";
@@ -12,14 +12,14 @@ import {
   parseDollarsToCents,
 } from "@/lib/commercial/money";
 import { applyInvoicePayment } from "@/lib/commercial/apply-payment";
-import { formatDocumentNumber } from "@/lib/commercial/numbering";
+import { allocateDocumentNumber } from "@/lib/commercial/allocate-number";
+import { loadOrganization } from "@/lib/org/organization";
 import { clientOnlyActor, withOrgQueries, withOrgQuery } from "@/lib/db";
 import {
   clientCompanies,
   invoiceLines,
   invoices,
   jobs,
-  organizations,
   quoteLines,
   type Invoice,
   type InvoiceLine,
@@ -97,22 +97,10 @@ export async function createInvoiceFromJob(orgId: string, jobId: string) {
   );
   if (!job) throw new Error("Job not found");
 
-  const orgRows = await withOrgQuery<(typeof organizations.$inferSelect)[]>(
-    orgId,
-    (database) =>
-      database
-        .select()
-        .from(organizations)
-        .where(eq(organizations.id, orgId))
-        .limit(1)
-  );
+  const orgRows = [await loadOrganization(orgId)];
   const org = orgRows[0];
   if (!org) throw new Error("Org not found");
 
-  const invoiceNumber = formatDocumentNumber(
-    org.invoicePrefix,
-    org.nextInvoiceNumber
-  );
   const due = new Date();
   due.setDate(due.getDate() + org.paymentTermsDays);
 
@@ -152,15 +140,10 @@ export async function createInvoiceFromJob(orgId: string, jobId: string) {
     defaultTaxRateBps: org.defaultTaxRateBps,
   });
 
-  await withOrgQuery(orgId, (database) =>
-    database
-      .update(organizations)
-      .set({
-        nextInvoiceNumber: sql`${organizations.nextInvoiceNumber} + 1`,
-      })
-      .where(eq(organizations.id, orgId))
-  );
-  await withOrgQuery(orgId, (database) =>
+  // Allocate the number atomically, then write the invoice and its lines in a
+  // single transaction so a failure cannot leave an invoice without lines.
+  const invoiceNumber = await allocateDocumentNumber(orgId, "invoice");
+  await withOrgQueries(orgId, (database) => [
     database.insert(invoices).values({
       id: invoiceId,
       orgId,
@@ -174,13 +157,11 @@ export async function createInvoiceFromJob(orgId: string, jobId: string) {
       taxCents: totals.taxCents,
       totalCents: totals.totalCents,
       createdBy: session.user.id,
-    })
-  );
-  if (lineValues.length > 0) {
-    await withOrgQuery(orgId, (database) =>
-      database.insert(invoiceLines).values(lineValues)
-    );
-  }
+    }),
+    ...(lineValues.length > 0
+      ? [database.insert(invoiceLines).values(lineValues)]
+      : []),
+  ]);
 
   redirect(`/dashboard/invoices/${invoiceId}`);
 }
@@ -217,15 +198,7 @@ export async function addInvoiceLine(
 }
 
 async function recalcInvoice(orgId: string, invoiceId: string) {
-  const orgRows = await withOrgQuery<(typeof organizations.$inferSelect)[]>(
-    orgId,
-    (database) =>
-      database
-        .select()
-        .from(organizations)
-        .where(eq(organizations.id, orgId))
-        .limit(1)
-  );
+  const orgRows = [await loadOrganization(orgId)];
   const org = orgRows[0]!;
   const lines = await withOrgQuery<(typeof invoiceLines.$inferSelect)[]>(
     orgId,
@@ -273,15 +246,7 @@ export async function sendInvoice(orgId: string, invoiceId: string) {
   const invoice = invoiceRows[0];
   if (!invoice) throw new Error("Invoice not found");
 
-  const orgRows = await withOrgQuery<(typeof organizations.$inferSelect)[]>(
-    orgId,
-    (database) =>
-      database
-        .select()
-        .from(organizations)
-        .where(eq(organizations.id, orgId))
-        .limit(1)
-  );
+  const orgRows = [await loadOrganization(orgId)];
   const org = orgRows[0]!;
 
   const companyRows = await withOrgQuery<{ name: string }[]>(orgId, (database) =>

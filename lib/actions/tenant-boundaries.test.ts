@@ -48,6 +48,14 @@ function loadActions(
     "@/lib/auth/permissions": permissions,
     "@/lib/db/schema": schema,
     "@/lib/commercial/money": money,
+    "@/lib/commercial/allocate-number": {
+      allocateDocumentNumber: async () => { throw queryReached; },
+    },
+    "@/lib/org/organization": {
+      findOrganization: async () => { throw queryReached; },
+      loadOrganization: async () => { throw queryReached; },
+      updateOrganization: async () => { throw queryReached; },
+    },
     "@/lib/commercial/apply-payment": {
       applyInvoicePayment: async () => { throw queryReached; },
     },
